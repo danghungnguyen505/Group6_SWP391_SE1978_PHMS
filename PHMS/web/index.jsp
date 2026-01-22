@@ -12,6 +12,16 @@
     </head>
     <body>
         <h1>Welcome to Pet Hospital Management System</h1>
-        <a href="login.jsp">Login Here</a>
+        <a href="home">Trang chủ</a>
+        <br>
+        <a href="login">Đăng nhập</a>
+        <br>
+        <a href="register">Đăng ký</a>
+        <br>
+        <a href="forgot-password">Quên mật khẩu</a>
+        <br>
+        <a href="change-password">Đổi mật khẩu</a>
+        <br>
+        <a href="profile">Profile</a>
     </body>
 </html>
