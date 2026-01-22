@@ -25,7 +25,7 @@ public class AppointmentController extends HttpServlet {
         }
 
         AppointmentDAO appointmentDAO = new AppointmentDAO();
-        request.setAttribute("appointments", appointmentDAO.getAppointmentsByOwnerId(account.getId()));
+        request.setAttribute("appointments", appointmentDAO.getAppointmentsByOwnerId(account.getUserId()));
         
         String success = request.getParameter("success");
         if (success != null) {

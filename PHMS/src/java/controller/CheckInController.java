@@ -32,7 +32,7 @@ public class CheckInController extends HttpServlet {
             request.setAttribute("appointments", appointmentDAO.getTodayAppointmentsForVet(0)); // 0 means all
         } else if (role.equalsIgnoreCase("Veterinarian")) {
             // Veterinarian sees only their appointments
-            request.setAttribute("appointments", appointmentDAO.getTodayAppointmentsForVet(account.getId()));
+            request.setAttribute("appointments", appointmentDAO.getTodayAppointmentsForVet(account.getUserId()));
         } else {
             response.sendRedirect(request.getContextPath() + "/login");
             return;

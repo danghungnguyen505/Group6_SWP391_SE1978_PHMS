@@ -1,5 +1,3 @@
-package model;
-
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
@@ -16,11 +14,6 @@ public class Service {
     private double basePrice;
     private String description;
     private boolean isActive;
-
-    public Service() {
-    }
-
-    public Service(int serviceId, String name, double basePrice, String description, boolean isActive) {
     private int manageBy;
     
     public Service() {

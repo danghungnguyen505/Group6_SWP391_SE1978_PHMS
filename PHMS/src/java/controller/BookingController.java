@@ -41,7 +41,7 @@ public class BookingController extends HttpServlet {
         VeterinarianDAO vetDAO = new VeterinarianDAO();
         ScheduleDAO scheduleDAO = new ScheduleDAO();
 
-        System.out.println("BookingController - User ID: " + account.getId() + ", Role: " + account.getRole());
+        System.out.println("BookingController - User ID: " + account.getUserId() + ", Role: " + account.getRole());
 
         // Get date parameter or use today
         String dateParam = request.getParameter("date");
@@ -57,7 +57,7 @@ public class BookingController extends HttpServlet {
             selectedDate = new Date(cal.getTimeInMillis());
         }
 
-        java.util.List<model.Pet> pets = petDAO.getPetsByOwnerId(account.getId());
+        java.util.List<model.Pet> pets = petDAO.getPetsByOwnerId(account.getUserId());
         System.out.println("BookingController - Number of pets: " + pets.size());
         request.setAttribute("pets", pets);
         request.setAttribute("services", serviceDAO.getAllActiveServices());

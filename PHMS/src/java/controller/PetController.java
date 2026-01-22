@@ -9,7 +9,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
-import model.Pet;
 import model.User;
 
 @WebServlet(name = "PetController", urlPatterns = {"/my-pets"})
@@ -27,8 +26,8 @@ public class PetController extends HttpServlet {
         }
 
         PetDAO petDAO = new PetDAO();
-        System.out.println("PetController - User ID: " + account.getId() + ", Role: " + account.getRole());
-        List<model.Pet> pets = petDAO.getPetsByOwnerId(account.getId());
+        System.out.println("PetController - User ID: " + account.getUserId() + ", Role: " + account.getRole());
+        List<model.Pet> pets = petDAO.getPetsByOwnerId(account.getUserId());
         System.out.println("PetController - Number of pets retrieved: " + pets.size());
         request.setAttribute("pets", pets);
 
@@ -58,7 +57,7 @@ public class PetController extends HttpServlet {
                 request.setAttribute("error", "Vui lòng điền đầy đủ thông tin (Tên và Loài là bắt buộc)!");
             } else {
                 try {
-                    int petId = petDAO.createPet(account.getId(), name.trim(), species.trim(), 
+                    int petId = petDAO.createPet(account.getUserId(), name.trim(), species.trim(), 
                             historySummary != null ? historySummary.trim() : "");
                     if (petId > 0) {
                         request.setAttribute("success", "Thêm thú cưng thành công! ID: " + petId);
@@ -90,7 +89,7 @@ public class PetController extends HttpServlet {
             }
         } else if ("delete".equals(action)) {
             int petId = Integer.parseInt(request.getParameter("petId"));
-            boolean success = petDAO.deletePet(petId, account.getId());
+            boolean success = petDAO.deletePet(petId, account.getUserId());
             if (success) {
                 request.setAttribute("success", "Xóa thú cưng thành công!");
             } else {

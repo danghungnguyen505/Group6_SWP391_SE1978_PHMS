@@ -1,44 +1,3 @@
-package model;
-
-public class User {
-    // 1. Khai báo các thuộc tính giống hệt các cột trong bảng Users
-    private int id;             // user_id
-    private String username;    // username
-    private String password;    // password
-    private String fullName;    // full_name
-    private String phone;       // phone
-    private String role;        // role
-
-    // 2. Constructor
-    public User() {
-    }
-
-    // 3. Constructor đầy đủ tham số (Dùng khi lấy dữ liệu từ DB lên)
-    public User(int id, String username, String password, String fullName, String phone, String role) {
-        this.id = id;
-        this.username = username;
-        this.password = password;
-        this.fullName = fullName;
-        this.phone = phone;
-        this.role = role;
-    }
-    
-    // 4. Constructor thiếu ID (Dùng khi tạo User mới để Insert vào DB - vì ID tự tăng)
-    public User(String username, String password, String fullName, String phone, String role) {
-        this.username = username;
-        this.password = password;
-        this.fullName = fullName;
-        this.phone = phone;
-        this.role = role;
-    }
-
-    // 5. Getters và Setters để JSP và Servlet truy xuất dữ liệu
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
@@ -121,19 +80,6 @@ public class User {
         this.phone = phone;
     }
 
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    // 6. Hàm toString() Giúp in thông tin đối tượng ra console
-    @Override
-    public String toString() {
-        return "User{" + "id=" + id + ", username=" + username + ", role=" + role + '}';
-    }
     public String getEmail() {
         return email;
     }
