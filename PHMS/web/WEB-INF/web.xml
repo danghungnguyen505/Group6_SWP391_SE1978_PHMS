@@ -35,4 +35,22 @@
         <servlet-name>CheckInController</servlet-name>
         <url-pattern>/checkin</url-pattern>
     </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>ReceptionistController</servlet-name>
+        <servlet-class>controller.ReceptionistController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ReceptionistController</servlet-name>
+        <url-pattern>/recep-appointments</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>PetController</servlet-name>
+        <servlet-class>controller.PetController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PetController</servlet-name>
+        <url-pattern>/my-pets</url-pattern>
+    </servlet-mapping>
 </web-app>

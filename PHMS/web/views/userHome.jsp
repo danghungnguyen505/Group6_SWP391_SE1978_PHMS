@@ -73,6 +73,11 @@
                             Lịch Hẹn Của Tôi
                         </a>
                     </li>
+                    <li style="margin: 10px 0;">
+                        <a href="${pageContext.request.contextPath}/my-pets" style="display: inline-block; padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 4px;">
+                            Thú Cưng Của Tôi
+                        </a>
+                    </li>
                 </ul>
             </div>
             

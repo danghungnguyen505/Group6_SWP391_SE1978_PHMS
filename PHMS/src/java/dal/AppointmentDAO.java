@@ -13,7 +13,12 @@ import model.Appointment;
 public class AppointmentDAO extends DBContext {
 
     public int createAppointment(int petId, int vetId, Timestamp startTime, String type, int serviceId) {
-        String sql = "INSERT INTO Appointment (pet_id, vet_id, start_time, status, type, created_at) VALUES (?, ?, ?, 'Pending Payment', ?, GETDATE())";
+        if (connection == null) {
+            System.out.println("Lỗi createAppointment: Database connection is null!");
+            return -1;
+        }
+        
+        String sql = "INSERT INTO Appointment (pet_id, vet_id, start_time, status, type, created_at) VALUES (?, ?, ?, 'Pending Confirmation', ?, GETDATE())";
         PreparedStatement st = null;
         ResultSet rs = null;
         try {
@@ -22,18 +27,35 @@ public class AppointmentDAO extends DBContext {
             st.setInt(2, vetId);
             st.setTimestamp(3, startTime);
             st.setString(4, type);
+            
+            System.out.println("Executing SQL: " + sql);
+            System.out.println("Parameters: petId=" + petId + ", vetId=" + vetId + ", startTime=" + startTime + ", type=" + type);
+            
             int result = st.executeUpdate();
+            System.out.println("Execute update result: " + result);
+            
             if (result > 0) {
                 rs = st.getGeneratedKeys();
-                if (rs.next()) {
-                    int apptId = rs.getInt(1);
-                    // Store service_id in a separate table or add to Appointment table
-                    // For now, we'll add it to a junction table or extend Appointment
+                if (rs != null && rs.next()) {
+                    // Try to get by column name first, then by index
+                    int apptId;
+                    try {
+                        apptId = rs.getInt("appt_id");
+                    } catch (SQLException e) {
+                        apptId = rs.getInt(1);
+                    }
+                    System.out.println("Created appointment with ID: " + apptId);
                     return apptId;
+                } else {
+                    System.out.println("Warning: No generated keys returned!");
                 }
+            } else {
+                System.out.println("Warning: No rows affected!");
             }
         } catch (SQLException e) {
             System.out.println("Lỗi createAppointment: " + e.getMessage());
+            System.out.println("SQL State: " + e.getSQLState());
+            System.out.println("Error Code: " + e.getErrorCode());
             e.printStackTrace();
         } finally {
             try {
@@ -124,7 +146,7 @@ public class AppointmentDAO extends DBContext {
                     + "INNER JOIN Employee e ON v.emp_id = e.user_id "
                     + "INNER JOIN Users u ON e.user_id = u.user_id "
                     + "WHERE CAST(a.start_time AS DATE) = CAST(GETDATE() AS DATE) "
-                    + "AND a.status IN ('Confirmed', 'Pending Payment') "
+                    + "AND a.status IN ('Confirmed', 'Pending Confirmation') "
                     + "ORDER BY a.start_time ASC";
         } else {
             sql = "SELECT a.appt_id, a.pet_id, a.vet_id, a.start_time, a.status, a.type, "
@@ -193,7 +215,7 @@ public class AppointmentDAO extends DBContext {
                 + "INNER JOIN Employee e ON v.emp_id = e.user_id "
                 + "INNER JOIN Users u ON e.user_id = u.user_id "
                 + "WHERE CAST(a.start_time AS DATE) = ? "
-                + "AND a.status IN ('Confirmed', 'Pending Payment')";
+                + "AND a.status IN ('Confirmed', 'Pending Confirmation')";
         PreparedStatement st = null;
         ResultSet rs = null;
         try {
@@ -233,7 +255,7 @@ public class AppointmentDAO extends DBContext {
 
         String sql = "SELECT appt_id, pet_id, vet_id, start_time, status, type "
                 + "FROM Appointment "
-                + "WHERE status = 'Pending Payment' "
+                + "WHERE status IN ('Pending Payment', 'Pending Confirmation') "
                 + "AND created_at IS NOT NULL "
                 + "AND GETDATE() > DATEADD(MINUTE, 15, created_at)";
         PreparedStatement st = null;
@@ -266,20 +288,36 @@ public class AppointmentDAO extends DBContext {
     }
 
     public boolean isTimeSlotAvailable(int vetId, Timestamp startTime) {
+        if (connection == null) {
+            System.out.println("Lỗi isTimeSlotAvailable: Database connection is null!");
+            return false;
+        }
+        
+        // Check by hour only (ignore minutes and seconds)
         String sql = "SELECT COUNT(*) as count FROM Appointment "
-                + "WHERE vet_id = ? AND start_time = ? AND status NOT IN ('Cancelled', 'Completed')";
+                + "WHERE vet_id = ? "
+                + "AND CAST(start_time AS DATE) = CAST(? AS DATE) "
+                + "AND DATEPART(HOUR, start_time) = DATEPART(HOUR, ?) "
+                + "AND status NOT IN ('Cancelled', 'Completed')";
         PreparedStatement st = null;
         ResultSet rs = null;
         try {
+            System.out.println("Checking time slot availability - vetId: " + vetId + ", startTime: " + startTime);
             st = connection.prepareStatement(sql);
             st.setInt(1, vetId);
             st.setTimestamp(2, startTime);
+            st.setTimestamp(3, startTime);
             rs = st.executeQuery();
             if (rs.next()) {
-                return rs.getInt("count") == 0;
+                int count = rs.getInt("count");
+                System.out.println("Time slot count: " + count);
+                boolean available = count == 0;
+                System.out.println("Time slot available: " + available);
+                return available;
             }
         } catch (SQLException e) {
             System.out.println("Lỗi isTimeSlotAvailable: " + e.getMessage());
+            System.out.println("SQL State: " + e.getSQLState());
             e.printStackTrace();
         } finally {
             try {
@@ -290,5 +328,128 @@ public class AppointmentDAO extends DBContext {
             }
         }
         return false;
+    }
+    
+    public boolean deleteAppointment(int apptId) {
+        if (connection == null) {
+            System.out.println("Lỗi deleteAppointment: Database connection is null!");
+            return false;
+        }
+        
+        String sql = "DELETE FROM Appointment WHERE appt_id = ?";
+        PreparedStatement st = null;
+        try {
+            System.out.println("Deleting appointment ID: " + apptId);
+            st = connection.prepareStatement(sql);
+            st.setInt(1, apptId);
+            int result = st.executeUpdate();
+            System.out.println("Delete result: " + result);
+            return result > 0;
+        } catch (SQLException e) {
+            System.out.println("Lỗi deleteAppointment: " + e.getMessage());
+            System.out.println("SQL State: " + e.getSQLState());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (st != null) st.close();
+            } catch (SQLException e) {
+                System.out.println("Lỗi khi đóng tài nguyên: " + e.getMessage());
+            }
+        }
+        return false;
+    }
+
+    public List<Appointment> getCompletedAppointments() {
+        List<Appointment> appointments = new ArrayList<>();
+        if (connection == null) {
+            System.out.println("Lỗi getCompletedAppointments: Database connection is null!");
+            return appointments;
+        }
+        
+        String sql = "SELECT a.appt_id, a.pet_id, a.vet_id, a.start_time, a.status, a.type, "
+                + "p.name as pet_name, u.full_name as vet_name "
+                + "FROM Appointment a "
+                + "INNER JOIN Pet p ON a.pet_id = p.pet_id "
+                + "INNER JOIN Veterinarian v ON a.vet_id = v.emp_id "
+                + "INNER JOIN Employee e ON v.emp_id = e.user_id "
+                + "INNER JOIN Users u ON e.user_id = u.user_id "
+                + "WHERE a.status = 'Completed' "
+                + "ORDER BY a.start_time DESC";
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        try {
+            st = connection.prepareStatement(sql);
+            rs = st.executeQuery();
+            while (rs.next()) {
+                Appointment appt = new Appointment();
+                appt.setApptId(rs.getInt("appt_id"));
+                appt.setPetId(rs.getInt("pet_id"));
+                appt.setVetId(rs.getInt("vet_id"));
+                appt.setStartTime(rs.getTimestamp("start_time"));
+                appt.setStatus(rs.getString("status"));
+                appt.setType(rs.getString("type"));
+                appt.setPetName(rs.getString("pet_name"));
+                appt.setVetName(rs.getString("vet_name"));
+                appointments.add(appt);
+            }
+        } catch (SQLException e) {
+            System.out.println("Lỗi getCompletedAppointments: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (st != null) st.close();
+            } catch (SQLException e) {
+                System.out.println("Lỗi khi đóng tài nguyên: " + e.getMessage());
+            }
+        }
+        return appointments;
+    }
+
+    public List<Appointment> getPendingConfirmationAppointments() {
+        List<Appointment> appointments = new ArrayList<>();
+        if (connection == null) {
+            System.out.println("Lỗi getPendingConfirmationAppointments: Database connection is null!");
+            return appointments;
+        }
+        
+        String sql = "SELECT a.appt_id, a.pet_id, a.vet_id, a.start_time, a.status, a.type, "
+                + "p.name as pet_name, u.full_name as vet_name "
+                + "FROM Appointment a "
+                + "INNER JOIN Pet p ON a.pet_id = p.pet_id "
+                + "INNER JOIN Veterinarian v ON a.vet_id = v.emp_id "
+                + "INNER JOIN Employee e ON v.emp_id = e.user_id "
+                + "INNER JOIN Users u ON e.user_id = u.user_id "
+                + "WHERE a.status = 'Pending Confirmation' "
+                + "ORDER BY a.start_time ASC";
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        try {
+            st = connection.prepareStatement(sql);
+            rs = st.executeQuery();
+            while (rs.next()) {
+                Appointment appt = new Appointment();
+                appt.setApptId(rs.getInt("appt_id"));
+                appt.setPetId(rs.getInt("pet_id"));
+                appt.setVetId(rs.getInt("vet_id"));
+                appt.setStartTime(rs.getTimestamp("start_time"));
+                appt.setStatus(rs.getString("status"));
+                appt.setType(rs.getString("type"));
+                appt.setPetName(rs.getString("pet_name"));
+                appt.setVetName(rs.getString("vet_name"));
+                appointments.add(appt);
+            }
+        } catch (SQLException e) {
+            System.out.println("Lỗi getPendingConfirmationAppointments: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (st != null) st.close();
+            } catch (SQLException e) {
+                System.out.println("Lỗi khi đóng tài nguyên: " + e.getMessage());
+            }
+        }
+        return appointments;
     }
 }

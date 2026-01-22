@@ -1,5 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -91,6 +92,70 @@
                 <div class="success-message">${success}</div>
             </c:if>
             
+            <h2>Lịch Làm Việc Theo Ca - <fmt:formatDate value="${selectedDate}" pattern="dd/MM/yyyy" /></h2>
+            <div style="margin-bottom: 20px;">
+                <label>Chọn Ngày:</label>
+                <input type="date" id="datePicker" value="<fmt:formatDate value='${selectedDate}' pattern='yyyy-MM-dd' />" 
+                       onchange="location.href='${pageContext.request.contextPath}/booking?date=' + this.value" 
+                       style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            
+            <div style="margin-bottom: 30px; overflow-x: auto; border: 1px solid #ddd; padding: 15px; border-radius: 4px;">
+                <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
+                    <thead>
+                        <tr style="background-color: #6f42c1; color: white;">
+                            <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Ca Làm Việc</th>
+                            <c:forEach var="vet" items="${veterinarians}">
+                                <th style="padding: 10px; text-align: center; border: 1px solid #ddd;">${vet.fullName}</th>
+                            </c:forEach>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach var="hour" begin="8" end="16">
+                            <tr>
+                                <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">
+                                    ${hour}:00 - ${hour + 1}:00
+                                </td>
+                                <c:forEach var="vet" items="${veterinarians}">
+                                    <td style="padding: 5px; text-align: center; border: 1px solid #ddd;">
+                                        <c:set var="slotKey" value="${vet.empId}_${hour}" />
+                                        <c:set var="foundSlot" value="false" />
+                                        <c:forEach var="slot" items="${timeSlots}">
+                                            <c:if test="${slot.vetId == vet.empId && slot.hour == hour}">
+                                                <c:set var="foundSlot" value="true" />
+                                                <c:choose>
+                                                    <c:when test="${slot.available}">
+                                                        <button type="button" 
+                                                                class="slot-btn available" 
+                                                                data-vet-id="${slot.vetId}"
+                                                                data-date="<fmt:formatDate value='${slot.workDate}' pattern='yyyy-MM-dd' />"
+                                                                data-hour="${slot.hour}"
+                                                                style="width: 100%; padding: 8px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                                            Trống
+                                                        </button>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <div style="width: 100%; padding: 8px; background-color: #dc3545; color: white; border-radius: 4px; text-align: center;">
+                                                            Bận
+                                                        </div>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </c:if>
+                                        </c:forEach>
+                                        <c:if test="${!foundSlot}">
+                                            <div style="width: 100%; padding: 8px; background-color: #e9ecef; color: #6c757d; border-radius: 4px; text-align: center;">
+                                                Nghỉ
+                                            </div>
+                                        </c:if>
+                                    </td>
+                                </c:forEach>
+                            </tr>
+                        </c:forEach>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h2>Điền Thông Tin Đặt Lịch</h2>
             <form action="${pageContext.request.contextPath}/booking" method="post">
                 <div class="form-group">
                     <label for="petId">Chọn Thú Cưng:</label>
@@ -146,6 +211,26 @@
             // Set minimum date to today
             var today = new Date().toISOString().slice(0, 16);
             document.getElementById("dateTime").setAttribute("min", today);
+            
+            // Handle time slot selection
+            document.querySelectorAll('.slot-btn.available').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var vetId = this.getAttribute('data-vet-id');
+                    var dateStr = this.getAttribute('data-date');
+                    var hour = this.getAttribute('data-hour');
+                    
+                    // Set veterinarian
+                    document.getElementById('vetId').value = vetId;
+                    
+                    // Set date and time
+                    var hourStr = String(hour).padStart(2, '0');
+                    var datetime = dateStr + 'T' + hourStr + ':00';
+                    document.getElementById('dateTime').value = datetime;
+                    
+                    // Scroll to form
+                    document.querySelector('h2:last-of-type').scrollIntoView({ behavior: 'smooth' });
+                });
+            });
         </script>
     </body>
 </html>

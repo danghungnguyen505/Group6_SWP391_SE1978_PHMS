@@ -116,6 +116,8 @@
                                 <th>ID</th>
                                 <th>Thú Cưng</th>
                                 <th>Bác Sĩ</th>
+                                <th>Ngày</th>
+                                <th>Ca Làm Việc</th>
                                 <th>Thời Gian</th>
                                 <th>Loại Khám</th>
                                 <th>Trạng Thái</th>
@@ -128,7 +130,45 @@
                                     <td>${appt.petName}</td>
                                     <td>${appt.vetName}</td>
                                     <td>
-                                        <fmt:formatDate value="${appt.startTime}" pattern="dd/MM/yyyy HH:mm" />
+                                        <fmt:formatDate value="${appt.startTime}" pattern="dd/MM/yyyy" />
+                                    </td>
+                                    <td>
+                                        <fmt:formatDate value="${appt.startTime}" pattern="HH" var="hour" />
+                                        <c:choose>
+                                            <c:when test="${hour == '08'}">
+                                                Buổi Sáng - Ca 1: 08:00 - 09:00
+                                            </c:when>
+                                            <c:when test="${hour == '09'}">
+                                                Buổi Sáng - Ca 2: 09:00 - 10:00
+                                            </c:when>
+                                            <c:when test="${hour == '10'}">
+                                                Buổi Sáng - Ca 3: 10:00 - 11:00
+                                            </c:when>
+                                            <c:when test="${hour == '11'}">
+                                                Buổi Sáng - Ca 4: 11:00 - 12:00
+                                            </c:when>
+                                            <c:when test="${hour == '12'}">
+                                                Buổi Sáng - Ca 5: 12:00 - 13:00
+                                            </c:when>
+                                            <c:when test="${hour == '13'}">
+                                                Buổi Chiều - Ca 1: 13:00 - 14:00
+                                            </c:when>
+                                            <c:when test="${hour == '14'}">
+                                                Buổi Chiều - Ca 2: 14:00 - 15:00
+                                            </c:when>
+                                            <c:when test="${hour == '15'}">
+                                                Buổi Chiều - Ca 3: 15:00 - 16:00
+                                            </c:when>
+                                            <c:when test="${hour == '16'}">
+                                                Buổi Chiều - Ca 4: 16:00 - 17:00
+                                            </c:when>
+                                            <c:otherwise>
+                                                <fmt:formatDate value="${appt.startTime}" pattern="HH:mm" />
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                    <td>
+                                        <fmt:formatDate value="${appt.startTime}" pattern="HH:mm" />
                                     </td>
                                     <td>${appt.type}</td>
                                     <td>
@@ -145,8 +185,14 @@
                                             <c:when test="${appt.status == 'Cancelled'}">
                                                 <span class="status status-cancelled">Đã Hủy</span>
                                             </c:when>
+                                            <c:when test="${appt.status == 'Pending Confirmation'}">
+                                                <span class="status status-pending">Chờ Xác Nhận</span>
+                                            </c:when>
                                             <c:when test="${appt.status == 'Pending Payment'}">
                                                 <span class="status status-pending-payment">Chờ Thanh Toán</span>
+                                            </c:when>
+                                            <c:when test="${appt.status == 'Confirmed'}">
+                                                <span class="status status-confirmed">Thành Công</span>
                                             </c:when>
                                             <c:when test="${appt.status == 'Checked-in'}">
                                                 <span class="status status-checked-in">Đã Check-in</span>

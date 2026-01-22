@@ -29,8 +29,19 @@ public class DBContext {
             String url = "jdbc:sqlserver://localhost:1433;databaseName=PHMS_DB;encrypt=true;trustServerCertificate=true;";
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             connection = DriverManager.getConnection(url, user, pass);
-        } catch (ClassNotFoundException | SQLException ex) {
-            Logger.getLogger(DBContext.class.getName()).log(Level.SEVERE, null, ex);
+            if (connection != null) {
+                System.out.println("Database connection established successfully!");
+            } else {
+                System.out.println("Database connection is null!");
+            }
+        } catch (ClassNotFoundException ex) {
+            System.out.println("JDBC Driver not found: " + ex.getMessage());
+            Logger.getLogger(DBContext.class.getName()).log(Level.SEVERE, "JDBC Driver not found", ex);
+        } catch (SQLException ex) {
+            System.out.println("Database connection failed: " + ex.getMessage());
+            System.out.println("SQL State: " + ex.getSQLState());
+            System.out.println("Error Code: " + ex.getErrorCode());
+            Logger.getLogger(DBContext.class.getName()).log(Level.SEVERE, "Database connection failed", ex);
         }
     }
     

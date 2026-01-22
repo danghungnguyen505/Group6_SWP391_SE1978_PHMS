@@ -64,6 +64,11 @@
                 <h2>Chức Năng</h2>
                 <ul style="list-style: none; padding: 0;">
                     <li style="margin: 10px 0;">
+                        <a href="${pageContext.request.contextPath}/recep-appointments" style="display: inline-block; padding: 10px 20px; background-color: #17a2b8; color: white; text-decoration: none; border-radius: 4px;">
+                            Quản Lý Lịch Hẹn
+                        </a>
+                    </li>
+                    <li style="margin: 10px 0;">
                         <a href="${pageContext.request.contextPath}/checkin" style="display: inline-block; padding: 10px 20px; background-color: #17a2b8; color: white; text-decoration: none; border-radius: 4px;">
                             Check-in & Queue
                         </a>
