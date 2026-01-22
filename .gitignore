@@ -11,7 +11,6 @@
 .mtj.tmp/
 
 # Package Files #
-*.jar
 *.war
 *.nar
 *.ear
@@ -28,3 +27,5 @@ hs_err_pid*
 replay_pid*
 /PHMS/nbproject/private/
 /PHMS/build/
+/SWP391_SE1978_PHMS/nbproject/private/
+/SWP391_SE1978_PHMS/build/

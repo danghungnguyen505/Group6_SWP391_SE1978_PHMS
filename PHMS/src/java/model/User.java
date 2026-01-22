@@ -39,6 +39,46 @@ public class User {
 
     public void setId(int id) {
         this.id = id;
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package model;
+
+/**
+ *
+ * @author Nguyen Dang Hung
+ */
+public class User {
+    private int userId;
+    private String username;
+    private String password;
+    private String fullName;
+    private String role; 
+    private String phone;
+    private String email;
+    private String address; 
+    
+    public User() {
+    }
+
+    public User(int userId, String username, String password, String fullName, String role, String phone, String email, String address) {
+        this.userId = userId;
+        this.username = username;
+        this.password = password;
+        this.fullName = fullName;
+        this.role = role;
+        this.phone = phone;
+        this.email = email;
+        this.address = address;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getUsername() {
@@ -65,6 +105,14 @@ public class User {
         this.fullName = fullName;
     }
 
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
     public String getPhone() {
         return phone;
     }
@@ -86,4 +134,20 @@ public class User {
     public String toString() {
         return "User{" + "id=" + id + ", username=" + username + ", role=" + role + '}';
     }
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+    
 }

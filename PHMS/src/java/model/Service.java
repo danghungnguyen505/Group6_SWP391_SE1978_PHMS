@@ -1,5 +1,15 @@
 package model;
 
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package model;
+
+/**
+ *
+ * @author Nguyen Dang Hung
+ */
 public class Service {
     private int serviceId;
     private String name;
@@ -11,11 +21,18 @@ public class Service {
     }
 
     public Service(int serviceId, String name, double basePrice, String description, boolean isActive) {
+    private int manageBy;
+    
+    public Service() {
+    }
+
+    public Service(int serviceId, String name, double basePrice, String description, boolean isActive, int manageBy) {
         this.serviceId = serviceId;
         this.name = name;
         this.basePrice = basePrice;
         this.description = description;
         this.isActive = isActive;
+        this.manageBy = manageBy;
     }
 
     public int getServiceId() {
@@ -57,4 +74,21 @@ public class Service {
     public void setActive(boolean active) {
         isActive = active;
     }
+    public boolean isIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public int getManageBy() {
+        return manageBy;
+    }
+
+    public void setManageBy(int manageBy) {
+        this.manageBy = manageBy;
+    }
+
+    
 }
