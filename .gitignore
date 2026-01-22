@@ -17,9 +17,15 @@
 *.zip
 *.tar.gz
 *.rar
+*.sql
+
+# Chặn toàn bộ thư mục allowlib
+/PHMS/allowlib/
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+/PHMS/nbproject/private/
+/PHMS/build/
 /SWP391_SE1978_PHMS/nbproject/private/
 /SWP391_SE1978_PHMS/build/
