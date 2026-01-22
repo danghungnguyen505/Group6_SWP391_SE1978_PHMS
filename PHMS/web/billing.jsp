@@ -16,7 +16,7 @@
 <p>Invoice #: ${invoice.id}</p>
 <p>Total: ${invoice.totalAmount}</p>
 
-<form action="vnpay-create" method="post">
+<form action="vnpay-return" method="post">
     <button>Pay with VNPay</button>
 </form>
 
