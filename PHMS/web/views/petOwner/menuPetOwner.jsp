@@ -15,6 +15,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <link href="${pageContext.request.contextPath}/assets/css/pages/menuPetOwner.css" rel="stylesheet" type="text/css"/>
+        <script src="${pageContext.request.contextPath}/assets/js/saveSchedule.js"></script>
     </head>
     <body>
 
@@ -87,7 +88,7 @@
             </div>
 
             <!-- Booking Form Grid -->
-            <form action="submitBooking" method="post" class="booking-grid">
+            <form action="${pageContext.request.contextPath}/booking" method="post" id="bookingForm" class="booking-grid">
 
                 <!-- Card 1: Visit Details -->
                 <div class="card">
@@ -98,8 +99,12 @@
                     <div class="form-group">
                         <label>Select Pet</label>
                         <select class="form-control" name="petId">
-                            <option value="luna">Luna (Cat)</option>
-                            <option value="max">Max (Dog)</option>
+                            <c:forEach items="${pets}" var="p">
+                                <option value="${p.id}">${p.name} (${p.species})</option>
+                            </c:forEach>
+                            <c:if test="${empty pets}">
+                                <option value="" disabled>Bạn chưa có thú cưng nào</option>
+                            </c:if>
                         </select>
                     </div>
 
@@ -113,9 +118,17 @@
 
                     <div class="form-group">
                         <label>Preferred Veterinarian</label>
-                        <select class="form-control" name="vetId">
-                            <option value="dr_brown">Dr. Emily Brown - Veterinary Surgeon</option>
-                            <option value="dr_smith">Dr. John Smith - General Practitioner</option>
+                        <select class="form-control" name="vetId" onchange="this.form.submit()">
+                            <option value="">-- Chọn bác sĩ --</option>
+                            <c:forEach items="${schedules}" var="s">
+                                <option value="${s.empId}" ${param.vetId == s.empId ? 'selected' : ''}>${s.vetName}
+                            </c:forEach>
+                            <c:if test="${empty schedules && not empty param.selectedDate}">
+                                <option disabled>Không có bác sĩ nào có lịch vào ngày này</option>
+                            </c:if>
+                            <c:if test="${empty param.selectedDate}">
+                                <option disabled>Vui lòng chọn ngày trước</option>
+                            </c:if>
                         </select>
                     </div>
                 </div>
@@ -128,29 +141,28 @@
 
                     <div class="form-group">
                         <label>Select Date</label>
-                        <input type="text" class="form-control" value="29/02/2025" name="appointmentDate">
+                        <input type="date" name="selectedDate" class="form-control" 
+                                value="${selectedDateStr}"
+                                onchange="this.form.submit()">
                     </div>
 
                     <div class="form-group">
                         <label>Available Time Slots</label>
                         <div class="time-slots-grid">
-                            <button type="button" class="time-btn">09:00 AM</button>
-                            <button type="button" class="time-btn" disabled>09:30 AM</button>
-                            <button type="button" class="time-btn">10:00 AM</button>
-                            <button type="button" class="time-btn">10:30 AM</button>
-
-                            <button type="button" class="time-btn">11:00 AM</button>
-                            <button type="button" class="time-btn" disabled>11:30 AM</button>
-                            <button type="button" class="time-btn">02:00 PM</button>
-                            <button type="button" class="time-btn">02:30 PM</button>
-
-                            <button type="button" class="time-btn">03:00 PM</button>
-                            <button type="button" class="time-btn">03:30 PM</button>
-                            <button type="button" class="time-btn selected">04:00 PM</button>
-                            <button type="button" class="time-btn">04:30 PM</button>
-
-                            <!-- Input ẩn để lưu giá trị giờ đã chọn -->
-                            <input type="hidden" name="timeSlot" value="16:00">
+                            <c:if test="${empty availableSlots}">
+                                <p class="text-muted" style="grid-column: span 4; font-size: 0.9em;">
+                                    Vui lòng chọn Ngày và Bác sĩ để xem giờ trống.
+                                </p>
+                            </c:if>
+                            <c:forEach items="${availableSlots}" var="slot">
+                                <button type="button" 
+                                        class="time-btn ${slot.available ? '' : 'disabled'} ${param.timeSlot == slot.timeValue ? 'selected' : ''}"
+                                        ${slot.available ? '' : 'disabled'}
+                                        onclick="selectTime(this, '${slot.timeValue}')">
+                                    ${slot.timeLabel}
+                                </button>
+                            </c:forEach>
+                            <input type="hidden" name="timeSlot" id="selectedTimeSlot" value="${param.timeSlot}">
                         </div>
                     </div>
                 </div>

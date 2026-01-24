@@ -9,8 +9,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.User;
 import dal.PetDAO;
+import dal.ScheduleVeterianrianDAO;
 import dal.ServiceDAO;
 import dal.UserDAO;
+import java.util.List;
+import model.Schedule;
 
 /**
  *
@@ -30,14 +33,19 @@ public class PetOwnerMenuController extends HttpServlet {
             return;
         }
         try {
+            // 1. Lấy danh sách thú cưng của User
             PetDAO petDao = new PetDAO();
-            ServiceDAO serviceDao = new ServiceDAO();
-            UserDAO userDao = new UserDAO();
             request.setAttribute("pets", petDao.getPetsByOwnerId(account.getUserId())); 
+            // 2. Lấy danh sách Dịch vụ
+            ServiceDAO serviceDao = new ServiceDAO();
             request.setAttribute("services", serviceDao.getAllServices());
-            request.setAttribute("vets", userDao.getAllVeterinarians());
+            // 3. Lấy danh sách Lịch làm việc của Bác sĩ 
+            ScheduleVeterianrianDAO scheduleDao = new ScheduleVeterianrianDAO();
+            List<Schedule> schedules = scheduleDao.getAvailableSchedules();
+            request.setAttribute("schedules", schedules);
+
         } catch(Exception e) {
-            System.out.println("Chưa kết nối DB hoặc lỗi truy vấn: " + e);
+            e.printStackTrace();
         }
         request.getRequestDispatcher("/views/petOwner/menuPetOwner.jsp").forward(request, response);
     }

@@ -350,3 +350,16 @@ textarea.form-control {
     color: #9CA3AF;
     text-align: center;
 }
+
+/*.time-btn:disabled, .disabled-slot {
+    background-color: #e9ecef;
+    color: #adb5bd;
+    cursor: not-allowed;
+    border: 1px solid #dee2e6;
+}
+
+.time-btn.selected {
+    background-color: #10b981;  Màu xanh lá 
+    color: white;
+    border-color: #10b981;
+}*/
