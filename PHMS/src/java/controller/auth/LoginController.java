@@ -104,7 +104,7 @@ public class LoginController extends HttpServlet {
                 response.sendRedirect("doctor/schedule");
             } else {
                 response.sendRedirect("home");
-            }
+            } 
         }
     }
 
