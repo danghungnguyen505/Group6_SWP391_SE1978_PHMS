@@ -37,36 +37,21 @@ public class AppointmentDAO extends DBContext{
         return list;
     }
     //Hàm insert cuoc hen
-//    public void insertAppointment(model.Appointment appt) {
-//        String sql = "INSERT INTO Appointment (pet_id, vet_id, start_time, status, type, notes) VALUES (?, ?, ?, ?, ?, ?)";
-//        try {
-//            PreparedStatement st = connection.prepareStatement(sql);
-//            st.setInt(1, appt.getPetId());
-//            st.setInt(2, appt.getVetId());
-//            st.setTimestamp(3, appt.getStartTime());
-//            st.setString(4, "Pending"); // Set là Chờ duyệt
-//            st.setString(5, appt.getType());
-//            st.setString(6, appt.getNotes()); // Lưu ghi chú
-//            st.executeUpdate();
-//        } catch (SQLException e) {
-//            System.out.println("Error insertAppointment: " + e);
-//        }
-//    }
     public boolean insertAppointment(model.Appointment appt) {
-        String sql = "INSERT INTO Appointment (pet_id, vet_id, start_time, status, type, notes) VALUES (?, ?, ?, ?, ?, ?)";
+    String sql = "INSERT INTO Appointment (pet_id, vet_id, start_time, status, type, notes) VALUES (?, ?, ?, ?, ?, ?)";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, appt.getPetId());
             st.setInt(2, appt.getVetId());
             st.setTimestamp(3, appt.getStartTime());
-            st.setString(4, "Pending");
+            st.setString(4, "Pending"); // Trạng thái mặc định là Chờ duyệt
             st.setString(5, appt.getType());
             st.setString(6, appt.getNotes());
-            st.executeUpdate();
-            return true; // <--- Trả về true nếu chạy êm
+            int rowsAffected = st.executeUpdate();
+            return rowsAffected > 0;
         } catch (SQLException e) {
-            System.out.println("Error insertAppointment: " + e);
-            return false; // <--- Trả về false nếu lỗi
+            System.out.println("SQL Error at insertAppointment: " + e.getMessage());
+            return false;
         }
     }
     public List<model.Appointment> getPendingAppointments() {
@@ -76,9 +61,9 @@ public class AppointmentDAO extends DBContext{
                          "u_vet.full_name AS vet_name, " +
                          "u_owner.full_name AS owner_name " +
                          "FROM Appointment a " +
-                         "JOIN Pet p ON a.pet_id = p.id " +
+                         "JOIN Pet p ON a.pet_id = p.pet_id " +
                          "JOIN Users u_vet ON a.vet_id = u_vet.user_id " +
-                         "JOIN Users u_owner ON p.owner_id = u_owner.user_id " + 
+                         "JOIN Users u_owner ON p.owner_id = u_owner.user_id " +
                          "WHERE a.status = 'Pending' " +
                          "ORDER BY a.start_time ASC";
         try {
@@ -99,5 +84,20 @@ public class AppointmentDAO extends DBContext{
             System.out.println("Error getPendingAppointments: " + e);
         }
         return list;
+    }
+
+    /** Cập nhật trạng thái cuộc hẹn (Lễ tân duyệt: Confirmed hoặc từ chối: Cancelled) */
+    public boolean updateAppointmentStatus(int apptId, String status) {
+        String sql = "UPDATE Appointment SET status = ? WHERE appt_id = ? AND status = 'Pending'";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setString(1, status);
+            st.setInt(2, apptId);
+            int rows = st.executeUpdate();
+            return rows > 0;
+        } catch (SQLException e) {
+            System.out.println("Error updateAppointmentStatus: " + e.getMessage());
+            return false;
+        }
     }
 }

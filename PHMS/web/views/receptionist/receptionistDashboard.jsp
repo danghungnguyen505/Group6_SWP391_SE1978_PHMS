@@ -15,6 +15,9 @@
     <body>
         <div class="content">
             <h3>Danh sách chờ duyệt (Pending Requests)</h3>
+            <c:if test="${not empty actionMessage}">
+                <p class="alert alert-info">${actionMessage}</p>
+            </c:if>
             <c:if test="${empty pendingList}">
                 <p>Không có yêu cầu đặt lịch nào mới.</p>
             </c:if>
@@ -42,8 +45,10 @@
                                 <td>${a.startTime}</td>
                                 <td>${a.notes}</td>
                                 <td>
-                                    <a href="appointment-action?id=${a.apptId}&status=Confirmed" class="btn btn-success btn-sm">Duyệt</a>
-                                    <a href="appointment-action?id=${a.apptId}&status=Cancelled" class="btn btn-danger btn-sm">Hủy</a>
+                                    <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${a.apptId}&status=Confirmed" 
+                                       class="btn btn-success btn-sm">Duyệt</a>
+                                    <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${a.apptId}&status=Cancelled" 
+                                       class="btn btn-danger btn-sm">Hủy</a>
                                 </td>
                             </tr>
                         </c:forEach>

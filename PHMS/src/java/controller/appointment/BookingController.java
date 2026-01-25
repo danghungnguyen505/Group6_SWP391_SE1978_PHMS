@@ -63,11 +63,15 @@ public class BookingController extends HttpServlet {
             String timeStr = request.getParameter("timeSlot");
             String notes = request.getParameter("notes");
             // Validate
-            if (petIdStr == null || vetIdStr == null || timeStr == null || timeStr.isEmpty()) {
-                request.setAttribute("error", "Vui lòng chọn đầy đủ Ngày, Bác sĩ và Giờ khám!");
+            if (petIdStr == null || petIdStr.isEmpty() || vetIdStr == null || vetIdStr.isEmpty()
+                    || dateStr == null || dateStr.isEmpty() || timeStr == null || timeStr.isEmpty()) {
+                request.setAttribute("error", "Vui lòng chọn đầy đủ Thú cưng, Ngày, Bác sĩ và Giờ khám!");
+                request.setAttribute("selectedDateStr", dateStr); 
+                request.setAttribute("selectedVetId", vetIdStr);
+                processViewSlot(request, response);
                 return;
             }
-            // Gộp Ngày + Giờ
+            // Gộp Ngày + Giờ (dateStr từ input type=date: yyyy-MM-dd; timeStr từ slot: HH:mm)
             String dateTimeString = dateStr + " " + timeStr + ":00";
             Timestamp startTime = Timestamp.valueOf(dateTimeString);
             // Tạo Object
@@ -75,8 +79,8 @@ public class BookingController extends HttpServlet {
             appt.setPetId(Integer.parseInt(petIdStr));
             appt.setVetId(Integer.parseInt(vetIdStr));
             appt.setStartTime(startTime);
-            appt.setType(serviceType);
-            appt.setNotes(notes);
+            appt.setType(serviceType != null ? serviceType : "Checkup"); // Mặc định nếu null
+            appt.setNotes(notes != null ? notes : "");
             // Gọi DAO lưu
             AppointmentDAO dao = new AppointmentDAO();
             boolean isSaved = dao.insertAppointment(appt);

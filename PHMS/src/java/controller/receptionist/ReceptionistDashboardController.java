@@ -35,6 +35,12 @@ public class ReceptionistDashboardController extends HttpServlet {
         dal.AppointmentDAO dao = new dal.AppointmentDAO();
         List<model.Appointment> pendingList = dao.getPendingAppointments();
         request.setAttribute("pendingList", pendingList);
+        // Hiển thị thông báo sau Duyệt/Hủy (chỉ 1 lần)
+        Object msg = session.getAttribute("actionMessage");
+        if (msg != null) {
+            request.setAttribute("actionMessage", msg);
+            session.removeAttribute("actionMessage");
+        }
         request.getRequestDispatcher("/views/receptionist/receptionistDashboard.jsp").forward(request, response);
     } 
 
