@@ -3,20 +3,19 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/JavaScript.js to edit this template
  */
 
-// JS đơn giản chỉ để chọn giờ và copy giá trị sang form confirm
-function selectTime(btn) {
-    // Xóa class selected cũ
-    document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('selected'));
-    // Thêm class selected mới
-    btn.classList.add('selected');
-    // Lưu giá trị
-    document.getElementById('selectedTime').value = btn.innerText;
-}
+function selectTime(element, timeValue) {
+        // 1. Xóa class 'selected' ở tất cả các nút khác
+        var buttons = document.getElementsByClassName('time-btn');
+        for (var i = 0; i < buttons.length; i++) {
+            buttons[i].classList.remove('selected');
+        }
 
-function submitBooking() {
-    // Copy dữ liệu sang form POST
-    document.getElementById('finalPetId').value = document.getElementsByName('petId')[0].value;
-    document.getElementById('finalTime').value = document.getElementById('selectedTime').value;
-    // Submit
-    document.getElementById('confirmForm').submit();
-}
+        // 2. Thêm class 'selected' cho nút vừa bấm
+        element.classList.add('selected');
+
+        // 3. Gán giá trị giờ vào ô input ẩn để gửi về Server
+        document.getElementById('selectedTimeSlot').value = timeValue;
+        
+        // (Debug) Kiểm tra xem đã nhận giá trị chưa
+        console.log("Selected time: " + timeValue);
+    }

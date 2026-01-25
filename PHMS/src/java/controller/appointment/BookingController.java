@@ -24,8 +24,10 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import model.Appointment;
 import model.TimeSlot;
 import model.User;
+import java.sql.Timestamp;
 
 /**
  *
@@ -37,11 +39,59 @@ public class BookingController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        processViewSlot(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String action = request.getParameter("action");
+        if ("book".equals(action)) {
+            saveAppointment(request, response);
+        }
+        processViewSlot(request, response);
+    }
+
+    //XỬ LÝ LƯU CUỘC HẸN
+    private void saveAppointment(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            // Lấy dữ liệu từ form
+            String petIdStr = request.getParameter("petId");
+            String serviceType = request.getParameter("serviceType");
+            String vetIdStr = request.getParameter("vetId");
+            String dateStr = request.getParameter("selectedDate");
+            String timeStr = request.getParameter("timeSlot");
+            String notes = request.getParameter("notes");
+            // Validate
+            if (petIdStr == null || vetIdStr == null || timeStr == null || timeStr.isEmpty()) {
+                request.setAttribute("error", "Vui lòng chọn đầy đủ Ngày, Bác sĩ và Giờ khám!");
+                return;
+            }
+            // Gộp Ngày + Giờ
+            String dateTimeString = dateStr + " " + timeStr + ":00";
+            Timestamp startTime = Timestamp.valueOf(dateTimeString);
+            // Tạo Object
+            Appointment appt = new Appointment();
+            appt.setPetId(Integer.parseInt(petIdStr));
+            appt.setVetId(Integer.parseInt(vetIdStr));
+            appt.setStartTime(startTime);
+            appt.setType(serviceType);
+            appt.setNotes(notes);
+            // Gọi DAO lưu
+            AppointmentDAO dao = new AppointmentDAO();
+            boolean isSaved = dao.insertAppointment(appt);
+            if (isSaved) {
+                request.setAttribute("successMessage", "Đặt lịch thành công! Vui lòng chờ Lễ tân duyệt.");
+            } else {
+                request.setAttribute("error", "Lỗi: Không thể lưu cuộc hẹn (Dữ liệu không hợp lệ hoặc lỗi server).");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Lỗi đặt lịch: " + e.getMessage());
+        }
+    }
+
+    private void processViewSlot(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         User account = (User) session.getAttribute("account");
@@ -152,5 +202,4 @@ public class BookingController extends HttpServlet {
         request.setAttribute("selectedVetId", vetIdStr);
         request.getRequestDispatcher("/views/petOwner/menuPetOwner.jsp").forward(request, response);
     }
-
 }

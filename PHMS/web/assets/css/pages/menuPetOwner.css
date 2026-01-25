@@ -224,7 +224,7 @@ body {
 
 /* Form Elements */
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 
 .form-group label {
@@ -351,15 +351,15 @@ textarea.form-control {
     text-align: center;
 }
 
-/*.time-btn:disabled, .disabled-slot {
-    background-color: #e9ecef;
-    color: #adb5bd;
-    cursor: not-allowed;
-    border: 1px solid #dee2e6;
+.time-btn.selected {
+    background-color: #059669; /* Màu xanh khi chọn */
+    color: white;
+    border-color: #0056b3;
 }
 
-.time-btn.selected {
-    background-color: #10b981;  Màu xanh lá 
-    color: white;
-    border-color: #10b981;
-}*/
+.time-btn:disabled {
+    background-color: #e9ecef;
+    color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
+}

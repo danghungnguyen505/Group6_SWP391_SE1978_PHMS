@@ -102,7 +102,9 @@ public class LoginController extends HttpServlet {
                 response.sendRedirect("admin/dashboard"); 
             } else if ("Veterinarian".equalsIgnoreCase(role)) {
                 response.sendRedirect("doctor/schedule");
-            } else {
+            } else if ("Receptionist".equalsIgnoreCase(role)) {
+                response.sendRedirect("receptionist/dashboard");
+            }  else {
                 response.sendRedirect("home");
             } 
         }
