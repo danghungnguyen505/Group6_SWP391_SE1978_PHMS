@@ -69,7 +69,7 @@
                     <div style="display: inline-flex; align-items: center; gap: 10px;">
                         <span class="btn btn-dark">
                            <i class="fa-solid fa-user" style="color: greenyellow;padding-right: 10px"></i> 
-                             ${sessionScope.account.fullName}
+                             <a href="${pageContext.request.contextPath}/petOwner/menuPetOwner">${sessionScope.account.fullName}</a>
                         </span>
                         
                         <!-- Nút Logout -->

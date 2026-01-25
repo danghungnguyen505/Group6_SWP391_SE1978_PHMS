@@ -75,7 +75,9 @@
         <main class="main-content">
             <!-- Top Header -->
             <header class="top-bar">
-                <button class="btn-signout">Sign Out</button>
+                    <a href="${pageContext.request.contextPath}/logout" class="btn btn-dark" style="background-color: #ef4444; border-color: #ef4444;">
+                        Đăng xuất
+                    </a>
             </header>
 
             <!-- Page Title & Actions -->
