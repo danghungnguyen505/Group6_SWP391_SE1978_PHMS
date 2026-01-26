@@ -1,29 +1,37 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package model;
 
+/**
+ *
+ * @author zoxy4
+ */
 public class Pet {
-    private int petId;
-    private int ownerId;
-    private String name;
-    private String species;
+    private int id;       
+    private int ownerId;     
+    private String name;       
+    private String species;    
     private String historySummary;
 
     public Pet() {
     }
 
-    public Pet(int petId, int ownerId, String name, String species, String historySummary) {
-        this.petId = petId;
+    public Pet(int id, int ownerId, String name, String species, String historySummary) {
+        this.id = id;
         this.ownerId = ownerId;
         this.name = name;
         this.species = species;
         this.historySummary = historySummary;
     }
 
-    public int getPetId() {
-        return petId;
+    public int getId() {
+        return id;
     }
 
-    public void setPetId(int petId) {
-        this.petId = petId;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getOwnerId() {
@@ -57,4 +65,5 @@ public class Pet {
     public void setHistorySummary(String historySummary) {
         this.historySummary = historySummary;
     }
+    
 }

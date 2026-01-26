@@ -15,7 +15,25 @@ public class Appointment {
     private int serviceId;
     private Timestamp createdAt;
     private String ownerEmail;
+    private String notes;
+    private String ownerName;
+    
+    public String getNotes() {
+        return notes;
+    }
 
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
+    }
+    
     public Appointment() {
     }
 
