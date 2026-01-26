@@ -39,7 +39,7 @@
             <c:if test="${not empty sessionScope.account}">
                 <c:choose>
                     <c:when test="${sessionScope.account.role == 'PetOwner'}">
-                        <a href="${pageContext.request.contextPath}/petOwner/Appointment">Đặt lịch</a>
+                        <a href="${pageContext.request.contextPath}/petOwner/menuPetOwner">Đặt lịch</a>
                     </c:when>
                     <c:when test="${sessionScope.account.role == 'Veterinarian'}">
                         <a href="${pageContext.request.contextPath}/doctor/schedule">Lịch làm việc</a>
@@ -49,7 +49,6 @@
                     </c:when>
                 </c:choose>
             </c:if> 
-            <a href="${pageContext.request.contextPath}/petOwner/menuPetOwner"> Main Menu </a>
         </div>
         <div>
             <!-- LOGIC HIỂN THỊ NÚT ĐĂNG NHẬP / USER PROFILE -->
@@ -59,7 +58,7 @@
                     <a href="${pageContext.request.contextPath}/login" class="btn btn-dark">
                         Đăng nhập
                     </a>
-                    <a href="${pageContext.request.contextPath}/register" class="btn btn-outline" style="margin-left: 10px; color: white; border-color: white;">
+                    <a href="${pageContext.request.contextPath}/register" class="btn btn-outline" style="margin-left: 10px; color: black; border-color: black;">
                         Đăng ký
                     </a>
                 </c:when>
