@@ -14,6 +14,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VetCare Pro - Chăm sóc Thú cưng Chuyên nghiệp</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/layout.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/components.css">
@@ -34,14 +35,50 @@
             <a href="#services">Dịch vụ</a>
             <a href="#doctors">Bác sĩ</a>
             <a href="#testimonials">Về chúng tôi</a>
+            <!-- Link Dashboard dành cho từng role (Tùy chọn) -->
+            <c:if test="${not empty sessionScope.account}">
+                <c:choose>
+                    <c:when test="${sessionScope.account.role == 'PetOwner'}">
+                        <a href="${pageContext.request.contextPath}/petOwner/Appointment">Đặt lịch</a>
+                    </c:when>
+                    <c:when test="${sessionScope.account.role == 'Veterinarian'}">
+                        <a href="${pageContext.request.contextPath}/doctor/schedule">Lịch làm việc</a>
+                    </c:when>
+                    <c:when test="${sessionScope.account.role == 'ClinicManager'}">
+                        <a href="${pageContext.request.contextPath}/admin/dashboard">Quản trị</a>
+                    </c:when>
+                </c:choose>
+            </c:if> 
+            <a href="${pageContext.request.contextPath}/petOwner/menuPetOwner"> Main Menu </a>
         </div>
         <div>
-            <a href="${pageContext.request.contextPath}/login" class="btn btn-dark">
-                Đăng nhập
-            </a>
-            <a href="${pageContext.request.contextPath}/register" class="btn btn-dark">
-                Đăng ký
-            </a>    
+            <!-- LOGIC HIỂN THỊ NÚT ĐĂNG NHẬP / USER PROFILE -->
+            <c:choose>
+                <%-- TRƯỜNG HỢP 1: CHƯA ĐĂNG NHẬP --%>
+                <c:when test="${empty sessionScope.account}">
+                    <a href="${pageContext.request.contextPath}/login" class="btn btn-dark">
+                        Đăng nhập
+                    </a>
+                    <a href="${pageContext.request.contextPath}/register" class="btn btn-outline" style="margin-left: 10px; color: white; border-color: white;">
+                        Đăng ký
+                    </a>
+                </c:when>
+
+                <%-- TRƯỜNG HỢP 2: ĐÃ ĐĂNG NHẬP --%>
+                <c:otherwise>
+                    <div style="display: inline-flex; align-items: center; gap: 10px;">
+                        <span class="btn btn-dark">
+                           <i class="fa-solid fa-user" style="color: greenyellow;padding-right: 10px"></i> 
+                             <a href="${pageContext.request.contextPath}/petOwner/menuPetOwner">${sessionScope.account.fullName}</a>
+                        </span>
+                        
+                        <!-- Nút Logout -->
+                        <a href="${pageContext.request.contextPath}/logout" class="btn btn-dark" style="background-color: #ef4444; border-color: #ef4444;">
+                            Đăng xuất
+                        </a>
+                    </div>
+                </c:otherwise>
+            </c:choose>
         </div>
     </nav>
 
@@ -53,7 +90,18 @@
             <h1>Chăm sóc Toàn diện <br/> <span>Cho Thú cưng.</span></h1>
             <p>Sử dụng công nghệ hiện đại và lòng tận tâm để bảo vệ sức khỏe cho người bạn nhỏ của bạn.</p>
             <div class="hero-actions">
-                <a href="${pageContext.request.contextPath}/login" class="btn btn-primary">Đặt lịch ngay</a>
+                
+                <!-- SỬA LINK NÚT "ĐẶT LỊCH NGAY" -->
+                <c:choose>
+                    <c:when test="${not empty sessionScope.account and sessionScope.account.role == 'PetOwner'}">
+                        <a href="${pageContext.request.contextPath}/petOwner/booking" class="btn btn-primary">Đặt lịch ngay</a>
+                    </c:when>
+                    <c:otherwise>
+                        <!-- Nếu chưa login hoặc không phải PetOwner thì trỏ về Login -->
+                        <a href="${pageContext.request.contextPath}/login" class="btn btn-primary">Đặt lịch ngay</a>
+                    </c:otherwise>
+                </c:choose>
+
                 <button class="btn btn-outline">Tìm hiểu thêm</button>
             </div>
         </div>
