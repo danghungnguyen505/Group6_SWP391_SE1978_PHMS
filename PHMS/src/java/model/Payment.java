@@ -1,35 +1,21 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
-/**
- *
- * @author TrungNguyen2002
- */
 public class Payment {
-     private int id;
+    private int paymentId;
     private int invoiceId;
-    private String method; // CASH, VNPAY
-    private String status; // SUCCESS, FAILED, PENDING
+    private String transCode;
+    private double amount;
+    private String method;
+    private String status;
 
-    public Payment() {
+    public Payment() {}
+
+    public int getPaymentId() {
+        return paymentId;
     }
 
-    public Payment(int id, int invoiceId, String method, String status) {
-        this.id = id;
-        this.invoiceId = invoiceId;
-        this.method = method;
-        this.status = status;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+    public void setPaymentId(int paymentId) {
+        this.paymentId = paymentId;
     }
 
     public int getInvoiceId() {
@@ -38,6 +24,22 @@ public class Payment {
 
     public void setInvoiceId(int invoiceId) {
         this.invoiceId = invoiceId;
+    }
+
+    public String getTransCode() {
+        return transCode;
+    }
+
+    public void setTransCode(String transCode) {
+        this.transCode = transCode;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
     }
 
     public String getMethod() {
@@ -55,6 +57,4 @@ public class Payment {
     public void setStatus(String status) {
         this.status = status;
     }
-    
-    
 }

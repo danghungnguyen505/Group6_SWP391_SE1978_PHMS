@@ -1,32 +1,36 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
-/**
- *
- * @author TrungNguyen2002
- */
 public class Invoice {
-    private int id;
+    private int invoiceId;
+    private int apptId;
+    private int recepId;
     private double totalAmount;
-    private String status;
+    private String status; // Unpaid, Paid
 
     public Invoice() {}
 
-    public Invoice(int id, double totalAmount, String status) {
-        this.id = id;
-        this.totalAmount = totalAmount;
-        this.status = status;
+    public int getInvoiceId() {
+        return invoiceId;
     }
 
-    public int getId() {
-        return id;
+    public void setInvoiceId(int invoiceId) {
+        this.invoiceId = invoiceId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public int getApptId() {
+        return apptId;
+    }
+
+    public void setApptId(int apptId) {
+        this.apptId = apptId;
+    }
+
+    public int getRecepId() {
+        return recepId;
+    }
+
+    public void setRecepId(int recepId) {
+        this.recepId = recepId;
     }
 
     public double getTotalAmount() {

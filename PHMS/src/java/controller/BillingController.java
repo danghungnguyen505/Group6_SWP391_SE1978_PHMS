@@ -12,16 +12,13 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import dal.InvoiceDAO;
-import dal.PaymentDAO;
-import model.Payment;
 import model.Invoice;
-
 /**
  *
  * @author TrungNguyen2002
  */
-@WebServlet(name = "VNPayController", urlPatterns = {"/vnpay-return"})
-public class VNPayController extends HttpServlet {
+@WebServlet(name = "BillingController", urlPatterns = {"/billing"})
+public class BillingController extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -40,10 +37,10 @@ public class VNPayController extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet VNPayController</title>");            
+            out.println("<title>Servlet BillingController</title>");            
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet VNPayController at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet BillingController at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -58,40 +55,30 @@ public class VNPayController extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-      @Override
-protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-        throws ServletException, IOException {
+     @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
 
-    int invoiceId = Integer.parseInt(req.getParameter("invoiceId"));
+        String invoiceIdRaw = req.getParameter("invoiceId");
 
-    InvoiceDAO invoiceDAO = new InvoiceDAO();
-    PaymentDAO paymentDAO = new PaymentDAO();
+        if (invoiceIdRaw == null) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing invoiceId");
+            return;
+        }
 
-    // 1. Load invoice (needed for amount)
-    Invoice invoice = invoiceDAO.getInvoiceById(invoiceId);
+        int invoiceId = Integer.parseInt(invoiceIdRaw);
 
-    if (invoice == null) {
-        resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Invoice not found");
-        return;
+        InvoiceDAO invoiceDAO = new InvoiceDAO();
+        Invoice invoice = invoiceDAO.getInvoiceById(invoiceId);
+
+        if (invoice == null) {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Invoice not found");
+            return;
+        }
+
+        req.setAttribute("invoice", invoice);
+        req.getRequestDispatcher("billing.jsp").forward(req, resp);
     }
-
-    // 2. Update invoice status
-    invoiceDAO.updateInvoiceStatus(invoiceId, "Paid");
-
-    // 3. Create payment record
-    Payment payment = new Payment();
-    payment.setInvoiceId(invoiceId);
-    payment.setAmount(invoice.getTotalAmount());
-    payment.setMethod("VNPAY");
-    payment.setStatus("SUCCESS");
-    payment.setTransCode("VNPAY_" + System.currentTimeMillis());
-
-    paymentDAO.insertPayment(payment);
-
-    // 4. Redirect to success page
-    resp.sendRedirect("payment-success.jsp");
-}
-
 
     /**
      * Handles the HTTP <code>POST</code> method.
