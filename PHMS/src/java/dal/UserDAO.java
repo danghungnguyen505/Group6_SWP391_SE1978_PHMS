@@ -6,6 +6,7 @@ package dal;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import model.User;
 
 /**
@@ -137,4 +138,5 @@ public class UserDAO extends DBContext {
         }
         return null;
     }
+    
 }

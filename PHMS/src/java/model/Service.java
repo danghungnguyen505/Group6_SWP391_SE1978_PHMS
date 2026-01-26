@@ -60,6 +60,13 @@ public class Service {
         this.description = description;
     }
 
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
     public boolean isIsActive() {
         return isActive;
     }

@@ -1,11 +1,8 @@
 package dal;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,24 +16,31 @@ import java.util.logging.Logger;
  * @author FPT University - PRJ30X
  */
 public class DBContext {
+
     protected Connection connection;
+
     public DBContext() {
-        //@Students: You are not allowed to edit this method  
         try {
-            Properties properties = new Properties();
-            InputStream inputStream = getClass().getClassLoader().getResourceAsStream("../ConnectDB.properties");
-            try {
-                properties.load(inputStream);
-            } catch (IOException ex) {
-                Logger.getLogger(DBContext.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            String user = properties.getProperty("userID");
-            String pass = properties.getProperty("password");
-            String url = properties.getProperty("url");
+            // Edit your database info here
+            String user = "sa";
+            String pass = "123";
+            String url = "jdbc:sqlserver://localhost:1433;databaseName=PHMS_DB;encrypt=true;trustServerCertificate=true;";
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             connection = DriverManager.getConnection(url, user, pass);
-        } catch (ClassNotFoundException | SQLException ex) {
-            Logger.getLogger(DBContext.class.getName()).log(Level.SEVERE, null, ex);
+            if (connection != null) {
+                System.out.println("Database connection established successfully!");
+            } else {
+                System.out.println("Database connection is null!");
+            }
+        } catch (ClassNotFoundException ex) {
+            System.out.println("JDBC Driver not found: " + ex.getMessage());
+            Logger.getLogger(DBContext.class.getName()).log(Level.SEVERE, "JDBC Driver not found", ex);
+        } catch (SQLException ex) {
+            System.out.println("Database connection failed: " + ex.getMessage());
+            System.out.println("SQL State: " + ex.getSQLState());
+            System.out.println("Error Code: " + ex.getErrorCode());
+            Logger.getLogger(DBContext.class.getName()).log(Level.SEVERE, "Database connection failed", ex);
         }
     }
+    
 }
