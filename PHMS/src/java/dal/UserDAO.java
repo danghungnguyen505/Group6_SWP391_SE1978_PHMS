@@ -7,6 +7,8 @@ package dal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import model.User;
 
 /**
@@ -138,5 +140,24 @@ public class UserDAO extends DBContext {
         }
         return null;
     }
-    
+    //List Veterinarians để hiện danh sách làm việc
+    public List<User> getAllVeterinarians() {
+        List<User> list = new ArrayList<>();
+        // Join bảng Users và Veterinarian để chỉ lấy những ai là Bác sĩ
+        String sql = "SELECT u.user_id, u.full_name FROM Users u " +
+                     "JOIN Veterinarian v ON u.user_id = v.emp_id";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                User u = new User();
+                u.setUserId(rs.getInt("user_id"));
+                u.setFullName(rs.getString("full_name"));
+                list.add(u);
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return list;
+    }
 }

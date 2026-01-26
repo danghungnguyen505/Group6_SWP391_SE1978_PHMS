@@ -1,3 +1,7 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package dal;
 
 import java.sql.PreparedStatement;
@@ -7,183 +11,110 @@ import java.util.ArrayList;
 import java.util.List;
 import model.Pet;
 
-public class PetDAO extends DBContext {
-
+/**
+ *
+ * @author zoxy4
+ */
+public class PetDAO extends DBContext{
+    // 1. Lấy danh sách thú cưng của một chủ sở hữu (Dùng cho Booking & Dashboard)
     public List<Pet> getPetsByOwnerId(int ownerId) {
-        List<Pet> pets = new ArrayList<>();
-        if (connection == null) {
-            System.out.println("Lỗi getPetsByOwnerId: Database connection is null!");
-            return pets;
-        }
-        
-        String sql = "SELECT pet_id, owner_id, name, species, history_summary FROM Pet WHERE owner_id = ?";
-        PreparedStatement st = null;
-        ResultSet rs = null;
+        List<Pet> list = new ArrayList<>();
+        String sql = "SELECT * FROM Pet WHERE owner_id = ?";
         try {
-            System.out.println("getPetsByOwnerId - ownerId: " + ownerId);
-            st = connection.prepareStatement(sql);
+            PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, ownerId);
-            rs = st.executeQuery();
-            int count = 0;
+            ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                Pet pet = new Pet();
-                pet.setPetId(rs.getInt("pet_id"));
-                pet.setOwnerId(rs.getInt("owner_id"));
-                pet.setName(rs.getString("name"));
-                pet.setSpecies(rs.getString("species"));
-                pet.setHistorySummary(rs.getString("history_summary"));
-                pets.add(pet);
-                count++;
-                System.out.println("Found pet: " + pet.getName() + " (ID: " + pet.getPetId() + ")");
+                Pet p = new Pet(
+                    rs.getInt("pet_id"),
+                    rs.getInt("owner_id"),
+                    rs.getString("name"),
+                    rs.getString("species"),
+                    rs.getString("history_summary")
+                );
+                list.add(p);
             }
-            System.out.println("Total pets found: " + count);
         } catch (SQLException e) {
-            System.out.println("Lỗi getPetsByOwnerId: " + e.getMessage());
-            System.out.println("SQL State: " + e.getSQLState());
-            System.out.println("Error Code: " + e.getErrorCode());
-            e.printStackTrace();
-        } finally {
-            try {
-                if (rs != null) rs.close();
-                if (st != null) st.close();
-            } catch (SQLException e) {
-                System.out.println("Lỗi khi đóng tài nguyên: " + e.getMessage());
-            }
+            System.out.println("Error getPetsByOwnerId: " + e);
         }
-        return pets;
+        return list;
     }
-
+    // 2. Lấy thông tin chi tiết 1 thú cưng theo ID (Dùng khi xem chi tiết hoặc sửa)
     public Pet getPetById(int petId) {
-        String sql = "SELECT pet_id, owner_id, name, species, history_summary FROM Pet WHERE pet_id = ?";
-        PreparedStatement st = null;
-        ResultSet rs = null;
+        String sql = "SELECT * FROM Pet WHERE pet_id = ?";
         try {
-            st = connection.prepareStatement(sql);
+            PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, petId);
-            rs = st.executeQuery();
+            ResultSet rs = st.executeQuery();
             if (rs.next()) {
-                Pet pet = new Pet();
-                pet.setPetId(rs.getInt("pet_id"));
-                pet.setOwnerId(rs.getInt("owner_id"));
-                pet.setName(rs.getString("name"));
-                pet.setSpecies(rs.getString("species"));
-                pet.setHistorySummary(rs.getString("history_summary"));
-                return pet;
+                return new Pet(
+                    rs.getInt("pet_id"),
+                    rs.getInt("owner_id"),
+                    rs.getString("name"),
+                    rs.getString("species"),
+                    rs.getString("history_summary")
+                );
             }
         } catch (SQLException e) {
-            System.out.println("Lỗi getPetById: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            try {
-                if (rs != null) rs.close();
-                if (st != null) st.close();
-            } catch (SQLException e) {
-                System.out.println("Lỗi khi đóng tài nguyên: " + e.getMessage());
-            }
+            System.out.println("Error getPetById: " + e);
         }
         return null;
     }
-
-    public int createPet(int ownerId, String name, String species, String historySummary) {
-        if (connection == null) {
-            System.out.println("Lỗi createPet: Database connection is null!");
-            return -1;
-        }
-        
+    // 3. Thêm thú cưng mới (Add New Pet)
+    public boolean addPet(int ownerId, String name, String species, String history) {
         String sql = "INSERT INTO Pet (owner_id, name, species, history_summary) VALUES (?, ?, ?, ?)";
-        PreparedStatement st = null;
-        ResultSet rs = null;
         try {
-            st = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+            PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, ownerId);
             st.setString(2, name);
             st.setString(3, species);
-            st.setString(4, historySummary != null ? historySummary : "");
-            
-            System.out.println("Executing SQL: " + sql);
-            System.out.println("Parameters: ownerId=" + ownerId + ", name=" + name + ", species=" + species);
-            
-            int result = st.executeUpdate();
-            System.out.println("Execute update result: " + result);
-            
-            if (result > 0) {
-                rs = st.getGeneratedKeys();
-                if (rs != null && rs.next()) {
-                    // Try to get by column name first, then by index
-                    int petId;
-                    try {
-                        petId = rs.getInt("pet_id");
-                    } catch (SQLException e) {
-                        petId = rs.getInt(1);
-                    }
-                    System.out.println("Created pet with ID: " + petId);
-                    return petId;
-                } else {
-                    System.out.println("Warning: No generated keys returned!");
-                }
-            } else {
-                System.out.println("Warning: No rows affected!");
-            }
+            st.setString(4, history);
+            int rows = st.executeUpdate();
+            return rows > 0;
         } catch (SQLException e) {
-            System.out.println("Lỗi createPet: " + e.getMessage());
-            System.out.println("SQL State: " + e.getSQLState());
-            System.out.println("Error Code: " + e.getErrorCode());
-            e.printStackTrace();
-        } finally {
-            try {
-                if (rs != null) rs.close();
-                if (st != null) st.close();
-            } catch (SQLException e) {
-                System.out.println("Lỗi khi đóng tài nguyên: " + e.getMessage());
-            }
+            System.out.println("Error addPet: " + e);
         }
-        return -1;
+        return false;
     }
-
-    public boolean updatePet(int petId, String name, String species, String historySummary) {
+    // 4. Cập nhật thông tin thú cưng (Update Pet Info)
+    public boolean updatePet(Pet p) {
         String sql = "UPDATE Pet SET name = ?, species = ?, history_summary = ? WHERE pet_id = ?";
-        PreparedStatement st = null;
         try {
-            st = connection.prepareStatement(sql);
-            st.setString(1, name);
-            st.setString(2, species);
-            st.setString(3, historySummary);
-            st.setInt(4, petId);
-            int result = st.executeUpdate();
-            return result > 0;
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setString(1, p.getName());
+            st.setString(2, p.getSpecies());
+            st.setString(3, p.getHistorySummary());
+            st.setInt(4, p.getId());
+            int rows = st.executeUpdate();
+            return rows > 0;
         } catch (SQLException e) {
-            System.out.println("Lỗi updatePet: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            try {
-                if (st != null) st.close();
-            } catch (SQLException e) {
-                System.out.println("Lỗi khi đóng tài nguyên: " + e.getMessage());
-            }
+            System.out.println("Error updatePet: " + e);
         }
         return false;
     }
-
-    public boolean deletePet(int petId, int ownerId) {
-        // Only allow owner to delete their own pet
-        String sql = "DELETE FROM Pet WHERE pet_id = ? AND owner_id = ?";
-        PreparedStatement st = null;
+    // 5. Xóa thú cưng (Delete Pet)
+    public boolean deletePet(int petId) {
+        String sql = "DELETE FROM Pet WHERE pet_id = ?";
         try {
-            st = connection.prepareStatement(sql);
+            PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, petId);
-            st.setInt(2, ownerId);
-            int result = st.executeUpdate();
-            return result > 0;
+            int rows = st.executeUpdate();
+            return rows > 0;
         } catch (SQLException e) {
-            System.out.println("Lỗi deletePet: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            try {
-                if (st != null) st.close();
-            } catch (SQLException e) {
-                System.out.println("Lỗi khi đóng tài nguyên: " + e.getMessage());
-            }
+            System.out.println("Error deletePet: " + e);
         }
         return false;
     }
+    
+    // Hàm main để test thử DAO 
+//    public static void main(String[] args) {
+//        PetDAO dao = new PetDAO();
+//        int ownerIdTest = 5; 
+//        System.out.println("Danh sách thú cưng của User ID " + ownerIdTest + ":");
+//        List<Pet> list = dao.getPetsByOwnerId(ownerIdTest);
+//        
+//        for (Pet p : list) {
+//            System.out.println("- " + p.getName() + " (" + p.getSpecies() + ")");
+//        }
+//    }
 }

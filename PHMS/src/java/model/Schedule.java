@@ -1,5 +1,13 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package model;
 
+/**
+ *
+ * @author zoxy4
+ */
 import java.sql.Date;
 
 public class Schedule {
@@ -8,17 +16,18 @@ public class Schedule {
     private int managerId;
     private Date workDate;
     private String shiftTime;
-    private String vetName;
+    private String vetName; 
 
     public Schedule() {
     }
 
-    public Schedule(int scheduleId, int empId, int managerId, Date workDate, String shiftTime) {
+    public Schedule(int scheduleId, int empId, int managerId, Date workDate, String shiftTime, String vetName) {
         this.scheduleId = scheduleId;
         this.empId = empId;
         this.managerId = managerId;
         this.workDate = workDate;
         this.shiftTime = shiftTime;
+        this.vetName = vetName;
     }
 
     public int getScheduleId() {
@@ -68,4 +77,7 @@ public class Schedule {
     public void setVetName(String vetName) {
         this.vetName = vetName;
     }
+
+
+    
 }
