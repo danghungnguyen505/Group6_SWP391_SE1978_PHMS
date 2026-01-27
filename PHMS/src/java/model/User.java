@@ -17,8 +17,17 @@ public class User {
     private String phone;
     private String email;
     private String address; 
+    private boolean isActive;
     
     public User() {
+    }
+
+    public boolean isIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
     }
 
     public User(int userId, String username, String password, String fullName, String role, String phone, String email, String address) {
