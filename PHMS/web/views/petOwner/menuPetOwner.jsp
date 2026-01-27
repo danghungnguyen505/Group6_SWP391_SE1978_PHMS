@@ -86,7 +86,7 @@
                     <h1>Book Appointment</h1>
                     <p>Schedule a visit for your beloved pet in just a few clicks.</p>
                 </div>
-                <button class="btn-cancel">Cancel Booking</button>
+                <button class="btn-cancel">Back to home</button>
             </div>
 
             <!-- Booking Form Grid -->

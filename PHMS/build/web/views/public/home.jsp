@@ -93,7 +93,7 @@
                 <!-- SỬA LINK NÚT "ĐẶT LỊCH NGAY" -->
                 <c:choose>
                     <c:when test="${not empty sessionScope.account and sessionScope.account.role == 'PetOwner'}">
-                        <a href="${pageContext.request.contextPath}/petOwner/booking" class="btn btn-primary">Đặt lịch ngay</a>
+                        <a href="${pageContext.request.contextPath}/petOwner/menuPetOwner" class="btn btn-primary">Đặt lịch ngay</a>
                     </c:when>
                     <c:otherwise>
                         <!-- Nếu chưa login hoặc không phải PetOwner thì trỏ về Login -->
