@@ -31,7 +31,6 @@ public class ScheduleVeterianrianDAO extends DBContext {
                 Schedule s = new Schedule();
                 s.setScheduleId(rs.getInt("schedule_id"));
                 s.setEmpId(rs.getInt("emp_id"));
-                s.setVetName(rs.getString("full_name")); 
                 // s.setManagerId(rs.getInt("manager_id")); 
                 s.setWorkDate(rs.getDate("work_date"));
                 s.setShiftTime(rs.getString("shift_time"));
