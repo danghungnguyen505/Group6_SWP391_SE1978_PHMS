@@ -35,9 +35,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
 
 .admin-nav-links {
     display: flex;
-    flex-direction: row;
+    flex-direction: column; 
     gap: 0.5rem;             
-    width: 500px;          
+    width: 200px;          
     padding: 1rem;
 }
 
@@ -56,7 +56,6 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     text-decoration: none;  
     width: 100%;            
     box-sizing: border-box;
-    white-space: nowrap;  
 }
 
 .admin-nav-item:hover {
