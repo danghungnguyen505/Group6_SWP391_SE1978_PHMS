@@ -33,7 +33,7 @@ public class SaveAppointmentController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            // 1. // Lấy dữ liệu từ form
+            // 1. Lấy dữ liệu từ form
             String petIdStr = request.getParameter("petId");
             String serviceType = request.getParameter("serviceType");
             String vetIdStr = request.getParameter("vetId");
