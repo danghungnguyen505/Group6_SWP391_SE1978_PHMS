@@ -213,5 +213,24 @@
             <p>&copy; 2026 PHMS_DB Management System. All rights reserved.</p>
         </div>
     </footer>
+    <script>
+        //Hiện thông báo khi đặt lịch thành công
+        window.onload = function() {
+            <% 
+                // Lấy thông báo từ Session
+                String msg = (String) session.getAttribute("toastMessage");
+                if(msg != null) {
+                    String[] parts = msg.split("\\|");
+                    String text = parts.length > 1 ? parts[1] : msg;
+            %>
+                // Hiển thị thông báo
+                alert("<%= text %>");
+            <% 
+                // Xóa ngay để F5 không hiện lại
+                session.removeAttribute("toastMessage");
+                } 
+            %>
+        };
+    </script>
 </body>
 </html>

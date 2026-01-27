@@ -23,7 +23,9 @@ body {
     color: #334155;
 }
 
-a { text-decoration: none; }
+a {
+    text-decoration: none;
+}
 
 /* --- SIDEBAR --- */
 .sidebar {
@@ -80,8 +82,12 @@ a { text-decoration: none; }
     border-left-color: #10b981;
 }
 
-.menu li a.text-danger { color: #ef4444; }
-.menu li a.text-danger:hover { background-color: #fef2f2; }
+.menu li a.text-danger {
+    color: #ef4444;
+}
+.menu li a.text-danger:hover {
+    background-color: #fef2f2;
+}
 
 /* Help Box in Sidebar */
 .help-box {
@@ -91,7 +97,11 @@ a { text-decoration: none; }
     border-radius: 12px;
 }
 
-.help-text { font-size: 13px; color: #94a3b8; margin-bottom: 12px; }
+.help-text {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-bottom: 12px;
+}
 
 .btn-contact {
     display: block;
@@ -144,7 +154,9 @@ a { text-decoration: none; }
     transition: 0.2s;
 }
 
-.btn-signout:hover { background-color: #f1f5f9; }
+.btn-signout:hover {
+    background-color: #f1f5f9;
+}
 
 /* --- CARD & TABLE --- */
 .card {
@@ -185,7 +197,9 @@ tbody tr {
     border-bottom: 1px solid #f1f5f9;
 }
 
-tbody tr:last-child { border-bottom: none; }
+tbody tr:last-child {
+    border-bottom: none;
+}
 
 tbody td {
     padding: 20px 0;
@@ -195,10 +209,25 @@ tbody td {
 }
 
 /* Column specific styles */
-.col-id { font-weight: 700; color: #1e293b; }
-.col-pet { font-weight: 600; color: #1e293b; }
-.col-service { color: #10b981; font-weight: 500; }
-.col-notes { font-style: italic; color: #94a3b8; max-width: 200px; }
+.col-id {
+    font-weight: 700;
+    color: #1e293b;
+}
+.col-pet {
+    font-weight: 600;
+    color: #1e293b;
+}
+.col-service {
+    color: #10b981;
+    font-weight: 500;
+}
+.col-notes {
+    max-width: 200px;       /* Giới hạn chiều rộng (bạn có thể chỉnh số này) */
+    white-space: nowrap;    /* Không cho xuống dòng */
+    overflow: hidden;       /* Ẩn phần chữ bị thừa */
+    text-overflow: ellipsis; /* Thêm dấu "..." vào cuối */
+    cursor: pointer;        /* Đổi con trỏ chuột thành hình bàn tay */
+}
 
 /* Buttons in Table */
 .action-group {
@@ -224,14 +253,18 @@ tbody td {
     background-color: #10b981;
     color: white;
 }
-.btn-approve:hover { background-color: #059669; }
+.btn-approve:hover {
+    background-color: #059669;
+}
 
 .btn-reject {
     background-color: #fff;
     border: 1px solid #ef4444;
     color: #ef4444;
 }
-.btn-reject:hover { background-color: #fef2f2; }
+.btn-reject:hover {
+    background-color: #fef2f2;
+}
 
 /* Alerts */
 .alert {
@@ -250,4 +283,75 @@ tbody td {
     text-align: center;
     padding: 40px;
     color: #94a3b8;
+}
+/* CSS cho nút Xem Note */
+.btn-view-note {
+    background-color: #059669; /* Màu xanh dương */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+.btn-view-note:hover {
+    background-color: #2563eb;
+}
+
+/* CSS cho Modal (Hộp thoại) - Mặc định ẩn (display: none) */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5); /* Màu đen mờ */
+}
+
+/* Nội dung hộp thoại */
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* Cách trên 15% và giữa màn hình */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%; /* Rộng 50% màn hình */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+/* Nút đóng (X) */
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.close-btn:hover {
+    color: black;
+}
+
+/* Tiêu đề modal */
+.modal-title {
+    margin-top: 0;
+    color: #1f2937;
+    font-size: 1.25rem;
+    font-weight: 600;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+/* Nội dung note bên trong */
+.modal-body {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #4b5563;
+    white-space: pre-wrap; /* Giữ nguyên xuống dòng nếu có */
+    max-height: 400px;
+    overflow-y: auto;
 }

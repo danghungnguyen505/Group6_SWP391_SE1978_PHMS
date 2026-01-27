@@ -45,54 +45,7 @@ public class BookingController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String action = request.getParameter("action");
-        if ("book".equals(action)) {
-            saveAppointment(request, response);
-        }
         processViewSlot(request, response);
-    }
-
-    //XỬ LÝ LƯU CUỘC HẸN
-    private void saveAppointment(HttpServletRequest request, HttpServletResponse response) {
-        try {
-            // Lấy dữ liệu từ form
-            String petIdStr = request.getParameter("petId");
-            String serviceType = request.getParameter("serviceType");
-            String vetIdStr = request.getParameter("vetId");
-            String dateStr = request.getParameter("selectedDate");
-            String timeStr = request.getParameter("timeSlot");
-            String notes = request.getParameter("notes");
-            // Validate
-            if (petIdStr == null || petIdStr.isEmpty() || vetIdStr == null || vetIdStr.isEmpty()
-                    || dateStr == null || dateStr.isEmpty() || timeStr == null || timeStr.isEmpty()) {
-                request.setAttribute("error", "Vui lòng chọn đầy đủ Thú cưng, Ngày, Bác sĩ và Giờ khám!");
-                request.setAttribute("selectedDateStr", dateStr); 
-                request.setAttribute("selectedVetId", vetIdStr);
-                processViewSlot(request, response);
-                return;
-            }
-            // Gộp Ngày + Giờ (dateStr từ input type=date: yyyy-MM-dd; timeStr từ slot: HH:mm)
-            String dateTimeString = dateStr + " " + timeStr + ":00";
-            Timestamp startTime = Timestamp.valueOf(dateTimeString);
-            // Tạo Object
-            Appointment appt = new Appointment();
-            appt.setPetId(Integer.parseInt(petIdStr));
-            appt.setVetId(Integer.parseInt(vetIdStr));
-            appt.setStartTime(startTime);
-            appt.setType(serviceType != null ? serviceType : "Checkup"); // Mặc định nếu null
-            appt.setNotes(notes != null ? notes : "");
-            // Gọi DAO lưu
-            AppointmentDAO dao = new AppointmentDAO();
-            boolean isSaved = dao.insertAppointment(appt);
-            if (isSaved) {
-                request.setAttribute("successMessage", "Đặt lịch thành công! Vui lòng chờ Lễ tân duyệt.");
-            } else {
-                request.setAttribute("error", "Lỗi: Không thể lưu cuộc hẹn (Dữ liệu không hợp lệ hoặc lỗi server).");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", "Lỗi đặt lịch: " + e.getMessage());
-        }
     }
 
     private void processViewSlot(HttpServletRequest request, HttpServletResponse response)
