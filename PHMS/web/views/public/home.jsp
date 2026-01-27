@@ -59,7 +59,7 @@
                     <a href="${pageContext.request.contextPath}/login" class="btn btn-dark">
                         Đăng nhập
                     </a>
-                    <a href="${pageContext.request.contextPath}/register" class="btn btn-outline" style="margin-left: 10px; color: white; border-color: white;">
+                    <a href="${pageContext.request.contextPath}/register" class="btn btn-dark" style="margin-left: 10px; color: white; border-color: white;">
                         Đăng ký
                     </a>
                 </c:when>
@@ -69,7 +69,7 @@
                     <div style="display: inline-flex; align-items: center; gap: 10px;">
                         <span class="btn btn-dark">
                            <i class="fa-solid fa-user" style="color: greenyellow;padding-right: 10px"></i> 
-                             <a href="${pageContext.request.contextPath}/petOwner/menuPetOwner">${sessionScope.account.fullName}</a>
+                             <a href="${pageContext.request.contextPath}/profile">${sessionScope.account.fullName}</a>
                         </span>
                         
                         <!-- Nút Logout -->

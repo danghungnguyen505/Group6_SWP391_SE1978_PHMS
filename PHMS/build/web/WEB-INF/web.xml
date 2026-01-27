@@ -61,6 +61,18 @@
         <servlet-name>LoadAppointmentController</servlet-name>
         <servlet-class>controller.LoadAppointmentController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>UserListController</servlet-name>
+        <servlet-class>controller.admin.UserListController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>UserCreateController</servlet-name>
+        <servlet-class>controller.admin.UserCreateController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>UserEditController</servlet-name>
+        <servlet-class>controller.admin.UserEditController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>HomeController</servlet-name>
         <url-pattern>/home</url-pattern>
@@ -127,6 +139,18 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>BookingController</servlet-name>
-        <url-pattern>/booking</url-pattern> 
+        <url-pattern>/booking</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UserListController</servlet-name>
+        <url-pattern>/admin/users</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UserCreateController</servlet-name>
+        <url-pattern>/admin/user-create</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UserEditController</servlet-name>
+        <url-pattern>/admin/user-edit</url-pattern>
     </servlet-mapping>
 </web-app>
