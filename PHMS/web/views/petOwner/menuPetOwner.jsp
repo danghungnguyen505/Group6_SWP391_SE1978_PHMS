@@ -16,6 +16,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <link href="${pageContext.request.contextPath}/assets/css/pages/menuPetOwner.css" rel="stylesheet" type="text/css"/>
         <script src="${pageContext.request.contextPath}/assets/js/saveSchedule.js"></script>
+
     </head>
     <body>
 
@@ -75,9 +76,9 @@
         <main class="main-content">
             <!-- Top Header -->
             <header class="top-bar">
-                    <a href="${pageContext.request.contextPath}/logout" class="btn btn-dark" style="background-color: #ef4444; border-color: #ef4444;">
-                        Đăng xuất
-                    </a>
+                <a href="${pageContext.request.contextPath}/logout" class="btn btn-dark" style="background-color: #ef4444; border-color: #ef4444;">
+                    Logout
+                </a>
             </header>
 
             <!-- Page Title & Actions -->
@@ -86,7 +87,9 @@
                     <h1>Book Appointment</h1>
                     <p>Schedule a visit for your beloved pet in just a few clicks.</p>
                 </div>
-                <button class="btn-cancel">Cancel Booking</button>
+                <button type="button" class="btn-cancel" onclick="window.location.href='${pageContext.request.contextPath}/home'">
+                       Back to home
+                </button>
             </div>
 
             <!-- Booking Form Grid -->
@@ -142,10 +145,11 @@
                     <div>
                         <div class="notes-header">
                             <div class="section-title" style="margin-bottom:0">Notes & Symptoms</div>
-                            <span class="char-count">0/500</span>
+                            <span class="char-count"></span>
                         </div>
                         <div class="form-group" style="margin-top: 15px;">
-                            <textarea class="form-control" name="notes" placeholder="Tell us about your pet's symptoms or any specific concerns..."></textarea>
+                            <textarea class="form-control" name="notes" maxlength="100"
+                                      placeholder="Tell us about your pet's symptoms or any specific concerns..."></textarea>
                         </div>
                     </div>
                 </div>
@@ -160,8 +164,8 @@
                         <label>Available Time Slots</label>
                         <div class="time-slots-grid">
                             <c:if test="${empty availableSlots}">
-                                <p class="text-muted" style="grid-column: span 4; font-size: 0.9em;">
-                                    Vui lòng chọn Ngày và Bác sĩ để xem giờ trống.
+                                <p class="text-muted" style="grid-column: span 4; font-size: 0.9em;color: red">
+                                    Please select a Date and Doctor to see available appointments.
                                 </p>
                             </c:if>
                             <c:forEach items="${availableSlots}" var="slot">
@@ -177,7 +181,10 @@
                     </div>
                     <!-- Card 4: Action Button -->
                     <div class="action-card">
-                        <button type="submit" name="action" value="book" class="btn-confirm">
+                        <button type="submit" 
+                                id="btnConfirm"
+                                formaction="${pageContext.request.contextPath}/save-appointment" 
+                                class="btn-confirm">
                             Confirm Booking <i class="fa-solid fa-arrow-right"></i>
                         </button>
                         <p class="disclaimer">By confirming, you agree to our 24-hour cancellation policy.</p>

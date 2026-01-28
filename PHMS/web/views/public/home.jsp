@@ -39,7 +39,7 @@
             <c:if test="${not empty sessionScope.account}">
                 <c:choose>
                     <c:when test="${sessionScope.account.role == 'PetOwner'}">
-                        <a href="${pageContext.request.contextPath}/petOwner/Appointment">Đặt lịch</a>
+                        <a href="${pageContext.request.contextPath}/petOwner/menuPetOwner">Đặt lịch</a>
                     </c:when>
                     <c:when test="${sessionScope.account.role == 'Veterinarian'}">
                         <a href="${pageContext.request.contextPath}/doctor/schedule">Lịch làm việc</a>
@@ -49,7 +49,6 @@
                     </c:when>
                 </c:choose>
             </c:if> 
-            <a href="${pageContext.request.contextPath}/petOwner/menuPetOwner"> Main Menu </a>
         </div>
         <div>
             <!-- LOGIC HIỂN THỊ NÚT ĐĂNG NHẬP / USER PROFILE -->
@@ -59,7 +58,7 @@
                     <a href="${pageContext.request.contextPath}/login" class="btn btn-dark">
                         Đăng nhập
                     </a>
-                    <a href="${pageContext.request.contextPath}/register" class="btn btn-dark" style="margin-left: 10px; color: white; border-color: white;">
+                    <a href="${pageContext.request.contextPath}/register" class="btn btn-outline" style="margin-left: 10px; color: black; border-color: black;">
                         Đăng ký
                     </a>
                 </c:when>
@@ -69,7 +68,7 @@
                     <div style="display: inline-flex; align-items: center; gap: 10px;">
                         <span class="btn btn-dark">
                            <i class="fa-solid fa-user" style="color: greenyellow;padding-right: 10px"></i> 
-                             <a href="${pageContext.request.contextPath}/profile">${sessionScope.account.fullName}</a>
+                             <a href="${pageContext.request.contextPath}/petOwner/menuPetOwner">${sessionScope.account.fullName}</a>
                         </span>
                         
                         <!-- Nút Logout -->
@@ -94,7 +93,7 @@
                 <!-- SỬA LINK NÚT "ĐẶT LỊCH NGAY" -->
                 <c:choose>
                     <c:when test="${not empty sessionScope.account and sessionScope.account.role == 'PetOwner'}">
-                        <a href="${pageContext.request.contextPath}/petOwner/booking" class="btn btn-primary">Đặt lịch ngay</a>
+                        <a href="${pageContext.request.contextPath}/petOwner/menuPetOwner" class="btn btn-primary">Đặt lịch ngay</a>
                     </c:when>
                     <c:otherwise>
                         <!-- Nếu chưa login hoặc không phải PetOwner thì trỏ về Login -->
@@ -214,5 +213,24 @@
             <p>&copy; 2026 PHMS_DB Management System. All rights reserved.</p>
         </div>
     </footer>
+    <script>
+        //Hiện thông báo khi đặt lịch thành công
+        window.onload = function() {
+            <% 
+                // Lấy thông báo từ Session
+                String msg = (String) session.getAttribute("toastMessage");
+                if(msg != null) {
+                    String[] parts = msg.split("\\|");
+                    String text = parts.length > 1 ? parts[1] : msg;
+            %>
+                // Hiển thị thông báo
+                alert("<%= text %>");
+            <% 
+                // Xóa ngay để F5 không hiện lại
+                session.removeAttribute("toastMessage");
+                } 
+            %>
+        };
+    </script>
 </body>
 </html>

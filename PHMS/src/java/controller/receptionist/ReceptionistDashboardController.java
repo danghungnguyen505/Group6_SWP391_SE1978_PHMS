@@ -34,6 +34,10 @@ public class ReceptionistDashboardController extends HttpServlet {
         // Lấy danh sách chờ duyệt từ DAO
         dal.AppointmentDAO dao = new dal.AppointmentDAO();
         List<model.Appointment> pendingList = dao.getPendingAppointments();
+        //Danh sách đã duyệt
+        List<model.Appointment> confirmedList = dao.getConfirmedAppointments();
+        request.setAttribute("confirmedList", confirmedList);
+        
         request.setAttribute("pendingList", pendingList);
         // Hiển thị thông báo sau Duyệt/Hủy (chỉ 1 lần)
         Object msg = session.getAttribute("actionMessage");
@@ -43,7 +47,7 @@ public class ReceptionistDashboardController extends HttpServlet {
         }
         request.getRequestDispatcher("/views/receptionist/receptionistDashboard.jsp").forward(request, response);
     } 
-
+//
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
