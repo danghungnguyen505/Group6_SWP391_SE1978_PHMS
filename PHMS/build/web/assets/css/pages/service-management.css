@@ -1,0 +1,173 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Jan 22, 2026, 1:56:58 AM
+    Author     : Nguyen Dang Hung
+*/
+.mgmt-page {
+    padding: 0;
+    background-color: var(--bg-light);
+}
+
+/* Admin Navbar */
+.admin-navbar {
+    background: white;
+    padding: 0.75rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow-sm);
+}
+
+.admin-logo {
+    font-weight: 900;
+    font-size: 1.25rem;
+    color: #2563eb;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+}
+
+.admin-nav-links {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;             
+    width: 500px;          
+    padding: 1rem;
+}
+
+.admin-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.75rem 1rem; 
+    border-radius: 0.75rem;
+    transition: all 0.2s ease;
+    text-decoration: none;  
+    width: 100%;            
+    box-sizing: border-box;
+    white-space: nowrap;  
+}
+
+.admin-nav-item:hover {
+    color: #2563eb;
+    background: #eff6ff;
+}
+
+.admin-nav-item.active {
+    color: #2563eb;
+    background: #eff6ff;
+}
+
+.admin-nav-item svg {
+    width: 20px;            
+    height: 20px;
+    opacity: 0.8;          
+}
+
+.user-info {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-name {
+    color: var(--secondary);
+    font-weight: 700;
+}
+
+/* Management Layout */
+.mgmt-container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+}
+
+.mgmt-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+}
+
+.mgmt-title {
+    font-size: 1.875rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: var(--secondary);
+}
+
+.mgmt-subtitle {
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Button Variants */
+.btn-danger {
+    background-color: #ef4444;
+    color: white !important;
+    border: none;
+}
+
+.btn-danger:hover {
+    background-color: #dc2626;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background-color: #6b7280;
+    color: white !important;
+}
+
+.btn-secondary:hover {
+    background-color: #475569;
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+}
+
+/* Table Enhancements */
+.table-cell-bold {
+    font-weight: 700;
+    color: var(--secondary);
+}
+
+.table-cell-price {
+    font-weight: 900;
+    color: var(--primary-dark);
+}
+
+.action-link {
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+.action-link:hover {
+    opacity: 0.7;
+}
+
+.edit-link { color: #2563eb; margin-right: 1rem; }
+.hide-link { color: #ef4444; }
