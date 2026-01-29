@@ -1,0 +1,348 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Jan 28, 2026, 11:48:39 PM
+    Author     : zoxy4
+*/
+
+/* --- Global Resets --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    display: flex;
+    background-color: #f8f9fa;
+    height: 100vh;
+    overflow: hidden; /* Prevent body scroll, scroll main instead */
+}
+
+/* --- Sidebar Styling --- */
+.sidebar {
+    width: 260px;
+    background-color: #ffffff;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #e5e7eb;
+    height: 100vh;
+}
+
+.brand {
+    font-size: 20px;
+    font-weight: 700;
+    color: #10b981; /* VetCare Green */
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.menu {
+    list-style: none;
+    flex-grow: 1;
+}
+
+.menu li {
+    margin-bottom: 10px;
+}
+
+.menu a {
+    text-decoration: none;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.menu a:hover {
+    background-color: #f3f4f6;
+    color: #10b981;
+}
+
+.menu a.active {
+    background-color: #ecfdf5;
+    color: #10b981;
+    font-weight: 600;
+}
+
+.text-danger { color: #ef4444 !important; }
+
+.help-box {
+    margin-top: auto;
+    background: #f9fafb;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.help-text { font-size: 13px; color: #6b7280; margin-bottom: 8px; font-weight: 600;}
+.btn-contact {
+    display: block;
+    background: #1f2937;
+    color: white;
+    text-decoration: none;
+    padding: 8px 0;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* --- Main Content --- */
+.main-content {
+    flex-grow: 1;
+    padding: 30px;
+    overflow-y: auto;
+    padding-bottom: 100px; /* Space for footer */
+}
+
+/* Header Section */
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.header-text h2 { font-size: 22px; color: #111827; margin-bottom: 5px; }
+.header-text p { color: #6b7280; font-size: 14px; }
+
+.header-actions { display: flex; align-items: center; gap: 10px; }
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.btn-outline {
+    background: white;
+    border: 1px solid #d1d5db;
+    color: #374151;
+}
+.btn-outline:hover { background: #f3f4f6; }
+
+.btn-primary {
+    background: #10b981;
+    border: none;
+    color: white;
+}
+.btn-primary:hover { background: #059669; }
+
+.btn-signout {
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    color: #6b7280;
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+/* Controls Bar (Filter) */
+.controls-bar {
+    background: white;
+    padding: 12px 20px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    margin-bottom: 25px;
+}
+
+.date-nav {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-arrow {
+    background: #f3f4f6;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #6b7280;
+}
+.nav-arrow:hover { background: #e5e7eb; }
+
+.date-range { font-weight: 700; color: #374151; font-size: 14px; }
+
+.role-filter { display: flex; align-items: center; gap: 8px; }
+.filter-label { font-size: 11px; font-weight: 700; color: #9ca3af; margin-right: 5px; letter-spacing: 0.5px; }
+
+.filter-btn {
+    border: none;
+    background: white;
+    color: #6b7280;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.filter-btn:hover { background: #f3f4f6; }
+.filter-btn.active { background: #f3f4f6; color: #111827; }
+
+/* --- Calendar Grid --- */
+.schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 columns for 7 days */
+    gap: 15px;
+}
+
+.day-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.day-header {
+    background: white;
+    text-align: center;
+    padding: 15px 10px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+}
+
+.day-header.active-day {
+    background: #ecfdf5; /* Light green bg */
+    border: 1px solid #a7f3d0;
+}
+
+.day-name { display: block; font-size: 10px; font-weight: 700; color: #9ca3af; margin-bottom: 5px; }
+.day-header.active-day .day-name { color: #10b981; }
+
+.day-num { font-size: 18px; font-weight: 700; color: #374151; }
+.day-header.active-day .day-num { color: #047857; }
+
+/* Shift Cards */
+.shift-card {
+    background: white;
+    border-radius: 10px;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    position: relative;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+.shift-card.leave-card {
+    background: #fef2f2; /* Light red */
+    border-color: #fecaca;
+}
+
+.shift-info { display: flex; flex-direction: column; gap: 4px; }
+
+.avatar-circle {
+    width: 24px;
+    height: 24px;
+    background: #e5e7eb;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: #6b7280;
+    position: absolute;
+    top: 12px;
+    left: 12px;
+}
+.avatar-circle.red { background: #ef4444; color: white; }
+
+/* Adjust padding for cards with avatar absolute positioning */
+.shift-card:not(.leave-card) .shift-info {
+    margin-left: 32px; 
+}
+
+.shift-info h4 { font-size: 13px; color: #1f2937; font-weight: 700; }
+
+.role-badge { font-size: 9px; font-weight: 700; text-transform: uppercase; color: #9ca3af; display: block; margin-bottom: 2px;}
+
+.time { font-size: 11px; color: #6b7280; display: flex; align-items: center; gap: 5px; }
+
+/* Leave Card Specifics */
+.leave-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;}
+.leave-header .avatar-circle { position: static; }
+.tag-leave {
+    background: #ef4444;
+    color: white;
+    font-size: 8px;
+    font-weight: 700;
+    padding: 2px 4px;
+    border-radius: 3px;
+    text-transform: uppercase;
+}
+
+/* Empty Slots */
+.empty-slot-marker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0;
+    color: #d1d5db;
+    gap: 5px;
+}
+.empty-slot-marker span { font-size: 10px; font-weight: 700; letter-spacing: 1px; }
+
+.add-slot-btn {
+    border: 1px dashed #d1d5db;
+    border-radius: 10px;
+    padding: 8px;
+    text-align: center;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.add-slot-btn:hover { background: #f9fafb; border-color: #9ca3af; color: #6b7280; }
+
+/* --- Footer Stats --- */
+.footer-stats {
+    position: fixed;
+    bottom: 0;
+    left: 260px; /* Width of sidebar */
+    right: 0;
+    background: #111827; /* Dark bg */
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    z-index: 100;
+}
+
+.stats-group { display: flex; gap: 40px; }
+.stat-item { display: flex; flex-direction: column; }
+.stat-label { font-size: 10px; font-weight: 700; color: #6b7280; letter-spacing: 0.5px; margin-bottom: 2px; }
+.stat-value { font-size: 18px; font-weight: 700; color: white; }
+.text-green { color: #10b981; }
+.text-blue { color: #3b82f6; }
+
+.warning-box {
+    background: #1f2937;
+    border: 1px solid #374151;
+    padding: 8px 15px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.warning-box i { color: #f59e0b; /* Warning Yellow */ font-size: 18px; }
+.warning-text { display: flex; flex-direction: column; }
+.warning-text strong { font-size: 12px; color: #e5e7eb; }
+.warning-text span { font-size: 11px; color: #9ca3af; }

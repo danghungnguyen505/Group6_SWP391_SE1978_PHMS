@@ -100,4 +100,37 @@ public class AppointmentDAO extends DBContext{
             return false;
         }
     }
+    //Xác nhận cuộc nhận
+    public List<model.Appointment> getConfirmedAppointments() {
+        List<model.Appointment> list = new ArrayList<>();
+        String sql = "SELECT a.appt_id, a.start_time, a.type, a.notes, " +
+                     "p.name AS pet_name, " +
+                     "u_vet.full_name AS vet_name, " +
+                     "u_owner.full_name AS owner_name " +
+                     "FROM Appointment a " +
+                     "JOIN Pet p ON a.pet_id = p.pet_id " +
+                     "JOIN Users u_vet ON a.vet_id = u_vet.user_id " +
+                     "JOIN Users u_owner ON p.owner_id = u_owner.user_id " +
+                     "WHERE a.status = 'Confirmed' " + // Chỉ lấy trạng thái Confirmed
+                     "ORDER BY a.start_time ASC";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                model.Appointment a = new model.Appointment();
+                a.setApptId(rs.getInt("appt_id")); 
+                a.setStartTime(rs.getTimestamp("start_time"));
+                a.setType(rs.getString("type"));
+                a.setNotes(rs.getString("notes"));
+                a.setPetName(rs.getString("pet_name"));
+                a.setVetName(rs.getString("vet_name"));
+                a.setOwnerName(rs.getString("owner_name"));
+                a.setStatus("Confirmed"); // Set cứng trạng thái để hiển thị nếu cần
+                list.add(a);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getConfirmedAppointments: " + e);
+        }
+        return list;
+    }
 }
