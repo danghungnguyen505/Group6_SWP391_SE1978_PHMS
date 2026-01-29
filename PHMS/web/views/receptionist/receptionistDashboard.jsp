@@ -37,6 +37,11 @@
                     </a>
                 </li>
                 <li>
+                    <a href="${pageContext.request.contextPath}/receptionist/scheduling">
+                        <i class="fa-solid fa-truck-medical"></i> Staff Scheduling
+                    </a>
+                </li>
+                <li>
                     <a href="${pageContext.request.contextPath}/receptionist/appointments" class="active">
                         <i class="fa-regular fa-calendar-check"></i> Appointments
                     </a>
