@@ -133,4 +133,35 @@ public class AppointmentDAO extends DBContext{
         }
         return list;
     }
+    //Hàm lấy cuộc hẹn đã từng,sắp tới của petOwner
+    public List<model.Appointment> getAppointmentsByOwnerId(int ownerId) {
+            List<model.Appointment> list = new ArrayList<>();
+            String sql = "SELECT a.appt_id, a.start_time, a.status, a.type, a.notes, " +
+                         "p.name AS pet_name, " +
+                         "u.full_name AS vet_name " +
+                         "FROM Appointment a " +
+                         "JOIN Pet p ON a.pet_id = p.pet_id " +
+                         "JOIN Users u ON a.vet_id = u.user_id " +
+                         "WHERE p.owner_id = ? " +
+                         "ORDER BY a.start_time DESC"; // Mới nhất lên đầu
+            try {
+                PreparedStatement st = connection.prepareStatement(sql);
+                st.setInt(1, ownerId);
+                ResultSet rs = st.executeQuery();
+                while (rs.next()) {
+                    model.Appointment a = new model.Appointment();
+                    a.setApptId(rs.getInt("appt_id"));
+                    a.setStartTime(rs.getTimestamp("start_time"));
+                    a.setStatus(rs.getString("status"));
+                    a.setType(rs.getString("type"));
+                    a.setNotes(rs.getString("notes"));
+                    a.setPetName(rs.getString("pet_name"));
+                    a.setVetName(rs.getString("vet_name"));
+                    list.add(a);
+                }
+            } catch (SQLException e) {
+                System.out.println("Error getAppointmentsByOwnerId: " + e);
+            }
+            return list;
+        }
 }

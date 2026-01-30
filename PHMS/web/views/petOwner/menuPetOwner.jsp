@@ -35,8 +35,13 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link active">
+                    <a href="#" class="nav-link active" >
                         <i class="fa-regular fa-calendar-check"></i> Appointments
+                    </a>
+                </li>
+                <li class="nav-item" style="font-size: 13px;">
+                    <a href="${pageContext.request.contextPath}/myAppointment"class="nav-link">
+                        <i class="fa-solid fa-calendar-check"></i> My Appointments
                     </a>
                 </li>
                 <li class="nav-item">

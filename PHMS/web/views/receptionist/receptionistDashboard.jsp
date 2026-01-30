@@ -131,7 +131,7 @@
                                     <td class="col-service">${a.type}</td>
                                     <td>${a.vetName}</td>
                                     <td>${a.startTime}</td>
-                                    <td style="text-align: center;">
+                                    <td>
                                         <c:if test="${not empty a.notes}">
                                             <button type="button" 
                                                     class="btn-view-note" 
