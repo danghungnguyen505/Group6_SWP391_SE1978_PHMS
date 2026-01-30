@@ -92,9 +92,9 @@
                     <h1>My Appointments</h1>
                     <p>Track your upcoming visits and view past history.</p>
                 </div>
-                <button type="button" class="btn-cancel" onclick="window.location.href='${pageContext.request.contextPath}/home'">
-                       Back to home
-                </button>
+                <a href="${pageContext.request.contextPath}/home" class="btn btn-outline-secondary" style="text-decoration: none;">
+                    <i class="fa-solid fa-arrow-left me-2"></i> Back to Home
+                </a>
             </div>
 
             <div class="section-header">
@@ -118,6 +118,7 @@
                             <th>Doctor</th>
                             <th>Status</th>
                             <th>Notes</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -144,6 +145,34 @@
                                     </c:if>
                                     <c:if test="${empty u.notes}">
                                         <span style="color: #9ca3af; font-style: italic; font-size: 0.9em;">No notes</span>
+                                    </c:if>
+                                </td>
+                                <td style="text-align: center;">
+                                    <jsp:useBean id="now" class="java.util.Date" />
+                                    <c:set var="currentTime" value="${now.time}" />
+                                    <c:set var="createdTime" value="${u.createdAt != null ? u.createdAt.time : 0}" />
+                                    <c:set var="hoursPassed" value="${(currentTime - createdTime) / (1000 * 60 * 60)}" />
+                                    <c:if test="${hoursPassed < 5}">
+                                        <div class="action-buttons">
+                                            <a href="${pageContext.request.contextPath}/appointment-action?id=${u.apptId}&type=reschedule" 
+                                               class="btn-action btn-reschedule" title="Reschedule">
+                                                <i class="fa-regular fa-clock"></i>
+                                            </a>
+                                            <a href="${pageContext.request.contextPath}/appointment-action?id=${u.apptId}&type=cancel" 
+                                               class="btn-action btn-cancel" title="Cancel">
+                                                <i class="fa-solid fa-user-doctor"></i>
+                                            </a>
+                                        </div>
+
+                                        <div style="font-size: 0.75rem; color: #666; margin-top: 5px; text-align: left;">
+                                            Time Can Change: <fmt:formatNumber value="${5 - hoursPassed}" maxFractionDigits="0"/>h
+                                        </div>
+                                    </c:if>
+
+                                    <c:if test="${hoursPassed >= 5}">
+                                        <div style="color: #9ca3af; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 5px; background: #f3f4f6; padding: 5px; border-radius: 4px;">
+                                            <i class="fa-solid fa-lock"></i> Locked
+                                        </div>
                                     </c:if>
                                 </td>
                             </tr>
@@ -195,42 +224,42 @@
                     </tbody>
                 </table>
             </c:if>
-         <!--Paging của History-->           
-        <c:if test="${totalPages > 1}">
-            <div class="pagination-container">
+            <!--Paging của History-->           
+            <c:if test="${totalPages > 1}">
+                <div class="pagination-container">
 
-                <c:if test="${currentPage > 1}">
-                    <a href="?page=${currentPage - 1}" class="page-link">
-                        <i class="fa-solid fa-chevron-left"></i>
-                    </a>
-                </c:if>
+                    <c:if test="${currentPage > 1}">
+                        <a href="?page=${currentPage - 1}" class="page-link">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+                    </c:if>
 
-                <c:forEach begin="1" end="${totalPages}" var="i">
-                    <a href="?page=${i}" class="page-link ${currentPage == i ? 'active' : ''}">
-                        ${i}
-                    </a>
-                </c:forEach>
+                    <c:forEach begin="1" end="${totalPages}" var="i">
+                        <a href="?page=${i}" class="page-link ${currentPage == i ? 'active' : ''}">
+                            ${i}
+                        </a>
+                    </c:forEach>
 
-                <c:if test="${currentPage < totalPages}">
-                    <a href="?page=${currentPage + 1}" class="page-link">
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </a>
-                </c:if>
+                    <c:if test="${currentPage < totalPages}">
+                        <a href="?page=${currentPage + 1}" class="page-link">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                    </c:if>
 
-            </div>
-        </c:if>     
-        <!--Click để xem note chi tiết-->
-        <div id="noteModal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn" onclick="closeModal()">&times;</span>
-                <h2 class="modal-title">
-                    <i class="fa-solid fa-clipboard-list"></i> Appointment Notes
-                </h2>
-                <div id="modalNoteContent" class="modal-body">
+                </div>
+            </c:if>     
+            <!--Click để xem note chi tiết-->
+            <div id="noteModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-btn" onclick="closeModal()"></span>
+                    <h2 class="modal-title">
+                        <i class="fa-solid fa-clipboard-list"></i> Appointment Notes
+                    </h2>
+                    <div id="modalNoteContent" class="modal-body">
+                    </div>
                 </div>
             </div>
-        </div>
-    </main>
-    <script src="${pageContext.request.contextPath}/assets/js/myAppointment.js"></script>
-</body>
+        </main>
+        <script src="${pageContext.request.contextPath}/assets/js/myAppointment.js"></script>
+    </body>
 </html>
