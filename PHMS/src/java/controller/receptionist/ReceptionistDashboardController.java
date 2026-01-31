@@ -17,7 +17,7 @@ import model.User;
 
 /**
  *
- * @author zoxy4
+ * @author zoxy4 (ReceptionistDashboardController)
  */
 @WebServlet(name="ReceptionistDashboardController", urlPatterns={"/receptionist/dashboard"})
 public class ReceptionistDashboardController extends HttpServlet {

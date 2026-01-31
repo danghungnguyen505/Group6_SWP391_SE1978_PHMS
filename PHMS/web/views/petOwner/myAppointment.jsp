@@ -154,10 +154,11 @@
                                     <c:set var="hoursPassed" value="${(currentTime - createdTime) / (1000 * 60 * 60)}" />
                                     <c:if test="${hoursPassed < 5}">
                                         <div class="action-buttons">
-                                            <a href="${pageContext.request.contextPath}/appointment-action?id=${u.apptId}&type=reschedule" 
-                                               class="btn-action btn-reschedule" title="Reschedule">
-                                                <i class="fa-regular fa-clock"></i>
-                                            </a>
+                                        <a href="${pageContext.request.contextPath}/booking?petId=${u.petId}&vetId=${u.vetId}&serviceType=${u.type}&rescheduleId=${u.apptId}&selectedDate=<fmt:formatDate value="${u.startTime}" pattern="yyyy-MM-dd"/>" 
+                                            class="btn-action btn-reschedule" 
+                                            title="Reschedule">
+                                             <i class="fa-regular fa-clock"></i>
+                                         </a>
                                             <a href="${pageContext.request.contextPath}/appointment-action?id=${u.apptId}&type=cancel" 
                                                class="btn-action btn-cancel" title="Cancel">
                                                 <i class="fa-solid fa-user-doctor"></i>

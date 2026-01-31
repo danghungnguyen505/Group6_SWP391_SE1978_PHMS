@@ -177,9 +177,17 @@ public class AppointmentDAO extends DBContext {
     }
 
     //Xử lý Hủy trong 5 tiếng/thay đổi cuộc hẹn
-    //Lấy thông tin 1 cuộc hẹn
+    // Lấy thông tin 1 cuộc hẹn (Updated to fetch Names via JOIN)
     public model.Appointment getAppointmentById(int apptId) {
-        String sql = "SELECT * FROM Appointment WHERE appt_id = ?";
+        // SQL query with JOINs to fetch pet_name and vet_name (and service if needed)
+        String sql = "SELECT a.*, "
+                   + "p.name AS pet_name, "
+                   + "u.full_name AS vet_name "
+                   + "FROM Appointment a "
+                   + "JOIN Pet p ON a.pet_id = p.pet_id "
+                   + "JOIN Users u ON a.vet_id = u.user_id "
+                   + "WHERE a.appt_id = ?";
+                   
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, apptId);
@@ -191,7 +199,16 @@ public class AppointmentDAO extends DBContext {
                 a.setStatus(rs.getString("status"));
                 a.setType(rs.getString("type"));
                 a.setNotes(rs.getString("notes"));
-                a.setCreatedAt(rs.getTimestamp("created_at")); 
+                a.setCreatedAt(rs.getTimestamp("created_at"));
+                
+                // Set the fetched names
+                a.setPetName(rs.getString("pet_name"));
+                a.setVetName(rs.getString("vet_name"));
+                
+                // IDs (if needed)
+                a.setPetId(rs.getInt("pet_id"));
+                a.setVetId(rs.getInt("vet_id"));
+
                 return a;
             }
         } catch (SQLException e) {
@@ -209,6 +226,25 @@ public class AppointmentDAO extends DBContext {
             return st.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Error reschedule: " + e);
+            return false;
+        }
+    }
+    //Update cuộc hẹn
+    public boolean updateAppointmentFull(model.Appointment appt) {
+        String sql = "UPDATE Appointment SET pet_id = ?, vet_id = ?, start_time = ?, type = ?, notes = ?, status = 'Pending' "
+                   + "WHERE appt_id = ?";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, appt.getPetId());
+            st.setInt(2, appt.getVetId());
+            st.setTimestamp(3, appt.getStartTime());
+            st.setString(4, appt.getType());
+            st.setString(5, appt.getNotes());
+            st.setInt(6, appt.getApptId()); // ID của cuộc hẹn cần sửa
+            
+            return st.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Error updateAppointmentFull: " + e);
             return false;
         }
     }

@@ -99,7 +99,7 @@
 
             <!-- Booking Form Grid -->
             <form action="${pageContext.request.contextPath}/booking" method="post" id="bookingForm" class="booking-grid">
-
+                <input type="hidden" name="rescheduleId" value="${param.rescheduleId}">
                 <!-- Card 1: Visit Details -->
                 <div class="card">
                     <div class="section-title">
@@ -110,7 +110,8 @@
                         <label>Select Pet</label>
                         <select class="form-control" name="petId">
                             <c:forEach items="${pets}" var="p">
-                                <option value="${p.id}">${p.name} (${p.species})</option>
+                                <option value="${p.id}" ${param.petId == p.id ? 'selected' : ''}>
+                                    ${p.name} (${p.species})</option>
                             </c:forEach>
                             <c:if test="${empty pets}">
                                 <option value="" disabled>Bạn chưa có thú cưng nào</option>
@@ -121,8 +122,10 @@
                     <div class="form-group">
                         <label>Service Type</label>
                         <select class="form-control" name="serviceType">
-                            <option value="general">General Examination ($50 - $120)</option>
-                            <option value="vaccination">Vaccination ($30 - $80)</option>
+                            <option value="general" ${param.serviceType == 'general' ? 'selected' : ''}>
+                                General Examination ($50 - $120)</option>
+                            <option value="vaccination" ${param.serviceType == 'vaccination' ? 'selected' : ''}>
+                                Vaccination ($30 - $80)</option>
                         </select>
                     </div>
                     <div class="form-group">

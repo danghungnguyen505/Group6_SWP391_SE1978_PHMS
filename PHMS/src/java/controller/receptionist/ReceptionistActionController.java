@@ -20,8 +20,8 @@ import model.User;
  *
  * @author zoxy4
  */
-@WebServlet(name="AppointmentActionController", urlPatterns={"/receptionist/appointment-action"})
-public class AppointmentActionController extends HttpServlet {
+@WebServlet(name="ReceptionistActionController", urlPatterns={"/receptionist/appointment-action"})
+public class ReceptionistActionController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {

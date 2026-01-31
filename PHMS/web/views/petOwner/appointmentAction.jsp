@@ -1,5 +1,5 @@
 <%-- 
-    Document   : appointmentAction
+    Document   : appointmentAction (PetOwner)
     Created on : Jan 31, 2026, 2:12:03 AM
     Author     : zoxy4
 --%>
@@ -52,18 +52,18 @@
                 </div>
             </div>
 
-            <c:if test="${!canAction}">
+            <c:if test="${isLocked}">
                 <div class="alert-locked">
                     <i class="fa-solid fa-lock fa-2x mb-3"></i>
                     <h5>Action Locked</h5>
-                    <p class="mb-3">You cannot cancel or reschedule within <strong>5 hours</strong> of the appointment time.</p>
+                    <p class="mb-3">Action locked! You can only cancel/reschedule within <strong>5 hours</strong> after booking.</p>
                     <a href="${pageContext.request.contextPath}/myAppointment" class="btn btn-outline-danger">
                         <i class="fa-solid fa-arrow-left"></i> Go Back
                     </a>
                 </div>
             </c:if>
 
-            <c:if test="${canAction}">
+            <c:if test="${!isLocked}">
                 <form action="${pageContext.request.contextPath}/appointment-action" method="POST">
                     <input type="hidden" name="apptId" value="${appt.apptId}">
                     
@@ -78,39 +78,11 @@
                         <input type="hidden" name="action" value="confirm_cancel">
                         
                         <div class="d-flex gap-2 mt-4">
-                            <a href="${pageContext.request.contextPath}/my-appointments" class="btn btn-light border flex-fill">
+                            <a href="${pageContext.request.contextPath}/myAppointment" class="btn btn-light border flex-fill">
                                 <i class="fa-solid fa-xmark"></i> Keep Appointment
                             </a>
                             <button type="submit" class="btn btn-confirm-cancel flex-fill">
                                 <i class="fa-solid fa-check"></i> Yes, Cancel It
-                            </button>
-                        </div>
-                    </c:if>
-
-                    <c:if test="${actionType == 'reschedule'}">
-                        <input type="hidden" name="action" value="confirm_reschedule">
-                        
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label><i class="fa-regular fa-calendar"></i> New Date</label>
-                                    <input type="date" name="newDate" class="form-control" required min="<%= new java.sql.Date(System.currentTimeMillis()) %>">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label><i class="fa-regular fa-clock"></i> New Time</label>
-                                    <input type="time" name="newTime" class="form-control" required>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="d-flex gap-2 mt-4">
-                            <a href="${pageContext.request.contextPath}/my-appointments" class="btn btn-light border flex-fill">
-                                <i class="fa-solid fa-arrow-left"></i> Cancel
-                            </a>
-                            <button type="submit" class="btn btn-confirm-reschedule flex-fill">
-                                <i class="fa-solid fa-paper-plane"></i> Request Change
                             </button>
                         </div>
                     </c:if>
@@ -121,4 +93,3 @@
 
 </body>
 </html>
-

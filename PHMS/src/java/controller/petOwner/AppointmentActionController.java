@@ -89,12 +89,24 @@ public class AppointmentActionController extends HttpServlet {
         if ("confirm_cancel".equals(action)) {
             dao.updateAppointmentStatus(apptId, "Cancelled");
             request.getSession().setAttribute("toastMessage", "success|Đã hủy lịch hẹn.");
+            response.sendRedirect(request.getContextPath() + "/home");
+            return;
         } else if ("confirm_reschedule".equals(action)) {
             String newDate = request.getParameter("newDate");
-            String newTime = request.getParameter("newTime");
-            String dateTimeStr = newDate + " " + newTime + ":00";
-            Timestamp newStart = Timestamp.valueOf(dateTimeStr);
-            dao.rescheduleAppointment(apptId, newStart);
+            //String newTime = request.getParameter("newTime");
+            //String dateTimeStr = newDate + " " + newTime + ":00";
+            //Timestamp newStart = Timestamp.valueOf(dateTimeStr);
+            //Lấy thông tin cũ của cuộc hẹn
+            int petId = appt.getPetId();
+            int vetId = appt.getVetId();
+            String serviceType = appt.getType();
+            String redirectUrl = request.getContextPath() + "/booking"
+            + "?petId=" + petId
+            + "&serviceType=" + serviceType
+            + "&selectedDate=" + newDate
+            + "&vetId=" + vetId
+            + "&rescheduleApptId=" + apptId;
+            //dao.rescheduleAppointment(apptId, newStart);
             request.getSession().setAttribute("toastMessage", "success|Đã gửi yêu cầu đổi lịch.");
         }
         response.sendRedirect(request.getContextPath() + "/my-appointments");
