@@ -48,7 +48,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="${pageContext.request.contextPath}/myPetOwner"class="nav-link">
                         <i class="fa-solid fa-paw"></i> My Pets
                     </a>
                 </li>
