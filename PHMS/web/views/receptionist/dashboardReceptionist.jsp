@@ -1,8 +1,7 @@
 <%-- 
-    Document   : receptionistDashboard
-    Created on : Jan 25, 2026, 1:25:46 AM
+    Document   : dashboardReceptionist
+    Created on : Feb 1, 2026, 10:36:50 PM
     Author     : zoxy4
-    Updated UI : Standard CSS (No Tailwind)
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -27,7 +26,7 @@
 
             <ul class="menu">
                 <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/dashboard">
+                    <a href="${pageContext.request.contextPath}/receptionist/dashboard" class="active">
                         <i class="fa-solid fa-table-columns"></i> Dashboard
                     </a>
                 </li>
@@ -42,7 +41,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/appointments" class="active">
+                    <a href="${pageContext.request.contextPath}/receptionist/appointment">
                         <i class="fa-regular fa-calendar-check"></i> Appointments
                     </a>
                 </li>
@@ -168,62 +167,90 @@
             <!-- Main Card: Confirmed Requests -->
             <div class="card" style="margin-top: 20px;">
                 <div class="section-title">
-                    <span>Upcoming Appointments (Confirmed)</span>
+                    <span>Today's Check-in Queue (<fmt:formatDate value="<%=new java.util.Date()%>" pattern="dd/MM/yyyy"/>)</span>
                 </div>
 
-                <c:if test="${empty confirmedList}">
+                <c:if test="${empty todayList}">
                     <div class="empty-state">
-                        <p>No confirmed appointments found.</p>
+                        <p>No appointments scheduled for today.</p>
                     </div>
                 </c:if>
 
-                <c:if test="${not empty confirmedList}">
+                <c:if test="${not empty todayList}">
                     <table>
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Owner</th>
-                                <th>Pet</th>
-                                <th>Service</th>
-                                <th>Veterinarian</th>
                                 <th>Time</th>
-                                <th>Notes</th>
+                                <th>ID</th>
+                                <th>Owner & Pet</th>
+                                <th>Service</th>
+                                <th>Doctor</th>
                                 <th>Status</th>
+                                <th style="text-align: center;">Check-in Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <c:forEach items="${confirmedList}" var="c">
-                                <tr>
-                                    <td class="col-id">#${c.apptId}</td> 
-                                    <td>${c.ownerName}</td>
-                                    <td class="col-pet">${c.petName}</td>
-                                    <td class="col-service">${c.type}</td>
-                                    <td>${c.vetName}</td>
-                                    <td>${c.startTime}</td>
-                                    <td class="col-notes">${c.notes}</td>
-                                    <td>
-                                        <span style="background-color: #d1fae5; color: #065f46; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
-                                            Confirmed
-                                        </span>
-                                    </td>
-                                </tr>
-                            </c:forEach>
+                            <c:forEach items="${todayList}" var="t">
+                                <jsp:useBean id="now" class="java.util.Date" />
+                                <c:set var="isLate" value="${t.startTime.time < now.time && t.status == 'Confirmed'}" />
+
+                                <tr style="${isLate ? 'background-color: #fff1f2;' : ''}">
+                                    <td style="font-weight: bold; color: var(--primary);">
+                            <fmt:formatDate value="${t.startTime}" pattern="HH:mm"/>
+                            </td>
+                            <td class="col-id">#${t.apptId}</td>
+                            <td>
+                                <div>${t.ownerName}</div>
+                                <small style="color: #666;">Pet: ${t.petName}</small>
+                            </td>
+                            <td class="col-service">${t.type}</td>
+                            <td>${t.vetName}</td>
+                            <td>
+                                <c:choose>
+                                    <c:when test="${t.status == 'Confirmed'}">
+                                        <span style="background: #d1fae5; color: #065f46; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">Confirmed</span>
+                                    </c:when>
+                                    <c:when test="${t.status == 'Checked-in'}">
+                                        <span style="background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">Checked-in</span>
+                                    </c:when>
+                                    <c:when test="${t.status == 'No-show'}">
+                                        <span style="background: #f3f4f6; color: #374151; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">No-show</span>
+                                    </c:when>
+                                </c:choose>
+
+                                <c:if test="${isLate}">
+                                    <div style="color: red; font-size: 11px; margin-top: 2px;"><i class="fa-solid fa-circle-exclamation"></i> Late</div>
+                                </c:if>
+                            </td>
+                            <td style="text-align: center;">
+                                <c:if test="${t.status == 'Confirmed'}">
+                                    <div class="action-group">
+                                        <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${t.apptId}&status=Checked-in" 
+                                           class="btn btn-approve" 
+                                           title="Patient Arrived">
+                                            <i class="fa-solid fa-check-to-slot"></i> Check-in
+                                        </a>
+
+                                        <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${t.apptId}&status=No-show" 
+                                           class="btn btn-reject"
+                                           style="background-color: #64748b; color: white;"
+                                           title="Patient did not come"
+                                           onclick="return confirm('Mark this appointment as No-show?');">
+                                            <i class="fa-solid fa-user-slash"></i> No-show
+                                        </a>
+                                    </div>
+                                </c:if>
+
+                                <c:if test="${t.status != 'Confirmed'}">
+                                    <span style="color: #94a3b8; font-style: italic;">Action taken</span>
+                                </c:if>
+                            </td>
+                            </tr>
+                        </c:forEach>
                         </tbody>
                     </table>
                 </c:if>
             </div>
         </main>
-            <!--Bảng note details-->
-        <div id="noteModal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn" onclick="closeModal()">&times;</span>
-                <h2 class="modal-title">
-                    <i class="fa-regular fa-clipboard"></i> Notes Details
-                </h2>
-                <div id="modalNoteContent" class="modal-body">
-                    </div>
-            </div>
-        </div>
-        <script src="${pageContext.request.contextPath}/assets/js/receptionistDashboard.js"></script>   
     </body>
 </html>

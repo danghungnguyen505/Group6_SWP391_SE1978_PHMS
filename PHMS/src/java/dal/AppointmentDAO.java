@@ -248,4 +248,49 @@ public class AppointmentDAO extends DBContext {
             return false;
         }
     }
+    //Checkin 1. Hàm lấy danh sách cuộc hẹn TRONG NGÀY HÔM NAY (Confirmed, Checked-in, Pending)
+    public List<model.Appointment> getTodayAppointments() {
+        List<model.Appointment> list = new ArrayList<>();
+        // SQL: Lấy cuộc hẹn có ngày bắt đầu = ngày hiện tại
+        String sql = "SELECT a.*, p.name AS pet_name, u.full_name AS vet_name, u_owner.full_name AS owner_name "
+                   + "FROM Appointment a "
+                   + "JOIN Pet p ON a.pet_id = p.pet_id "
+                   + "JOIN Users u ON a.vet_id = u.user_id "
+                   + "JOIN Users u_owner ON p.owner_id = u_owner.user_id "
+                   + "WHERE CAST(a.start_time AS DATE) = CAST(GETDATE() AS DATE) " // Dùng GETDATE() cho SQL Server, hoặc CURDATE() cho MySQL
+                   + "AND a.status IN ('Confirmed', 'Checked-in', 'No-show') "
+                   + "ORDER BY a.start_time ASC";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                model.Appointment a = new model.Appointment();
+                a.setApptId(rs.getInt("appt_id"));
+                a.setStartTime(rs.getTimestamp("start_time"));
+                a.setStatus(rs.getString("status")); // Quan trọng để check trạng thái
+                a.setType(rs.getString("type"));
+                a.setNotes(rs.getString("notes"));
+                a.setPetName(rs.getString("pet_name"));
+                a.setVetName(rs.getString("vet_name"));
+                a.setOwnerName(rs.getString("owner_name"));
+                list.add(a);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getTodayAppointments: " + e);
+        }
+        return list;
+    }
+    //Checkin 2. Hàm update trạng thái chung (dùng cho cả Check-in và No-show)
+    public boolean changeAppointmentStatus(int apptId, String newStatus) {
+        String sql = "UPDATE Appointment SET status = ? WHERE appt_id = ?";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setString(1, newStatus);
+            st.setInt(2, apptId);
+            return st.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Error changeAppointmentStatus: " + e);
+            return false;
+        }
+    }
 }

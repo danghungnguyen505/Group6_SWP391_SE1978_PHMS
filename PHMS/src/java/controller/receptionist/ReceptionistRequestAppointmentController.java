@@ -17,10 +17,10 @@ import model.User;
 
 /**
  *
- * @author zoxy4 (ReceptionistDashboardController)
+ * @author zoxy4 (ReceptionistRequestAppointmentController)
  */
-@WebServlet(name="ReceptionistDashboardController", urlPatterns={"/receptionist/dashboard"})
-public class ReceptionistDashboardController extends HttpServlet {
+@WebServlet(name="ReceptionistDashboardController", urlPatterns={"/receptionist/appointment"})
+public class ReceptionistRequestAppointmentController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -45,7 +45,7 @@ public class ReceptionistDashboardController extends HttpServlet {
             request.setAttribute("actionMessage", msg);
             session.removeAttribute("actionMessage");
         }
-        request.getRequestDispatcher("/views/receptionist/receptionistDashboard.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/receptionist/receptionistRequestAppointment.jsp").forward(request, response);
     } 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
