@@ -1,0 +1,288 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Feb 3, 2026, 1:15:41 AM
+    Author     : zoxy4
+*/
+
+/* --- Dashboard Layout --- */
+.main-content {
+    flex-grow: 1;
+    padding: 30px 40px;
+    background-color: #F9FAFB;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.welcome-text h1 { font-size: 24px; font-weight: 700; color: #111827; margin: 0; }
+.welcome-text p { color: #6B7280; font-size: 14px; margin-top: 5px; }
+
+.user-actions { display: flex; align-items: center; gap: 20px; }
+
+.notification-btn {
+    width: 40px; height: 40px;
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    cursor: pointer;
+    color: #6B7280;
+}
+.badge-dot {
+    width: 8px; height: 8px;
+    background: #EF4444;
+    border-radius: 50%;
+    position: absolute;
+    top: 10px; right: 10px;
+    border: 1px solid white;
+}
+
+.btn-signout {
+    background: white;
+    border: 1px solid #E5E7EB;
+    color: #374151;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: 0.2s;
+}
+.btn-signout:hover { background: #F3F4F6; }
+
+/* Stats Row */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.stat-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+}
+.green-bg { background: #ECFDF5; color: #10B981; }
+.blue-bg { background: #EFF6FF; color: #3B82F6; }
+.orange-bg { background: #FFFBEB; color: #F59E0B; }
+
+.stat-info h3 { font-size: 24px; font-weight: 700; color: #111827; margin: 0; }
+.stat-info p { margin: 0; color: #6B7280; font-size: 13px; }
+
+/* Dashboard Grid */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* Cột trái to gấp đôi cột phải */
+    gap: 24px;
+    align-items: start;
+}
+
+/* Common Card Style */
+.section-card {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #E5E7EB;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.card-header h3 { font-size: 16px; font-weight: 700; color: #111827; margin: 0; }
+
+.view-all, .add-new-btn {
+    font-size: 13px; font-weight: 600; text-decoration: none;
+}
+.view-all { color: #10B981; }
+.add-new-btn { color: #3B82F6; }
+
+/* Next Appointment Highlight */
+.appointment-details {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: #F9FAFB;
+    padding: 16px;
+    border-radius: 12px;
+}
+
+.date-box {
+    background: white;
+    padding: 10px 16px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.date-box .month { display: block; font-size: 11px; font-weight: 700; color: #EF4444; }
+.date-box .day { display: block; font-size: 20px; font-weight: 700; color: #111827; }
+
+.appt-info h4 { font-size: 15px; font-weight: 700; margin: 0 0 5px 0; }
+.appt-info p { margin: 0; font-size: 13px; color: #6B7280; margin-bottom: 2px; }
+
+.time-badge {
+    background: #ECFDF5;
+    color: #059669;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* My Pets Grid */
+.pets-grid {
+    display: flex;
+    gap: 16px;
+}
+
+.pet-mini-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid #E5E7EB;
+    padding: 10px;
+    border-radius: 12px;
+    flex: 1;
+    transition: 0.2s;
+}
+.pet-mini-card:hover { border-color: #10B981; cursor: pointer; }
+
+.pet-mini-card img {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.pet-mini-info h4 { font-size: 14px; font-weight: 600; margin: 0; }
+.pet-mini-info span { font-size: 12px; color: #6B7280}
+
+/* --- Quick Actions --- */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn-action {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+/* Nút chính (Xanh lá) */
+.btn-action.primary {
+    background-color: #10B981;
+    color: white !important;
+    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+}
+.btn-action.primary:hover {
+    background-color: #059669;
+    transform: translateY(-2px);
+}
+
+/* Nút phụ (Xanh dương nhạt) */
+.btn-action.secondary {
+    background-color: #EFF6FF;
+    color: #3B82F6 !important;
+}
+.btn-action.secondary:hover {
+    background-color: #DBEAFE;
+    transform: translateY(-2px);
+}
+
+/* --- Notifications --- */
+.notif-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.notif-item {
+    display: flex;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid #F3F4F6;
+}
+.notif-item:last-child {
+    border-bottom: none;
+}
+
+.notif-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+/* Màu cho từng loại thông báo */
+.notif-icon.warning {
+    background-color: #FFFBEB;
+    color: #F59E0B;
+}
+.notif-icon.success {
+    background-color: #ECFDF5;
+    color: #10B981;
+}
+
+.notif-text p {
+    margin: 0;
+    font-size: 14px;
+    color: #111827;
+    line-height: 1.4;
+}
+
+.notif-text span {
+    font-size: 12px;
+    color: #6B7280;
+    display: block;
+    margin-top: 2px;
+}
+
+/* Chỉnh lại tiêu đề nhỏ trong card */
+.section-card h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
