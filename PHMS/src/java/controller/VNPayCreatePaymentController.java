@@ -11,17 +11,13 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import dal.InvoiceDAO;
-import dal.PaymentDAO;
-import model.Payment;
-import model.Invoice;
 
 /**
  *
  * @author TrungNguyen2002
  */
-@WebServlet(name = "VNPayController", urlPatterns = {"/vnpay-return"})
-public class VNPayController extends HttpServlet {
+@WebServlet(name = "VNPayCreatePaymentController", urlPatterns = {"/vnpay-create"})
+public class VNPayCreatePaymentController extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -40,10 +36,10 @@ public class VNPayController extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet VNPayController</title>");            
+            out.println("<title>Servlet VNPayCreatePaymentController</title>");            
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet VNPayController at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet VNPayCreatePaymentController at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -58,56 +54,23 @@ public class VNPayController extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-     @Override
-protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-        throws ServletException, IOException {
+      @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
 
-    // ✅ 0. Check VNPay response first
-    String responseCode = req.getParameter("vnp_ResponseCode");
+        int invoiceId = Integer.parseInt(req.getParameter("invoiceId"));
 
-    if (responseCode != null && !"00".equals(responseCode)) {
-        // VNPay says payment failed
-        resp.sendRedirect("payment-failed.jsp");
-        return;
+        // 👉 TEMP FAKE VNPay SANDBOX URL
+        // (This is NOT real signing yet)
+        String fakeVNPayUrl =
+            "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+            + "?vnp_TxnRef=" + invoiceId
+            + "&vnp_Amount=100000"
+            + "&vnp_ResponseCode=00"
+            + "&invoiceId=" + invoiceId;
+
+        resp.sendRedirect(fakeVNPayUrl);
     }
-
-    // ✅ 1. Get invoiceId safely
-    String invoiceIdRaw = req.getParameter("invoiceId");
-    if (invoiceIdRaw == null) {
-        resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing invoiceId");
-        return;
-    }
-
-    int invoiceId = Integer.parseInt(invoiceIdRaw);
-
-    InvoiceDAO invoiceDAO = new InvoiceDAO();
-    PaymentDAO paymentDAO = new PaymentDAO();
-
-    // 2. Load invoice
-    Invoice invoice = invoiceDAO.getInvoiceById(invoiceId);
-    if (invoice == null) {
-        resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Invoice not found");
-        return;
-    }
-
-    // 3. Update invoice status
-    invoiceDAO.updateInvoiceStatus(invoiceId, "Paid");
-
-    // 4. Create payment record
-    Payment payment = new Payment();
-    payment.setInvoiceId(invoiceId);
-    payment.setAmount(invoice.getTotalAmount());
-    payment.setMethod("VNPAY");
-    payment.setStatus("SUCCESS");
-    payment.setTransCode("VNPAY_" + System.currentTimeMillis());
-
-    paymentDAO.insertPayment(payment);
-
-    // 5. Redirect success
-    resp.sendRedirect("payment-success.jsp");
-}
-
-
 
     /**
      * Handles the HTTP <code>POST</code> method.

@@ -1,0 +1,151 @@
+.billing-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    max-width: 1100px;
+}
+
+.invoice-card, .checkout-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.sub-text {
+    color: #6b7280;
+}
+
+.btn-outline {
+    border: 1px solid #e5e7eb;
+    background: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.invoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.badge {
+    background: #eef2ff;
+    color: #4f46e5;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+}
+
+.status-badge.unpaid {
+    background: #fff7ed;
+    color: #c2410c;
+    padding: 4px 10px;
+    border-radius: 999px;
+}
+
+.status-badge.paid {
+    background: #ecfdf5;
+    color: #059669;
+    padding: 4px 10px;
+    border-radius: 999px;
+}
+
+.invoice-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+}
+
+.invoice-table-header,
+.invoice-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    padding: 10px 0;
+}
+
+.invoice-table-header {
+    font-weight: 600;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.invoice-row {
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.invoice-summary {
+    margin-top: 16px;
+}
+
+.invoice-summary div {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+}
+
+.grand-total {
+    font-size: 18px;
+    font-weight: 700;
+    color: #16a34a;
+}
+
+.checkout-card .payment-method {
+    width: 100%;
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    margin-bottom: 12px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.checkout-card .payment-method.qr {
+    border-color: #16a34a;
+    background: #ecfdf5;
+}
+
+.discount-box {
+    display: flex;
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.discount-box input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.btn-apply {
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: none;
+    background: #111827;
+    color: white;
+}
+
+.btn-pay {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    background: #16a34a;
+    color: white;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 16px;
+}

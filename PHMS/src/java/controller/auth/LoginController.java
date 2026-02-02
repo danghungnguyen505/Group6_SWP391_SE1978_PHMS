@@ -78,7 +78,7 @@ public class LoginController extends HttpServlet {
         String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
         VerifyRecaptcha vr = new VerifyRecaptcha();
         boolean isCaptchaValid = vr.verify(gRecaptchaResponse);
-        if (isCaptchaValid) {
+        if (!isCaptchaValid) {
             request.setAttribute("error", "Vui lòng xác thực bạn không phải là người máy!");
             request.setAttribute("username", request.getParameter("username"));
             request.getRequestDispatcher("views/auth/login.jsp").forward(request, response);

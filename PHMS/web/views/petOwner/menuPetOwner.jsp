@@ -1,78 +1,5 @@
-<%-- 
-    Document   : menuPetOwner
-    Created on : Jan 24, 2026, 7:07:59 PM
-    Author     : zoxy4
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>VetCare Pro - Dashboard</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <link href="${pageContext.request.contextPath}/assets/css/pages/menuPetOwner.css" rel="stylesheet" type="text/css"/>
-        <script src="${pageContext.request.contextPath}/assets/js/saveSchedule.js"></script>
-    </head>
-    <body>
-
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="brand">
-                <i class="fa-solid fa-plus"></i>
-                <span>VetCare Pro</span>
-            </div>
-
-            <div class="menu-label">Main Menu</div>
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa-solid fa-border-all"></i> Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link active">
-                        <i class="fa-regular fa-calendar-check"></i> Appointments
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa-solid fa-paw"></i> My Pets
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa-solid fa-file-medical"></i> Medical Records
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa-regular fa-credit-card"></i> Billing
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa-solid fa-bolt"></i> AI Health Guide
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa-solid fa-gear"></i> Administration
-                    </a>
-                </li>
-            </ul>
-
-            <div class="support-box">
-                <p>Need help?</p>
-                <button class="btn-support">Contact Support</button>
-            </div>
-        </aside>
-
-        <!-- Main Content Area -->
-        <main class="main-content">
             <!-- Top Header -->
             <header class="top-bar">
                     <a href="${pageContext.request.contextPath}/logout" class="btn btn-dark" style="background-color: #ef4444; border-color: #ef4444;">
@@ -190,6 +117,4 @@
                     </c:if>
                 </div>
             </form>
-        </main>
-    </body>
-</html>
+       

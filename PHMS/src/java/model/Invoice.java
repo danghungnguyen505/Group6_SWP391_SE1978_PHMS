@@ -6,7 +6,8 @@ public class Invoice {
     private int recepId;
     private double totalAmount;
     private String status; // Unpaid, Paid
-
+private String ownerName;
+private String petName;
     public Invoice() {}
 
     public int getInvoiceId() {
@@ -48,4 +49,21 @@ public class Invoice {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
+    }
+
+    public String getPetName() {
+        return petName;
+    }
+
+    public void setPetName(String petName) {
+        this.petName = petName;
+    }
+    
 }
