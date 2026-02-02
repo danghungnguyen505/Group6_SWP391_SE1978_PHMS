@@ -4,6 +4,7 @@
  */
 package controller;
 
+import dal.InvoiceDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -16,8 +17,8 @@ import jakarta.servlet.http.HttpServletResponse;
  *
  * @author TrungNguyen2002
  */
-@WebServlet(name = "VNPaySimulateController", urlPatterns = {"/vnpay-simulate"})
-public class VNPaySimulateController extends HttpServlet {
+@WebServlet(name = "PayCashServlet", urlPatterns = {"/pay-cash"})
+public class PayCashServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -36,10 +37,10 @@ public class VNPaySimulateController extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet VNPaySimulateController</title>");            
+            out.println("<title>Servlet PayCashServlet</title>");            
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet VNPaySimulateController at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet PayCashServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -54,13 +55,15 @@ public class VNPaySimulateController extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
 
-        String invoiceId = req.getParameter("invoiceId");
-        req.setAttribute("invoiceId", invoiceId);
-        req.getRequestDispatcher("vnpay-simulate.jsp").forward(req, resp);
+        int invoiceId = Integer.parseInt(request.getParameter("invoiceId"));
+
+        InvoiceDAO dao = new InvoiceDAO();
+        dao.updateInvoiceStatus(invoiceId, "PAID");
+
+        response.sendRedirect("billing?invoiceId=" + invoiceId);
     }
 
     /**

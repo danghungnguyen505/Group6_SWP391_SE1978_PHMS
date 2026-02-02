@@ -13,9 +13,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import dal.InvoiceDAO;
 import dal.InvoiceDetailDAO;
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import model.Invoice;
 import model.InvoiceDetail;
+import model.User;
 /**
  *
  * @author TrungNguyen2002
@@ -24,33 +26,47 @@ import model.InvoiceDetail;
 public class BillingController extends HttpServlet {
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+        throws ServletException, IOException {
 
-        String invoiceIdRaw = req.getParameter("invoiceId");
+    HttpSession session = req.getSession();
+    User account = (User) session.getAttribute("account");
 
-        if (invoiceIdRaw == null) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "No invoice selected");
-            return;
+    InvoiceDAO invoiceDAO = new InvoiceDAO();
+    InvoiceDetailDAO detailDAO = new InvoiceDetailDAO();
+
+    String invoiceIdRaw = req.getParameter("invoiceId");
+    Integer invoiceId = null;
+
+    if (invoiceIdRaw != null) {
+        invoiceId = Integer.parseInt(invoiceIdRaw);
+    } else if (account != null) {
+        invoiceId = invoiceDAO.getLatestUnpaidInvoiceIdByOwner(account.getUserId());
+
+        // fallback if no unpaid invoices
+        if (invoiceId == null) {
+            invoiceId = invoiceDAO.getLatestInvoiceIdByOwner(account.getUserId());
         }
-
-        int invoiceId = Integer.parseInt(invoiceIdRaw);
-
-        InvoiceDAO invoiceDAO = new InvoiceDAO();
-        InvoiceDetailDAO detailDAO = new InvoiceDetailDAO();
-
-        Invoice invoice = invoiceDAO.getInvoiceFull(invoiceId);
-        List<InvoiceDetail> details = detailDAO.getByInvoiceId(invoiceId);
-double total = detailDAO.calculateTotalByInvoiceId(invoiceId);
-invoiceDAO.updateTotalAmount(invoiceId, total);
-invoice.setTotalAmount(total);
-        req.setAttribute("invoice", invoice);
-        req.setAttribute("details", details);
-
-        req.setAttribute("contentPage", "/views/petOwner/billing.jsp");
-req.getRequestDispatcher("/views/petOwner/layoutPetOwner.jsp").forward(req, resp);
-
     }
+
+    if (invoiceId == null) {
+        resp.sendError(HttpServletResponse.SC_NOT_FOUND, "No invoices found");
+        return;
+    }
+
+    Invoice invoice = invoiceDAO.getInvoiceFull(invoiceId);
+    List<InvoiceDetail> details = detailDAO.getByInvoiceId(invoiceId);
+
+    req.setAttribute("invoice", invoice);
+    req.setAttribute("details", details);
+    req.setAttribute("latestInvoiceId", invoiceId);
+    req.setAttribute("contentPage", "/views/petOwner/billing.jsp");
+
+    req.getRequestDispatcher("/views/petOwner/layoutPetOwner.jsp").forward(req, resp);
+}
+
+
+
 
 
 

@@ -56,6 +56,26 @@ public class InvoiceDetailDAO extends DBContext {
     }
     return 0;
 }
+public double calculateSubtotalByInvoiceId(int invoiceId) {
+    String sql = """
+        SELECT SUM(quantity * unit_price) AS subtotal
+        FROM InvoiceDetail
+        WHERE invoice_id = ?
+    """;
+
+    try {
+        PreparedStatement ps = connection.prepareStatement(sql);
+        ps.setInt(1, invoiceId);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getDouble("subtotal");
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
+
 
 
 }

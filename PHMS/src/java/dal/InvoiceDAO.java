@@ -104,5 +104,29 @@ public void updateTotalAmount(int invoiceId, double total) {
         e.printStackTrace();
     }
 }
+public Integer getLatestUnpaidInvoiceIdByOwner(int ownerId) {
+    String sql = """
+        SELECT TOP 1 i.invoice_id
+        FROM Invoice i
+        JOIN Appointment a ON i.appt_id = a.appt_id
+        JOIN Pet p ON a.pet_id = p.pet_id
+        WHERE p.owner_id = ? AND i.status = 'UNPAID'
+        ORDER BY i.invoice_id DESC
+    """;
+
+    try {
+        PreparedStatement ps = connection.prepareStatement(sql);
+        ps.setInt(1, ownerId);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getInt("invoice_id");
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return null;
+}
+
+
 
 }

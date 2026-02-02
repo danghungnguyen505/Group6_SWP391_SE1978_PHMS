@@ -43,17 +43,21 @@
         </li>
 
         <li class="nav-item">
-            <c:if test="${not empty latestInvoiceId}">
-                <a href="${pageContext.request.contextPath}/billing?invoiceId=${latestInvoiceId}" class="nav-link">
-                    <i class="fa-regular fa-credit-card"></i> Billing
-                </a>
-            </c:if>
-            <c:if test="${empty latestInvoiceId}">
-                <a href="#" class="nav-link disabled">
-                    <i class="fa-regular fa-credit-card"></i> Billing (no invoice)
-                </a>
-            </c:if>
-        </li>
+    <c:choose>
+       <c:when test="${latestInvoiceId != null}">
+    <a href="${pageContext.request.contextPath}/billing" class="nav-link">
+
+                <i class="fa-solid fa-receipt"></i> Billing
+            </a>
+        </c:when>
+        <c:otherwise>
+            <a class="nav-link disabled">
+                <i class="fa-solid fa-receipt"></i> Billing (no invoice)
+            </a>
+        </c:otherwise>
+    </c:choose>
+</li>
+
 
         <li class="nav-item">
             <a href="#" class="nav-link">
