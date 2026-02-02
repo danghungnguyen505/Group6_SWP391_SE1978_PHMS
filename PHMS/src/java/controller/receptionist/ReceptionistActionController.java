@@ -20,8 +20,8 @@ import model.User;
  *
  * @author zoxy4
  */
-@WebServlet(name="AppointmentActionController", urlPatterns={"/receptionist/appointment-action"})
-public class AppointmentActionController extends HttpServlet {
+@WebServlet(name="ReceptionistActionController", urlPatterns={"/receptionist/appointment-action"})
+public class ReceptionistActionController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
@@ -29,7 +29,7 @@ public class AppointmentActionController extends HttpServlet {
     } 
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         HttpSession session = request.getSession();
         User account = (User) session.getAttribute("account");
@@ -42,14 +42,29 @@ public class AppointmentActionController extends HttpServlet {
             String status = request.getParameter("status");
             if (idStr != null && status != null) {
                 int apptId = Integer.parseInt(idStr);
+                AppointmentDAO dao = new AppointmentDAO();
+                boolean isUpdated = false;
+                // TRƯỜNG HỢP 1: DUYỆT LỊCH (Pending -> Confirmed/Cancelled)
                 if (status.equals("Confirmed") || status.equals("Cancelled")) {
-                    AppointmentDAO dao = new AppointmentDAO();
-                    boolean isUpdated = dao.updateAppointmentStatus(apptId, status);
+                    isUpdated = dao.updateAppointmentStatus(apptId, status);
+                    
                     if (isUpdated) {
                         String msg = status.equals("Confirmed") ? "Đã duyệt cuộc hẹn thành công!" : "Đã từ chối cuộc hẹn!";
                         session.setAttribute("actionMessage", msg); 
                     } else {
                         session.setAttribute("actionMessage", "Lỗi: Không thể cập nhật (Có thể cuộc hẹn không còn ở trạng thái Pending).");
+                    }
+                } 
+                // TRƯỜNG HỢP 2: CHECK-IN / NO-SHOW (Confirmed -> Checked-in/No-show)
+                else if (status.equals("Checked-in") || status.equals("No-show")) {
+                    // Gọi hàm changeAppointmentStatus (Hàm tổng quát mới thêm vào DAO)
+                    isUpdated = dao.changeAppointmentStatus(apptId, status);
+                    
+                    if (isUpdated) {
+                        String msg = status.equals("Checked-in") ? "Check-in thành công!" : "Đã đánh dấu vắng mặt (No-show).";
+                        session.setAttribute("actionMessage", msg);
+                    } else {
+                        session.setAttribute("actionMessage", "Lỗi: Không thể cập nhật trạng thái.");
                     }
                 }
             }
