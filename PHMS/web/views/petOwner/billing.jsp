@@ -54,25 +54,33 @@
             <div class="invoice-row">
                 <span>${d.serviceName}</span>
                 <span>${d.quantity}</span>
-                <span>${d.unitPrice}</span>
-                <span class="bold">${d.subtotal}</span>
+               <span>$${d.unitPrice}</span>
+<span class="bold">$${d.subtotal}</span>
             </div>
         </c:forEach>
+<c:set var="subtotal" value="0"/>
 
+<c:forEach items="${details}" var="d">
+    <c:set var="subtotal" value="${subtotal + d.subtotal}"/>
+</c:forEach>
+
+<c:set var="tax" value="${subtotal * 0.08}"/>
+<c:set var="grandTotal" value="${subtotal + tax}"/>
         <div class="invoice-summary">
-            <div>
-                <span>Subtotal</span>
-             
-            </div>
-            <div>
-                <span>Tax (8%)</span>
-   
-            </div>
-            <div class="grand-total">
-                <span>Grand Total</span>
-                <span>${invoice.totalAmount}</span>
-            </div>
-        </div>
+    <div>
+        <span>Subtotal</span>
+        <span>$${subtotal}</span>
+    </div>
+    <div>
+        <span>Tax (8%)</span>
+        <span>$${tax}</span>
+    </div>
+    <div class="grand-total">
+        <span>Grand Total</span>
+        <span>$${grandTotal}</span>
+    </div>
+</div>
+
     </div>
 
     <!-- CHECKOUT CARD -->
@@ -109,8 +117,8 @@
         </div>
 
         <button class="btn-pay">
-            Pay ${invoice.totalAmount}
-        </button>
+    Pay $${invoice.totalAmount}
+</button>
     </div>
 
 </div>

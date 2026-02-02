@@ -149,3 +149,19 @@
     font-weight: 600;
     margin-top: 16px;
 }
+@media print {
+    .sidebar,
+    .checkout-card,
+    .btn-outline {
+        display: none !important;
+    }
+
+    .invoice-card {
+        box-shadow: none;
+        border: none;
+    }
+
+    body {
+        background: white;
+    }
+}

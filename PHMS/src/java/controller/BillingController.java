@@ -39,7 +39,7 @@ public class BillingController extends HttpServlet {
         InvoiceDAO invoiceDAO = new InvoiceDAO();
         InvoiceDetailDAO detailDAO = new InvoiceDetailDAO();
 
-        Invoice invoice = invoiceDAO.getInvoiceById(invoiceId);
+        Invoice invoice = invoiceDAO.getInvoiceFull(invoiceId);
         List<InvoiceDetail> details = detailDAO.getByInvoiceId(invoiceId);
 double total = detailDAO.calculateTotalByInvoiceId(invoiceId);
 invoiceDAO.updateTotalAmount(invoiceId, total);

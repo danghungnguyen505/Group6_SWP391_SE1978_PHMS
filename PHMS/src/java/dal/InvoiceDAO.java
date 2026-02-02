@@ -29,7 +29,8 @@ public class InvoiceDAO extends DBContext {
 
 
     public void updateInvoiceStatus(int id, String status) {
-        String sql = "UPDATE Invoice SET status = ? WHERE id = ?";
+       String sql = "UPDATE Invoice SET status = ? WHERE invoice_id = ?";
+
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, status);
