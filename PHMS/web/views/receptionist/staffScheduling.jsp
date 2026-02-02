@@ -30,7 +30,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/triage" class="text-danger">
+                    <a href="${pageContext.request.contextPath}/receptionist/dashboard" class="text-danger">
                         <i class="fa-solid fa-truck-medical"></i> Emergency Triage
                     </a>
                 </li>
@@ -46,22 +46,22 @@
                     </a>
                 </li>
                 <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/pets">
+                    <a href="${pageContext.request.contextPath}/receptionist/dashboard">
                         <i class="fa-solid fa-paw"></i> My Pets
                     </a>
                 </li>
                 <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/records">
+                    <a href="${pageContext.request.contextPath}/receptionist/dashboard">
                         <i class="fa-solid fa-file-medical"></i> Medical Records
                     </a>
                 </li>
                 <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/billing">
+                    <a href="${pageContext.request.contextPath}/receptionist/dashboard">
                         <i class="fa-regular fa-credit-card"></i> Billing
                     </a>
                 </li>
                 <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/admin">
+                    <a href="${pageContext.request.contextPath}/receptionist/dashboard">
                         <i class="fa-solid fa-gear"></i> Administration
                     </a>
                 </li>
