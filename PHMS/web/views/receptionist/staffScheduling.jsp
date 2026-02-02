@@ -41,7 +41,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/appointments">
+                    <a href="${pageContext.request.contextPath}/receptionist/appointment">
                         <i class="fa-regular fa-calendar-check"></i> Appointments
                     </a>
                 </li>
