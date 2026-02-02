@@ -33,7 +33,7 @@
             <div class="menu-label">Main Menu</div>
             <ul class="nav-menu">
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="${pageContext.request.contextPath}/dashboard" class="nav-link">
                         <i class="fa-solid fa-border-all"></i> Dashboard
                     </a>
                 </li>
@@ -53,23 +53,18 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="${pageContext.request.contextPath}/medicalRecords" class="nav-link">
                         <i class="fa-solid fa-file-medical"></i> Medical Records
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="${pageContext.request.contextPath}/billing" class="nav-link">
                         <i class="fa-regular fa-credit-card"></i> Billing
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="${pageContext.request.contextPath}/aiHealthGuide" class="nav-link">
                         <i class="fa-solid fa-bolt"></i> AI Health Guide
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa-solid fa-gear"></i> Administration
                     </a>
                 </li>
             </ul>
@@ -154,11 +149,11 @@
                                     <c:set var="hoursPassed" value="${(currentTime - createdTime) / (1000 * 60 * 60)}" />
                                     <c:if test="${hoursPassed < 5}">
                                         <div class="action-buttons">
-                                        <a href="${pageContext.request.contextPath}/booking?petId=${u.petId}&vetId=${u.vetId}&serviceType=${u.type}&rescheduleId=${u.apptId}&selectedDate=<fmt:formatDate value="${u.startTime}" pattern="yyyy-MM-dd"/>" 
-                                            class="btn-action btn-reschedule" 
-                                            title="Reschedule">
-                                             <i class="fa-regular fa-clock"></i>
-                                         </a>
+                                            <a href="${pageContext.request.contextPath}/booking?petId=${u.petId}&vetId=${u.vetId}&serviceType=${u.type}&rescheduleId=${u.apptId}&selectedDate=<fmt:formatDate value="${u.startTime}" pattern="yyyy-MM-dd"/>" 
+                                               class="btn-action btn-reschedule" 
+                                               title="Reschedule">
+                                                <i class="fa-regular fa-clock"></i>
+                                            </a>
                                             <a href="${pageContext.request.contextPath}/appointment-action?id=${u.apptId}&type=cancel" 
                                                class="btn-action btn-cancel" title="Cancel">
                                                 <i class="fa-solid fa-user-doctor"></i>
@@ -228,27 +223,48 @@
             <!--Paging của History-->           
             <c:if test="${totalPages > 1}">
                 <div class="pagination-container">
-
                     <c:if test="${currentPage > 1}">
                         <a href="?page=${currentPage - 1}" class="page-link">
                             <i class="fa-solid fa-chevron-left"></i>
                         </a>
                     </c:if>
-
-                    <c:forEach begin="1" end="${totalPages}" var="i">
-                        <a href="?page=${i}" class="page-link ${currentPage == i ? 'active' : ''}">
-                            ${i}
-                        </a>
-                    </c:forEach>
-
+                    <c:choose>
+                        <%-- TRƯỜNG HỢP 1: Tổng số trang ít hơn hoặc bằng 5 -> Hiển thị hết --%>
+                        <c:when test="${totalPages <= 5}">
+                            <c:forEach begin="1" end="${totalPages}" var="i">
+                                <a href="?page=${i}" class="page-link ${currentPage == i ? 'active' : ''}">
+                                    ${i}
+                                </a>
+                            </c:forEach>
+                        </c:when>
+                        <%-- TRƯỜNG HỢP 2: Tổng số trang lớn hơn 5 --%>
+                        <c:otherwise>
+                            <%-- Luôn hiện trang 1 --%>
+                            <a href="?page=1" class="page-link ${currentPage == 1 ? 'active' : ''}">1</a>
+                            <%-- Dấu ... bên trái nếu cần --%>
+                            <c:if test="${currentPage > 3}"><span class="pagination-ellipsis">...</span></c:if>
+                            <%-- Các trang ở giữa (current - 1 đến current + 1) --%>
+                            <c:forEach begin="${currentPage > 2 ? currentPage - 1 : 2}" 
+                                       end="${currentPage < totalPages - 1 ? currentPage + 1 : totalPages - 1}" var="i">
+                                <a href="?page=${i}" class="page-link ${currentPage == i ? 'active' : ''}">${i}</a>
+                            </c:forEach>
+                            <%-- Dấu ... bên phải --%>
+                            <c:if test="${currentPage < totalPages - 2}">
+                                <span class="pagination-ellipsis">...</span>
+                            </c:if>
+                            <%-- Hiện trang cuối --%>
+                            <a href="?page=${totalPages}" class="page-link ${currentPage == totalPages ? 'active' : ''}">
+                                ${totalPages}
+                            </a>
+                        </c:otherwise>
+                    </c:choose>
                     <c:if test="${currentPage < totalPages}">
                         <a href="?page=${currentPage + 1}" class="page-link">
                             <i class="fa-solid fa-chevron-right"></i>
                         </a>
                     </c:if>
-
                 </div>
-            </c:if>     
+            </c:if>
             <!--Click để xem note chi tiết-->
             <div id="noteModal" class="modal">
                 <div class="modal-content">
