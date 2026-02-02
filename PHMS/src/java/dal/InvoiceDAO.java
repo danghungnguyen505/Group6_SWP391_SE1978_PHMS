@@ -127,6 +127,15 @@ public Integer getLatestUnpaidInvoiceIdByOwner(int ownerId) {
     return null;
 }
 
-
+public void markAsPaid(int invoiceId) {
+    String sql = "UPDATE Invoice SET status = 'PAID' WHERE invoice_id = ?";
+    try {
+        PreparedStatement ps = connection.prepareStatement(sql);
+        ps.setInt(1, invoiceId);
+        ps.executeUpdate();
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
 
 }

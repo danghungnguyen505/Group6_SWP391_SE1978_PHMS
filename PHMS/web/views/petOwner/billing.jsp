@@ -143,7 +143,8 @@
 
         document.getElementById("qrcode").innerHTML = "";
         new QRCode(document.getElementById("qrcode"), {
-            text: "${pageContext.request.contextPath}/vnpay-create?invoiceId=${invoice.invoiceId}",
+            text: "http://192.168.4.198:8080${pageContext.request.contextPath}/vnpay-create?invoiceId=${invoice.invoiceId}",
+
             width: 220,
             height: 220
         });
