@@ -191,7 +191,7 @@
                                 <th style="text-align: center;">Check-in Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody>${todayList}
                             <c:forEach items="${todayList}" var="t">
                                 <jsp:useBean id="now" class="java.util.Date" />
                                 <c:set var="isLate" value="${t.startTime.time < now.time && t.status == 'Confirmed'}" />
@@ -220,10 +220,6 @@
                                             <c:when test="${t.status == 'In-Progress'}">
                                                 <span style="background: #fde68a; color: #92400e; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
                                                     In-Progress</span>
-                                            </c:when>
-                                            <c:when test="${t.status == 'No-show'}">
-                                                <span style="background: #f3f4f6; color: #374151; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
-                                                    No-show</span>
                                             </c:when>
                                             <c:when test="${t.status == 'Process'}">
                                                 <span style="background: #f3f4f6; color: #433751; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">

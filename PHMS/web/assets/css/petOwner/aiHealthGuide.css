@@ -109,9 +109,15 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
 }
 
 @keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-    70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    0% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
 }
 
 /* Chat Container (The big white box) */
@@ -238,7 +244,7 @@ textarea::placeholder {
     justify-content: center;
 }
 
-textarea:focus + .btn-send, 
+textarea:focus + .btn-send,
 textarea:not(:placeholder-shown) + .btn-send {
     background-color: #10B981;
     color: white;
@@ -252,4 +258,39 @@ textarea:not(:placeholder-shown) + .btn-send {
     color: #9CA3AF;
     letter-spacing: 0.5px;
     text-transform: uppercase;
+}
+
+/* Hiệu ứng loading */
+.loading-bubble {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    background: #f0f0f0;
+    border-radius: 15px;
+    width: fit-content;
+    margin-bottom: 15px;
+}
+.loading-bubble.active {
+    display: flex;
+}
+
+/* Bong bóng chat của User (cần thêm vào CSS gốc) */
+.message.user-message {
+    flex-direction: row-reverse;
+    align-self: flex-end;
+}
+.message.user-message .message-content {
+    background-color: #0d6efd; /* Màu xanh Bootstrap */
+    color: white;
+    border-bottom-right-radius: 0;
+}
+
+/* Ẩn thanh cuộn nhưng vẫn cuộn được */
+.chat-history::-webkit-scrollbar {
+    width: 6px;
+}
+.chat-history::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
 }

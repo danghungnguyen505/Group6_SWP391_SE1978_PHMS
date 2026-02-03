@@ -56,10 +56,10 @@ public class AppointmentDAO extends DBContext {
             return false;
         }
     }
-    
+
     /**
-     * Insert appointment and return the generated ID.
-     * Used for emergency appointments where we need the ID immediately for triage.
+     * Insert appointment and return the generated ID. Used for emergency
+     * appointments where we need the ID immediately for triage.
      */
     public int insertAppointmentReturnId(model.Appointment appt) {
         String sql = "INSERT INTO Appointment (pet_id, vet_id, start_time, status, type, notes) VALUES (?, ?, ?, ?, ?, ?)";
@@ -207,14 +207,16 @@ public class AppointmentDAO extends DBContext {
     // Lấy thông tin 1 cuộc hẹn (Updated to fetch Names via JOIN)
     public model.Appointment getAppointmentById(int apptId) {
         // SQL query with JOINs to fetch pet_name and vet_name (and service if needed)
-        String sql = "SELECT a.*, "
-                   + "p.name AS pet_name, "
-                   + "u.full_name AS vet_name "
-                   + "FROM Appointment a "
-                   + "JOIN Pet p ON a.pet_id = p.pet_id "
-                   + "JOIN Users u ON a.vet_id = u.user_id "
-                   + "WHERE a.appt_id = ?";
-                   
+        String sql
+                = "SELECT a.*, "
+                + "       p.name AS pet_name, "
+                + "       u.full_name AS vet_name, "
+                + "       o.full_name AS owner_name "
+                + "FROM Appointment a "
+                + "JOIN Pet p ON a.pet_id = p.pet_id "
+                + "JOIN Users u ON a.vet_id = u.user_id "
+                + "JOIN Users o ON p.owner_id = o.user_id "
+                + "WHERE a.appt_id = ?";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, apptId);
@@ -226,15 +228,14 @@ public class AppointmentDAO extends DBContext {
                 a.setStatus(rs.getString("status"));
                 a.setType(rs.getString("type"));
                 a.setNotes(rs.getString("notes"));
-                
+
                 // Set the fetched names
                 a.setPetName(rs.getString("pet_name"));
                 a.setVetName(rs.getString("vet_name"));
-                
+                a.setOwnerName(rs.getString("owner_name"));
                 // IDs (if needed)
                 a.setPetId(rs.getInt("pet_id"));
                 a.setVetId(rs.getInt("vet_id"));
-
                 return a;
             }
         } catch (SQLException e) {
@@ -248,12 +249,13 @@ public class AppointmentDAO extends DBContext {
      */
     public model.Appointment getAppointmentByIdForOwner(int apptId, int ownerId) {
         String sql = "SELECT a.*, "
-                   + "p.owner_id, p.name AS pet_name, "
-                   + "u.full_name AS vet_name "
-                   + "FROM Appointment a "
-                   + "JOIN Pet p ON a.pet_id = p.pet_id "
-                   + "JOIN Users u ON a.vet_id = u.user_id "
-                   + "WHERE a.appt_id = ? AND p.owner_id = ?";
+                + "p.owner_id, p.name AS pet_name, "
+                + "u.full_name AS vet_name "
+                + "u_owner.full_name AS owner_name "
+                + "FROM Appointment a "
+                + "JOIN Pet p ON a.pet_id = p.pet_id "
+                + "JOIN Users u ON a.vet_id = u.user_id "
+                + "WHERE a.appt_id = ? AND p.owner_id = ?";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, apptId);
@@ -268,6 +270,7 @@ public class AppointmentDAO extends DBContext {
                 a.setNotes(rs.getString("notes"));
                 a.setPetName(rs.getString("pet_name"));
                 a.setVetName(rs.getString("vet_name"));
+                a.setOwnerName(rs.getString("owner_name"));
                 a.setPetId(rs.getInt("pet_id"));
                 a.setVetId(rs.getInt("vet_id"));
                 return a;
@@ -279,13 +282,14 @@ public class AppointmentDAO extends DBContext {
     }
 
     /**
-     * PetOwner hủy lịch: chỉ cho phép hủy khi lịch thuộc ownerId và đang ở Pending/Confirmed.
+     * PetOwner hủy lịch: chỉ cho phép hủy khi lịch thuộc ownerId và đang ở
+     * Pending/Confirmed.
      */
     public boolean cancelAppointmentByOwner(int apptId, int ownerId) {
         String sql = "UPDATE a SET a.status = 'Cancelled' "
-                   + "FROM Appointment a "
-                   + "JOIN Pet p ON a.pet_id = p.pet_id "
-                   + "WHERE a.appt_id = ? AND p.owner_id = ? AND a.status IN ('Pending','Confirmed')";
+                + "FROM Appointment a "
+                + "JOIN Pet p ON a.pet_id = p.pet_id "
+                + "WHERE a.appt_id = ? AND p.owner_id = ? AND a.status IN ('Pending','Confirmed')";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, apptId);
@@ -296,6 +300,7 @@ public class AppointmentDAO extends DBContext {
             return false;
         }
     }
+
     // 2. Đổi lịch (Reschedule) - Đưa trạng thái về Pending để lễ tân duyệt lại
     public boolean rescheduleAppointment(int apptId, java.sql.Timestamp newTime) {
         String sql = "UPDATE Appointment SET start_time = ?, status = 'Pending' WHERE appt_id = ?";
@@ -309,10 +314,11 @@ public class AppointmentDAO extends DBContext {
             return false;
         }
     }
+
     //Update cuộc hẹn
     public boolean updateAppointmentFull(model.Appointment appt) {
         String sql = "UPDATE Appointment SET pet_id = ?, vet_id = ?, start_time = ?, type = ?, notes = ?, status = 'Pending' "
-                   + "WHERE appt_id = ?";
+                + "WHERE appt_id = ?";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, appt.getPetId());
@@ -321,26 +327,27 @@ public class AppointmentDAO extends DBContext {
             st.setString(4, appt.getType());
             st.setString(5, appt.getNotes());
             st.setInt(6, appt.getApptId()); // ID của cuộc hẹn cần sửa
-            
+
             return st.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Error updateAppointmentFull: " + e);
             return false;
         }
     }
+
     //Checkin 1. Hàm lấy danh sách cuộc hẹn TRONG NGÀY HÔM NAY cho lễ tân
     // Bao gồm: Confirmed, Checked-in, No-show, Completed
     public List<model.Appointment> getTodayAppointments() {
         List<model.Appointment> list = new ArrayList<>();
         // SQL: Lấy cuộc hẹn có ngày bắt đầu = ngày hiện tại
         String sql = "SELECT a.*, p.name AS pet_name, u.full_name AS vet_name, u_owner.full_name AS owner_name "
-                   + "FROM Appointment a "
-                   + "JOIN Pet p ON a.pet_id = p.pet_id "
-                   + "JOIN Users u ON a.vet_id = u.user_id "
-                   + "JOIN Users u_owner ON p.owner_id = u_owner.user_id "
-                   + "WHERE CAST(a.start_time AS DATE) = CAST(GETDATE() AS DATE) " // Dùng GETDATE() cho SQL Server, hoặc CURDATE() cho MySQL
-                   + "AND a.status IN ('Confirmed', 'Checked-in', 'No-show', 'Completed') "
-                   + "ORDER BY a.start_time ASC";
+                + "FROM Appointment a "
+                + "JOIN Pet p ON a.pet_id = p.pet_id "
+                + "JOIN Users u ON a.vet_id = u.user_id "
+                + "JOIN Users u_owner ON p.owner_id = u_owner.user_id "
+                + "WHERE CAST(a.start_time AS DATE) = CAST(GETDATE() AS DATE) " // Dùng GETDATE() cho SQL Server, hoặc CURDATE() cho MySQL
+                + "AND a.status IN ('Confirmed', 'Checked-in', 'In-Progress', 'No-show', 'Completed') "
+                + "ORDER BY a.start_time ASC";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             ResultSet rs = st.executeQuery();
@@ -363,7 +370,8 @@ public class AppointmentDAO extends DBContext {
     }
 
     /**
-     * Veterinarian queue: appointments for TODAY assigned to this vet that are Checked-in.
+     * Veterinarian queue: appointments for TODAY assigned to this vet that are
+     * Checked-in.
      */
     public List<model.Appointment> getTodayCheckedInAppointmentsForVet(int vetId) {
         List<model.Appointment> list = new ArrayList<>();
@@ -397,6 +405,7 @@ public class AppointmentDAO extends DBContext {
         }
         return list;
     }
+
     //Checkin 2. Hàm update trạng thái chung (dùng cho cả Check-in và No-show)
     public boolean changeAppointmentStatus(int apptId, String newStatus) {
         String sql = "UPDATE Appointment SET status = ? WHERE appt_id = ?";
@@ -412,8 +421,8 @@ public class AppointmentDAO extends DBContext {
     }
 
     /**
-     * Mark appointment as Completed if it is not already Cancelled.
-     * Used after successful invoice payment.
+     * Mark appointment as Completed if it is not already Cancelled. Used after
+     * successful invoice payment.
      */
     public boolean completeIfNotCancelled(int apptId) {
         String sql = "UPDATE Appointment SET status = 'Completed' WHERE appt_id = ? AND status <> 'Cancelled'";
@@ -427,14 +436,14 @@ public class AppointmentDAO extends DBContext {
     }
 
     /**
-     * Auto-cancel appointments for a staff (vet) on a specific date
-     * when a leave request is approved.
+     * Auto-cancel appointments for a staff (vet) on a specific date when a
+     * leave request is approved.
      */
     public int cancelAppointmentsForEmpOnDate(int empId, java.sql.Date date) {
         String sql = "UPDATE Appointment SET status = 'Cancelled' "
-                   + "WHERE vet_id = ? "
-                   + "AND CAST(start_time AS DATE) = ? "
-                   + "AND status IN ('Pending','Confirmed')";
+                + "WHERE vet_id = ? "
+                + "AND CAST(start_time AS DATE) = ? "
+                + "AND status IN ('Pending','Confirmed')";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, empId);
             st.setDate(2, date);
@@ -446,14 +455,14 @@ public class AppointmentDAO extends DBContext {
     }
 
     /**
-     * Auto-cancel appointments that are still in 'Pending Payment'
-     * and whose start_time is at least 'minutes' minutes in the past.
-     * This approximates the 15-minute pending payment window using start_time.
+     * Auto-cancel appointments that are still in 'Pending Payment' and whose
+     * start_time is at least 'minutes' minutes in the past. This approximates
+     * the 15-minute pending payment window using start_time.
      */
     public int autoCancelPendingPaymentAppointments(int minutes) {
         String sql = "UPDATE Appointment SET status = 'Cancelled' "
-                   + "WHERE status = 'Pending Payment' "
-                   + "AND DATEDIFF(MINUTE, start_time, GETDATE()) >= ?";
+                + "WHERE status = 'Pending Payment' "
+                + "AND DATEDIFF(MINUTE, start_time, GETDATE()) >= ?";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, minutes);
             return st.executeUpdate();
@@ -462,23 +471,23 @@ public class AppointmentDAO extends DBContext {
             return 0;
         }
     }
-    
+
     /**
      * Get appointments by date range and status (for notification job).
      */
-    public List<model.Appointment> getAppointmentsByDateRange(java.sql.Timestamp startDate, 
-                                                               java.sql.Timestamp endDate, 
-                                                               String status) {
+    public List<model.Appointment> getAppointmentsByDateRange(java.sql.Timestamp startDate,
+            java.sql.Timestamp endDate,
+            String status) {
         List<model.Appointment> list = new ArrayList<>();
-        String sql = "SELECT a.*, p.name AS pet_name, u.full_name AS vet_name, u_owner.full_name AS owner_name " +
-                     "FROM Appointment a " +
-                     "JOIN Pet p ON a.pet_id = p.pet_id " +
-                     "JOIN Users u ON a.vet_id = u.user_id " +
-                     "JOIN Users u_owner ON p.owner_id = u_owner.user_id " +
-                     "WHERE CAST(a.start_time AS DATE) >= CAST(? AS DATE) " +
-                     "AND CAST(a.start_time AS DATE) <= CAST(? AS DATE) " +
-                     "AND a.status = ? " +
-                     "ORDER BY a.start_time ASC";
+        String sql = "SELECT a.*, p.name AS pet_name, u.full_name AS vet_name, u_owner.full_name AS owner_name "
+                + "FROM Appointment a "
+                + "JOIN Pet p ON a.pet_id = p.pet_id "
+                + "JOIN Users u ON a.vet_id = u.user_id "
+                + "JOIN Users u_owner ON p.owner_id = u_owner.user_id "
+                + "WHERE CAST(a.start_time AS DATE) >= CAST(? AS DATE) "
+                + "AND CAST(a.start_time AS DATE) <= CAST(? AS DATE) "
+                + "AND a.status = ? "
+                + "ORDER BY a.start_time ASC";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setTimestamp(1, startDate);
             st.setTimestamp(2, endDate);
@@ -503,46 +512,46 @@ public class AppointmentDAO extends DBContext {
         }
         return list;
     }
-    
+
     /**
      * Get appointments with filters (date, status, vet) for receptionist/admin.
      */
-    public List<model.Appointment> getAppointmentsWithFilters(String startDateStr, String endDateStr, 
-                                                               String status, Integer vetId) {
+    public List<model.Appointment> getAppointmentsWithFilters(String startDateStr, String endDateStr,
+            String status, Integer vetId) {
         List<model.Appointment> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-            "SELECT a.*, p.name AS pet_name, u.full_name AS vet_name, u_owner.full_name AS owner_name " +
-            "FROM Appointment a " +
-            "JOIN Pet p ON a.pet_id = p.pet_id " +
-            "JOIN Users u ON a.vet_id = u.user_id " +
-            "JOIN Users u_owner ON p.owner_id = u_owner.user_id " +
-            "WHERE 1=1 "
+                "SELECT a.*, p.name AS pet_name, u.full_name AS vet_name, u_owner.full_name AS owner_name "
+                + "FROM Appointment a "
+                + "JOIN Pet p ON a.pet_id = p.pet_id "
+                + "JOIN Users u ON a.vet_id = u.user_id "
+                + "JOIN Users u_owner ON p.owner_id = u_owner.user_id "
+                + "WHERE 1=1 "
         );
-        
+
         List<Object> params = new ArrayList<>();
-        
+
         if (util.ValidationUtils.isNotEmpty(startDateStr)) {
             sql.append("AND CAST(a.start_time AS DATE) >= ? ");
             params.add(startDateStr);
         }
-        
+
         if (util.ValidationUtils.isNotEmpty(endDateStr)) {
             sql.append("AND CAST(a.start_time AS DATE) <= ? ");
             params.add(endDateStr);
         }
-        
+
         if (util.ValidationUtils.isNotEmpty(status) && !"All".equalsIgnoreCase(status)) {
             sql.append("AND a.status = ? ");
             params.add(status);
         }
-        
+
         if (vetId != null && vetId > 0) {
             sql.append("AND a.vet_id = ? ");
             params.add(vetId);
         }
-        
+
         sql.append("ORDER BY a.start_time DESC");
-        
+
         try (PreparedStatement st = connection.prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) {
                 Object param = params.get(i);
@@ -588,8 +597,7 @@ public class AppointmentDAO extends DBContext {
                 + "WHERE a.type = 'Urgent' "
                 + "AND a.status IN ('Pending','Confirmed','Checked-in') "
                 + "ORDER BY a.start_time ASC";
-        try (PreparedStatement st = connection.prepareStatement(sql);
-             ResultSet rs = st.executeQuery()) {
+        try (PreparedStatement st = connection.prepareStatement(sql); ResultSet rs = st.executeQuery()) {
             while (rs.next()) {
                 model.Appointment a = new model.Appointment();
                 a.setApptId(rs.getInt("appt_id"));
@@ -643,6 +651,7 @@ public class AppointmentDAO extends DBContext {
         }
         return list;
     }
+
     //Mark appointment as Completed for the assigned vet only when In-Progress.
     //Danh dau cuoc hen da Completed
     public boolean completeForVet(int apptId, int vetId) {
