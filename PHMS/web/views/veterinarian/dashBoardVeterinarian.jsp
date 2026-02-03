@@ -32,7 +32,9 @@
                         <i class="fa-regular fa-calendar-check"></i> Appointments</a></li>
                 <li><a href="${pageContext.request.contextPath}/veterinarian/dashboard">
                         <i class="fa-solid fa-paw"></i> My Pets</a></li>
-                <li><a href="${pageContext.request.contextPath}/veterinarian/dashboard">
+                <li><a href="${pageContext.request.contextPath}/veterinarian/emr/queue">
+                        <i class="fa-solid fa-stethoscope"></i> EMR Queue</a></li>
+                <li><a href="${pageContext.request.contextPath}/veterinarian/emr/records">
                         <i class="fa-solid fa-file-medical"></i> Medical Records</a></li>
                 <li><a href="${pageContext.request.contextPath}/veterinarian/dashboard">
                         <i class="fa-regular fa-credit-card"></i> Billing</a></li>
