@@ -14,12 +14,9 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>My Pets - VetCare Pro</title>
-
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
         <link href="${pageContext.request.contextPath}/assets/css/pages/menuPetOwner.css" rel="stylesheet" type="text/css"/>
-
         <link href="${pageContext.request.contextPath}/assets/css/pages/myPetOwner.css" rel="stylesheet" type="text/css"/>
     </head>
     <body>
@@ -86,9 +83,14 @@
                     <p>Comprehensive overview of your pet's health records.</p>
                 </div>
                 <form method="get" action="${pageContext.request.contextPath}/myPetOwner">
+                    <!-- Giữ lại search khi đổi dropdown -->
+                    <c:if test="${not empty searchKeyword}">
+                        <input type="hidden" name="search" value="${searchKeyword}">
+                    </c:if>
+
                     <select class="switch-pet-dropdown" name="selectedPetId" onchange="this.form.submit()">
                         <c:if test="${empty allPets}">
-                            <option value="">Bạn chưa có thú cưng nào</option>
+                            <option value="">No pets found</option>
                         </c:if>
                         <c:forEach items="${allPets}" var="p">
                             <option value="${p.id}" ${selectedPet != null && selectedPet.id == p.id ? 'selected' : ''}>
@@ -101,6 +103,7 @@
 
             <div class="pet-dashboard-grid">
 
+                <!-- Left Column: Selected Pet Details -->
                 <div class="left-col">
                     <div class="pet-card">
                         <div style="text-align: right; margin-bottom: -10px;">
@@ -118,7 +121,7 @@
 
                         <c:if test="${empty selectedPet}">
                             <div class="pet-name">No pets</div>
-                            <div class="pet-breed">Please add your first pet</div>
+                            <div class="pet-breed">Add a pet or clear search</div>
                         </c:if>
                         <c:if test="${not empty selectedPet}">
                             <div class="pet-name">${selectedPet.name}</div>
@@ -168,14 +171,35 @@
                     </div>
                 </div>
 
+                <!-- Right Column: List & History -->
                 <div class="right-col">
 
                     <div class="history-section" style="margin-bottom: 20px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+
+                        <!-- Header with Search -->
+                        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                             <h3 style="margin:0;">My Pets List</h3>
-                            <a class="btn btn-primary btn-sm" href="${pageContext.request.contextPath}/pet/add" style="text-decoration:none;">
-                                <i class="fa-solid fa-plus"></i> Add Pet
-                            </a>
+
+                            <div class="d-flex gap-2">
+                                <form action="${pageContext.request.contextPath}/myPetOwner" method="get" class="d-flex">
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" name="search" class="form-control" 
+                                               placeholder="Search name/species..." 
+                                               value="${searchKeyword}">
+                                        <button class="btn btn-outline-primary" type="submit">
+                                            <i class="fa-solid fa-magnifying-glass"></i>
+                                        </button>
+                                        <c:if test="${not empty searchKeyword}">
+                                            <a href="${pageContext.request.contextPath}/myPetOwner" class="btn btn-outline-secondary" title="Clear">
+                                                <i class="fa-solid fa-xmark"></i>
+                                            </a>
+                                        </c:if>
+                                    </div>
+                                </form>
+                                <a class="btn btn-primary btn-sm d-flex align-items-center" href="${pageContext.request.contextPath}/pet/add">
+                                    <i class="fa-solid fa-plus me-1"></i> Add
+                                </a>
+                            </div>
                         </div>
 
                         <c:if test="${empty pets}">
@@ -196,12 +220,15 @@
                                 </thead>
                                 <tbody>
                                     <c:forEach items="${pets}" var="p2">
+                                        <!-- Giữ param search khi click xem chi tiết -->
+                                        <c:set var="searchParam" value="${not empty searchKeyword ? '&search='.concat(searchKeyword) : ''}" />
+
                                         <tr>
                                             <td>#${p2.id}</td>
                                             <td>${p2.name}</td>
                                             <td>${p2.species}</td>
                                             <td style="text-align:right;">
-                                                <a class="view-detail-btn" href="${pageContext.request.contextPath}/myPetOwner?selectedPetId=${p2.id}" style="margin-right: 10px;">View</a>
+                                                <a class="view-detail-btn" href="${pageContext.request.contextPath}/myPetOwner?selectedPetId=${p2.id}${searchParam}" style="margin-right: 10px;">View</a>
                                                 <a class="view-detail-btn" href="${pageContext.request.contextPath}/pet/update?id=${p2.id}" style="margin-right: 10px;">Edit</a>
                                                 <form action="${pageContext.request.contextPath}/pet/delete" method="post" style="display:inline;">
                                                     <input type="hidden" name="id" value="${p2.id}">
@@ -214,17 +241,21 @@
                                 </tbody>
                             </table>
 
+                            <!-- Pagination with Search Param -->
                             <c:if test="${totalPages > 1}">
                                 <div style="display:flex; gap:8px; justify-content:flex-end; margin-top: 10px;">
+                                    <c:set var="searchParam" value="${not empty searchKeyword ? '&search='.concat(searchKeyword) : ''}" />
+                                    <c:set var="selectedParam" value="${selectedPet != null ? '&selectedPetId='.concat(selectedPet.id) : ''}" />
+
                                     <c:if test="${currentPage > 1}">
-                                        <a class="view-detail-btn" href="?page=${currentPage - 1}${selectedPet != null ? '&selectedPetId=' : ''}${selectedPet != null ? selectedPet.id : ''}">Prev</a>
+                                        <a class="view-detail-btn" href="?page=${currentPage - 1}${searchParam}${selectedParam}">Prev</a>
                                     </c:if>
                                     <c:forEach begin="1" end="${totalPages}" var="i">
-                                        <a class="view-detail-btn" href="?page=${i}${selectedPet != null ? '&selectedPetId=' : ''}${selectedPet != null ? selectedPet.id : ''}"
-                                           style="${currentPage == i ? 'font-weight:700;' : ''}">${i}</a>
+                                        <a class="view-detail-btn" href="?page=${i}${searchParam}${selectedParam}"
+                                           style="${currentPage == i ? 'font-weight:700; background-color:#e2e8f0;' : ''}">${i}</a>
                                     </c:forEach>
                                     <c:if test="${currentPage < totalPages}">
-                                        <a class="view-detail-btn" href="?page=${currentPage + 1}${selectedPet != null ? '&selectedPetId=' : ''}${selectedPet != null ? selectedPet.id : ''}">Next</a>
+                                        <a class="view-detail-btn" href="?page=${currentPage + 1}${searchParam}${selectedParam}">Next</a>
                                     </c:if>
                                 </div>
                             </c:if>

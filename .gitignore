@@ -18,7 +18,7 @@
 *.tar.gz
 *.rar
 *.sql
-
+*.GeminiClient.java
 # Chặn toàn bộ thư mục allowlib
 /PHMS/allowlib/
 

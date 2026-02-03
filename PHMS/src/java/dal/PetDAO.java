@@ -117,4 +117,31 @@ public class PetDAO extends DBContext{
 //            System.out.println("- " + p.getName() + " (" + p.getSpecies() + ")");
 //        }
 //    }
+    // 6. Tìm kiếm thú cưng theo Tên hoặc Loài (Search Pet)
+    public List<Pet> searchPets(int ownerId, String keyword) {
+        List<Pet> list = new ArrayList<>();
+        // Tìm kiếm gần đúng (LIKE) theo tên hoặc loài, và PHẢI thuộc về owner đó
+        String sql = "SELECT * FROM Pet WHERE owner_id = ? AND (name LIKE ? OR species LIKE ?)";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, ownerId);
+            String pattern = "%" + keyword + "%";
+            st.setString(2, pattern);
+            st.setString(3, pattern);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                Pet p = new Pet(
+                        rs.getInt("pet_id"),
+                        rs.getInt("owner_id"),
+                        rs.getString("name"),
+                        rs.getString("species"),
+                        rs.getString("history_summary")
+                );
+                list.add(p);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error searchPets: " + e);
+        }
+        return list;
+    }
 }
