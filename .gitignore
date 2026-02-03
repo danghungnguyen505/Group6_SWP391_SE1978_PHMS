@@ -37,11 +37,5 @@ PHMS/nbproject/private/private.xml
 /build
 /bin
 
-# Bỏ qua các thư mục build của NetBeans
-/build
-/dist
-/nbproject/private
-
-# Bỏ qua file cấu hình chứa mật khẩu/API Key
+# Bỏ qua file chứa key bí mật
 config.properties
-src/java/config.properties

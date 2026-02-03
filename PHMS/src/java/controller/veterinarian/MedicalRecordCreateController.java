@@ -99,8 +99,7 @@ public class MedicalRecordCreateController extends HttpServlet {
             MedicalRecordDAO dao = new MedicalRecordDAO();
             boolean ok = dao.createForVet(apptId, account.getUserId(), diagnosis, treatmentPlan);
             if (ok) {
-                //session.setAttribute("toastMessage", "success|Medical record created. Appointment marked as Completed.");
-                session.setAttribute("toastMessage", "success|Medical record created. Appointment marked as In-Progress.");
+                session.setAttribute("toastMessage", "success|Medical record created. Appointment marked as Completed.");
                 response.sendRedirect(request.getContextPath() + "/veterinarian/emr/records");
             } else {
                 request.setAttribute("error", "Cannot create medical record. Appointment may not be Checked-in or not assigned to you.");

@@ -50,11 +50,7 @@ public class LabRequestCreateController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/veterinarian/emr/records");
             return;
         }
-        if ("Completed".equalsIgnoreCase(mr.getApptStatus())) {
-            session.setAttribute("toastMessage", "error|Appointment already completed. Cannot request lab test.");
-            response.sendRedirect(request.getContextPath() + "/veterinarian/lab/requests");
-            return;
-        }
+
         request.setAttribute("record", mr);
         request.getRequestDispatcher("/views/veterinarian/labRequestCreate.jsp").forward(request, response);
     }
@@ -96,18 +92,7 @@ public class LabRequestCreateController extends HttpServlet {
             request.getRequestDispatcher("/views/veterinarian/labRequestCreate.jsp").forward(request, response);
             return;
         }
-        MedicalRecordDAO mrDao = new MedicalRecordDAO();
-        MedicalRecord mr = mrDao.getByIdForVet(recordId, account.getUserId());
-        if (mr == null) {
-            session.setAttribute("toastMessage", "error|Record not found or access denied.");
-            response.sendRedirect(request.getContextPath() + "/veterinarian/emr/records");
-            return;
-        }
-        if ("Completed".equalsIgnoreCase(mr.getApptStatus())) {
-            session.setAttribute("toastMessage", "error|Appointment already completed. Cannot request lab test.");
-            response.sendRedirect(request.getContextPath() + "/veterinarian/lab/requests");
-            return;
-        }
+
         LabTestDAO dao = new LabTestDAO();
         boolean ok = dao.createForVet(recordId, account.getUserId(), testType, requestNotes);
         if (ok) {

@@ -105,8 +105,8 @@ public class PaymentCreateController extends HttpServlet {
         
         if (ok) {
             invoiceDAO.updateStatus(invoiceId, "Paid");
-//            AppointmentDAO apptDAO = new AppointmentDAO();
-//            apptDAO.completeIfNotCancelled(inv.getApptId());
+            AppointmentDAO apptDAO = new AppointmentDAO();
+            apptDAO.completeIfNotCancelled(inv.getApptId());
             session.setAttribute("toastMessage", "success|Thanh toán tiền mặt thành công.");
         } else {
             session.setAttribute("toastMessage", "error|Lỗi hệ thống khi ghi nhận thanh toán.");

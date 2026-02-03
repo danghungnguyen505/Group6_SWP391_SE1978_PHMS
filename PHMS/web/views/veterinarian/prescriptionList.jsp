@@ -52,12 +52,10 @@
                     <div class="section-title" style="margin:0;">
                         <span>Prescription Items</span>
                     </div>
-                    <c:if test="${record.apptStatus != 'Completed'}">
-                        <a href="${pageContext.request.contextPath}/veterinarian/prescription/create?recordId=${record.recordId}" 
-                           class="btn btn-approve" style="text-decoration:none;">
-                            <i class="fa-solid fa-plus"></i> Add Prescription
-                        </a>
-                    </c:if>
+                    <a href="${pageContext.request.contextPath}/veterinarian/prescription/create?recordId=${record.recordId}" 
+                       class="btn btn-approve" style="text-decoration:none;">
+                        <i class="fa-solid fa-plus"></i> Add Prescription
+                    </a>
                 </div>
 
                 <c:choose>
@@ -65,12 +63,10 @@
                         <div style="text-align:center; padding:40px; color:#6b7280;">
                             <i class="fa-solid fa-prescription-bottle" style="font-size:48px; margin-bottom:10px;"></i>
                             <p>No prescriptions found for this medical record.</p>
-                            <c:if test="${record.apptStatus != 'Completed'}">
-                                <a href="${pageContext.request.contextPath}/veterinarian/prescription/create?recordId=${record.recordId}" 
-                                   class="btn btn-approve" style="text-decoration:none; margin-top:10px;">
-                                    <i class="fa-solid fa-plus"></i> Create Prescription
-                                </a>
-                            </c:if>
+                            <a href="${pageContext.request.contextPath}/veterinarian/prescription/create?recordId=${record.recordId}" 
+                               class="btn btn-approve" style="text-decoration:none; margin-top:10px;">
+                                <i class="fa-solid fa-plus"></i> Create Prescription
+                            </a>
                         </div>
                     </c:when>
                     <c:otherwise>
@@ -92,20 +88,15 @@
                                         <td style="padding:10px;">${pres.dosage}</td>
                                         <td style="padding:10px;"><fmt:formatNumber value="${pres.medicinePrice}" type="currency" currencySymbol="₫"/></td>
                                         <td style="padding:10px;">
-                                            <c:if test="${record.apptStatus != 'Completed'}">
-                                                <form method="post" action="${pageContext.request.contextPath}/veterinarian/prescription/delete" 
-                                                      style="display:inline;" 
-                                                      onsubmit="return confirm('Bạn có chắc muốn xóa thuốc này khỏi đơn?');">
-                                                    <input type="hidden" name="presId" value="${pres.presId}">
-                                                    <input type="hidden" name="recordId" value="${record.recordId}">
-                                                    <button type="submit" class="btn btn-reject" style="padding:5px 10px;">
-                                                        <i class="fa-solid fa-trash"></i> Delete
-                                                    </button>
-                                                </form>
-                                            </c:if>
-                                            <c:if test="${record.apptStatus == 'Completed'}">
-                                                <span style="color:#6b7280; font-style: italic;">Locked</span>
-                                            </c:if>       
+                                            <form method="post" action="${pageContext.request.contextPath}/veterinarian/prescription/delete" 
+                                                  style="display:inline;" 
+                                                  onsubmit="return confirm('Bạn có chắc muốn xóa thuốc này khỏi đơn?');">
+                                                <input type="hidden" name="presId" value="${pres.presId}">
+                                                <input type="hidden" name="recordId" value="${record.recordId}">
+                                                <button type="submit" class="btn btn-reject" style="padding:5px 10px;">
+                                                    <i class="fa-solid fa-trash"></i> Delete
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 </c:forEach>
@@ -113,11 +104,7 @@
                         </table>
                     </c:otherwise>
                 </c:choose>
-                <c:if test="${record.apptStatus == 'Completed'}">
-                    <div style="margin-top: 12px; color:#6b7280; font-style: italic;">
-                        Appointment completed. Prescription editing is locked.
-                    </div>
-                </c:if>
+
                 <div style="display:flex; gap:10px; margin-top: 20px;">
                     <a class="btn btn-reject" style="text-decoration:none; background:#e5e7eb;color:#111827;"
                        href="${pageContext.request.contextPath}/veterinarian/emr/records">Back to Records</a>

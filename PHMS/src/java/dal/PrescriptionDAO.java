@@ -21,11 +21,11 @@ public class PrescriptionDAO extends DBContext {
             return false;
         }
         
-        // Verify record belongs to vet AND appointment is In-Progress
-        // (business rule: cannot prescribe if appointment is In-Progress
+        // Verify record belongs to vet AND appointment has been COMPLETED
+        // (business rule: cannot prescribe if appointment is not COMPLETED)
         String checkSql = "SELECT mr.record_id FROM MedicalRecord mr " +
                          "JOIN Appointment a ON mr.appt_id = a.appt_id " +
-                         "WHERE mr.record_id = ? AND a.vet_id = ? AND a.status = 'In-Progress'";
+                         "WHERE mr.record_id = ? AND a.vet_id = ? AND a.status = 'Completed'";
         String insertSql = "INSERT INTO Prescription (record_id, medicine_id, quantity, dosage) VALUES (?, ?, ?, ?)";
         
         boolean oldAutoCommit = connection.getAutoCommit();
@@ -181,7 +181,7 @@ public class PrescriptionDAO extends DBContext {
         String sql = "DELETE p FROM Prescription p " +
                      "JOIN MedicalRecord mr ON p.record_id = mr.record_id " +
                      "JOIN Appointment a ON mr.appt_id = a.appt_id " +
-                     "WHERE p.pres_id = ? AND a.vet_id = ? AND a.status = 'In-Progress'";
+                     "WHERE p.pres_id = ? AND a.vet_id = ?";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, presId);
             st.setInt(2, vetId);
@@ -200,7 +200,7 @@ public class PrescriptionDAO extends DBContext {
                      "FROM Prescription p " +
                      "JOIN MedicalRecord mr ON p.record_id = mr.record_id " +
                      "JOIN Appointment a ON mr.appt_id = a.appt_id " +
-                     "WHERE p.pres_id = ? AND a.vet_id = ? AND a.status = 'In-Progress'";
+                     "WHERE p.pres_id = ? AND a.vet_id = ?";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, quantity);
             st.setString(2, dosage);
@@ -223,7 +223,7 @@ public class PrescriptionDAO extends DBContext {
                      "JOIN Medicine m ON p.medicine_id = m.medicine_id " +
                      "JOIN MedicalRecord mr ON p.record_id = mr.record_id " +
                      "JOIN Appointment a ON mr.appt_id = a.appt_id " +
-                     "WHERE p.pres_id = ? AND a.vet_id = ? AND a.status = 'In-Progress'";
+                     "WHERE p.pres_id = ? AND a.vet_id = ?";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, presId);
             st.setInt(2, vetId);
