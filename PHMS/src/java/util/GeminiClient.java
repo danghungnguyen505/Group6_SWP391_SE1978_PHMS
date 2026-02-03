@@ -22,19 +22,22 @@ public class GeminiClient {
 
     // 👇 1. API KEY CỦA BẠN
     private static final String API_KEY = loadApiKey();
+    private static final String MODEL_NAME = "gemini-2.5-flash";
     private static String loadApiKey() {
         Properties prop = new Properties();
-        // Đường dẫn file config
-        try (FileInputStream input = new FileInputStream("config.properties")) {
+        // Đọc file từ classpath (thư mục classes sau khi build)
+        try (InputStream input = GeminiClient.class.getClassLoader().getResourceAsStream("config.properties")) {
+            if (input == null) {
+                System.err.println("LỖI: Không tìm thấy config.properties trong Source Packages!");
+                return null;
+            }
             prop.load(input);
             return prop.getProperty("gemini.api.key");
         } catch (IOException ex) {
-            System.err.println("Không tìm thấy file config.properties!");
+            ex.printStackTrace();
             return null;
         }
     }
-    private static final String MODEL_NAME = "gemini-2.5-flash";
-
     // 👇 2. ĐÂY LÀ PHẦN QUAN TRỌNG: KỊCH BẢN HUẤN LUYỆN AI Phòng khám thú cưng (SYSTEM PROMPT)
     // Bạn có thể thêm bớt các câu hỏi mẫu vào đây để AI học theo.
     private static final String SYSTEM_PROMPT = """

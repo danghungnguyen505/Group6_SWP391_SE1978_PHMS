@@ -19,7 +19,15 @@ public class MedicalRecord {
     private String vetName;
     private int vetId;
     private int ownerId;
+    private String apptStatus;
+    
+    public String getApptStatus() {
+        return apptStatus;
+    }
 
+    public void setApptStatus(String apptStatus) {
+        this.apptStatus = apptStatus;
+    }
     public int getRecordId() {
         return recordId;
     }

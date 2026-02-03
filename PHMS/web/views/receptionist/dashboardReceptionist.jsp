@@ -210,16 +210,28 @@
                                     <td>
                                         <c:choose>
                                             <c:when test="${t.status == 'Confirmed'}">
-                                                <span style="background: #d1fae5; color: #065f46; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">Confirmed</span>
+                                                <span style="background: #d1fae5; color: #065f46; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
+                                                    Confirmed</span>
                                             </c:when>
                                             <c:when test="${t.status == 'Checked-in'}">
-                                                <span style="background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">Checked-in</span>
+                                                <span style="background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
+                                                    Checked-in</span>
+                                            </c:when>
+                                            <c:when test="${t.status == 'In-Progress'}">
+                                                <span style="background: #fde68a; color: #92400e; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
+                                                    In-Progress</span>
                                             </c:when>
                                             <c:when test="${t.status == 'No-show'}">
-                                                <span style="background: #f3f4f6; color: #374151; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">No-show</span>
+                                                <span style="background: #f3f4f6; color: #374151; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
+                                                    No-show</span>
+                                            </c:when>
+                                            <c:when test="${t.status == 'Process'}">
+                                                <span style="background: #f3f4f6; color: #433751; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
+                                                    Process</span>
                                             </c:when>
                                             <c:when test="${t.status == 'Completed'}">
-                                                <span style="background: #fee2e2; color: #b91c1c; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">Completed</span>
+                                                <span style="background: #fee2e2; color: #b91c1c; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
+                                                    Completed</span>
                                             </c:when>
                                         </c:choose>
 

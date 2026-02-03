@@ -204,16 +204,15 @@ public class AppointmentDAO extends DBContext {
     }
 
     //Xử lý Hủy trong 5 tiếng/thay đổi cuộc hẹn
-    // Lấy thông tin 1 cuộc hẹn (fetch pet/vet/owner names via JOIN)
+    // Lấy thông tin 1 cuộc hẹn (Updated to fetch Names via JOIN)
     public model.Appointment getAppointmentById(int apptId) {
+        // SQL query with JOINs to fetch pet_name and vet_name (and service if needed)
         String sql = "SELECT a.*, "
                    + "p.name AS pet_name, "
-                   + "u.full_name AS vet_name, "
-                   + "u_owner.full_name AS owner_name "
+                   + "u.full_name AS vet_name "
                    + "FROM Appointment a "
                    + "JOIN Pet p ON a.pet_id = p.pet_id "
                    + "JOIN Users u ON a.vet_id = u.user_id "
-                   + "JOIN Users u_owner ON p.owner_id = u_owner.user_id "
                    + "WHERE a.appt_id = ?";
                    
         try {
@@ -228,9 +227,9 @@ public class AppointmentDAO extends DBContext {
                 a.setType(rs.getString("type"));
                 a.setNotes(rs.getString("notes"));
                 
+                // Set the fetched names
                 a.setPetName(rs.getString("pet_name"));
                 a.setVetName(rs.getString("vet_name"));
-                a.setOwnerName(rs.getString("owner_name"));
                 
                 // IDs (if needed)
                 a.setPetId(rs.getInt("pet_id"));
@@ -643,5 +642,19 @@ public class AppointmentDAO extends DBContext {
             System.out.println("Error getEmergencyAppointmentsForVet: " + e.getMessage());
         }
         return list;
+    }
+    //Mark appointment as Completed for the assigned vet only when In-Progress.
+    //Danh dau cuoc hen da Completed
+    public boolean completeForVet(int apptId, int vetId) {
+        String sql = "UPDATE Appointment SET status = 'Completed' "
+                + "WHERE appt_id = ? AND vet_id = ? AND status = 'In-Progress'";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, apptId);
+            st.setInt(2, vetId);
+            return st.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Error completeForVet: " + e.getMessage());
+            return false;
+        }
     }
 }

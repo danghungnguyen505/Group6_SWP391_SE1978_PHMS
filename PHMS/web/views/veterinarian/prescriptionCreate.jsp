@@ -129,7 +129,7 @@
                                     <select name="medicineId" class="medicine-select" required style="width:100%; padding:8px;">
                                         <option value="">-- Select Medicine --</option>
                                         <c:forEach var="med" items="${medicines}">
-                                            <option value="${med.medicineId}">${med.name} (${med.unit})</option>
+                                            <option value="${med.medicineId}" data-stock="${med.stockQuantity}">${med.name} (Stock: ${med.stockQuantity} ${med.unit})</option>
                                         </c:forEach>
                                     </select>
                                 </div>
@@ -179,7 +179,7 @@
                             <select name="medicineId" class="medicine-select" required style="width:100%; padding:8px;">
                                 <option value="">-- Select Medicine --</option>
                                 <c:forEach var="med" items="${medicines}">
-                                    <option value="${med.medicineId}">${med.name} (${med.unit})</option>
+                                    <option value="${med.medicineId}" data-stock="${med.stockQuantity}">${med.name} (Stock: ${med.stockQuantity} ${med.unit})</option>
                                 </c:forEach>
                             </select>
                         </div>

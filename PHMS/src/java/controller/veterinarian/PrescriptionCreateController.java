@@ -51,7 +51,11 @@ public class PrescriptionCreateController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/veterinarian/emr/records");
             return;
         }
-        
+        if ("Completed".equalsIgnoreCase(record.getApptStatus())) {
+            session.setAttribute("toastMessage", "error|Appointment already completed. Không thể kê đơn.");
+            response.sendRedirect(request.getContextPath() + "/veterinarian/prescription/list?recordId=" + recordId);
+            return;
+        }
         MedicineDAO medicineDAO = new MedicineDAO();
         List<Medicine> medicines = medicineDAO.getAllMedicines();
         
@@ -92,7 +96,11 @@ public class PrescriptionCreateController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/veterinarian/emr/records");
             return;
         }
-        
+        if ("Completed".equalsIgnoreCase(record.getApptStatus())) {
+            session.setAttribute("toastMessage", "error|Appointment already completed. Không thể kê đơn.");
+            response.sendRedirect(request.getContextPath() + "/veterinarian/prescription/list?recordId=" + recordId);
+            return;
+        }
         // Collect prescription items
         String[] medicineIds = request.getParameterValues("medicineId");
         String[] quantities = request.getParameterValues("quantity");
@@ -120,10 +128,10 @@ public class PrescriptionCreateController extends HttpServlet {
                 int medId = Integer.parseInt(medIdStr);
                 int qty = Integer.parseInt(qtyStr);
                 
-                // Chỉ kiểm tra thuốc có tồn tại trong danh mục, KHÔNG kiểm soát tồn kho
+                // Check medicine exists and stock
                 Medicine med = medicineDAO.getById(medId);
-                if (med == null) {
-                    request.setAttribute("error", "Thuốc không tồn tại trong danh mục.");
+                if (med == null || med.getStockQuantity() < qty) {
+                    request.setAttribute("error", "Thuốc không tồn tại hoặc không đủ số lượng tồn kho.");
                     doGet(request, response);
                     return;
                 }
