@@ -17,17 +17,51 @@ import model.Service;
 public class InvoiceDAO extends DBContext {
 
     /**
-     * Create invoice and details for an appointment.
-     * All unit prices are loaded from DB (ServiceList / Medicine), not from client.
+     * Create invoice and details for an appointment. All unit prices are loaded
+     * from DB (ServiceList / Medicine), not from client.
      */
+    public void updateInvoiceStatus(int invoiceId, String status) {
+        String sql = "UPDATE Invoice SET status = ? WHERE invoice_id = ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, status);
+            ps.setInt(2, invoiceId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    // Thêm một biến static để lưu lỗi gần nhất
+    public static String SQL_ERROR_LOG = "";
+
+    public int createInvoice(int apptId, int recepId, double totalAmount) {
+        String sql = "INSERT INTO Invoice (appt_id, recep_id, total_amount, status) VALUES (?, ?, ?, 'Unpaid')";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setInt(1, apptId);
+            ps.setInt(2, recepId);
+            ps.setDouble(3, totalAmount);
+            ps.executeUpdate();
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            // LƯU LỖI VÀO BIẾN NÀY ĐỂ XEM
+            SQL_ERROR_LOG = e.getMessage();
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
     public Integer createInvoiceForAppointment(int apptId, int recepId,
-                                               List<InvoiceDetail> details) throws SQLException {
+            List<InvoiceDetail> details) throws SQLException {
         if (details == null || details.isEmpty()) {
             return null;
         }
 
         String insertInvoiceSql = "INSERT INTO Invoice (appt_id, recep_id, total_amount, status) "
-                                + "VALUES (?, ?, 0, 'Unpaid')";
+                + "VALUES (?, ?, 0, 'Unpaid')";
         String insertDetailSql = "INSERT INTO InvoiceDetail "
                 + "(invoice_id, medicine_id, service_id, item_type, quantity, unit_price) "
                 + "VALUES (?, ?, ?, ?, ?, ?)";
@@ -63,7 +97,9 @@ public class InvoiceDAO extends DBContext {
             try (PreparedStatement det = connection.prepareStatement(insertDetailSql)) {
                 for (InvoiceDetail d : details) {
                     int qty = d.getQuantity();
-                    if (qty <= 0) continue;
+                    if (qty <= 0) {
+                        continue;
+                    }
 
                     double unitPrice;
                     Integer medicineId = null;
@@ -129,9 +165,114 @@ public class InvoiceDAO extends DBContext {
         }
     }
 
+<<<<<<< Updated upstream
+=======
+    /**
+     * Tự động tạo hóa đơn cho một cuộc hẹn dựa trên: - Dịch vụ chính từ
+     * Appointment.type -> ServiceList.name - Thuốc từ các Prescription thuộc
+     * các MedicalRecord của cuộc hẹn đó Lễ tân không cần chọn tay từng dịch
+     * vụ/thuốc.
+     */
+    public Integer autoCreateInvoiceForAppointment(int apptId, int recepId) throws SQLException {
+        // Không tạo trùng hóa đơn cho cùng 1 cuộc hẹn
+        if (getInvoiceByAppointment(apptId) != null) {
+            return null;
+        }
+
+        List<InvoiceDetail> autoDetails = new ArrayList<>();
+
+        // 1. Lấy thông tin loại dịch vụ từ Appointment
+        String apptSql = "SELECT type FROM Appointment WHERE appt_id = ?";
+        String apptType = null;
+        try (PreparedStatement st = connection.prepareStatement(apptSql)) {
+            st.setInt(1, apptId);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    apptType = rs.getString("type");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error autoCreateInvoiceForAppointment - load appointment: " + e.getMessage());
+        }
+
+        boolean hasMainService = false;
+
+        // 2. Map Appointment.type -> ServiceList (dịch vụ chính) nếu có
+        if (apptType != null && !apptType.trim().isEmpty()) {
+            String serviceSql = "SELECT service_id FROM ServiceList WHERE name = ? AND is_active = 1";
+            try (PreparedStatement st = connection.prepareStatement(serviceSql)) {
+                st.setString(1, apptType);
+                try (ResultSet rs = st.executeQuery()) {
+                    if (rs.next()) {
+                        InvoiceDetail serviceDetail = new InvoiceDetail();
+                        serviceDetail.setServiceId(rs.getInt("service_id"));
+                        serviceDetail.setItemType("Service");
+                        serviceDetail.setQuantity(1); // 1 lần dịch vụ chính cho cuộc hẹn
+                        autoDetails.add(serviceDetail);
+                        hasMainService = true;
+                    }
+                }
+            } catch (SQLException e) {
+                System.out.println("Error autoCreateInvoiceForAppointment - load main service: " + e.getMessage());
+            }
+        }
+
+        // 2b. Nếu không map được theo type, fallback: lấy dịch vụ active đầu tiên làm dịch vụ chính
+        if (!hasMainService) {
+            String fallbackSql = "SELECT TOP 1 service_id FROM ServiceList WHERE is_active = 1 ORDER BY service_id ASC";
+            try (PreparedStatement st = connection.prepareStatement(fallbackSql); ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    InvoiceDetail serviceDetail = new InvoiceDetail();
+                    serviceDetail.setServiceId(rs.getInt("service_id"));
+                    serviceDetail.setItemType("Service");
+                    serviceDetail.setQuantity(1);
+                    autoDetails.add(serviceDetail);
+                    hasMainService = true;
+                }
+            } catch (SQLException e) {
+                System.out.println("Error autoCreateInvoiceForAppointment - fallback main service: " + e.getMessage());
+            }
+        }
+
+        // 3. Thêm thuốc từ Prescription của cuộc hẹn (tính tiền thuốc)
+        String medSql = "SELECT p.medicine_id, SUM(p.quantity) AS total_qty "
+                + "FROM Prescription p "
+                + "JOIN MedicalRecord mr ON p.record_id = mr.record_id "
+                + "WHERE mr.appt_id = ? "
+                + "GROUP BY p.medicine_id";
+        try (PreparedStatement st = connection.prepareStatement(medSql)) {
+            st.setInt(1, apptId);
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    int medicineId = rs.getInt("medicine_id");
+                    int qty = rs.getInt("total_qty");
+                    if (qty <= 0) {
+                        continue;
+                    }
+                    InvoiceDetail medDetail = new InvoiceDetail();
+                    medDetail.setMedicineId(medicineId);
+                    medDetail.setItemType("Medicine");
+                    medDetail.setQuantity(qty);
+                    autoDetails.add(medDetail);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error autoCreateInvoiceForAppointment - load medicines: " + e.getMessage());
+        }
+
+        // Nếu không có bất kỳ dịch vụ nào thì không tạo hóa đơn
+        if (autoDetails.isEmpty()) {
+            return null;
+        }
+
+        // Tái sử dụng logic transaction đã có
+        return createInvoiceForAppointment(apptId, recepId, autoDetails);
+    }
+
+>>>>>>> Stashed changes
     public Invoice getInvoiceByAppointment(int apptId) {
         String sql = "SELECT invoice_id, appt_id, recep_id, total_amount, status "
-                   + "FROM Invoice WHERE appt_id = ?";
+                + "FROM Invoice WHERE appt_id = ?";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, apptId);
             try (ResultSet rs = st.executeQuery()) {
@@ -147,7 +288,7 @@ public class InvoiceDAO extends DBContext {
 
     public Invoice getInvoiceById(int invoiceId) {
         String sql = "SELECT invoice_id, appt_id, recep_id, total_amount, status "
-                   + "FROM Invoice WHERE invoice_id = ?";
+                + "FROM Invoice WHERE invoice_id = ?";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, invoiceId);
             try (ResultSet rs = st.executeQuery()) {
@@ -164,7 +305,7 @@ public class InvoiceDAO extends DBContext {
     public List<InvoiceDetail> getDetailsByInvoice(int invoiceId) {
         List<InvoiceDetail> list = new ArrayList<>();
         String sql = "SELECT detail_id, invoice_id, medicine_id, service_id, item_type, quantity, unit_price "
-                   + "FROM InvoiceDetail WHERE invoice_id = ?";
+                + "FROM InvoiceDetail WHERE invoice_id = ?";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, invoiceId);
             try (ResultSet rs = st.executeQuery()) {
@@ -210,4 +351,3 @@ public class InvoiceDAO extends DBContext {
         return inv;
     }
 }
-

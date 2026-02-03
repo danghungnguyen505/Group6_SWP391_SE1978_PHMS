@@ -98,7 +98,7 @@ body {
 }
 
 .nav-link:hover {
-    background-color: #F3F4F6;
+    background-color: #ECFDF5;
 }
 
 .nav-link.active {
@@ -177,11 +177,11 @@ body {
 }
 
 .btn-cancel {
-    background: #F3F4F6;
-    border: none;
+    background: #ECFDF5;
+    border: 1px solid #D1FAE5;
     padding: 10px 20px;
     border-radius: 8px;
-    color: var(--text-gray);
+    color: var(--primary-green-dark);
     cursor: pointer;
     font-weight: 600;
     
@@ -190,8 +190,9 @@ body {
 /* Form Layout Grid */
 .booking-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 24px;
+    align-items: start;
 }
 
 .card {
@@ -280,16 +281,16 @@ select.form-control {
     transition: all 0.2s;
 }
 
-.time-btn:disabled {
+/*.time-btn:disabled {
     color: #D1D5DB;
     background: #F9FAFB;
     cursor: not-allowed;
-}
+}*/
 
 .time-btn.selected {
-    background-color: #347d52; /* Màu xanh đậm như hình */
+    background-color: var(--primary-green);
     color: white;
-    border-color: #347d52;
+    border-color: var(--primary-green);
 }
 
 .time-btn:hover:not(:disabled):not(.selected) {
@@ -326,7 +327,7 @@ textarea.form-control {
 }
 
 .btn-confirm {
-    background-color: #111827;
+    background-color: var(--primary-green);
     color: white;
     width: 100%;
     padding: 16px;
@@ -343,7 +344,7 @@ textarea.form-control {
 }
 
 .btn-confirm:hover {
-    background-color: black;
+    background-color: var(--primary-green-dark);
 }
 
 .disclaimer {
@@ -353,15 +354,15 @@ textarea.form-control {
     text-align: center;
 }
 
-.time-btn.selected {
-    background-color: #059669; /* Màu xanh khi chọn */
+/*.time-btn.selected {
+    background-color: #059669;  Màu xanh khi chọn 
     color: white;
     border-color: #0056b3;
-}
+}*/
 
 .time-btn:disabled {
-    background-color: #e9ecef;
-    color: #6c757d;
+    background-color: #F3F4F6;
+    color: #94A3B8;
     cursor: not-allowed;
-    opacity: 0.6;
+    opacity: 0.8;
 }
