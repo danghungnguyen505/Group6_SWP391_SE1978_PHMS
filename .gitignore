@@ -18,7 +18,6 @@
 *.tar.gz
 *.rar
 *.sql
-*.GeminiClient.java
 # Chặn toàn bộ thư mục allowlib
 /PHMS/allowlib/
 
@@ -33,3 +32,10 @@ replay_pid*
 nbproject/private/
 PHMS/nbproject/private/private.xml
 PHMS/nbproject/private/private.xml
+
+# Bỏ qua các file biên dịch
+/build
+/bin
+
+# Bỏ qua file chứa key bí mật
+config.properties

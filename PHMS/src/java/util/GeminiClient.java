@@ -4,6 +4,7 @@
 package util;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -11,6 +12,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,8 +21,18 @@ public class GeminiClient {
     private static final Logger LOGGER = Logger.getLogger(GeminiClient.class.getName());
 
     // 👇 1. API KEY CỦA BẠN
-    private static final String API_KEY = "AIzaSyDJrco3kGrdpn2wmI6QSEV5Bo8Cx0YyaXo";
-
+    private static final String API_KEY = loadApiKey();
+    private static String loadApiKey() {
+        Properties prop = new Properties();
+        // Đường dẫn file config
+        try (FileInputStream input = new FileInputStream("config.properties")) {
+            prop.load(input);
+            return prop.getProperty("gemini.api.key");
+        } catch (IOException ex) {
+            System.err.println("Không tìm thấy file config.properties!");
+            return null;
+        }
+    }
     private static final String MODEL_NAME = "gemini-2.5-flash";
 
     // 👇 2. ĐÂY LÀ PHẦN QUAN TRỌNG: KỊCH BẢN HUẤN LUYỆN AI Phòng khám thú cưng (SYSTEM PROMPT)
