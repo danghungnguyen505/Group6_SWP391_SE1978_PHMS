@@ -69,6 +69,10 @@
                            href="${pageContext.request.contextPath}/veterinarian/emr/update?id=${record.recordId}">
                             <i class="fa-solid fa-pen"></i> Edit
                         </a>
+                        <a class="btn btn-approve" style="text-decoration:none; background:#16a34a;"
+                           href="${pageContext.request.contextPath}/veterinarian/prescription/create?recordId=${record.recordId}">
+                            <i class="fa-solid fa-prescription-bottle-medical"></i> Prescribe Medicine
+                        </a>
                         <a class="btn btn-approve" style="text-decoration:none; background:#111827;"
                            href="${pageContext.request.contextPath}/veterinarian/lab/request?recordId=${record.recordId}">
                             <i class="fa-solid fa-flask"></i> Order Lab Test

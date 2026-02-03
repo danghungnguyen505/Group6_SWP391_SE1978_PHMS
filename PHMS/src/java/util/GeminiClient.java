@@ -1,3 +1,6 @@
+/*
+ * File: src/java/util/GeminiClient.java
+ */
 package util;
 
 import java.io.BufferedReader;
@@ -8,73 +11,82 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Simple client for Google Gemini API (Generative Language).
- * Reads configuration from Gemini.properties (apiKey, model, endpoint).
- */
 public class GeminiClient {
 
     private static final Logger LOGGER = Logger.getLogger(GeminiClient.class.getName());
 
-    private static final String API_KEY;
-    private static final String MODEL;
-    private static final String ENDPOINT;
+    // 👇 1. API KEY CỦA BẠN
+    private static final String API_KEY = "AIzaSyD8qfH6VB-mmH9QGxAD8U2l8YClMlnTZZg";
 
-    static {
-        Properties props = new Properties();
-        String key = "";
-        String model = "gemini-1.5-flash";
-        String endpoint = "https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent?key=%s";
-        try {
-            InputStream in = GeminiClient.class.getClassLoader().getResourceAsStream("Gemini.properties");
-            if (in != null) {
-                props.load(in);
-                in.close();
-                key = props.getProperty("apiKey", "");
-                model = props.getProperty("model", model);
-                String ep = props.getProperty("endpoint", endpoint);
-                endpoint = ep;
-            }
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error loading Gemini.properties", e);
-        }
-        API_KEY = key;
-        MODEL = model;
-        ENDPOINT = endpoint;
-    }
+    private static final String MODEL_NAME = "gemini-2.5-flash";
+
+    // 👇 2. ĐÂY LÀ PHẦN QUAN TRỌNG: KỊCH BẢN HUẤN LUYỆN AI (SYSTEM PROMPT)
+    // Bạn có thể thêm bớt các câu hỏi mẫu vào đây để AI học theo.
+    private static final String SYSTEM_PROMPT = """
+    Bạn là trợ lý ảo AI chuyên gia của hệ thống 'Pet Health Management' (PHMS).
+    Nhiệm vụ: Tư vấn sức khỏe, dinh dưỡng, lịch tiêm phòng và chăm sóc thú cưng.
+    
+    NGUYÊN TẮC TRẢ LỜI:
+    1. Giọng điệu: Thân thiện, chuyên nghiệp, đồng cảm.
+    2. Định dạng: Tuyệt đối KHÔNG dùng Markdown (không dùng dấu **, không dùng dấu #). Dùng gạch đầu dòng (-) nếu cần liệt kê.
+    3. An toàn: Với các triệu chứng nguy hiểm (nôn máu, co giật, ngộ độc, khó thở...), BẮT BUỘC phải khuyên người dùng đưa thú cưng đến bác sĩ thú y ngay lập tức.
+    4. Độ dài: Trả lời ngắn gọn, đi thẳng vào vấn đề, khoảng 3-5 câu.
+
+    DỮ LIỆU THAM KHẢO (HỌC THEO CÁC VÍ DỤ SAU):
+    
+    Q: Chó con 2 tháng tuổi cần tiêm gì?
+    A: Chó con 2 tháng tuổi cần bắt đầu tiêm mũi vắc-xin đa giá lần 1 (phòng 5 hoặc 7 bệnh nguy hiểm như Care, Parvo). Ngoài ra, bạn cũng nên tẩy giun cho bé trước khi tiêm. Hãy đưa bé đến phòng khám để bác sĩ kiểm tra sức khỏe nhé.
+
+    Q: Mèo nhà tôi bị nôn ra búi lông?
+    A: Đây là hiện tượng sinh lý bình thường do mèo liếm lông. Bạn có thể cho mèo ăn cỏ mèo hoặc gel tiêu búi lông để hỗ trợ tiêu hóa. Tuy nhiên, nếu bé nôn quá nhiều kèm bỏ ăn hoặc mệt mỏi, hãy đưa đi khám ngay.
+
+    Q: Chó ăn phải sô cô la (chocolate) có sao không?
+    A: CẢNH BÁO: Sô cô la rất độc đối với chó, có thể gây co giật và tử vong! Hãy đưa bé đến thú y ngay lập tức để gây nôn hoặc rửa ruột. Đừng tự xử lý tại nhà nếu không có hướng dẫn của bác sĩ.
+
+    Q: Lịch tẩy giun cho thú cưng thế nào?
+    A: Với thú non (dưới 6 tháng), nên tẩy giun mỗi tháng 1 lần. Với thú trưởng thành (trên 6 tháng), nên tẩy giun định kỳ 3-6 tháng/lần tùy môi trường sống.
+
+    Q: Mèo đi vệ sinh không đúng chỗ?
+    A: Có thể do khay cát bị bẩn, thay đổi loại cát, hoặc bé đang bị stress/viêm đường tiết niệu. Hãy thử làm sạch khay cát và quan sát. Nếu bé đi tiểu rắt hoặc kêu đau, cần đi khám bác sĩ.
+
+    (Hết dữ liệu mẫu)
+
+    CÂU HỎI THỰC TẾ CỦA NGƯỜI DÙNG:
+    """;
 
     public static boolean isConfigured() {
-        return API_KEY != null && !API_KEY.isEmpty();
+        return API_KEY != null && !API_KEY.isEmpty() && !API_KEY.startsWith("CHANGE") && !API_KEY.contains("DÁN_API_KEY");
     }
 
-    /**
-     * Call Gemini API with a simple text prompt and return the text response.
-     */
-    public static String chat(String prompt) throws IOException {
+    public static String chat(String userQuestion) throws IOException {
         if (!isConfigured()) {
-            throw new IOException("Gemini API key is not configured.");
+            return "Chưa cấu hình API Key.";
         }
 
-        String urlStr = String.format(ENDPOINT, MODEL, API_KEY);
+        String cleanKey = API_KEY.trim();
+        String urlStr = "https://generativelanguage.googleapis.com/v1beta/models/"
+                + MODEL_NAME
+                + ":generateContent?key=" + cleanKey;
+
         URL url = new URL(urlStr);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("POST");
-        conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+        conn.setRequestProperty("Content-Type", "application/json");
         conn.setDoOutput(true);
 
-        // Build minimal JSON request body manually to avoid extra JSON libraries
-        StringBuilder jsonBody = new StringBuilder();
-        jsonBody.append("{\"contents\":[{\"parts\":[{\"text\":");
-        jsonBody.append("\"").append(escapeJson(prompt)).append("\"");
-        jsonBody.append("}]}]}");
+        // GHÉP KỊCH BẢN VÀO CÂU HỎI
+        String finalPrompt = SYSTEM_PROMPT + "\n" + userQuestion;
+
+        // Xử lý JSON
+        String cleanPrompt = escapeJson(finalPrompt);
+        String jsonBody = "{\"contents\":[{\"parts\":[{\"text\":\"" + cleanPrompt + "\"}]}]}";
 
         try (OutputStream os = conn.getOutputStream()) {
-            byte[] input = jsonBody.toString().getBytes(StandardCharsets.UTF_8);
-            os.write(input);
+            byte[] input = jsonBody.getBytes(StandardCharsets.UTF_8);
+            os.write(input, 0, input.length);
         }
 
         int status = conn.getResponseCode();
@@ -87,96 +99,78 @@ public class GeminiClient {
             }
         }
 
-        if (status < 200 || status >= 300) {
-            LOGGER.log(Level.WARNING, "Gemini API error: HTTP " + status + " - " + resp);
-            throw new IOException("Gemini API error: " + resp);
+        if (status != 200) {
+            String errorMsg = resp.toString();
+            LOGGER.log(Level.WARNING, "API Error (" + status + "): " + errorMsg);
+            if (status == 404) {
+                return "Lỗi 404: API Key hoặc Model sai.";
+            }
+            if (status == 429) {
+                return "Hệ thống quá tải, thử lại sau.";
+            }
+            return "Lỗi kết nối AI (" + status + ").";
         }
 
-        // Very simple JSON parsing: try to extract the first "text":"..." value
-        return extractFirstTextField(resp.toString());
+        return extractTextFromResponse(resp.toString());
     }
 
     private static String escapeJson(String s) {
-        if (s == null) return "";
-        StringBuilder sb = new StringBuilder();
-        for (char c : s.toCharArray()) {
-            switch (c) {
-                case '"':
-                    sb.append("\\\"");
-                    break;
-                case '\\':
-                    sb.append("\\\\");
-                    break;
-                case '\b':
-                    sb.append("\\b");
-                    break;
-                case '\f':
-                    sb.append("\\f");
-                    break;
-                case '\n':
-                    sb.append("\\n");
-                    break;
-                case '\r':
-                    sb.append("\\r");
-                    break;
-                case '\t':
-                    sb.append("\\t");
-                    break;
-                default:
-                    if (c < 0x20) {
-                        sb.append(String.format("\\u%04x", (int) c));
-                    } else {
-                        sb.append(c);
-                    }
-            }
+        if (s == null) {
+            return "";
         }
-        return sb.toString();
+        return s.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\b", "\\b")
+                .replace("\f", "\\f")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t");
     }
 
-    /**
-     * Naive JSON parser to get the first occurrence of "text":"...".
-     */
-    private static String extractFirstTextField(String json) {
-        if (json == null) return "";
-        String key = "\"text\":\"";
-        int idx = json.indexOf(key);
-        if (idx < 0) return "";
-        int start = idx + key.length();
-        StringBuilder sb = new StringBuilder();
-        boolean escape = false;
-        for (int i = start; i < json.length(); i++) {
-            char c = json.charAt(i);
-            if (escape) {
-                // handle a few common escapes
-                switch (c) {
-                    case '"':
-                        sb.append('"');
-                        break;
-                    case '\\':
-                        sb.append('\\');
-                        break;
-                    case 'n':
-                        sb.append('\n');
-                        break;
-                    case 'r':
-                        sb.append('\r');
-                        break;
-                    case 't':
-                        sb.append('\t');
-                        break;
-                    default:
-                        sb.append(c);
-                }
-                escape = false;
-            } else if (c == '\\') {
-                escape = true;
-            } else if (c == '"') {
-                break;
-            } else {
-                sb.append(c);
+    private static String extractTextFromResponse(String json) {
+        try {
+            String key = "\"text\"";
+            int idx = json.indexOf(key);
+            if (idx < 0) {
+                return "AI không trả lời nội dung nào.";
             }
+            int startQuote = json.indexOf("\"", idx + key.length());
+            if (startQuote < 0) {
+                return "";
+            }
+
+            StringBuilder result = new StringBuilder();
+            boolean isEscaped = false;
+            for (int i = startQuote + 1; i < json.length(); i++) {
+                char c = json.charAt(i);
+                if (isEscaped) {
+                    if (c == 'n') {
+                        result.append('\n');
+                    } else if (c == '"') {
+                        result.append('"');
+                    } else {
+                        result.append(c);
+                    }
+                    isEscaped = false;
+                } else {
+                    if (c == '\\') {
+                        isEscaped = true;
+                    } else if (c == '"') {
+                        break;
+                    } else {
+                        result.append(c);
+                    }
+                }
+            }
+
+            // Xóa các ký tự Markdown nếu AI vẫn lỡ trả về
+            String rawText = result.toString();
+            return rawText.replace("**", "") // Xóa in đậm
+                    .replace("##", "") // Xóa tiêu đề
+                    .replace("* ", "- "); // Đổi dấu sao đầu dòng thành gạch ngang
+
+        } catch (Exception e) {
+            return "Lỗi đọc câu trả lời.";
         }
-        return sb.toString().trim();
     }
 }
-

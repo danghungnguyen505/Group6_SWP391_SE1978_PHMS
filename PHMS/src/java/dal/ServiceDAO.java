@@ -132,4 +132,54 @@ public class ServiceDAO extends DBContext {
         }
         return null;
     }
+
+    /**
+     * Get active service by its name (used for invoice preview mapping from Appointment.type).
+     */
+    public Service getActiveServiceByName(String name) {
+        String sql = "SELECT service_id, name, base_price, description, is_active, managed_by "
+                   + "FROM ServiceList WHERE name = ? AND is_active = 1";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, name);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new Service(
+                            rs.getInt("service_id"),
+                            rs.getString("name"),
+                            rs.getDouble("base_price"),
+                            rs.getString("description"),
+                            rs.getBoolean("is_active"),
+                            rs.getInt("managed_by")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getActiveServiceByName: " + e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * Fallback: lấy 1 dịch vụ active đầu tiên.
+     */
+    public Service getFirstActiveService() {
+        String sql = "SELECT TOP 1 service_id, name, base_price, description, is_active, managed_by "
+                   + "FROM ServiceList WHERE is_active = 1 ORDER BY service_id ASC";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return new Service(
+                        rs.getInt("service_id"),
+                        rs.getString("name"),
+                        rs.getDouble("base_price"),
+                        rs.getString("description"),
+                        rs.getBoolean("is_active"),
+                        rs.getInt("managed_by")
+                );
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getFirstActiveService: " + e.getMessage());
+        }
+        return null;
+    }
 }

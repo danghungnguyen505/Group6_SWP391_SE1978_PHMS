@@ -120,10 +120,10 @@ public class PrescriptionCreateController extends HttpServlet {
                 int medId = Integer.parseInt(medIdStr);
                 int qty = Integer.parseInt(qtyStr);
                 
-                // Check medicine exists and stock
+                // Chỉ kiểm tra thuốc có tồn tại trong danh mục, KHÔNG kiểm soát tồn kho
                 Medicine med = medicineDAO.getById(medId);
-                if (med == null || med.getStockQuantity() < qty) {
-                    request.setAttribute("error", "Thuốc không tồn tại hoặc không đủ số lượng tồn kho.");
+                if (med == null) {
+                    request.setAttribute("error", "Thuốc không tồn tại trong danh mục.");
                     doGet(request, response);
                     return;
                 }

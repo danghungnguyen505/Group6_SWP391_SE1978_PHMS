@@ -192,12 +192,14 @@ public class MedicalRecordDAO extends DBContext {
 
     /**
      * Update medical record for vet (must own appointment).
+     * Business rule:
+     * - Do NOT allow update when related appointment is CANCELLED.
      */
     public boolean updateForVet(int recordId, int vetId, String diagnosis, String treatmentPlan) {
         String sql = "UPDATE mr SET mr.diagnosis = ?, mr.treatment_plan = ? "
                 + "FROM MedicalRecord mr "
                 + "JOIN Appointment a ON mr.appt_id = a.appt_id "
-                + "WHERE mr.record_id = ? AND a.vet_id = ?";
+                + "WHERE mr.record_id = ? AND a.vet_id = ? AND a.status <> 'Cancelled'";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setString(1, diagnosis);
             st.setString(2, treatmentPlan);

@@ -26,6 +26,11 @@ public class InvoiceDAO extends DBContext {
             return null;
         }
 
+        // Business rule: do not create duplicated invoice for the same appointment
+        if (getInvoiceByAppointment(apptId) != null) {
+            return null;
+        }
+
         String insertInvoiceSql = "INSERT INTO Invoice (appt_id, recep_id, total_amount, status) "
                                 + "VALUES (?, ?, 0, 'Unpaid')";
         String insertDetailSql = "INSERT INTO InvoiceDetail "
@@ -127,6 +132,107 @@ public class InvoiceDAO extends DBContext {
         } finally {
             connection.setAutoCommit(oldAutoCommit);
         }
+    }
+
+    /**
+     * Tự động tạo hóa đơn cho một cuộc hẹn dựa trên:
+     * - Dịch vụ chính từ Appointment.type -> ServiceList.name
+     * - Thuốc từ các Prescription thuộc các MedicalRecord của cuộc hẹn đó
+     * Lễ tân không cần chọn tay từng dịch vụ/thuốc.
+     */
+    public Integer autoCreateInvoiceForAppointment(int apptId, int recepId) throws SQLException {
+        // Không tạo trùng hóa đơn cho cùng 1 cuộc hẹn
+        if (getInvoiceByAppointment(apptId) != null) {
+            return null;
+        }
+
+        List<InvoiceDetail> autoDetails = new ArrayList<>();
+
+        // 1. Lấy thông tin loại dịch vụ từ Appointment
+        String apptSql = "SELECT type FROM Appointment WHERE appt_id = ?";
+        String apptType = null;
+        try (PreparedStatement st = connection.prepareStatement(apptSql)) {
+            st.setInt(1, apptId);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    apptType = rs.getString("type");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error autoCreateInvoiceForAppointment - load appointment: " + e.getMessage());
+        }
+
+        boolean hasMainService = false;
+
+        // 2. Map Appointment.type -> ServiceList (dịch vụ chính) nếu có
+        if (apptType != null && !apptType.trim().isEmpty()) {
+            String serviceSql = "SELECT service_id FROM ServiceList WHERE name = ? AND is_active = 1";
+            try (PreparedStatement st = connection.prepareStatement(serviceSql)) {
+                st.setString(1, apptType);
+                try (ResultSet rs = st.executeQuery()) {
+                    if (rs.next()) {
+                        InvoiceDetail serviceDetail = new InvoiceDetail();
+                        serviceDetail.setServiceId(rs.getInt("service_id"));
+                        serviceDetail.setItemType("Service");
+                        serviceDetail.setQuantity(1); // 1 lần dịch vụ chính cho cuộc hẹn
+                        autoDetails.add(serviceDetail);
+                        hasMainService = true;
+                    }
+                }
+            } catch (SQLException e) {
+                System.out.println("Error autoCreateInvoiceForAppointment - load main service: " + e.getMessage());
+            }
+        }
+
+        // 2b. Nếu không map được theo type, fallback: lấy dịch vụ active đầu tiên làm dịch vụ chính
+        if (!hasMainService) {
+            String fallbackSql = "SELECT TOP 1 service_id FROM ServiceList WHERE is_active = 1 ORDER BY service_id ASC";
+            try (PreparedStatement st = connection.prepareStatement(fallbackSql);
+                 ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    InvoiceDetail serviceDetail = new InvoiceDetail();
+                    serviceDetail.setServiceId(rs.getInt("service_id"));
+                    serviceDetail.setItemType("Service");
+                    serviceDetail.setQuantity(1);
+                    autoDetails.add(serviceDetail);
+                    hasMainService = true;
+                }
+            } catch (SQLException e) {
+                System.out.println("Error autoCreateInvoiceForAppointment - fallback main service: " + e.getMessage());
+            }
+        }
+
+        // 3. Thêm thuốc từ Prescription của cuộc hẹn (tính tiền thuốc)
+        String medSql = "SELECT p.medicine_id, SUM(p.quantity) AS total_qty "
+                + "FROM Prescription p "
+                + "JOIN MedicalRecord mr ON p.record_id = mr.record_id "
+                + "WHERE mr.appt_id = ? "
+                + "GROUP BY p.medicine_id";
+        try (PreparedStatement st = connection.prepareStatement(medSql)) {
+            st.setInt(1, apptId);
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    int medicineId = rs.getInt("medicine_id");
+                    int qty = rs.getInt("total_qty");
+                    if (qty <= 0) continue;
+                    InvoiceDetail medDetail = new InvoiceDetail();
+                    medDetail.setMedicineId(medicineId);
+                    medDetail.setItemType("Medicine");
+                    medDetail.setQuantity(qty);
+                    autoDetails.add(medDetail);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error autoCreateInvoiceForAppointment - load medicines: " + e.getMessage());
+        }
+
+        // Nếu không có bất kỳ dịch vụ nào thì không tạo hóa đơn
+        if (autoDetails.isEmpty()) {
+            return null;
+        }
+
+        // Tái sử dụng logic transaction đã có
+        return createInvoiceForAppointment(apptId, recepId, autoDetails);
     }
 
     public Invoice getInvoiceByAppointment(int apptId) {
