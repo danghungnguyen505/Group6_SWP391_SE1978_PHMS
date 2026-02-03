@@ -32,7 +32,7 @@
                 </li>
                 <li><a href="${pageContext.request.contextPath}/myPetOwner"class="nav-link">
                         <i class="fa-solid fa-paw"></i> My Pets</a></li>
-                <li><a href="${pageContext.request.contextPath}/medicalRecords"class="nav-link">
+                <li><a href="${pageContext.request.contextPath}/my-medical-records"class="nav-link">
                         <i class="fa-solid fa-file-medical"></i> Medical Records</a></li>
                 <li><a href="${pageContext.request.contextPath}/billing"class="nav-link">
                         <i class="fa-regular fa-credit-card"></i> Billing</a></li>

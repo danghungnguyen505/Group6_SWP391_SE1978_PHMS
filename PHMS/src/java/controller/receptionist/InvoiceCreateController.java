@@ -136,8 +136,16 @@ public class InvoiceCreateController extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/receptionist/invoice/create?apptId=" + apptId);
                 return;
             }
+<<<<<<< Updated upstream
             session.setAttribute("toastMessage", "success|Tạo hóa đơn thành công.");
             response.sendRedirect(request.getContextPath() + "/receptionist/invoice/detail?invoiceId=" + invoiceId);
+=======
+            session.setAttribute("toastMessage", "success|Tạo hóa đơn thành công. Chuyển sang thanh toán VNPay.");
+            // Sau khi tạo hóa đơn xong, chuyển ngay sang luồng thanh toán VNPay
+            //response.sendRedirect(request.getContextPath() + "/payment/vnpay/checkout?invoiceId=" + invoiceId);
+            session.setAttribute("toastMessage", "success|Hóa đơn đã được tạo. Vui lòng chọn phương thức thanh toán.");
+            response.sendRedirect(request.getContextPath() + "/receptionist/payment/create?invoiceId=" + invoiceId);
+>>>>>>> Stashed changes
         } catch (SQLException e) {
             e.printStackTrace();
             session.setAttribute("toastMessage", "error|Lỗi hệ thống khi tạo hóa đơn: " + e.getMessage());
