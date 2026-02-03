@@ -87,4 +87,19 @@ public class ScheduleVeterianrianDAO extends DBContext {
         }
         return list;
     }
+
+    /**
+     * Delete schedules for a staff on a specific date (used by leave auto-block).
+     */
+    public int deleteSchedulesByEmpAndDate(int empId, Date date) {
+        String sql = "DELETE FROM Schedule WHERE emp_id = ? AND work_date = ?";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, empId);
+            st.setDate(2, date);
+            return st.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error deleteSchedulesByEmpAndDate: " + e);
+            return 0;
+        }
+    }
 }

@@ -32,7 +32,7 @@ public class MyAppointmentController extends HttpServlet {
         User account = (User) session.getAttribute("account");
         // 1. Check login
         if (account == null || !"PetOwner".equalsIgnoreCase(account.getRole())) {
-            response.sendRedirect(request.getContextPath() + "/views/auth/login.jsp");
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
         // 2. Lấy dữ liệu từ DAO

@@ -11,7 +11,6 @@
 <head>
     <title>Quên mật khẩu</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/components.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/pages/login.css">
 </head>
 <body>

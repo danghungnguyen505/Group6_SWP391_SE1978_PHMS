@@ -53,7 +53,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="${pageContext.request.contextPath}/my-medical-records" class="nav-link">
                         <i class="fa-solid fa-file-medical"></i> Medical Records
                     </a>
                 </li>
@@ -65,11 +65,6 @@
                 <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="fa-solid fa-bolt"></i> AI Health Guide
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa-solid fa-gear"></i> Administration
                     </a>
                 </li>
             </ul>
@@ -150,15 +145,17 @@
                                 <td style="text-align: center;">
                                     <jsp:useBean id="now" class="java.util.Date" />
                                     <c:set var="currentTime" value="${now.time}" />
-                                    <c:set var="createdTime" value="${u.createdAt != null ? u.createdAt.time : 0}" />
-                                    <c:set var="hoursPassed" value="${(currentTime - createdTime) / (1000 * 60 * 60)}" />
-                                    <c:if test="${hoursPassed < 5}">
+                                    <c:set var="startTimeMs" value="${u.startTime.time}" />
+                                    <c:set var="hoursUntilStart" value="${(startTimeMs - currentTime) / (1000 * 60 * 60)}" />
+                                    <c:set var="isActionAllowed" value="${(u.status == 'Pending' || u.status == 'Confirmed') && hoursUntilStart >= 5}" />
+
+                                    <c:if test="${isActionAllowed}">
                                         <div class="action-buttons">
-                                        <a href="${pageContext.request.contextPath}/booking?petId=${u.petId}&vetId=${u.vetId}&serviceType=${u.type}&rescheduleId=${u.apptId}&selectedDate=<fmt:formatDate value="${u.startTime}" pattern="yyyy-MM-dd"/>" 
-                                            class="btn-action btn-reschedule" 
-                                            title="Reschedule">
-                                             <i class="fa-regular fa-clock"></i>
-                                         </a>
+                                            <a href="${pageContext.request.contextPath}/booking?petId=${u.petId}&vetId=${u.vetId}&serviceType=${u.type}&rescheduleId=${u.apptId}&selectedDate=<fmt:formatDate value="${u.startTime}" pattern="yyyy-MM-dd"/>" 
+                                               class="btn-action btn-reschedule" 
+                                               title="Reschedule">
+                                                <i class="fa-regular fa-clock"></i>
+                                            </a>
                                             <a href="${pageContext.request.contextPath}/appointment-action?id=${u.apptId}&type=cancel" 
                                                class="btn-action btn-cancel" title="Cancel">
                                                 <i class="fa-solid fa-user-doctor"></i>
@@ -166,11 +163,11 @@
                                         </div>
 
                                         <div style="font-size: 0.75rem; color: #666; margin-top: 5px; text-align: left;">
-                                            Time Can Change: <fmt:formatNumber value="${5 - hoursPassed}" maxFractionDigits="0"/>h
+                                            Bạn có thể hủy/đổi lịch trước giờ hẹn ít nhất 5 tiếng. Còn khoảng: <fmt:formatNumber value="${hoursUntilStart}" maxFractionDigits="0"/>h
                                         </div>
                                     </c:if>
 
-                                    <c:if test="${hoursPassed >= 5}">
+                                    <c:if test="${!isActionAllowed}">
                                         <div style="color: #9ca3af; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 5px; background: #f3f4f6; padding: 5px; border-radius: 4px;">
                                             <i class="fa-solid fa-lock"></i> Locked
                                         </div>

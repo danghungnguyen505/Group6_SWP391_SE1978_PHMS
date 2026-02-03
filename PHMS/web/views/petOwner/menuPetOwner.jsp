@@ -30,12 +30,12 @@
             <div class="menu-label">Main Menu</div>
             <ul class="nav-menu">
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="${pageContext.request.contextPath}/dashboard" class="nav-link">
                         <i class="fa-solid fa-border-all"></i> Dashboard
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link active" >
+                    <a href="${pageContext.request.contextPath}/booking" class="nav-link active" >
                         <i class="fa-regular fa-calendar-check"></i> Appointments
                     </a>
                 </li>
@@ -50,23 +50,18 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="${pageContext.request.contextPath}/my-medical-records" class="nav-link">
                         <i class="fa-solid fa-file-medical"></i> Medical Records
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="${pageContext.request.contextPath}/billing" class="nav-link">
                         <i class="fa-regular fa-credit-card"></i> Billing
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="${pageContext.request.contextPath}/aiHealthGuide" class="nav-link">
                         <i class="fa-solid fa-bolt"></i> AI Health Guide
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa-solid fa-gear"></i> Administration
                     </a>
                 </li>
             </ul>
@@ -156,8 +151,8 @@
                             <span class="char-count"></span>
                         </div>
                         <div class="form-group" style="margin-top: 15px;">
-                            <textarea class="form-control" name="notes" maxlength="100"
-                                      placeholder="Tell us about your pet's symptoms or any specific concerns..."></textarea>
+                            <textarea class="form-control" name="notes" maxlength="500"
+                                      placeholder="Tell us about your pet's symptoms or any specific concerns...">${param.notes}</textarea>
                         </div>
                     </div>
                 </div>
