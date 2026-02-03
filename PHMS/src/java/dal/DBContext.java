@@ -1,8 +1,10 @@
 package dal;
 
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,10 +23,26 @@ public class DBContext {
 
     public DBContext() {
         try {
-            // Edit your database info here
-            String user = "sa";
-            String pass = "123";
-            String url = "jdbc:sqlserver://localhost:1433;databaseName=PHMS_DB;encrypt=true;trustServerCertificate=true;";
+            // Load database configuration from properties file
+            Properties props = new Properties();
+            InputStream input = getClass().getClassLoader().getResourceAsStream("ConnectDB.properties");
+            if (input == null) {
+                // Fallback: try loading from WEB-INF
+                input = getClass().getClassLoader().getResourceAsStream("/WEB-INF/ConnectDB.properties");
+            }
+            
+            if (input != null) {
+                props.load(input);
+                input.close();
+            } else {
+                // Fallback to default values if properties file not found
+                Logger.getLogger(DBContext.class.getName()).log(Level.WARNING, "ConnectDB.properties not found, using default values");
+            }
+            
+            String url = props.getProperty("url", "jdbc:sqlserver://localhost:1433;databaseName=PHMS_DB;encrypt=true;trustServerCertificate=true;");
+            String user = props.getProperty("userID", "sa");
+            String pass = props.getProperty("password", "123");
+            
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             connection = DriverManager.getConnection(url, user, pass);
             if (connection != null) {
@@ -40,6 +58,9 @@ public class DBContext {
             System.out.println("SQL State: " + ex.getSQLState());
             System.out.println("Error Code: " + ex.getErrorCode());
             Logger.getLogger(DBContext.class.getName()).log(Level.SEVERE, "Database connection failed", ex);
+        } catch (Exception ex) {
+            System.out.println("Error loading properties: " + ex.getMessage());
+            Logger.getLogger(DBContext.class.getName()).log(Level.SEVERE, "Error loading properties", ex);
         }
     }
     

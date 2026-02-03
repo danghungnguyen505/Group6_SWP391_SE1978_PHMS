@@ -17,18 +17,6 @@
         <servlet-class>controller.auth.LogoutController</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>CheckInController</servlet-name>
-        <servlet-class>controller.CheckInController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>ReceptionistController</servlet-name>
-        <servlet-class>controller.ReceptionistController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>PetController</servlet-name>
-        <servlet-class>controller.PetController</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>AdminDashboardController</servlet-name>
         <servlet-class>controller.admin.DashboardController</servlet-class>
     </servlet>
@@ -52,15 +40,6 @@
         <servlet-name>EditServiceController</servlet-name>
         <servlet-class>controller.admin.EditServiceController</servlet-class>
     </servlet>
-    <!-- SERVLET MAPPINGS -->
-    <servlet>
-        <servlet-name>AppointmentControllers</servlet-name>
-        <servlet-class>controller.petOwner.AppointmentController</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>LoadAppointmentController</servlet-name>
-        <servlet-class>controller.LoadAppointmentController</servlet-class>
-    </servlet>
     <servlet-mapping>
         <servlet-name>HomeController</servlet-name>
         <url-pattern>/home</url-pattern>
@@ -76,18 +55,6 @@
     <servlet-mapping>
         <servlet-name>LogoutController</servlet-name>
         <url-pattern>/logout</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>CheckInController</servlet-name>
-        <url-pattern>/checkin</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ReceptionistController</servlet-name>
-        <url-pattern>/recep-appointments</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>PetController</servlet-name>
-        <url-pattern>/my-pets</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>AdminDashboardController</servlet-name>
@@ -112,21 +79,5 @@
     <servlet-mapping>
         <servlet-name>EditServiceController</servlet-name>
         <url-pattern>/admin/edit-service</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>AppointmentControllers</servlet-name>
-        <url-pattern>/Appointment</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>LoadAppointmentController</servlet-name>
-        <url-pattern>/LoadAppointment</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>BookingController</servlet-name>
-        <servlet-class>controller.appointment.BookingController</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>BookingController</servlet-name>
-        <url-pattern>/booking</url-pattern> 
     </servlet-mapping>
 </web-app>

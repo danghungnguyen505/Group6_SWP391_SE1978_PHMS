@@ -6,6 +6,7 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -46,7 +47,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/pets">
+                    <a href="${pageContext.request.contextPath}/receptionist/dashboard">
                         <i class="fa-solid fa-paw"></i> My Pets
                     </a>
                 </li>
@@ -167,7 +168,8 @@
             <!-- Main Card: Confirmed Requests -->
             <div class="card" style="margin-top: 20px;">
                 <div class="section-title">
-                    <span>Today's Check-in Queue (<fmt:formatDate value="<%=new java.util.Date()%>" pattern="dd/MM/yyyy"/>)</span>
+                    <jsp:useBean id="today" class="java.util.Date" />
+                    <span>Today's Check-in Queue (<fmt:formatDate value="${today}" pattern="dd/MM/yyyy"/>)</span>
                 </div>
 
                 <c:if test="${empty todayList}">

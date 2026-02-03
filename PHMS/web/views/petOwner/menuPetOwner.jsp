@@ -14,7 +14,7 @@
         <title>VetCare Pro - Dashboard</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <link href="${pageContext.request.contextPath}/assets/css/petOwner/menuPetOwner.css" rel="stylesheet" type="text/css"/>
+        <link href="${pageContext.request.contextPath}/assets/css/pages/menuPetOwner.css" rel="stylesheet" type="text/css"/>
         <script src="${pageContext.request.contextPath}/assets/js/saveSchedule.js"></script>
 
     </head>
@@ -50,7 +50,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="${pageContext.request.contextPath}/medicalRecords" class="nav-link">
+                    <a href="${pageContext.request.contextPath}/my-medical-records" class="nav-link">
                         <i class="fa-solid fa-file-medical"></i> Medical Records
                     </a>
                 </li>
@@ -151,8 +151,8 @@
                             <span class="char-count"></span>
                         </div>
                         <div class="form-group" style="margin-top: 15px;">
-                            <textarea class="form-control" name="notes" maxlength="100"
-                                      placeholder="Tell us about your pet's symptoms or any specific concerns..."></textarea>
+                            <textarea class="form-control" name="notes" maxlength="500"
+                                      placeholder="Tell us about your pet's symptoms or any specific concerns...">${param.notes}</textarea>
                         </div>
                     </div>
                 </div>

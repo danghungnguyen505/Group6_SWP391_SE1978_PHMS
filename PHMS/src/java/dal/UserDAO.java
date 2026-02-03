@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import model.User;
+import util.PasswordUtil;
 
 /**
  *
@@ -17,31 +18,49 @@ import model.User;
  */
 public class UserDAO extends DBContext {
 
+    /**
+     * Check login credentials with BCrypt password verification
+     * Supports both BCrypt hashed passwords and plain text (for backward compatibility)
+     */
     public User checkLogin(String username, String password) {
-    String sql = "SELECT u.*, p.address, p.email FROM Users u " +
-                 "LEFT JOIN PetOwner p ON u.user_id = p.user_id " +
-                 "WHERE u.username = ? AND u.password = ?";
-    try {
-        PreparedStatement ps = connection.prepareStatement(sql);
-        ps.setString(1, username);
-        ps.setString(2, password);
-        ResultSet rs = ps.executeQuery();
-        if (rs.next()) {
-            User user = new User();
-            user.setUserId(rs.getInt("user_id"));
-            user.setUsername(rs.getString("username"));
-            user.setFullName(rs.getString("full_name"));
-            user.setRole(rs.getString("role"));
-            user.setPhone(rs.getString("phone"));
-            user.setEmail(rs.getString("email"));
-            user.setAddress(rs.getString("address"));
-            return user;
+        String sql = "SELECT u.*, p.address, p.email FROM Users u " +
+                     "LEFT JOIN PetOwner p ON u.user_id = p.user_id " +
+                     "WHERE u.username = ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                String storedPassword = rs.getString("password");
+                
+                // Verify password: check if it's BCrypt hash or plain text (for backward compatibility)
+                boolean passwordMatches = false;
+                if (PasswordUtil.isValidHash(storedPassword)) {
+                    // BCrypt hash - verify using BCrypt
+                    passwordMatches = PasswordUtil.verifyPassword(password, storedPassword);
+                } else {
+                    // Plain text (legacy) - direct comparison
+                    passwordMatches = password.equals(storedPassword);
+                }
+                
+                if (passwordMatches) {
+                    User user = new User();
+                    user.setUserId(rs.getInt("user_id"));
+                    user.setUsername(rs.getString("username"));
+                    user.setFullName(rs.getString("full_name"));
+                    user.setRole(rs.getString("role"));
+                    user.setPhone(rs.getString("phone"));
+                    user.setEmail(rs.getString("email"));
+                    user.setAddress(rs.getString("address"));
+                    // Don't store password in User object for security
+                    return user;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        return null;
     }
-    return null;
-}
 
     public boolean checkUsernameExists(String username) {
         String sql = "SELECT user_id FROM Users WHERE username = ?";
@@ -56,14 +75,20 @@ public class UserDAO extends DBContext {
         return false;
     }
 
+    /**
+     * Register a new pet owner with BCrypt password hashing
+     */
     public void registerOwner(String username, String password, String fullName, String email, String phone, String address) {
         String sqlUser = "INSERT INTO Users (username, password, full_name, phone, role) VALUES (?, ?, ?, ?, 'PetOwner')";
         String sqlOwner = "INSERT INTO PetOwner (user_id, address, email) VALUES (?, ?, ?)";
 
         try {
+            // Hash password using BCrypt
+            String hashedPassword = PasswordUtil.hashPassword(password);
+            
             PreparedStatement ps = connection.prepareStatement(sqlUser, PreparedStatement.RETURN_GENERATED_KEYS);
             ps.setString(1, username);
-            ps.setString(2, password); // chưa mã hoá BCrypt
+            ps.setString(2, hashedPassword);
             ps.setString(3, fullName);
             ps.setString(4, phone);
             ps.executeUpdate();
@@ -80,6 +105,7 @@ public class UserDAO extends DBContext {
             }
         } catch (Exception e) {
             System.out.println("Register Error: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -104,16 +130,51 @@ public class UserDAO extends DBContext {
         }
     }
 
+    /**
+     * Change user password with BCrypt hashing
+     */
     public void changePassword(int userId, String newPassword) {
         String sql = "UPDATE Users SET password = ? WHERE user_id = ?";
         try {
+            // Hash password using BCrypt
+            String hashedPassword = PasswordUtil.hashPassword(newPassword);
+            
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setString(1, newPassword);
+            ps.setString(1, hashedPassword);
             ps.setInt(2, userId);
             ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    /**
+     * Get user by ID (for password verification in change password)
+     */
+    public User getUserById(int userId) {
+        String sql = "SELECT u.*, p.address, p.email FROM Users u " +
+                     "LEFT JOIN PetOwner p ON u.user_id = p.user_id " +
+                     "WHERE u.user_id = ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                User user = new User();
+                user.setUserId(rs.getInt("user_id"));
+                user.setUsername(rs.getString("username"));
+                user.setPassword(rs.getString("password")); // Include password for verification
+                user.setFullName(rs.getString("full_name"));
+                user.setRole(rs.getString("role"));
+                user.setPhone(rs.getString("phone"));
+                user.setEmail(rs.getString("email"));
+                user.setAddress(rs.getString("address"));
+                return user;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 
@@ -159,5 +220,34 @@ public class UserDAO extends DBContext {
             System.out.println(e);
         }
         return list;
+    }
+    
+    /**
+     * Get owner (PetOwner) by pet ID.
+     */
+    public User getOwnerByPetId(int petId) {
+        String sql = "SELECT u.*, p.address, p.email FROM Users u " +
+                     "JOIN PetOwner po ON u.user_id = po.user_id " +
+                     "JOIN Pet p ON po.user_id = p.owner_id " +
+                     "WHERE p.pet_id = ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, petId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                User user = new User();
+                user.setUserId(rs.getInt("user_id"));
+                user.setUsername(rs.getString("username"));
+                user.setFullName(rs.getString("full_name"));
+                user.setRole(rs.getString("role"));
+                user.setPhone(rs.getString("phone"));
+                user.setEmail(rs.getString("email"));
+                user.setAddress(rs.getString("address"));
+                return user;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getOwnerByPetId: " + e.getMessage());
+        }
+        return null;
     }
 }

@@ -14,10 +14,13 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>My Pets - VetCare Pro</title>
+
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <link href="${pageContext.request.contextPath}/assets/css/petOwner/menuPetOwner.css" rel="stylesheet" type="text/css"/>
-        <link href="${pageContext.request.contextPath}/assets/css/petOwner/myPetOwner.css" rel="stylesheet" type="text/css"/>
+
+        <link href="${pageContext.request.contextPath}/assets/css/pages/menuPetOwner.css" rel="stylesheet" type="text/css"/>
+
+        <link href="${pageContext.request.contextPath}/assets/css/pages/myPetOwner.css" rel="stylesheet" type="text/css"/>
     </head>
     <body>
 
@@ -30,7 +33,7 @@
             <div class="menu-label">Main Menu</div>
             <ul class="nav-menu">
                 <li class="nav-item">
-                    <a href="${pageContext.request.contextPath}/dashboard" class="nav-link">
+                    <a href="#" class="nav-link">
                         <i class="fa-solid fa-border-all"></i> Dashboard
                     </a>
                 </li>
@@ -50,17 +53,17 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="${pageContext.request.contextPath}/medicalRecords" class="nav-link">
+                    <a href="${pageContext.request.contextPath}/my-medical-records" class="nav-link">
                         <i class="fa-solid fa-file-medical"></i> Medical Records
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="${pageContext.request.contextPath}/billing" class="nav-link">
+                    <a href="#" class="nav-link">
                         <i class="fa-regular fa-credit-card"></i> Billing
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="${pageContext.request.contextPath}/aiHealthGuide" class="nav-link">
+                    <a href="#" class="nav-link">
                         <i class="fa-solid fa-bolt"></i> AI Health Guide
                     </a>
                 </li>
@@ -82,11 +85,18 @@
                     <h1>Pet Profile & History</h1>
                     <p>Comprehensive overview of your pet's health records.</p>
                 </div>
-                <select class="switch-pet-dropdown">
-                    <option>Switch Pet: Buddy</option>
-                    <option>Switch Pet: Luna</option>
-                    <option>Switch Pet: Max</option>
-                </select>
+                <form method="get" action="${pageContext.request.contextPath}/myPetOwner">
+                    <select class="switch-pet-dropdown" name="selectedPetId" onchange="this.form.submit()">
+                        <c:if test="${empty allPets}">
+                            <option value="">Bạn chưa có thú cưng nào</option>
+                        </c:if>
+                        <c:forEach items="${allPets}" var="p">
+                            <option value="${p.id}" ${selectedPet != null && selectedPet.id == p.id ? 'selected' : ''}>
+                                ${p.name} (${p.species})
+                            </option>
+                        </c:forEach>
+                    </select>
+                </form>
             </div>
 
             <div class="pet-dashboard-grid">
@@ -94,7 +104,11 @@
                 <div class="left-col">
                     <div class="pet-card">
                         <div style="text-align: right; margin-bottom: -10px;">
-                            <a href="#" style="color: #cbd5e1;"><i class="fa-solid fa-pen"></i></a>
+                            <c:if test="${not empty selectedPet}">
+                                <a href="${pageContext.request.contextPath}/pet/update?id=${selectedPet.id}" style="color: #cbd5e1;" title="Edit pet">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+                            </c:if>
                         </div>
 
                         <div class="pet-avatar-wrapper">
@@ -102,36 +116,120 @@
                             <div class="status-indicator"></div>
                         </div>
 
-                        <div class="pet-name">Buddy</div>
-                        <div class="pet-breed">Golden Retriever</div>
+                        <c:if test="${empty selectedPet}">
+                            <div class="pet-name">No pets</div>
+                            <div class="pet-breed">Please add your first pet</div>
+                        </c:if>
+                        <c:if test="${not empty selectedPet}">
+                            <div class="pet-name">${selectedPet.name}</div>
+                            <div class="pet-breed">${selectedPet.species}</div>
+                        </c:if>
 
                         <div class="stats-grid">
                             <div class="stat-box">
-                                <span class="stat-label">Gender</span>
-                                <div class="stat-value">Male</div>
+                                <span class="stat-label">Pet ID</span>
+                                <div class="stat-value"><c:out value="${selectedPet != null ? selectedPet.id : '-'}"/></div>
                             </div>
                             <div class="stat-box">
-                                <span class="stat-label">Weight</span>
-                                <div class="stat-value">28kg</div>
+                                <span class="stat-label">Species</span>
+                                <div class="stat-value"><c:out value="${selectedPet != null ? selectedPet.species : '-'}"/></div>
                             </div>
                             <div class="stat-box">
-                                <span class="stat-label">Age</span>
-                                <div class="stat-value">3 Years</div>
+                                <span class="stat-label">Appointments</span>
+                                <div class="stat-value">-</div>
                             </div>
                             <div class="stat-box">
-                                <span class="stat-label">Type</span>
-                                <div class="stat-value">Dog</div>
+                                <span class="stat-label">Status</span>
+                                <div class="stat-value">Active</div>
                             </div>
                         </div>
 
                         <div class="alert-box">
-                            <div class="alert-title"><i class="fa-solid fa-triangle-exclamation"></i> Allergies & Alerts</div>
-                            <div class="alert-content">Chicken, Pollen</div>
+                            <div class="alert-title"><i class="fa-solid fa-notes-medical"></i> History Summary</div>
+                            <div class="alert-content">
+                                <c:if test="${empty selectedPet || empty selectedPet.historySummary}">
+                                    <span style="color:#94a3b8; font-style: italic;">No history summary</span>
+                                </c:if>
+                                <c:if test="${not empty selectedPet && not empty selectedPet.historySummary}">
+                                    <c:out value="${selectedPet.historySummary}"/>
+                                </c:if>
+                            </div>
                         </div>
+
+                        <c:if test="${not empty selectedPet}">
+                            <form action="${pageContext.request.contextPath}/pet/delete" method="post" style="margin-top: 12px;">
+                                <input type="hidden" name="id" value="${selectedPet.id}">
+                                <button type="submit" class="btn btn-outline-danger btn-sm"
+                                        onclick="return confirm('Bạn chắc chắn muốn xóa thú cưng này?');">
+                                    <i class="fa-solid fa-trash"></i> Delete Pet
+                                </button>
+                            </form>
+                        </c:if>
                     </div>
                 </div>
 
                 <div class="right-col">
+
+                    <div class="history-section" style="margin-bottom: 20px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+                            <h3 style="margin:0;">My Pets List</h3>
+                            <a class="btn btn-primary btn-sm" href="${pageContext.request.contextPath}/pet/add" style="text-decoration:none;">
+                                <i class="fa-solid fa-plus"></i> Add Pet
+                            </a>
+                        </div>
+
+                        <c:if test="${empty pets}">
+                            <div class="empty-state">
+                                <p>No pets found.</p>
+                            </div>
+                        </c:if>
+
+                        <c:if test="${not empty pets}">
+                            <table class="history-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Species</th>
+                                        <th style="text-align:right;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:forEach items="${pets}" var="p2">
+                                        <tr>
+                                            <td>#${p2.id}</td>
+                                            <td>${p2.name}</td>
+                                            <td>${p2.species}</td>
+                                            <td style="text-align:right;">
+                                                <a class="view-detail-btn" href="${pageContext.request.contextPath}/myPetOwner?selectedPetId=${p2.id}" style="margin-right: 10px;">View</a>
+                                                <a class="view-detail-btn" href="${pageContext.request.contextPath}/pet/update?id=${p2.id}" style="margin-right: 10px;">Edit</a>
+                                                <form action="${pageContext.request.contextPath}/pet/delete" method="post" style="display:inline;">
+                                                    <input type="hidden" name="id" value="${p2.id}">
+                                                    <button type="submit" class="view-detail-btn" style="border:none; background:none; color:#ef4444;"
+                                                            onclick="return confirm('Bạn chắc chắn muốn xóa thú cưng này?');">Delete</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </tbody>
+                            </table>
+
+                            <c:if test="${totalPages > 1}">
+                                <div style="display:flex; gap:8px; justify-content:flex-end; margin-top: 10px;">
+                                    <c:if test="${currentPage > 1}">
+                                        <a class="view-detail-btn" href="?page=${currentPage - 1}${selectedPet != null ? '&selectedPetId=' : ''}${selectedPet != null ? selectedPet.id : ''}">Prev</a>
+                                    </c:if>
+                                    <c:forEach begin="1" end="${totalPages}" var="i">
+                                        <a class="view-detail-btn" href="?page=${i}${selectedPet != null ? '&selectedPetId=' : ''}${selectedPet != null ? selectedPet.id : ''}"
+                                           style="${currentPage == i ? 'font-weight:700;' : ''}">${i}</a>
+                                    </c:forEach>
+                                    <c:if test="${currentPage < totalPages}">
+                                        <a class="view-detail-btn" href="?page=${currentPage + 1}${selectedPet != null ? '&selectedPetId=' : ''}${selectedPet != null ? selectedPet.id : ''}">Next</a>
+                                    </c:if>
+                                </div>
+                            </c:if>
+                        </c:if>
+                    </div>
 
                     <div class="history-section">
                         <ul class="nav nav-tabs">
@@ -154,22 +252,7 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>2023-10-15</td>
-                                    <td>Annual Vaccination</td>
-                                    <td>Dr. Sarah Wilson</td>
-                                    <td><a href="#" class="view-detail-btn">View Detail <i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i></a></td>
-                                </tr>
-                                <tr>
-                                    <td>2023-08-12</td>
-                                    <td>Minor Paw Injury</td>
-                                    <td>Dr. James Chen</td>
-                                    <td><a href="#" class="view-detail-btn">View Detail <i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i></a></td>
-                                </tr>
-                                <tr>
-                                    <td>2023-05-20</td>
-                                    <td>Dietary Consultation</td>
-                                    <td>Dr. Emily Brown</td>
-                                    <td><a href="#" class="view-detail-btn">View Detail <i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i></a></td>
+                                    <td colspan="4" style="color:#94a3b8; font-style: italic;">Medical history (EMR) will be implemented next.</td>
                                 </tr>
                             </tbody>
                         </table>

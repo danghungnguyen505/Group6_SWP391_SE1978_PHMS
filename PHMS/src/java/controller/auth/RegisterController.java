@@ -68,30 +68,117 @@ public class RegisterController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        //processRequest(request, response);
-        String user = request.getParameter("username");
+        // Get and sanitize input
+        String user = util.ValidationUtils.sanitize(request.getParameter("username"));
         String pass = request.getParameter("password");
         String repass = request.getParameter("repassword");
-        String name = request.getParameter("fullname");
-        String email = request.getParameter("email");
-        String phone = request.getParameter("phone");
-        String address = request.getParameter("address");
+        String name = util.ValidationUtils.sanitize(request.getParameter("fullname"));
+        String email = util.ValidationUtils.sanitize(request.getParameter("email"));
+        String phone = util.ValidationUtils.sanitize(request.getParameter("phone"));
+        String address = util.ValidationUtils.sanitize(request.getParameter("address"));
+        
+        // Validate all fields
+        if (!util.ValidationUtils.isNotEmpty(user) || !util.ValidationUtils.isValidUsername(user)) {
+            request.setAttribute("error", "Tên đăng nhập không hợp lệ! (3-50 ký tự, chỉ chữ, số và dấu gạch dưới)");
+            request.setAttribute("username", user);
+            request.setAttribute("fullname", name);
+            request.setAttribute("email", email);
+            request.setAttribute("phone", phone);
+            request.setAttribute("address", address);
+            request.getRequestDispatcher("views/auth/register.jsp").forward(request, response);
+            return;
+        }
+        
+        if (!util.ValidationUtils.isNotEmpty(pass) || !util.ValidationUtils.isValidPassword(pass)) {
+            request.setAttribute("error", "Mật khẩu phải có ít nhất 6 ký tự!");
+            request.setAttribute("username", user);
+            request.setAttribute("fullname", name);
+            request.setAttribute("email", email);
+            request.setAttribute("phone", phone);
+            request.setAttribute("address", address);
+            request.getRequestDispatcher("views/auth/register.jsp").forward(request, response);
+            return;
+        }
         
         if (!pass.equals(repass)) {
             request.setAttribute("error", "Mật khẩu nhập lại không khớp!");
+            request.setAttribute("username", user);
+            request.setAttribute("fullname", name);
+            request.setAttribute("email", email);
+            request.setAttribute("phone", phone);
+            request.setAttribute("address", address);
+            request.getRequestDispatcher("views/auth/register.jsp").forward(request, response);
+            return;
+        }
+        
+        if (!util.ValidationUtils.isNotEmpty(name) || !util.ValidationUtils.isLengthValid(name, 2, 100)) {
+            request.setAttribute("error", "Họ tên phải có từ 2 đến 100 ký tự!");
+            request.setAttribute("username", user);
+            request.setAttribute("fullname", name);
+            request.setAttribute("email", email);
+            request.setAttribute("phone", phone);
+            request.setAttribute("address", address);
+            request.getRequestDispatcher("views/auth/register.jsp").forward(request, response);
+            return;
+        }
+        
+        if (!util.ValidationUtils.isNotEmpty(email) || !util.ValidationUtils.isValidEmail(email)) {
+            request.setAttribute("error", "Email không hợp lệ!");
+            request.setAttribute("username", user);
+            request.setAttribute("fullname", name);
+            request.setAttribute("email", email);
+            request.setAttribute("phone", phone);
+            request.setAttribute("address", address);
+            request.getRequestDispatcher("views/auth/register.jsp").forward(request, response);
+            return;
+        }
+        
+        if (!util.ValidationUtils.isNotEmpty(phone) || !util.ValidationUtils.isValidPhone(phone)) {
+            request.setAttribute("error", "Số điện thoại không hợp lệ! (Ví dụ: 0912345678 hoặc +84912345678)");
+            request.setAttribute("username", user);
+            request.setAttribute("fullname", name);
+            request.setAttribute("email", email);
+            request.setAttribute("phone", phone);
+            request.setAttribute("address", address);
+            request.getRequestDispatcher("views/auth/register.jsp").forward(request, response);
+            return;
+        }
+        
+        if (!util.ValidationUtils.isNotEmpty(address) || !util.ValidationUtils.isLengthValid(address, 5, 255)) {
+            request.setAttribute("error", "Địa chỉ phải có từ 5 đến 255 ký tự!");
+            request.setAttribute("username", user);
+            request.setAttribute("fullname", name);
+            request.setAttribute("email", email);
+            request.setAttribute("phone", phone);
+            request.setAttribute("address", address);
             request.getRequestDispatcher("views/auth/register.jsp").forward(request, response);
             return;
         }
         
         UserDAO dao = new UserDAO();
         if (dao.checkUsernameExists(user)) {
-            request.setAttribute("error", "Username này đã tồn tại!");
+            request.setAttribute("error", "Tên đăng nhập này đã tồn tại!");
+            request.setAttribute("username", user);
+            request.setAttribute("fullname", name);
+            request.setAttribute("email", email);
+            request.setAttribute("phone", phone);
+            request.setAttribute("address", address);
             request.getRequestDispatcher("views/auth/register.jsp").forward(request, response);
         } else {
-            dao.registerOwner(user, pass, name, email, phone, address);
-            response.sendRedirect("login");
+            try {
+                dao.registerOwner(user, pass, name, email, phone, address);
+                request.getSession().setAttribute("successMessage", "Đăng ký thành công! Vui lòng đăng nhập.");
+                response.sendRedirect("login");
+            } catch (Exception e) {
+                request.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
+                request.setAttribute("username", user);
+                request.setAttribute("fullname", name);
+                request.setAttribute("email", email);
+                request.setAttribute("phone", phone);
+                request.setAttribute("address", address);
+                request.getRequestDispatcher("views/auth/register.jsp").forward(request, response);
+            }
         }
-    
     }
 
     /** 

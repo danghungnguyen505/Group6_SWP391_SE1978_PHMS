@@ -75,6 +75,7 @@ public class LoginController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         //processRequest(request, response);
+        // Validate reCAPTCHA
         String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
         VerifyRecaptcha vr = new VerifyRecaptcha();
         boolean isCaptchaValid = vr.verify(gRecaptchaResponse);
@@ -85,8 +86,16 @@ public class LoginController extends HttpServlet {
             return;
         }
 
+        // Validate input
         String u = request.getParameter("username");
         String p = request.getParameter("password");
+
+        if (u == null || u.trim().isEmpty() || p == null || p.trim().isEmpty()) {
+            request.setAttribute("error", "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!");
+            request.setAttribute("username", u != null ? u : "");
+            request.getRequestDispatcher("views/auth/login.jsp").forward(request, response);
+            return;
+        }
 
         UserDAO dao = new UserDAO();
         User account = dao.checkLogin(u, p);
@@ -100,16 +109,19 @@ public class LoginController extends HttpServlet {
             session.setAttribute("account", account);
 
             String role = account.getRole(); // Lấy từ DB: Admin, Veterinarian, PetOwner...
-
             if ("ClinicManager".equalsIgnoreCase(role) || "Admin".equalsIgnoreCase(role)) {
                 response.sendRedirect("admin/dashboard");
             } else if ("Veterinarian".equalsIgnoreCase(role)) {
                 response.sendRedirect("veterinarian/dashboard");
             } else if ("Receptionist".equalsIgnoreCase(role)) {
                 response.sendRedirect("receptionist/dashboard");
-            }  else {
+            } else if ("Nurse".equalsIgnoreCase(role)) {
+                response.sendRedirect("nurse/lab/queue");
+            } else if ("PetOwner".equalsIgnoreCase(role)) {
                 response.sendRedirect("home");
-            } 
+            } else {
+                response.sendRedirect("home");
+            }
         }
     }
 

@@ -73,15 +73,22 @@ public class ForgotPasswordController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        //processRequest(request, response);
-        String email = request.getParameter("email");
-        String otpInput = request.getParameter("otp");
-        String newPass = request.getParameter("newPass");
+        String email = util.ValidationUtils.sanitize(request.getParameter("email"));
+        String otpInput = util.ValidationUtils.sanitize(request.getParameter("otp"));
+        String newPass = request.getParameter("newPass"); // keep raw for strength validation
 
         HttpSession session = request.getSession();
         UserDAO dao = new UserDAO();
-        
-        if (email != null && otpInput == null) {
+
+        // STEP 1: Request OTP
+        if (email != null && (otpInput == null || otpInput.trim().isEmpty())) {
+            // Validate email format
+            if (!util.ValidationUtils.isNotEmpty(email) || !util.ValidationUtils.isValidEmail(email)) {
+                request.setAttribute("error", "Email không hợp lệ!");
+                request.getRequestDispatcher("views/auth/forgot-password.jsp").forward(request, response);
+                return;
+            }
+
             User user = dao.checkEmailExist(email);
             if (user != null) {
                 String otp = util.SendMail.getRandomOTP();
@@ -98,28 +105,52 @@ public class ForgotPasswordController extends HttpServlet {
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    request.setAttribute("error", "Error: " + e.getMessage());
+                    request.setAttribute("error", "Lỗi gửi email: " + e.getMessage());
                 }
             } else {
                 request.setAttribute("error", "Email này không tồn tại trong hệ thống!");
             }
             request.getRequestDispatcher("views/auth/forgot-password.jsp").forward(request, response);
+            return;
         }
-        else if (otpInput != null && newPass != null) {
+
+        // STEP 2: Verify OTP and reset password
+        if (otpInput != null && newPass != null) {
             String serverOtp = (String) session.getAttribute("otp");
 
+            // Basic OTP validation
+            if (!util.ValidationUtils.isNotEmpty(otpInput) || otpInput.length() > 10) {
+                request.setAttribute("step", "2");
+                request.setAttribute("error", "Mã OTP không hợp lệ!");
+                request.getRequestDispatcher("views/auth/forgot-password.jsp").forward(request, response);
+                return;
+            }
+
+            // Validate new password strength
+            if (!util.ValidationUtils.isValidPassword(newPass)) {
+                request.setAttribute("step", "2");
+                request.setAttribute("error", "Mật khẩu mới phải có ít nhất 6 ký tự!");
+                request.getRequestDispatcher("views/auth/forgot-password.jsp").forward(request, response);
+                return;
+            }
+
             if (serverOtp != null && otpInput.equals(serverOtp)) {
-                int userId = (int) session.getAttribute("resetUserId");
+                Object userIdObj = session.getAttribute("resetUserId");
+                if (userIdObj instanceof Integer) {
+                    int userId = (Integer) userIdObj;
 
-                dao.changePassword(userId, newPass);
+                    dao.changePassword(userId, newPass);
 
-                session.removeAttribute("otp");
-                session.removeAttribute("resetEmail");
-                session.removeAttribute("resetUserId");
+                    session.removeAttribute("otp");
+                    session.removeAttribute("resetEmail");
+                    session.removeAttribute("resetUserId");
 
-                request.setAttribute("success", "Đổi mật khẩu thành công! Vui lòng đăng nhập.");
+                    request.setAttribute("success", "Đổi mật khẩu thành công! Vui lòng đăng nhập.");
+                } else {
+                    request.setAttribute("error", "Phiên đặt lại mật khẩu không hợp lệ. Vui lòng thử lại.");
+                }
             } else {
-                request.setAttribute("step", "2"); 
+                request.setAttribute("step", "2");
                 request.setAttribute("error", "Mã OTP không đúng hoặc đã hết hạn!");
             }
             request.getRequestDispatcher("views/auth/forgot-password.jsp").forward(request, response);
