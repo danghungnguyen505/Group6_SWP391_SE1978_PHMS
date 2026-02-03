@@ -3,11 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/zoxy4/Desktop/Group6_SWP391_SE1978_PHMS/PHMS/src/java/dal/AppointmentDAO.java</file>
-            <file>file:/C:/Users/zoxy4/Desktop/Group6_SWP391_SE1978_PHMS/PHMS/src/java/controller/ai/AIChatController.java</file>
-            <file>file:/C:/Users/zoxy4/Desktop/Group6_SWP391_SE1978_PHMS/PHMS/src/java/dal/InvoiceDAO.java</file>
-            <file>file:/C:/Users/zoxy4/Desktop/Group6_SWP391_SE1978_PHMS/PHMS/web/views/petOwner/billingPetOwner.jsp</file>
-            <file>file:/C:/Users/zoxy4/Desktop/Group6_SWP391_SE1978_PHMS/PHMS/web/views/petOwner/aiHealthGuidePetOwner.jsp</file>
+            <file>file:/C:/Users/zoxy4/Desktop/Group6_SWP391_SE1978_PHMS/PHMS/web/views/receptionist/receptionistRequestAppointment.jsp</file>
+            <file>file:/C:/Users/zoxy4/Desktop/Group6_SWP391_SE1978_PHMS/PHMS/web/index.jsp</file>
+            <file>file:/C:/Users/zoxy4/Desktop/Group6_SWP391_SE1978_PHMS/PHMS/web/META-INF/context.xml</file>
+            <file>file:/C:/Users/zoxy4/Desktop/Group6_SWP391_SE1978_PHMS/PHMS/web/views/receptionist/dashboardReceptionist.jsp</file>
         </group>
     </open-files>
 </project-private>
