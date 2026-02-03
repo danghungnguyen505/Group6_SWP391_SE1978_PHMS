@@ -217,9 +217,10 @@
                 </div>
                 <!-- RIGHT COLUMN: CHECKOUT -->
                 <div class="checkout-card">
-                    <h3>Checkout</h3>
-                    <form action="${pageContext.request.contextPath}/receptionist/invoice/create" method="POST">
+                    <h3>Checkout</h3>${grandTotal}a${param.apptId}
+                    <form action="${pageContext.request.contextPath}/payment" method="POST">
                         <input type="hidden" name="apptId" value="${param.apptId}"/>
+                        <input type="hidden" name="grandTotal" value="${grandTotal}"/>
                         <div class="method-section">
                             <label class="section-label">SELECT METHOD</label>
                             <!-- Option 1: Cash (Disabled/Gray) -->

@@ -89,8 +89,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     font-size: 20px;
 }
 .green-bg { background: #ECFDF5; color: #10B981; }
-.blue-bg { background: #EFF6FF; color: #3B82F6; }
-.orange-bg { background: #FFFBEB; color: #F59E0B; }
+.blue-bg { background: #F0FDF4; color: #16A34A; }
+.orange-bg { background: #DCFCE7; color: #15803D; }
 
 .stat-info h3 { font-size: 24px; font-weight: 700; color: #111827; margin: 0; }
 .stat-info p { margin: 0; color: #6B7280; font-size: 13px; }
@@ -98,7 +98,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
 /* Dashboard Grid */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr; /* Cột trái to gấp đôi cột phải */
+    grid-template-columns: repeat(2, minmax(0, 1fr)); /* Cột trái to gấp đôi cột phải */
     gap: 24px;
     align-items: start;
 }
@@ -125,14 +125,14 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     font-size: 13px; font-weight: 600; text-decoration: none;
 }
 .view-all { color: #10B981; }
-.add-new-btn { color: #3B82F6; }
+.add-new-btn { color: #0F766E; }
 
 /* Next Appointment Highlight */
 .appointment-details {
     display: flex;
     align-items: center;
     gap: 20px;
-    background: #F9FAFB;
+    background: #F0FDF4;
     padding: 16px;
     border-radius: 12px;
 }
@@ -144,7 +144,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     text-align: center;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
-.date-box .month { display: block; font-size: 11px; font-weight: 700; color: #EF4444; }
+.date-box .month { display: block; font-size: 11px; font-weight: 700; color: #059669; }
 .date-box .day { display: block; font-size: 20px; font-weight: 700; color: #111827; }
 
 .appt-info h4 { font-size: 15px; font-weight: 700; margin: 0 0 5px 0; }
@@ -217,11 +217,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
 
 /* Nút phụ (Xanh dương nhạt) */
 .btn-action.secondary {
-    background-color: #EFF6FF;
-    color: #3B82F6 !important;
+    background-color: #ECFDF5;
+    color: #0F766E !important;
 }
 .btn-action.secondary:hover {
-    background-color: #DBEAFE;
+    background-color: #D1FAE5;
     transform: translateY(-2px);
 }
 

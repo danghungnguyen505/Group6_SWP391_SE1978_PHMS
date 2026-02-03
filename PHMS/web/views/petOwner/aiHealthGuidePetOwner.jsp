@@ -9,36 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="${pageContext.request.contextPath}/assets/css/dashboardLeft.css" rel="stylesheet">
     <link href="${pageContext.request.contextPath}/assets/css/petOwner/aiHealthGuide.css" rel="stylesheet">
-    
-    <style>
-        /* Hiệu ứng loading */
-        .loading-bubble {
-            display: none;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 15px;
-            background: #f0f0f0;
-            border-radius: 15px;
-            width: fit-content;
-            margin-bottom: 15px;
-        }
-        .loading-bubble.active { display: flex; }
-        
-        /* Bong bóng chat của User (cần thêm vào CSS gốc) */
-        .message.user-message {
-            flex-direction: row-reverse;
-            align-self: flex-end;
-        }
-        .message.user-message .message-content {
-            background-color: #0d6efd; /* Màu xanh Bootstrap */
-            color: white;
-            border-bottom-right-radius: 0;
-        }
-        
-        /* Ẩn thanh cuộn nhưng vẫn cuộn được */
-        .chat-history::-webkit-scrollbar { width: 6px; }
-        .chat-history::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
-    </style>
 </head>
 <body>
 
@@ -52,7 +22,7 @@
             <li><a href="${pageContext.request.contextPath}/booking" class="nav-link"><i class="fa-regular fa-calendar-check"></i> Appointments</a></li>
             <li><a href="${pageContext.request.contextPath}/myAppointment" class="nav-link"><i class="fa-solid fa-calendar-check"></i> My Appointments</a></li>
             <li><a href="${pageContext.request.contextPath}/myPetOwner" class="nav-link"><i class="fa-solid fa-paw"></i> My Pets</a></li>
-            <li><a href="${pageContext.request.contextPath}/medicalRecords" class="nav-link"><i class="fa-solid fa-file-medical"></i> Medical Records</a></li>
+            <li><a href="${pageContext.request.contextPath}/my-medical-records" class="nav-link"><i class="fa-solid fa-file-medical"></i> Medical Records</a></li>
             <li><a href="${pageContext.request.contextPath}/billing" class="nav-link"><i class="fa-regular fa-credit-card"></i> Billing</a></li>
             <li><a href="${pageContext.request.contextPath}/aiHealthGuide" class="nav-link active"><i class="fa-solid fa-bolt"></i> AI Health Guide</a></li>
         </ul>
