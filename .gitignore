@@ -39,3 +39,4 @@ PHMS/nbproject/private/private.xml
 
 # Bỏ qua file chứa key bí mật
 config.properties
+/Group6_SWP391_SE1978_PHMS/PHMS/dist/
