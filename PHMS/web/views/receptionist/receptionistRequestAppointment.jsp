@@ -111,10 +111,7 @@
                             <option value="Pending" ${filterStatus == 'Pending' ? 'selected' : ''}>Pending</option>
                             <option value="Confirmed" ${filterStatus == 'Confirmed' ? 'selected' : ''}>Confirmed</option>
                             <option value="Checked-in" ${filterStatus == 'Checked-in' ? 'selected' : ''}>Checked-in</option>
-<<<<<<< Updated upstream
-=======
                             <option value="In-Progress" ${filterStatus == 'Checked-in' ? 'selected' : ''}>In-Progress</option>
->>>>>>> Stashed changes
                             <option value="Completed" ${filterStatus == 'Completed' ? 'selected' : ''}>Completed</option>
                             <option value="Cancelled" ${filterStatus == 'Cancelled' ? 'selected' : ''}>Cancelled</option>
                         </select>
@@ -156,7 +153,6 @@
                         <p>No appointments found.</p>
                     </div>
                 </c:if>
-                ${appointments}
                 <!-- Data Table -->
                 <c:if test="${not empty appointments}">
                     <table>
@@ -194,12 +190,9 @@
                                             <c:when test="${a.status == 'Checked-in'}">
                                                 <span style="background:#dbeafe; color:#1e40af; padding:4px 8px; border-radius:4px; font-size:12px;">Checked-in</span>
                                             </c:when>
-<<<<<<< Updated upstream
-=======
                                                 <c:when test="${a.status == 'In-Progress'}">
                                                 <span style="background:#dbeafe; color:#1e40af; padding:4px 8px; border-radius:4px; font-size:12px;">In-Progress</span>
                                             </c:when>
->>>>>>> Stashed changes
                                             <c:when test="${a.status == 'Completed'}">
                                                 <span style="background:#dcfce7; color:#166534; padding:4px 8px; border-radius:4px; font-size:12px;">Completed</span>
                                             </c:when>

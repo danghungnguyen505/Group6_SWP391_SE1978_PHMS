@@ -42,6 +42,7 @@ public class MyPetController extends HttpServlet {
         try {
             // Get pagination parameters
             String pageStr = request.getParameter("page");
+            String search = request.getParameter("search"); // Lấy keyword search
             int currentPage = 1;
             if (pageStr != null && !pageStr.trim().isEmpty()) {
                 try {
@@ -62,15 +63,17 @@ public class MyPetController extends HttpServlet {
             if (selectedPetIdStr != null && !selectedPetIdStr.trim().isEmpty()) {
                 try {
                     int selectedPetId = Integer.parseInt(selectedPetIdStr);
+                    // Tìm trong list hiện tại (đã filter)
                     for (Pet p : allPets) {
                         if (p.getId() == selectedPetId) {
                             selectedPet = p;
                             break;
                         }
                     }
-                } catch (NumberFormatException ignored) {
-                    // ignore invalid id
-                }
+                    // Nếu không tìm thấy trong list (do đang search cái khác), 
+                    // có thể query riêng để hiển thị bên trái nếu muốn.
+                    // Ở đây nếu null thì lát nữa sẽ lấy con đầu tiên của list search.
+                } catch (NumberFormatException ignored) {}
             }
             if (selectedPet == null && allPets != null && !allPets.isEmpty()) {
                 selectedPet = allPets.get(0);

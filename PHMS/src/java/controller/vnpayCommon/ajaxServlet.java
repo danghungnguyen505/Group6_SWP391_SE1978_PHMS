@@ -52,15 +52,22 @@ public class ajaxServlet extends HttpServlet {
         // 3. Gọi DAO để INSERT vào DB và lấy về InvoiceId tự động
         InvoiceDAO invoiceDAO = new InvoiceDAO();
         int invoiceId = -99; // Giá trị mặc định để kiểm tra
-
-        try {
-            invoiceId = invoiceDAO.createInvoice(apptId, recepId, grandTotal);
-        } catch (Exception e) {
-            // Nếu có lỗi SQL, nó sẽ hiện ngay lên trình duyệt cho bạn xem
-            resp.setContentType("text/html;charset=UTF-8");
-            resp.getWriter().write("<h1>LỖI JAVA: " + e.getMessage() + "</h1>");
-            return;
+        String act = req.getParameter("act");
+        if ("create".equals(act)) {
+            try {
+                invoiceId = invoiceDAO.createInvoice(apptId, recepId, grandTotal);
+            } catch (Exception e) {
+                // Nếu có lỗi SQL, nó sẽ hiện ngay lên trình duyệt cho bạn xem
+                resp.setContentType("text/html;charset=UTF-8");
+                resp.getWriter().write("<h1>LỖI JAVA: " + e.getMessage() + "</h1>");
+                return;
+            }
         }
+        if ("detail".equals(act)) {
+            int id = Integer.parseInt(req.getParameter("invoiceId"));
+            invoiceId = id;
+        }
+        
 
         if (invoiceId <= 0) {
             resp.setContentType("text/html;charset=UTF-8");
@@ -69,7 +76,7 @@ public class ajaxServlet extends HttpServlet {
             resp.getWriter().write("<p>ApptId: " + apptId + " | RecepId: " + recepId + "</p>");
             return;
         }
-// ... Các dòng code VNPay bên dưới giữ nguyên ...
+
 
         String vnp_TxnRef = invoiceId + "_" + Config.getRandomNumber(8);
         String vnp_IpAddr = Config.getIpAddress(req);

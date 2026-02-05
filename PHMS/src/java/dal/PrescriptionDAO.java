@@ -21,10 +21,11 @@ public class PrescriptionDAO extends DBContext {
             return false;
         }
         
-        // Verify record belongs to vet
+        // Verify record belongs to vet AND appointment is In-Progress
+        // (business rule: cannot prescribe if appointment is In-Progress
         String checkSql = "SELECT mr.record_id FROM MedicalRecord mr " +
                          "JOIN Appointment a ON mr.appt_id = a.appt_id " +
-                         "WHERE mr.record_id = ? AND a.vet_id = ?";
+                         "WHERE mr.record_id = ? AND a.vet_id = ? AND a.status = 'In-Progress'";
         String insertSql = "INSERT INTO Prescription (record_id, medicine_id, quantity, dosage) VALUES (?, ?, ?, ?)";
         
         boolean oldAutoCommit = connection.getAutoCommit();
@@ -137,6 +138,41 @@ public class PrescriptionDAO extends DBContext {
         }
         return list;
     }
+
+    /**
+     * Get all prescriptions for an appointment (for receptionist / billing).
+     * Join Medicine to load unit price in DB.
+     */
+    public List<Prescription> getByApptId(int apptId) {
+        List<Prescription> list = new ArrayList<>();
+        String sql = "SELECT p.pres_id, p.record_id, p.medicine_id, p.quantity, p.dosage, "
+                + "m.name AS medicine_name, m.unit AS medicine_unit, m.price AS medicine_price "
+                + "FROM Prescription p "
+                + "JOIN Medicine m ON p.medicine_id = m.medicine_id "
+                + "JOIN MedicalRecord mr ON p.record_id = mr.record_id "
+                + "WHERE mr.appt_id = ? "
+                + "ORDER BY p.pres_id";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, apptId);
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    Prescription p = new Prescription();
+                    p.setPresId(rs.getInt("pres_id"));
+                    p.setRecordId(rs.getInt("record_id"));
+                    p.setMedicineId(rs.getInt("medicine_id"));
+                    p.setQuantity(rs.getInt("quantity"));
+                    p.setDosage(rs.getString("dosage"));
+                    p.setMedicineName(rs.getString("medicine_name"));
+                    p.setMedicineUnit(rs.getString("medicine_unit"));
+                    p.setMedicinePrice(rs.getDouble("medicine_price"));
+                    list.add(p);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getByApptId: " + e.getMessage());
+        }
+        return list;
+    }
     
     /**
      * Delete a prescription (for vet only).
@@ -145,7 +181,7 @@ public class PrescriptionDAO extends DBContext {
         String sql = "DELETE p FROM Prescription p " +
                      "JOIN MedicalRecord mr ON p.record_id = mr.record_id " +
                      "JOIN Appointment a ON mr.appt_id = a.appt_id " +
-                     "WHERE p.pres_id = ? AND a.vet_id = ?";
+                     "WHERE p.pres_id = ? AND a.vet_id = ? AND a.status = 'In-Progress'";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, presId);
             st.setInt(2, vetId);
@@ -164,7 +200,7 @@ public class PrescriptionDAO extends DBContext {
                      "FROM Prescription p " +
                      "JOIN MedicalRecord mr ON p.record_id = mr.record_id " +
                      "JOIN Appointment a ON mr.appt_id = a.appt_id " +
-                     "WHERE p.pres_id = ? AND a.vet_id = ?";
+                     "WHERE p.pres_id = ? AND a.vet_id = ? AND a.status = 'In-Progress'";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, quantity);
             st.setString(2, dosage);
@@ -187,7 +223,7 @@ public class PrescriptionDAO extends DBContext {
                      "JOIN Medicine m ON p.medicine_id = m.medicine_id " +
                      "JOIN MedicalRecord mr ON p.record_id = mr.record_id " +
                      "JOIN Appointment a ON mr.appt_id = a.appt_id " +
-                     "WHERE p.pres_id = ? AND a.vet_id = ?";
+                     "WHERE p.pres_id = ? AND a.vet_id = ? AND a.status = 'In-Progress'";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, presId);
             st.setInt(2, vetId);

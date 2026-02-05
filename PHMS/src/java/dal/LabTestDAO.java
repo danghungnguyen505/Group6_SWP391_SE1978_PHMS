@@ -19,7 +19,7 @@ public class LabTestDAO extends DBContext {
         String checkSql = "SELECT mr.record_id "
                 + "FROM MedicalRecord mr "
                 + "JOIN Appointment a ON mr.appt_id = a.appt_id "
-                + "WHERE mr.record_id = ? AND a.vet_id = ?";
+                + "WHERE mr.record_id = ? AND a.vet_id = ? AND a.status = 'In-Progress'";
         String insertSql = "INSERT INTO LabTest (record_id, nurse_id, test_type, request_notes, result_data, status) "
                 + "VALUES (?, NULL, ?, ?, NULL, 'Requested')";
         try {
@@ -52,7 +52,7 @@ public class LabTestDAO extends DBContext {
                 + "FROM LabTest lt "
                 + "JOIN MedicalRecord mr ON lt.record_id = mr.record_id "
                 + "JOIN Appointment a ON mr.appt_id = a.appt_id "
-                + "WHERE lt.test_id = ? AND a.vet_id = ? AND lt.status <> 'Completed'";
+                + "WHERE lt.test_id = ? AND a.vet_id = ? AND a.status = 'In-Progress' AND lt.status <> 'Completed'";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, testId);
             st.setInt(2, vetId);

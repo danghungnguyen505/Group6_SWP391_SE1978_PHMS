@@ -91,6 +91,14 @@ public class StaffAccountCreateController extends HttpServlet {
             return;
         }
         
+        // Phone must be unique across all users
+        if (userDAO.checkPhoneExists(phone)) {
+            request.setAttribute("error", "Số điện thoại này đã được sử dụng!");
+            repopulateForm(request, username, password, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber);
+            doGet(request, response);
+            return;
+        }
+        
         if (!isValidStaffRole(role)) {
             request.setAttribute("error", "Vai trò không hợp lệ!");
             repopulateForm(request, username, password, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber);

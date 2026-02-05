@@ -134,7 +134,7 @@ public class RegisterController extends HttpServlet {
         }
         
         if (!util.ValidationUtils.isNotEmpty(phone) || !util.ValidationUtils.isValidPhone(phone)) {
-            request.setAttribute("error", "Số điện thoại không hợp lệ! (Ví dụ: 0912345678 hoặc +84912345678)");
+            request.setAttribute("error", "Số điện thoại không hợp lệ! (Ví dụ: 0912345678)");
             request.setAttribute("username", user);
             request.setAttribute("fullname", name);
             request.setAttribute("email", email);
@@ -156,28 +156,52 @@ public class RegisterController extends HttpServlet {
         }
         
         UserDAO dao = new UserDAO();
+        // Uniqueness checks: username, email, phone
         if (dao.checkUsernameExists(user)) {
-            request.setAttribute("error", "Tên đăng nhập này đã tồn tại!");
+            request.setAttribute("error", "Tên đăng nhập này đã tồn tại! Vui lòng chọn tên khác.");
             request.setAttribute("username", user);
             request.setAttribute("fullname", name);
             request.setAttribute("email", email);
             request.setAttribute("phone", phone);
             request.setAttribute("address", address);
             request.getRequestDispatcher("views/auth/register.jsp").forward(request, response);
-        } else {
-            try {
-                dao.registerOwner(user, pass, name, email, phone, address);
-                request.getSession().setAttribute("successMessage", "Đăng ký thành công! Vui lòng đăng nhập.");
-                response.sendRedirect("login");
-            } catch (Exception e) {
-                request.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
-                request.setAttribute("username", user);
-                request.setAttribute("fullname", name);
-                request.setAttribute("email", email);
-                request.setAttribute("phone", phone);
-                request.setAttribute("address", address);
-                request.getRequestDispatcher("views/auth/register.jsp").forward(request, response);
-            }
+            return;
+        }
+
+        if (dao.checkEmailExists(email)) {
+            request.setAttribute("error", "Email này đã được sử dụng! Vui lòng dùng email khác.");
+            request.setAttribute("username", user);
+            request.setAttribute("fullname", name);
+            request.setAttribute("email", email);
+            request.setAttribute("phone", phone);
+            request.setAttribute("address", address);
+            request.getRequestDispatcher("views/auth/register.jsp").forward(request, response);
+            return;
+        }
+
+        if (dao.checkPhoneExists(phone)) {
+            request.setAttribute("error", "Số điện thoại này đã được sử dụng! Vui lòng dùng số khác.");
+            request.setAttribute("username", user);
+            request.setAttribute("fullname", name);
+            request.setAttribute("email", email);
+            request.setAttribute("phone", phone);
+            request.setAttribute("address", address);
+            request.getRequestDispatcher("views/auth/register.jsp").forward(request, response);
+            return;
+        }
+
+        try {
+            dao.registerOwner(user, pass, name, email, phone, address);
+            request.getSession().setAttribute("successMessage", "Đăng ký thành công! Vui lòng đăng nhập.");
+            response.sendRedirect("login");
+        } catch (Exception e) {
+            request.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
+            request.setAttribute("username", user);
+            request.setAttribute("fullname", name);
+            request.setAttribute("email", email);
+            request.setAttribute("phone", phone);
+            request.setAttribute("address", address);
+            request.getRequestDispatcher("views/auth/register.jsp").forward(request, response);
         }
     }
 

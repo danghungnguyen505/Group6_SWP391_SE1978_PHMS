@@ -60,6 +60,11 @@ public class InvoiceDAO extends DBContext {
             return null;
         }
 
+        // Business rule: do not create duplicated invoice for the same appointment
+        if (getInvoiceByAppointment(apptId) != null) {
+            return null;
+        }
+
         String insertInvoiceSql = "INSERT INTO Invoice (appt_id, recep_id, total_amount, status) "
                 + "VALUES (?, ?, 0, 'Unpaid')";
         String insertDetailSql = "INSERT INTO InvoiceDetail "
@@ -165,8 +170,6 @@ public class InvoiceDAO extends DBContext {
         }
     }
 
-<<<<<<< Updated upstream
-=======
     /**
      * Tự động tạo hóa đơn cho một cuộc hẹn dựa trên: - Dịch vụ chính từ
      * Appointment.type -> ServiceList.name - Thuốc từ các Prescription thuộc
@@ -269,7 +272,6 @@ public class InvoiceDAO extends DBContext {
         return createInvoiceForAppointment(apptId, recepId, autoDetails);
     }
 
->>>>>>> Stashed changes
     public Invoice getInvoiceByAppointment(int apptId) {
         String sql = "SELECT invoice_id, appt_id, recep_id, total_amount, status "
                 + "FROM Invoice WHERE appt_id = ?";

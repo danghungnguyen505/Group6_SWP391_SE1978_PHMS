@@ -96,7 +96,10 @@ public class ForgotPasswordController extends HttpServlet {
                 try {
                     util.SendMail.sendRecoveryOTP(getServletContext(), email, otp);
 
+                    long otpCreatedAt = System.currentTimeMillis();   // thời điểm tạo OTP
+
                     session.setAttribute("otp", otp);
+                    session.setAttribute("otpCreatedAt", otpCreatedAt); // lưu thời gian tạo OTP
                     session.setAttribute("resetEmail", email);
                     session.setAttribute("resetUserId", user.getUserId());
 
@@ -117,6 +120,22 @@ public class ForgotPasswordController extends HttpServlet {
         // STEP 2: Verify OTP and reset password
         if (otpInput != null && newPass != null) {
             String serverOtp = (String) session.getAttribute("otp");
+            Long otpCreatedAt = (Long) session.getAttribute("otpCreatedAt");
+
+            // Kiểm tra thời gian hết hạn OTP (5 phút)
+            long now = System.currentTimeMillis();
+            if (serverOtp == null || otpCreatedAt == null || (now - otpCreatedAt) > 5 * 60 * 1000) {
+                // Hết hạn => xoá session liên quan
+                session.removeAttribute("otp");
+                session.removeAttribute("otpCreatedAt");
+                session.removeAttribute("resetEmail");
+                session.removeAttribute("resetUserId");
+
+                request.setAttribute("step", "2");
+                request.setAttribute("error", "Mã OTP đã hết hạn! Vui lòng yêu cầu mã mới.");
+                request.getRequestDispatcher("views/auth/forgot-password.jsp").forward(request, response);
+                return;
+            }
 
             // Basic OTP validation
             if (!util.ValidationUtils.isNotEmpty(otpInput) || otpInput.length() > 10) {
@@ -134,7 +153,7 @@ public class ForgotPasswordController extends HttpServlet {
                 return;
             }
 
-            if (serverOtp != null && otpInput.equals(serverOtp)) {
+            if (otpInput.equals(serverOtp)) {
                 Object userIdObj = session.getAttribute("resetUserId");
                 if (userIdObj instanceof Integer) {
                     int userId = (Integer) userIdObj;
@@ -142,6 +161,7 @@ public class ForgotPasswordController extends HttpServlet {
                     dao.changePassword(userId, newPass);
 
                     session.removeAttribute("otp");
+                    session.removeAttribute("otpCreatedAt");
                     session.removeAttribute("resetEmail");
                     session.removeAttribute("resetUserId");
 
@@ -151,7 +171,7 @@ public class ForgotPasswordController extends HttpServlet {
                 }
             } else {
                 request.setAttribute("step", "2");
-                request.setAttribute("error", "Mã OTP không đúng hoặc đã hết hạn!");
+                request.setAttribute("error", "Mã OTP không đúng!");
             }
             request.getRequestDispatcher("views/auth/forgot-password.jsp").forward(request, response);
         }

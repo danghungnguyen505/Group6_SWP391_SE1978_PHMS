@@ -72,7 +72,7 @@ public class DashboardController extends HttpServlet {
         
         request.setAttribute("services", list);
         
-        request.getRequestDispatcher("/views/admin/serviceManagement.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/admin/dashboard.jsp").forward(request, response);
     } 
 
     /** 

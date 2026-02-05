@@ -49,7 +49,11 @@ public class MedicalRecordUpdateController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/veterinarian/emr/records");
             return;
         }
-
+        if ("Completed".equalsIgnoreCase(mr.getApptStatus())) {
+            session.setAttribute("toastMessage", "error|Appointment already completed. You cannot edit this record.");
+            response.sendRedirect(request.getContextPath() + "/veterinarian/emr/detail?id=" + recordId);
+            return;
+        }
         request.setAttribute("record", mr);
         request.getRequestDispatcher("/views/veterinarian/medicalRecordUpdate.jsp").forward(request, response);
     }
@@ -93,6 +97,13 @@ public class MedicalRecordUpdateController extends HttpServlet {
         }
 
         MedicalRecordDAO dao = new MedicalRecordDAO();
+        MedicalRecord existing = dao.getByIdForVet(recordId, account.getUserId());
+        //Khong cho sua neu da o trang thai Completed
+        if (existing != null && "Completed".equalsIgnoreCase(existing.getApptStatus())) {
+            session.setAttribute("toastMessage", "error|Appointment already completed. You cannot edit this record.");
+            response.sendRedirect(request.getContextPath() + "/veterinarian/emr/detail?id=" + recordId);
+            return;
+        }
         boolean ok = dao.updateForVet(recordId, account.getUserId(), diagnosis, treatmentPlan);
         if (ok) {
             session.setAttribute("toastMessage", "success|Medical record updated.");

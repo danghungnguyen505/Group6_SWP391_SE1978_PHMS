@@ -33,7 +33,10 @@ public class StaffAccountListController extends HttpServlet {
         }
         
         StaffAccountDAO staffDAO = new StaffAccountDAO();
-        int totalStaff = staffDAO.getTotalStaffAccounts();
+
+        String search = request.getParameter("search");
+        String roleFilter = request.getParameter("role");
+        String statusFilter = request.getParameter("status");
         
         int page = 1;
         String pageStr = request.getParameter("page");
@@ -46,16 +49,20 @@ public class StaffAccountListController extends HttpServlet {
             }
         }
         
+        int totalStaff = staffDAO.getTotalStaffAccounts(search, roleFilter, statusFilter);
         int totalPages = (int) Math.ceil((double) totalStaff / PAGE_SIZE);
         page = PaginationUtils.getValidPage(page, totalPages);
         
-        List<User> staffAccounts = staffDAO.getAllStaffAccounts(page, PAGE_SIZE);
+        List<User> staffAccounts = staffDAO.getAllStaffAccounts(page, PAGE_SIZE, search, roleFilter, statusFilter);
         
         request.setAttribute("staffAccounts", staffAccounts);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("totalStaff", totalStaff);
         request.setAttribute("pageSize", PAGE_SIZE);
+        request.setAttribute("searchKeyword", search);
+        request.setAttribute("roleFilter", roleFilter);
+        request.setAttribute("statusFilter", statusFilter);
         
         request.getRequestDispatcher("/views/admin/staffList.jsp").forward(request, response);
     }

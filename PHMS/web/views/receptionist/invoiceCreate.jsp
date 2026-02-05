@@ -1,98 +1,163 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>Tạo hóa đơn - PHMS</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/components.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/pages/service-management.css">
-</head>
-<body class="mgmt-page">
-<div class="mgmt-container">
-    <header class="mgmt-header">
-        <div>
-            <h1 class="mgmt-title">Tạo hóa đơn cho cuộc hẹn #${appt.apptId}</h1>
-            <p class="mgmt-subtitle">
-                Thú cưng: ${appt.petName} | Bác sĩ: ${appt.vetName} | Thời gian: ${appt.startTime}
-            </p>
-        </div>
-    </header>
+    <head>
+        <meta charset="UTF-8">
+        <title>Tạo hóa đơn - PHMS</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/components.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/pages/service-management.css">
+        <link href="${pageContext.request.contextPath}/assets/css/dashboardLeft.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link href="${pageContext.request.contextPath}/assets/css/dashboardLeft.css" rel="stylesheet">
+        <link href="${pageContext.request.contextPath}/assets/css/petOwner/billingPetOwner.css" rel="stylesheet">
+    </head>
+    <body>
+        <!-- LEFT SIDEBAR -->
+        <nav class="sidebar">
+            <div class="brand">
+                <i class="fa-solid fa-plus-square"></i> VetCare Pro
+            </div>
 
-    <c:if test="${not empty error}">
-        <div class="alert alert-error" style="margin-bottom: 1rem; color: #b91c1c;">
-            ${error}
-        </div>
-    </c:if>
+            <ul class="menu">
+                <li>
+                    <a href="${pageContext.request.contextPath}/receptionist/dashboard" class="active">
+                        <i class="fa-solid fa-table-columns"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="${pageContext.request.contextPath}/receptionist/dashboard" class="text-danger">
+                        <i class="fa-solid fa-truck-medical"></i> Emergency Triage
+                    </a>
+                </li>
+                <li>
+                    <a href="${pageContext.request.contextPath}/receptionist/scheduling">
+                        <i class="fa-solid fa-truck-medical"></i> Staff Scheduling
+                    </a>
+                </li>
+                <li>
+                    <a href="${pageContext.request.contextPath}/receptionist/appointment">
+                        <i class="fa-regular fa-calendar-check"></i> Appointments
+                    </a>
+                </li>
+                <li>
+                    <a href="${pageContext.request.contextPath}/receptionist/dashboard">
+                        <i class="fa-solid fa-paw"></i> My Pets
+                    </a>
+                <li>
+                </li>
+                    <a href="${pageContext.request.contextPath}/receptionist/dashboard">
+                        <i class="fa-solid fa-file-medical"></i> Medical Records
+                    </a>
+                </li>
+                <li>
+                    <a href="${pageContext.request.contextPath}/receptionist/dashboard">
+                        <i class="fa-regular fa-credit-card"></i> Billing
+                    </a>
+                </li>
+                <li>
+                    <a href="${pageContext.request.contextPath}/receptionist/dashboard">
+                        <i class="fa-solid fa-gear"></i> Administration
+                    </a>
+                </li>
+            </ul>
 
-    <form action="${pageContext.request.contextPath}/receptionist/invoice/create" method="post">
-        <input type="hidden" name="apptId" value="${appt.apptId}">
+            <div class="help-box">
+                <div class="help-text">Need help?</div>
+                <a href="#" class="btn-contact">Contact Support</a>
+            </div>
+        </nav>
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <!-- Top Header (Sign Out) -->
+            <header class="top-bar">
+                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
+            </header>
+            <!-- Page Title Section -->
+            <div class="page-header">
+                <div class="header-text">
+                    <h1>Billing & Checkout</h1>
+                    <p>Review details and complete payment for your recent visit.</p>
+                </div>
+                <button class="btn-print">
+                    <i class="fa-solid fa-print"></i> Print Invoice
+                </button>
+            </div>
+            <!-- Layout Grid -->
+            <div class="billing-grid">
+                <!-- LEFT COLUMN: INVOICE DETAILS -->
+                <div class="invoice-card">
 
-        <div class="data-table-container">
-            <h2 class="mgmt-title" style="font-size: 1.1rem;">Dịch vụ</h2>
-            <table class="data-table">
-                <thead>
-                <tr>
-                    <th>Chọn</th>
-                    <th>Tên dịch vụ</th>
-                    <th>Giá cơ bản</th>
-                    <th>Số lượng</th>
-                </tr>
-                </thead>
-                <tbody>
-                <c:forEach var="s" items="${services}">
-                    <tr>
-                        <td>
-                            <input type="checkbox" name="serviceId" value="${s.serviceId}">
-                        </td>
-                        <td>${s.name}</td>
-                        <td>${s.basePrice}</td>
-                        <td>
-                            <input type="number" name="serviceQty" value="1" min="1" max="100"
-                                   class="form-input" style="width: 80px;">
-                        </td>
-                    </tr>
-                </c:forEach>
-                </tbody>
-            </table>
-        </div>
+                    <!-- Invoice Header -->
+                    <div class="invoice-top">
+                        <div>
+                            <span class="invoice-label">INVOICE DETAILS</span>
+                            <h2 class="invoice-number">
+                                <c:out value="${invoiceNumber != null ? invoiceNumber : 'INV-DRAFT'}"/>
+                            </h2>
+                            <div class="invoice-date">
+                                Date:
+                                <c:out value="${invoiceDate != null ? invoiceDate : ''}"/>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="status-badge unpaid">UNPAID</span>
+                        </div>
+                    </div>
+                    <!-- Customer Info -->
+                    <div class="customer-info-row">
+                        <div class="info-group">
+                            <label>OWNER NAME</label>
+                            <div class="info-value">
+                                <c:out value="${appt.ownerName}"/>
+                            </div>
+                        </div>
+                        <div class="info-group">
+                            <label>PET NAME</label>
+                            <div class="info-value">
+                                <c:out value="${appt.petName}"/>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Line Items Table -->
+                    <table class="invoice-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50%;">SERVICE / ITEM</th>
+                                <th style="text-align: center;">QTY</th>
+                                <th style="text-align: right;">UNIT PRICE</th>
+                                <th style="text-align: right;">SUBTOTAL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:choose>
+                                <c:when test="${not empty mainService}">
+                                    <tr>
+                                        <td>
+                                            <c:out value="${mainService.name}"/>
+                                        </td>
+                                        <td class="text-center">1</td>
+                                        <td class="text-right">
+                                            <fmt:formatNumber value="${mainService.basePrice}" type="currency" currencySymbol="$"/>
+                                        </td>
+                                        <td class="text-right fw-bold">
+                                            <fmt:formatNumber value="${mainService.basePrice}" type="currency" currencySymbol="$"/>
+                                        </td>
+                                    </tr>
+                                </c:when>
+                                <c:otherwise>
+                                    <tr>
+                                        <td colspan="4" style="text-align:center; color:#6b7280;">
+                                            No billable service found for this appointment type.
+                                        </td>
+                                    </tr>
+                                </c:otherwise>
+                            </c:choose>
 
-<<<<<<< Updated upstream
-        <div class="data-table-container" style="margin-top: 1.5rem;">
-            <h2 class="mgmt-title" style="font-size: 1.1rem;">Thuốc</h2>
-            <table class="data-table">
-                <thead>
-                <tr>
-                    <th>Chọn</th>
-                    <th>Tên thuốc</th>
-                    <th>Đơn vị</th>
-                    <th>Giá</th>
-                    <th>Tồn kho</th>
-                    <th>Số lượng</th>
-                </tr>
-                </thead>
-                <tbody>
-                <c:forEach var="m" items="${medicines}">
-                    <tr>
-                        <td>
-                            <input type="checkbox" name="medicineId" value="${m.medicineId}">
-                        </td>
-                        <td>${m.name}</td>
-                        <td>${m.unit}</td>
-                        <td>${m.price}</td>
-                        <td>${m.stockQuantity}</td>
-                        <td>
-                            <input type="number" name="medicineQty" value="1" min="1" max="${m.stockQuantity}"
-                                   class="form-input" style="width: 80px;">
-                        </td>
-                    </tr>
-                </c:forEach>
-                </tbody>
-            </table>
-        </div>
-=======
                             <c:if test="${not empty prescriptions}">
                                 <c:forEach var="p" items="${prescriptions}">
                                     <tr>
@@ -156,6 +221,7 @@
                     <form action="${pageContext.request.contextPath}/payment" method="POST">
                         <input type="hidden" name="apptId" value="${param.apptId}"/>
                         <input type="hidden" name="grandTotal" value="${grandTotal}"/>
+                        <input type="hidden" name="act" value="create">
                         <div class="method-section">
                             <label class="section-label">SELECT METHOD</label>
                             <!-- Option 1: Cash (Disabled/Gray) -->
@@ -213,14 +279,7 @@
                 </div>
             </div> <!-- End Grid -->
         </main>
->>>>>>> Stashed changes
 
-        <div class="form-actions" style="margin-top: 1.5rem;">
-            <button type="submit" class="btn btn-primary">Tạo hóa đơn</button>
-            <a href="${pageContext.request.contextPath}/receptionist/dashboard" class="btn btn-secondary">Hủy</a>
-        </div>
-    </form>
-</div>
-</body>
+    </body>
 </html>
 

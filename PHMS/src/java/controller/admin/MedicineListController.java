@@ -35,6 +35,34 @@ public class MedicineListController extends HttpServlet {
         
         MedicineDAO medicineDAO = new MedicineDAO();
         List<Medicine> allMedicines = medicineDAO.getAllMedicines();
+
+        String search = request.getParameter("search");
+        String statusFilter = request.getParameter("status"); // active / inactive (out-of-stock)
+
+        List<Medicine> filteredMedicines = new java.util.ArrayList<>();
+        for (Medicine m : allMedicines) {
+            boolean match = true;
+
+            if (search != null && !search.trim().isEmpty()) {
+                String lower = search.trim().toLowerCase();
+                String name = m.getName() != null ? m.getName().toLowerCase() : "";
+                String unit = m.getUnit() != null ? m.getUnit().toLowerCase() : "";
+                match = name.contains(lower) || unit.contains(lower);
+            }
+
+            if (match && statusFilter != null && !statusFilter.trim().isEmpty()) {
+                boolean inStock = m.getStockQuantity() > 0;
+                if ("active".equalsIgnoreCase(statusFilter)) {
+                    match = inStock;
+                } else if ("inactive".equalsIgnoreCase(statusFilter)) {
+                    match = !inStock;
+                }
+            }
+
+            if (match) {
+                filteredMedicines.add(m);
+            }
+        }
         
         int page = 1;
         String pageStr = request.getParameter("page");
@@ -47,15 +75,17 @@ public class MedicineListController extends HttpServlet {
             }
         }
         
-        int totalPages = PaginationUtils.getTotalPages(allMedicines, PAGE_SIZE);
+        int totalPages = PaginationUtils.getTotalPages(filteredMedicines, PAGE_SIZE);
         page = PaginationUtils.getValidPage(page, totalPages);
-        List<Medicine> medicines = PaginationUtils.getPage(allMedicines, page, PAGE_SIZE);
+        List<Medicine> medicines = PaginationUtils.getPage(filteredMedicines, page, PAGE_SIZE);
         
         request.setAttribute("medicines", medicines);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
-        request.setAttribute("totalMedicines", allMedicines.size());
+        request.setAttribute("totalMedicines", filteredMedicines.size());
         request.setAttribute("pageSize", PAGE_SIZE);
+        request.setAttribute("searchKeyword", search);
+        request.setAttribute("statusFilter", statusFilter);
         
         request.getRequestDispatcher("/views/admin/medicineList.jsp").forward(request, response);
     }
