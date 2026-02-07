@@ -140,15 +140,15 @@ public class GeminiClient {
         }
 
         if (status != 200) {
-            String errorMsg = resp.toString();
-            LOGGER.log(Level.WARNING, "API Error (" + status + "): " + errorMsg);
+            String errorFromGoogle = resp.toString();
+            LOGGER.log(Level.SEVERE, "API Error (" + status + "): " + errorFromGoogle);
             if (status == 404) {
                 return "Lỗi 404: API Key hoặc Model sai.";
             }
             if (status == 429) {
                 return "Hệ thống quá tải, thử lại sau.";
             }
-            return "Lỗi kết nối AI (" + status + ").";
+            return "LỖI CHI TIẾT TỪ GOOGLE (Status " + status + "): " + errorFromGoogle;
         }
 
         return extractTextFromResponse(resp.toString());

@@ -346,7 +346,7 @@ public class AppointmentDAO extends DBContext {
                 + "JOIN Users u ON a.vet_id = u.user_id "
                 + "JOIN Users u_owner ON p.owner_id = u_owner.user_id "
                 + "WHERE CAST(a.start_time AS DATE) = CAST(GETDATE() AS DATE) " // Dùng GETDATE() cho SQL Server, hoặc CURDATE() cho MySQL
-                + "AND a.status IN ('Confirmed', 'Checked-in', 'No-show', 'Completed') "
+                + "AND a.status IN ('Confirmed', 'Checked-in', 'In-Progress', 'No-show', 'Completed') "
                 + "ORDER BY a.start_time ASC";
         try {
             PreparedStatement st = connection.prepareStatement(sql);

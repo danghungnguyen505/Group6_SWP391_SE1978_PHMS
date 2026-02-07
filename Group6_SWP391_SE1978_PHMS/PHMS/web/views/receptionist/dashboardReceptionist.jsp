@@ -18,7 +18,7 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     </head>
     <body>
-
+        
         <!-- LEFT SIDEBAR -->
         <nav class="sidebar">
             <div class="brand">
@@ -220,10 +220,6 @@
                                             <c:when test="${t.status == 'In-Progress'}">
                                                 <span style="background: #fde68a; color: #92400e; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
                                                     In-Progress</span>
-                                            </c:when>
-                                            <c:when test="${t.status == 'No-show'}">
-                                                <span style="background: #f3f4f6; color: #374151; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
-                                                    No-show</span>
                                             </c:when>
                                             <c:when test="${t.status == 'Process'}">
                                                 <span style="background: #f3f4f6; color: #433751; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">

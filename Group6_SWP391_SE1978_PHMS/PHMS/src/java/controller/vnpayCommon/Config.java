@@ -14,6 +14,7 @@ import java.util.Random;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import jakarta.servlet.http.HttpServletRequest;
+import java.net.URLEncoder;
 
 /**
  *
@@ -22,7 +23,7 @@ import jakarta.servlet.http.HttpServletRequest;
 public class Config {
 
     public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static String vnp_ReturnUrl = "http://localhost:8080/vnpay_jsp/vnpay_return.jsp";
+    public static String vnp_ReturnUrl = "http://localhost:8080/PHMS/vnpay-return";
     public static String vnp_TmnCode = "KD0PQSUD";
     public static String secretKey = "PLBFX0EKA0HXIE0UX68SSOJNJADFZK2H";
     public static String vnp_ApiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
@@ -64,25 +65,30 @@ public class Config {
     }
 
     //Util for VNPAY
-    public static String hashAllFields(Map fields) {
-        List fieldNames = new ArrayList(fields.keySet());
-        Collections.sort(fieldNames);
-        StringBuilder sb = new StringBuilder();
-        Iterator itr = fieldNames.iterator();
-        while (itr.hasNext()) {
-            String fieldName = (String) itr.next();
-            String fieldValue = (String) fields.get(fieldName);
-            if ((fieldValue != null) && (fieldValue.length() > 0)) {
-                sb.append(fieldName);
-                sb.append("=");
-                sb.append(fieldValue);
-            }
-            if (itr.hasNext()) {
+   public static String hashAllFields(Map<String, String> fields) {
+    List<String> fieldNames = new ArrayList<>(fields.keySet());
+    Collections.sort(fieldNames);
+    StringBuilder sb = new StringBuilder();
+    boolean first = true;
+    for (String fieldName : fieldNames) {
+        String fieldValue = fields.get(fieldName);
+        if (fieldValue != null && !fieldValue.isEmpty()) {
+            if (!first) {
                 sb.append("&");
             }
+            try {
+                // Encode value bằng US-ASCII cho hash (rất quan trọng ở return)
+                String encodedValue = URLEncoder.encode(fieldValue, "US-ASCII");
+                sb.append(fieldName).append("=").append(encodedValue);
+            } catch (UnsupportedEncodingException e) {
+                sb.append(fieldName).append("=").append(fieldValue);
+            }
+            first = false;
         }
-        return hmacSHA512(secretKey,sb.toString());
     }
+    String hash = hmacSHA512(secretKey, sb.toString());
+    return hash.toLowerCase();  // lowercase để khớp
+}
     
     public static String hmacSHA512(final String key, final String data) {
         try {

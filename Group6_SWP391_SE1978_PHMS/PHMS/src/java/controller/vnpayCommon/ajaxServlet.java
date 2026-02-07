@@ -7,7 +7,9 @@ package controller.vnpayCommon;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import java.io.IOException;import java.net.URLEncoder;
+import dal.InvoiceDAO;
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,37 +21,75 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import model.User;
 
 /**
  *
  * @author CTT VNPAY
  */
+@WebServlet(name = "ajaxServlet", urlPatterns = {"/payment"})
 public class ajaxServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String orderType = "other";
-        long amount = Integer.parseInt(req.getParameter("amount"))*100;
         String bankCode = req.getParameter("bankCode");
+
+        // 2. Lấy RecepId từ Session
+        HttpSession session = req.getSession();
+        User account = (User) session.getAttribute("account");
+        int recepId = account.getUserId();
+        double grandTotal = Double.parseDouble(req.getParameter("grandTotal"));
+        int apptId = Integer.parseInt(req.getParameter("apptId"));
+        long amount = (long) (grandTotal * 100);
+        // 3. Gọi DAO để INSERT vào DB và lấy về InvoiceId tự động
+        InvoiceDAO invoiceDAO = new InvoiceDAO();
+        int invoiceId = -99; // Giá trị mặc định để kiểm tra
+        String act = req.getParameter("act");
+        if ("create".equals(act)) {
+            try {
+                invoiceId = invoiceDAO.createInvoice(apptId, recepId, grandTotal);
+            } catch (Exception e) {
+                // Nếu có lỗi SQL, nó sẽ hiện ngay lên trình duyệt cho bạn xem
+                resp.setContentType("text/html;charset=UTF-8");
+                resp.getWriter().write("<h1>LỖI JAVA: " + e.getMessage() + "</h1>");
+                return;
+            }
+        }
+        if ("detail".equals(act)) {
+            int id = Integer.parseInt(req.getParameter("invoiceId"));
+            invoiceId = id;
+        }
         
-        String vnp_TxnRef = Config.getRandomNumber(8);
+
+        if (invoiceId <= 0) {
+            resp.setContentType("text/html;charset=UTF-8");
+            resp.getWriter().write("<h1>LỖI DATABASE THẬT SỰ:</h1>");
+            resp.getWriter().write("<h2 style='color:red'>" + InvoiceDAO.SQL_ERROR_LOG + "</h2>");
+            resp.getWriter().write("<p>ApptId: " + apptId + " | RecepId: " + recepId + "</p>");
+            return;
+        }
+
+
+        String vnp_TxnRef = invoiceId + "_" + Config.getRandomNumber(8);
         String vnp_IpAddr = Config.getIpAddress(req);
 
         String vnp_TmnCode = Config.vnp_TmnCode;
-        
+
         Map<String, String> vnp_Params = new HashMap<>();
         vnp_Params.put("vnp_Version", vnp_Version);
         vnp_Params.put("vnp_Command", vnp_Command);
         vnp_Params.put("vnp_TmnCode", vnp_TmnCode);
         vnp_Params.put("vnp_Amount", String.valueOf(amount));
         vnp_Params.put("vnp_CurrCode", "VND");
-        
+
         if (bankCode != null && !bankCode.isEmpty()) {
             vnp_Params.put("vnp_BankCode", bankCode);
         }
@@ -70,11 +110,11 @@ public class ajaxServlet extends HttpServlet {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
         String vnp_CreateDate = formatter.format(cld.getTime());
         vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
-        
+
         cld.add(Calendar.MINUTE, 15);
         String vnp_ExpireDate = formatter.format(cld.getTime());
         vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
-        
+
         List fieldNames = new ArrayList(vnp_Params.keySet());
         Collections.sort(fieldNames);
         StringBuilder hashData = new StringBuilder();
@@ -98,6 +138,7 @@ public class ajaxServlet extends HttpServlet {
                 }
             }
         }
+
         String queryUrl = query.toString();
         String vnp_SecureHash = Config.hmacSHA512(Config.secretKey, hashData.toString());
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
@@ -108,6 +149,7 @@ public class ajaxServlet extends HttpServlet {
         job.addProperty("data", paymentUrl);
         Gson gson = new Gson();
         resp.getWriter().write(gson.toJson(job));
+        resp.sendRedirect(paymentUrl);
     }
 
 }

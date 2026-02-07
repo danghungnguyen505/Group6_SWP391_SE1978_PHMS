@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import model.Service;
-    
+
 /**
  *
  * @author Nguyen Dang Hung
@@ -19,7 +19,7 @@ public class ServiceDAO extends DBContext {
 
     public List<Service> getAllActiveServices() {
         List<Service> services = new ArrayList<>();
-        String sql = "SELECT service_id, name, base_price, description, is_active FROM ServiceList WHERE is_active = 1";
+        String sql = "SELECT service_id, name, base_price, description, is_active FROM ServiceList WHERE is_active = 1 ORDER BY service_id DESC";
         PreparedStatement st = null;
         ResultSet rs = null;
         try {
@@ -39,18 +39,22 @@ public class ServiceDAO extends DBContext {
             e.printStackTrace();
         } finally {
             try {
-                if (rs != null) rs.close();
-                if (st != null) st.close();
+                if (rs != null) {
+                    rs.close();
+                }
+                if (st != null) {
+                    st.close();
+                }
             } catch (SQLException e) {
                 System.out.println("Lỗi khi đóng tài nguyên: " + e.getMessage());
             }
         }
         return services;
     }
-    
+
     public List<Service> getAllServices() {
         List<Service> list = new ArrayList<>();
-        String sql = "SELECT service_id, name, base_price, description, is_active, managed_by FROM ServiceList";
+        String sql = "SELECT service_id, name, base_price, description, is_active, managed_by FROM ServiceList ORDER BY service_id DESC";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
@@ -70,18 +74,15 @@ public class ServiceDAO extends DBContext {
         return list;
     }
 
-    public void addService(Service s) {
+    public void addService(Service s) throws Exception { 
         String sql = "INSERT INTO ServiceList (name, base_price, description, is_active, managed_by) VALUES (?, ?, ?, 1, ?)";
-        try {
-            PreparedStatement ps = connection.prepareStatement(sql);
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, s.getName());
             ps.setDouble(2, s.getBasePrice());
             ps.setString(3, s.getDescription());
             ps.setInt(4, s.getManageBy());
             ps.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } 
     }
 
     public void updateService(Service s) {
@@ -103,7 +104,7 @@ public class ServiceDAO extends DBContext {
         String sql = "UPDATE ServiceList SET is_active = ? WHERE service_id = ?";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setBoolean(1, !currentStatus); 
+            ps.setBoolean(1, !currentStatus);
             ps.setInt(2, id);
             ps.executeUpdate();
         } catch (Exception e) {
@@ -134,11 +135,12 @@ public class ServiceDAO extends DBContext {
     }
 
     /**
-     * Get active service by its name (used for invoice preview mapping from Appointment.type).
+     * Get active service by its name (used for invoice preview mapping from
+     * Appointment.type).
      */
     public Service getActiveServiceByName(String name) {
         String sql = "SELECT service_id, name, base_price, description, is_active, managed_by "
-                   + "FROM ServiceList WHERE name = ? AND is_active = 1";
+                + "FROM ServiceList WHERE name = ? AND is_active = 1";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, name);
             try (ResultSet rs = ps.executeQuery()) {
@@ -164,9 +166,8 @@ public class ServiceDAO extends DBContext {
      */
     public Service getFirstActiveService() {
         String sql = "SELECT TOP 1 service_id, name, base_price, description, is_active, managed_by "
-                   + "FROM ServiceList WHERE is_active = 1 ORDER BY service_id ASC";
-        try (PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                + "FROM ServiceList WHERE is_active = 1 ORDER BY service_id ASC";
+        try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 return new Service(
                         rs.getInt("service_id"),
@@ -181,5 +182,38 @@ public class ServiceDAO extends DBContext {
             System.out.println("Error getFirstActiveService: " + e.getMessage());
         }
         return null;
+    }
+
+    /**
+     * Check if a service name already exists (case-insensitive).
+     */
+    public boolean existsByName(String name) {
+        String sql = "SELECT service_id FROM ServiceList WHERE LOWER(name) = LOWER(?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, name);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            System.out.println("Error existsByName: " + e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * Check if a service name already exists for another service (used when editing).
+     */
+    public boolean existsByNameForOther(int serviceId, String name) {
+        String sql = "SELECT service_id FROM ServiceList WHERE LOWER(name) = LOWER(?) AND service_id <> ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, name);
+            ps.setInt(2, serviceId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            System.out.println("Error existsByNameForOther: " + e.getMessage());
+        }
+        return false;
     }
 }

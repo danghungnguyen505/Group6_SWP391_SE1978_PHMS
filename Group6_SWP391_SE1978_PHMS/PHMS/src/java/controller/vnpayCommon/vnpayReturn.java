@@ -1,0 +1,114 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
+ */
+package controller.vnpayCommon;
+
+import dal.InvoiceDAO;
+import java.io.IOException;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ *
+ * @author CTT VNPAY
+ */
+@WebServlet(name = "vnpayReturn", urlPatterns = {"/vnpay-return"})
+public class vnpayReturn extends HttpServlet {
+
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+   protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    response.setContentType("text/html;charset=UTF-8");
+
+    System.out.println("VNPAY Return URL called! Query: " + request.getQueryString());
+
+    // Lấy tất cả fields trừ SecureHash
+    Map<String, String> fields = new HashMap<>();
+    String vnp_SecureHash = request.getParameter("vnp_SecureHash");
+
+    for (Enumeration<String> params = request.getParameterNames(); params.hasMoreElements();) {
+        String fieldName = params.nextElement();
+        String fieldValue = request.getParameter(fieldName);
+        if (fieldValue != null && !fieldValue.isEmpty()) {
+            if (!fieldName.equals("vnp_SecureHash") && !fieldName.equals("vnp_SecureHashType")) {
+                fields.put(fieldName, fieldValue);
+            }
+        }
+    }
+
+    // Tính lại hash
+    String signValue = Config.hashAllFields(fields);
+
+    // Debug chi tiết
+    System.out.println("Computed signValue (tính lại): " + signValue);
+    System.out.println("Received vnp_SecureHash: " + vnp_SecureHash);
+    System.out.println("vnp_ResponseCode: " + request.getParameter("vnp_ResponseCode"));
+    System.out.println("vnp_OrderInfo received: " + request.getParameter("vnp_OrderInfo")); // để check value
+
+    if (signValue.equalsIgnoreCase(vnp_SecureHash)) {
+        System.out.println("Signature HỢP LỆ! Thanh toán thành công.");
+
+        String rawTxnRef = request.getParameter("vnp_TxnRef");
+        String responseCode = request.getParameter("vnp_ResponseCode");
+        boolean isSuccess = "00".equals(responseCode);
+
+        int invoiceId = -1;
+        try {
+            if (rawTxnRef != null && rawTxnRef.contains("_")) {
+                invoiceId = Integer.parseInt(rawTxnRef.split("_")[0]);
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi parse invoiceId: " + e.getMessage());
+        }
+
+        InvoiceDAO dao = new InvoiceDAO();
+        if (isSuccess && invoiceId > 0) {
+            dao.updateInvoiceStatus(invoiceId, "Paid");
+            request.setAttribute("message", "Thanh toán thành công hóa đơn #" + invoiceId);
+        } else {
+            dao.updateInvoiceStatus(invoiceId, "Failed");
+            request.setAttribute("message", "Thanh toán không thành công (Mã lỗi: " + responseCode + ")");
+        }
+
+        request.setAttribute("isSuccess", isSuccess);
+        request.getRequestDispatcher("/views/receptionist/vnpay_return.jsp").forward(request, response);
+    } else {
+        response.getWriter().println("<h2>Invalid Signature!</h2>");
+        response.getWriter().println("<p>Computed: " + signValue + "</p>");
+        response.getWriter().println("<p>Received: " + vnp_SecureHash + "</p>");
+        response.getWriter().println("<p>vnp_ResponseCode: " + request.getParameter("vnp_ResponseCode") + "</p>");
+        response.getWriter().println("<p>vnp_OrderInfo: " + request.getParameter("vnp_OrderInfo") + "</p>");
+    }
+}
+
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
+
+    @Override
+    public String getServletInfo() {
+        return "Short description";
+    }// </editor-fold>
+}

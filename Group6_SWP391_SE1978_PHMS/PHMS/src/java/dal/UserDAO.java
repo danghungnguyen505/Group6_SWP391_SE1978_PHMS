@@ -76,6 +76,58 @@ public class UserDAO extends DBContext {
     }
 
     /**
+     * Check if an email is already used by any PetOwner.
+     */
+    public boolean checkEmailExists(String email) {
+        String sql = "SELECT p.user_id FROM PetOwner p WHERE p.email = ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, email);
+            if (ps.executeQuery().next()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error checkEmailExists: " + e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * Check if a phone number is already used by any user.
+     */
+    public boolean checkPhoneExists(String phone) {
+        String sql = "SELECT user_id FROM Users WHERE phone = ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, phone);
+            if (ps.executeQuery().next()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error checkPhoneExists: " + e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * Check if a phone number is already used by another user (exclude current user).
+     */
+    public boolean checkPhoneExistsForOther(int userId, String phone) {
+        String sql = "SELECT user_id FROM Users WHERE phone = ? AND user_id <> ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, phone);
+            ps.setInt(2, userId);
+            if (ps.executeQuery().next()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error checkPhoneExistsForOther: " + e.getMessage());
+        }
+        return false;
+    }
+
+    /**
      * Register a new pet owner with BCrypt password hashing
      */
     public void registerOwner(String username, String password, String fullName, String email, String phone, String address) {
@@ -178,6 +230,7 @@ public class UserDAO extends DBContext {
     }
 
 
+    // (deprecated) Use checkEmailExists for uniqueness check instead.
     public User checkEmailExist(String email) {
         String sql = "SELECT u.*, p.address, p.email FROM Users u JOIN PetOwner p ON u.user_id = p.user_id WHERE p.email = ?";
         try {

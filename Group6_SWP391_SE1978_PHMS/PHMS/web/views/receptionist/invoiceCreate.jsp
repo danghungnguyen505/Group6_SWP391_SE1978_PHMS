@@ -48,8 +48,8 @@
                     <a href="${pageContext.request.contextPath}/receptionist/dashboard">
                         <i class="fa-solid fa-paw"></i> My Pets
                     </a>
-                </li>
                 <li>
+                </li>
                     <a href="${pageContext.request.contextPath}/receptionist/dashboard">
                         <i class="fa-solid fa-file-medical"></i> Medical Records
                     </a>
@@ -217,9 +217,11 @@
                 </div>
                 <!-- RIGHT COLUMN: CHECKOUT -->
                 <div class="checkout-card">
-                    <h3>Checkout</h3>
-                    <form action="${pageContext.request.contextPath}/receptionist/invoice/create" method="POST">
-                        <input type="hidden" name="apptId" value="${appt.apptId}"/>
+                    <h3>Checkout</h3>${grandTotal}a${param.apptId}
+                    <form action="${pageContext.request.contextPath}/payment" method="POST">
+                        <input type="hidden" name="apptId" value="${param.apptId}"/>
+                        <input type="hidden" name="grandTotal" value="${grandTotal}"/>
+                        <input type="hidden" name="act" value="create">
                         <div class="method-section">
                             <label class="section-label">SELECT METHOD</label>
                             <!-- Option 1: Cash (Disabled/Gray) -->

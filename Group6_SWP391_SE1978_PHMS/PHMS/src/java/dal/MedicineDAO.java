@@ -14,7 +14,7 @@ public class MedicineDAO extends DBContext {
 
     public List<Medicine> getAllMedicines() {
         List<Medicine> list = new ArrayList<>();
-        String sql = "SELECT medicine_id, name, unit, price, stock_quantity FROM Medicine";
+        String sql = "SELECT medicine_id, name, unit, price, stock_quantity FROM Medicine ORDER BY medicine_id";
         try (PreparedStatement st = connection.prepareStatement(sql);
              ResultSet rs = st.executeQuery()) {
             while (rs.next()) {
@@ -116,6 +116,39 @@ public class MedicineDAO extends DBContext {
             System.out.println("Error deleteMedicine: " + e.getMessage());
             return false;
         }
+    }
+
+    /**
+     * Check if a medicine name already exists (case-insensitive).
+     */
+    public boolean existsByName(String name) {
+        String sql = "SELECT medicine_id FROM Medicine WHERE LOWER(name) = LOWER(?)";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setString(1, name);
+            try (ResultSet rs = st.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            System.out.println("Error existsByName (Medicine): " + e.getMessage());
+        }
+        return false;
+    }
+
+    /**
+     * Check if a medicine name already exists for another medicine (used when editing).
+     */
+    public boolean existsByNameForOther(int medicineId, String name) {
+        String sql = "SELECT medicine_id FROM Medicine WHERE LOWER(name) = LOWER(?) AND medicine_id <> ?";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setString(1, name);
+            st.setInt(2, medicineId);
+            try (ResultSet rs = st.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            System.out.println("Error existsByNameForOther (Medicine): " + e.getMessage());
+        }
+        return false;
     }
 }
 

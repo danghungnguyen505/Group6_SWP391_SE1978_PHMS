@@ -28,8 +28,16 @@ public class StaffAccountUpdateController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-        
+
+        // Lấy ID từ query param (truy cập từ danh sách) hoặc từ attribute (trường hợp doPost gọi lại doGet khi có lỗi)
         String idStr = request.getParameter("id");
+        if (idStr == null || idStr.isEmpty()) {
+            Object userIdAttr = request.getAttribute("userId");
+            if (userIdAttr != null) {
+                idStr = String.valueOf(userIdAttr);
+            }
+        }
+
         if (!util.ValidationUtils.isIntegerInRange(idStr, 1, Integer.MAX_VALUE)) {
             session.setAttribute("toastMessage", "error|Staff ID không hợp lệ.");
             response.sendRedirect(request.getContextPath() + "/admin/staff/list");
@@ -104,6 +112,15 @@ public class StaffAccountUpdateController extends HttpServlet {
             return;
         }
         
+        // Phone must be unique across users (excluding current staff)
+        dal.UserDAO userDAO = new dal.UserDAO();
+        if (userDAO.checkPhoneExistsForOther(userId, phone)) {
+            request.setAttribute("error", "Số điện thoại này đã được sử dụng!");
+            request.setAttribute("userId", idStr);
+            doGet(request, response);
+            return;
+        }
+        
         if (!isValidStaffRole(role)) {
             request.setAttribute("error", "Vai trò không hợp lệ!");
             request.setAttribute("userId", idStr);
@@ -123,6 +140,14 @@ public class StaffAccountUpdateController extends HttpServlet {
         }
         
         StaffAccountDAO staffDAO = new StaffAccountDAO();
+
+        // Không cho phép thay đổi role của chính tài khoản đang đăng nhập (dù có chỉnh sửa HTML ở phía client)
+        if (userId == account.getUserId()) {
+            User currentStaff = staffDAO.getStaffAccountById(userId);
+            if (currentStaff != null && currentStaff.getRole() != null) {
+                role = currentStaff.getRole();
+            }
+        }
         try {
             boolean ok = staffDAO.updateStaffAccount(userId, fullName, phone, role,
                     employeeCode, department, salaryBase, specialization, licenseNumber);
