@@ -30,7 +30,8 @@ public class PetDAO extends DBContext{
                     rs.getInt("owner_id"),
                     rs.getString("name"),
                     rs.getString("species"),
-                    rs.getString("history_summary")
+                    rs.getString("history_summary"),
+                        rs.getString("gender")
                 );
                 list.add(p);
             }
@@ -52,7 +53,8 @@ public class PetDAO extends DBContext{
                     rs.getInt("owner_id"),
                     rs.getString("name"),
                     rs.getString("species"),
-                    rs.getString("history_summary")
+                    rs.getString("history_summary"),
+                        rs.getString("gender")
                 );
             }
         } catch (SQLException e) {
@@ -61,14 +63,15 @@ public class PetDAO extends DBContext{
         return null;
     }
     // 3. Thêm thú cưng mới (Add New Pet)
-    public boolean addPet(int ownerId, String name, String species, String history) {
-        String sql = "INSERT INTO Pet (owner_id, name, species, history_summary) VALUES (?, ?, ?, ?)";
+    public boolean addPet(int ownerId, String name, String species, String history, String gender) {
+        String sql = "INSERT INTO Pet (owner_id, name, species, history_summary, gender) VALUES (?, ?, ?, ?,?)";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, ownerId);
             st.setString(2, name);
             st.setString(3, species);
             st.setString(4, history);
+            st.setString(5, gender);
             int rows = st.executeUpdate();
             return rows > 0;
         } catch (SQLException e) {
@@ -135,7 +138,7 @@ public class PetDAO extends DBContext{
                         rs.getInt("owner_id"),
                         rs.getString("name"),
                         rs.getString("species"),
-                        rs.getString("history_summary")
+                        rs.getString("history_summary"), rs.getString("gender")
                 );
                 list.add(p);
             }
@@ -144,4 +147,5 @@ public class PetDAO extends DBContext{
         }
         return list;
     }
+    
 }

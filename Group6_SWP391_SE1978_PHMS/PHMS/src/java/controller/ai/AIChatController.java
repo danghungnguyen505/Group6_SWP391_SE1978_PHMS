@@ -52,7 +52,7 @@ public class AIChatController extends HttpServlet {
         String question = util.ValidationUtils.sanitize(request.getParameter("question"));
         if (!util.ValidationUtils.isNotEmpty(question)
                 || !util.ValidationUtils.isLengthValid(question, 1, 2000)) {
-            request.setAttribute("error", "Câu hỏi phải có từ 5 đến 2000 ký tự.");
+            request.setAttribute("error", "Câu hỏi phải có từ 1 đến 2000 ký tự.");
             doGet(request, response);
             return;
         }

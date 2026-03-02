@@ -18,7 +18,7 @@
         <link rel="stylesheet" href="${pageContext.request.contextPath}/views/veterinarian/nav/navVeterinarian.css">
     </head>
     <body>
-         <jsp:include page="nav/navVeterinarian.jsp" />
+        <jsp:include page="nav/navVeterinarian.jsp" />
 
         <main class="main-content">
             <div class="header-section">
@@ -59,13 +59,34 @@
                             <span class="day-num"><fmt:formatDate value="${colDate}" pattern="dd"/></span>
                         </div>
                         <c:forEach var="shift" items="${entry.value}">
-                            <div class="shift-card">
+                            <c:set var="leaveStatus" value="${leaveMap[entry.key]}" />
+                            <c:set var="shiftTypeLabel">
+                                <c:choose>
+                                    <c:when test="${shift.startTime.toString().startsWith('08')}">morning</c:when>
+                                    <c:when test="${shift.startTime.toString().startsWith('14')}">afternoon</c:when>
+                                    <c:otherwise>custom</c:otherwise>
+                                </c:choose>
+                            </c:set>
+                            <div class="shift-card
+                                 ${leaveStatus == 'Pending' ? ' leave-pending' : ''}
+                                 ${leaveStatus == 'Approved' ? ' leave-approved' : ''}
+                                 ${leaveStatus == 'Rejected' ? ' leave-rejected' : ''}"
+                                 onclick="window.location.href = '${pageContext.request.contextPath}/requestLeaveVeterinarian?date=${entry.key}&shiftType=${shiftTypeLabel}'"
+                                 style="cursor: pointer;">
                                 <div class="avatar-circle">
                                     ${shift.staffName != null ? shift.staffName.charAt(0) : 'U'}
                                 </div>
                                 <div class="shift-info">
                                     <h4>${shift.staffName}</h4>
                                     <span class="role-badge vet">VETERINARIAN</span>
+                                    <c:if test="${not empty leaveStatus}">
+                                        <div style="font-size: 11px; font-weight: bold; margin-top: 5px;
+                                             color:
+                                             ${leaveStatus == 'Pending' ? '#d97706' :
+                                               leaveStatus == 'Approved' ? '#dc2626' : '#6b7280'};">
+                                            [Leave: ${leaveStatus}]
+                                        </div>
+                                    </c:if>
                                     <div class="time">
                                         <i class="fa-regular fa-clock"></i> 
                                         <c:choose>
@@ -78,8 +99,8 @@
                                             <c:otherwise>
                                                 <span><fmt:formatDate value="${shift.startTime}" pattern="HH:mm"/> 4 Hours
                                                     <fmt:formatDate value="${shift.endTime}" pattern="HH:mm"/></span>
-                                            </c:otherwise>
-                                        </c:choose>
+                                                </c:otherwise>
+                                            </c:choose>
                                     </div>
                                 </div>
                             </div>

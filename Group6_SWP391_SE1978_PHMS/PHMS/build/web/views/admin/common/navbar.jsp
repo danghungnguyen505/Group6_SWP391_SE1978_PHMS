@@ -51,8 +51,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <%-- Link xử lý Leave Requests đã được sửa --%>
-            <a href="#" 
+            <a href="${pageContext.request.contextPath}/leavePending" 
                class="nav-link ${param.activePage == 'leave' ? 'active' : ''}">
                 <i class="fa-solid fa-calendar-check"></i> Leave Requests
             </a>

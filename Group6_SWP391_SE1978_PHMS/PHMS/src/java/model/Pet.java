@@ -14,16 +14,19 @@ public class Pet {
     private String name;       
     private String species;    
     private String historySummary;
+    private String gender;
 
-    public Pet() {
-    }
-
-    public Pet(int id, int ownerId, String name, String species, String historySummary) {
+    public Pet(int id, int ownerId, String name, String species, String historySummary, String string3) {
         this.id = id;
         this.ownerId = ownerId;
         this.name = name;
         this.species = species;
         this.historySummary = historySummary;
+        this.gender = gender;
+    }
+
+    
+    public Pet() {
     }
 
     public int getId() {
@@ -65,5 +68,13 @@ public class Pet {
     public void setHistorySummary(String historySummary) {
         this.historySummary = historySummary;
     }
-    
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
 }

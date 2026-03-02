@@ -14,13 +14,13 @@
 <div class="mgmt-container">
     <header class="mgmt-header">
         <div>
-            <h1 class="mgmt-title">Hàng đợi cấp cứu</h1>
-            <p class="mgmt-subtitle">Danh sách các ca cấp cứu đang chờ được khám.</p>
+            <h1 class="mgmt-title">Emergency queue</h1>
+            <p class="mgmt-subtitle">List of emergency cases awaiting examination.</p>
         </div>
     </header>
 
     <c:if test="${empty appointments}">
-        <p>Hiện không có ca cấp cứu nào.</p>
+        <p>There are currently no emergency cases.</p>
     </c:if>
 
     <c:if test="${not empty appointments}">
@@ -29,13 +29,13 @@
                 <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Thú cưng</th>
-                    <th>Chủ</th>
-                    <th>Bác sĩ</th>
-                    <th>Thời gian</th>
-                    <th>Mức độ</th>
-                    <th>Trạng thái</th>
-                    <th>Hành động</th>
+                    <th>Pets</th>
+                    <th>Pet Owner</th>
+                    <th>Veterinarian</th>
+                    <th>Time</th>
+                    <th>Level</th>
+                    <th>Status</th>
+                    <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -59,7 +59,7 @@
                                     <span class="badge" style="background:#16a34a;color:#fff;">Green</span>
                                 </c:when>
                                 <c:otherwise>
-                                    <span class="badge badge-inactive">Chưa triage</span>
+                                    <span class="badge badge-inactive">Do not triage</span>
                                 </c:otherwise>
                             </c:choose>
                         </td>

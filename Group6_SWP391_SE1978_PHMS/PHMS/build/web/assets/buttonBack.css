@@ -1,0 +1,53 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Mar 2, 2026, 10:20:23 PM
+    Author     : zoxy4
+*/
+
+
+/* Back to Home */
+.back-home-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    padding: 0.9rem 1.5rem;
+    background: #f3f4f6;
+    border: 1.5px solid #d1d5db;
+    border-radius: 1.2rem;
+
+    color: #6b806f;
+    font-size: 0.95rem;
+    font-weight: 800;
+
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    transition: all 0.25s ease;
+    text-decoration: none;
+}
+
+.back-home-btn:hover {
+    background: #059669;
+    border-color: #059669;
+    color: #374151;
+    transform: translateX(5px);
+}
+
+.back-home-btn svg {
+    width: 22px;
+    height: 22px;
+    transition: transform 0.25s ease;
+}
+.back-home-btn {
+    background: #e5e7eb;
+}
+.back-home-btn {
+    display: inline-flex;
+    width: fit-content;  
+}
+.back-home-floating {
+    padding-top: 20px;
+}

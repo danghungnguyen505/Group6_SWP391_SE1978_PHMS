@@ -19,13 +19,13 @@
                 <div class="mgmt-container">
                     <header class="mgmt-header">
                         <div>
-                            <h1 class="mgmt-title">Hàng đợi cấp cứu của tôi</h1>
-                            <p class="mgmt-subtitle">Các ca cấp cứu đã được triage và gán cho bạn.</p>
+                            <h1 class="mgmt-title">My emergency queue</h1>
+                            <p class="mgmt-subtitle">Emergency cases have been triaged and assigned to you.</p>
                         </div>
                     </header>
 
                     <c:if test="${empty appointments}">
-                        <p>Hiện không có ca cấp cứu nào trong hàng đợi.</p>
+                        <p>There are currently no emergency cases in the waiting list.</p>
                     </c:if>
 
                     <c:if test="${not empty appointments}">
@@ -34,11 +34,11 @@
                                 <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Thú cưng</th>
-                                        <th>Chủ</th>
-                                        <th>Thời gian</th>
-                                        <th>Mức độ</th>
-                                        <th>Triệu chứng ban đầu</th>
+                                        <th>Pet</th>
+                                        <th>Pet Owner</th>
+                                        <th>Time</th>
+                                        <th>Level</th>
+                                        <th>Initial symptoms</th>
                                     </tr>
                                 </thead>
                                 <tbody>

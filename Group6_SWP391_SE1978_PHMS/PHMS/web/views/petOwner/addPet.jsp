@@ -37,6 +37,11 @@
                     <label class="form-label">History Summary</label>
                     <textarea class="form-control" name="history" rows="4" maxlength="2000">${history}</textarea>
                 </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Gender</label>
+                    <input type="radio" name="gender" value="${gender}" maxlength="100" required>{}
+                </div>
                 <button class="btn btn-primary" type="submit">
                     <i class="fa-solid fa-plus"></i> Create
                 </button>

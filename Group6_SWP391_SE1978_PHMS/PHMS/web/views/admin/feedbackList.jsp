@@ -146,7 +146,7 @@
             <li class="nav-item"><a href="${pageContext.request.contextPath}/admin/staff/list" class="nav-link"><i class="fa-solid fa-users-gear"></i> Staff Management</a></li>
             <li class="nav-item"><a href="${pageContext.request.contextPath}/admin/reports" class="nav-link"><i class="fa-solid fa-chart-line"></i> Revenue</a></li>
             <li class="nav-item"><a href="#" class="nav-link active"><i class="fa-solid fa-comment-dots"></i> Feedback</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fa-solid fa-calendar-check"></i> Leave Requests</a></li>
+            <li class="nav-item"><a href="${pageContext.request.contextPath}/leavePending" class="nav-link"><i class="fa-solid fa-calendar-check"></i> Leave Requests</a></li>
             <li class="nav-item"><a href="#" class="nav-link"><i class="fa-solid fa-clock"></i> Scheduling</a></li>
         </ul>
         <div class="help-box"><p style="font-size:12px; font-weight:600;">Need help?</p><a href="#" class="btn-support">Contact Support</a></div>

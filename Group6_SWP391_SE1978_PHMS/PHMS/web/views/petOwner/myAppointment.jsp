@@ -174,38 +174,54 @@
             <!--Paging của History-->           
             <c:if test="${totalPages > 1}">
                 <div class="pagination-container">
-
+                    <!-- Previous -->
                     <c:if test="${currentPage > 1}">
                         <a href="?page=${currentPage - 1}" class="page-link">
                             <i class="fa-solid fa-chevron-left"></i>
                         </a>
                     </c:if>
-
-                    <c:forEach begin="1" end="${totalPages}" var="i">
-                        <a href="?page=${i}" class="page-link ${currentPage == i ? 'active' : ''}">
-                            ${i}
-                        </a>
+                    <!-- Trang 1 -->
+                    <a href="?page=1" class="page-link ${currentPage == 1 ? 'active' : ''}">1</a>
+                    <!-- Dấu ... bên trái -->
+                    <c:if test="${currentPage > 4}">
+                        <span class="page-dots">...</span>
+                    </c:if>
+                    <!-- Vòng lặp các trang ở giữa (Current - 2 đến Current + 2) -->
+                    <c:forEach begin="2" end="${totalPages - 1}" var="i">
+                        <c:if test="${i >= currentPage - 2 && i <= currentPage + 2}">
+                            <a href="?page=${i}" class="page-link ${currentPage == i ? 'active' : ''}">
+                                ${i}
+                            </a>
+                        </c:if>
                     </c:forEach>
-
+                    <!-- Dấu ... bên phải -->
+                    <c:if test="${currentPage < totalPages - 3}">
+                        <span class="page-dots">...</span>
+                    </c:if>
+                    <!-- Trang cuối (nếu tổng trang > 1) -->
+                    <c:if test="${totalPages > 1}">
+                        <a href="?page=${totalPages}" class="page-link ${currentPage == totalPages ? 'active' : ''}">
+                            ${totalPages}
+                        </a>
+                    </c:if>
+                    <!-- Next -->
                     <c:if test="${currentPage < totalPages}">
                         <a href="?page=${currentPage + 1}" class="page-link">
                             <i class="fa-solid fa-chevron-right"></i>
                         </a>
-                    </c:if>
-
-                </div>
-            </c:if>     
-            <!--Click để xem note chi tiết-->
-            <div id="noteModal" class="modal">
-                <div class="modal-content">
-                    <span class="close-btn" onclick="closeModal()"></span>
-                    <h2 class="modal-title">
-                        <i class="fa-solid fa-clipboard-list"></i> Appointment Notes
-                    </h2>
-                    <div id="modalNoteContent" class="modal-body">
+                    </c:if>   
+                </c:if> 
+                <!--Click để xem note chi tiết-->
+                <div id="noteModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-btn" onclick="closeModal()"></span>
+                        <h2 class="modal-title">
+                            <i class="fa-solid fa-clipboard-list"></i> Appointment Notes
+                        </h2>
+                        <div id="modalNoteContent" class="modal-body">
+                        </div>
                     </div>
                 </div>
-            </div>
         </main>
         <script src="${pageContext.request.contextPath}/assets/js/myAppointment.js"></script>
     </body>
