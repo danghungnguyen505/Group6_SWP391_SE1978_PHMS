@@ -8,23 +8,11 @@
         <title>VetCare Pro - Medical Records</title>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/pages/receptionistDashboard.css">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/views/veterinarian/nav/navVeterinarian.css">
     </head>
     <body>
-        <nav class="sidebar">
-            <div class="brand">
-                <i class="fa-solid fa-plus-square"></i> VetCare Pro
-            </div>
-            <ul class="menu">
-                <li><a href="${pageContext.request.contextPath}/veterinarian/emr/queue">
-                        <i class="fa-solid fa-stethoscope"></i> EMR Queue</a></li>
-                <li><a href="${pageContext.request.contextPath}/veterinarian/emr/records" class="active">
-                        <i class="fa-solid fa-file-medical"></i> Medical Records</a></li>
-            </ul>
-            <div class="help-box">
-                <div class="help-text">Need help?</div>
-                <a href="#" class="btn-contact">Contact Support</a>
-            </div>
-        </nav>
+       <jsp:include page="nav/navVeterinarian.jsp" />
 
         <main class="main-content">
             <div class="top-bar">

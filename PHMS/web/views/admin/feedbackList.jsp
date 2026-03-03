@@ -116,6 +116,9 @@
             background: none; border: none; cursor: pointer; font-size: 16px; margin-left: 10px; color: #cbd5e0; transition: 0.2s;
         }
         .btn-action:hover { color: var(--text-main); }
+        
+        .title-area h1 { font-size: 26px; font-weight: 900; text-transform: uppercase; letter-spacing: -0.5px; }
+        .title-area p { color: var(--text-muted); margin-top: 4px; font-size: 15px; }
 
         /* Pagination */
         .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 30px; }
@@ -126,32 +129,18 @@
         .page-link:hover { background: #e2e8f0; color: var(--text-main); }
 
         .help-box { margin-top: auto; background: #f8fafc; padding: 20px; border-radius: 16px; border: 1px solid #edf2f7; }
+        .help-box p { font-size: 13px; font-weight: 600; margin-bottom: 12px; }
         .btn-support { display: block; background: #0f172a; color: white; text-align: center; padding: 10px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 12px; margin-top: 8px; }
         .btn-signout { padding: 8px 16px; border: 1px solid #e2e8f0; border-radius: 8px; background: white; font-weight: 700; font-size: 11px; text-transform: uppercase; text-decoration: none; color: var(--text-main); }
     </style>
 </head>
 <body>
 
-    <nav class="sidebar">
-        <div class="logo"><i class="fa-solid fa-square-plus"></i> VetCare Pro</div>
-        <div class="menu-label">Admin Menu</div>
-        <ul class="nav-menu">
-            <li class="nav-item"><a href="${pageContext.request.contextPath}/admin/dashboard" class="nav-link"><i class="fa-solid fa-chart-pie"></i> Overview</a></li>
-            <li class="nav-item"><a href="${pageContext.request.contextPath}/admin/services" class="nav-link"><i class="fa-solid fa-file-medical"></i> Services</a></li>
-            <li class="nav-item">
-                <a href="${pageContext.request.contextPath}/admin/medicine/list" class="nav-link">
-                    <i class="fa-solid fa-capsules"></i> Pharmacy
-                </a>
-            </li>
-            <li class="nav-item"><a href="${pageContext.request.contextPath}/admin/staff/list" class="nav-link"><i class="fa-solid fa-users-gear"></i> Staff Management</a></li>
-            <li class="nav-item"><a href="${pageContext.request.contextPath}/admin/reports" class="nav-link"><i class="fa-solid fa-chart-line"></i> Revenue</a></li>
-            <li class="nav-item"><a href="#" class="nav-link active"><i class="fa-solid fa-comment-dots"></i> Feedback</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fa-solid fa-calendar-check"></i> Leave Requests</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fa-solid fa-clock"></i> Scheduling</a></li>
-        </ul>
-        <div class="help-box"><p style="font-size:12px; font-weight:600;">Need help?</p><a href="#" class="btn-support">Contact Support</a></div>
-    </nav>
+    
 
+    <jsp:include page="common/navbar.jsp">
+    <jsp:param name="activePage" value="feedback" />
+</jsp:include>
     <main class="main-content">
         <div class="top-bar">
             <div class="page-header">

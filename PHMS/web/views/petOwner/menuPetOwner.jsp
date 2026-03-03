@@ -3,7 +3,6 @@
     Created on : Jan 24, 2026, 7:07:59 PM
     Author     : zoxy4
 --%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
@@ -20,82 +19,26 @@
     </head>
     <body>
 
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="brand">
-                <i class="fa-solid fa-plus"></i>
-                <span>VetCare Pro</span>
-            </div>
-
-            <div class="menu-label">Main Menu</div>
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="${pageContext.request.contextPath}/dashboard" class="nav-link">
-                        <i class="fa-solid fa-border-all"></i> Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="${pageContext.request.contextPath}/booking" class="nav-link active" >
-                        <i class="fa-regular fa-calendar-check"></i> Appointments
-                    </a>
-                </li>
-                <li class="nav-item" style="font-size: 13px;">
-                    <a href="${pageContext.request.contextPath}/myAppointment"class="nav-link">
-                        <i class="fa-solid fa-calendar-check"></i> My Appointments
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="${pageContext.request.contextPath}/myPetOwner"class="nav-link">
-                        <i class="fa-solid fa-paw"></i> My Pets
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="${pageContext.request.contextPath}/my-medical-records" class="nav-link">
-                        <i class="fa-solid fa-file-medical"></i> Medical Records
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="${pageContext.request.contextPath}/billing" class="nav-link">
-                        <i class="fa-regular fa-credit-card"></i> Billing
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="${pageContext.request.contextPath}/aiHealthGuide" class="nav-link">
-                        <i class="fa-solid fa-bolt"></i> AI Health Guide
-                    </a>
-                </li>
-            </ul>
-
-            <div class="support-box">
-                <p>Need help?</p>
-                <button class="btn-support">Contact Support</button>
-            </div>
-        </aside>
-
-        <!-- Main Content Area -->
+        <jsp:include page="nav/navPetOwner.jsp" />
         <main class="main-content">
-            <!-- Top Header -->
             <header class="top-bar">
                 <a href="${pageContext.request.contextPath}/logout" class="btn btn-dark" style="background-color: #ef4444; border-color: #ef4444;">
                     Logout
                 </a>
             </header>
 
-            <!-- Page Title & Actions -->
             <div class="page-header">
                 <div class="page-title">
                     <h1>Book Appointment</h1>
                     <p>Schedule a visit for your beloved pet in just a few clicks.</p>
                 </div>
                 <button type="button" class="btn-cancel" onclick="window.location.href='${pageContext.request.contextPath}/home'">
-                       Back to home
+                        Back to home
                 </button>
             </div>
 
-            <!-- Booking Form Grid -->
             <form action="${pageContext.request.contextPath}/booking" method="post" id="bookingForm" class="booking-grid">
-                <input type="hidden" name="rescheduleId" value="${param.rescheduleId}">
-                <!-- Card 1: Visit Details -->
+               <input type="hidden" name="rescheduleId" value="${param.rescheduleId}">
                 <div class="card">
                     <div class="section-title">
                         <span class="step-badge">1</span> Visit Details
@@ -109,7 +52,7 @@
                                     ${p.name} (${p.species})</option>
                             </c:forEach>
                             <c:if test="${empty pets}">
-                                <option value="" disabled>Bạn chưa có thú cưng nào</option>
+                                <option value="" disabled>You don't have any pets yet.</option>
                             </c:if>
                         </select>
                     </div>
@@ -118,7 +61,7 @@
                         <label>Service Type</label>
                         <select class="form-control" name="serviceType">
                             <c:if test="${empty services}">
-                                <option value="" disabled>Hiện chưa có dịch vụ khả dụng</option>
+                                <option value="" disabled>Currently, no service is available.</option>
                             </c:if>
                             <c:forEach items="${services}" var="s">
                                 <option value="${s.name}" ${param.serviceType == s.name ? 'selected' : ''}>
@@ -136,19 +79,18 @@
                     <div class="form-group">
                         <label>Preferred Veterinarian</label>
                         <select class="form-control" name="vetId" onchange="this.form.submit()">
-                            <option value="">-- Chọn bác sĩ --</option>
+                            <option value="">-- Choose a Veterinarian --</option>
                             <c:forEach items="${schedules}" var="s">
                                 <option value="${s.empId}" ${param.vetId == s.empId ? 'selected' : ''}>${s.vetName}
                                 </c:forEach>
                                 <c:if test="${empty schedules && not empty param.selectedDate}">
-                                <option disabled>Không có bác sĩ nào có lịch vào ngày này</option>
+                                <option disabled>No Veterinarian are scheduled for this day.</option>
                             </c:if>
                             <c:if test="${empty param.selectedDate}">
-                                <option disabled>Vui lòng chọn ngày trước</option>
+                                <option disabled>Please select a date in advance.</option>
                             </c:if>
                         </select>
                     </div>
-                    <!-- Card 3: Notes -->
                     <div>
                         <div class="notes-header">
                             <div class="section-title" style="margin-bottom:0">Notes & Symptoms</div>
@@ -161,7 +103,6 @@
                     </div>
                 </div>
 
-                <!-- Card 2: Schedule -->
                 <div class="card">
                     <div class="section-title">
                         <span class="step-badge">2</span> Schedule
@@ -171,7 +112,7 @@
                         <label>Available Time Slots</label>
                         <div class="time-slots-grid">
                             <c:if test="${empty availableSlots}">
-                                <p class="text-muted" style="grid-column: span 4; font-size: 0.9em;color: red">
+                                <p style="grid-column: span 4; font-size: 0.9em;color:  red">
                                     Please select a Date and Doctor to see available appointments.
                                 </p>
                             </c:if>
@@ -186,7 +127,6 @@
                             <input type="hidden" name="timeSlot" id="selectedTimeSlot" value="${param.timeSlot}">
                         </div>
                     </div>
-                    <!-- Card 4: Action Button -->
                     <div class="action-card">
                         <button type="submit" 
                                 id="btnConfirm"
