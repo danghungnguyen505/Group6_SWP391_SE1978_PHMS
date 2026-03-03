@@ -34,7 +34,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
         HttpSession session = request.getSession();
         User account = (User) session.getAttribute("account");
         if (account == null || !"Receptionist".equalsIgnoreCase(account.getRole())) {
-            response.sendRedirect(request.getContextPath() + "/views/auth/login.jsp");
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
         try {
@@ -73,7 +73,15 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
         } catch (Exception e) {
             e.printStackTrace();
         }
-        response.sendRedirect(request.getContextPath() + "/receptionist/dashboard");
+        // Redirect back based on action type:
+        // - Approve/Reject: back to appointment list page
+        // - Check-in/No-show: back to dashboard queue
+        String status = request.getParameter("status");
+        if ("Confirmed".equals(status) || "Cancelled".equals(status)) {
+            response.sendRedirect(request.getContextPath() + "/receptionist/appointment");
+        } else {
+            response.sendRedirect(request.getContextPath() + "/receptionist/dashboard");
+        }
     }
 
 }

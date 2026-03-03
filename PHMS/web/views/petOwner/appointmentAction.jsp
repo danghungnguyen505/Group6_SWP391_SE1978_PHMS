@@ -56,7 +56,7 @@
                 <div class="alert-locked">
                     <i class="fa-solid fa-lock fa-2x mb-3"></i>
                     <h5>Action Locked</h5>
-                    <p class="mb-3">Action locked! You can only cancel/reschedule within <strong>5 hours</strong> after booking.</p>
+                    <p class="mb-3">Hành động bị khóa! Bạn chỉ có thể hủy/đổi lịch khi còn <strong>ít nhất 5 tiếng</strong> trước giờ hẹn.</p>
                     <a href="${pageContext.request.contextPath}/myAppointment" class="btn btn-outline-danger">
                         <i class="fa-solid fa-arrow-left"></i> Go Back
                     </a>

@@ -6,6 +6,7 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -17,7 +18,7 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     </head>
     <body>
-
+        
         <!-- LEFT SIDEBAR -->
         <nav class="sidebar">
             <div class="brand">
@@ -46,7 +47,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/pets">
+                    <a href="${pageContext.request.contextPath}/receptionist/dashboard">
                         <i class="fa-solid fa-paw"></i> My Pets
                     </a>
                 </li>
@@ -167,7 +168,8 @@
             <!-- Main Card: Confirmed Requests -->
             <div class="card" style="margin-top: 20px;">
                 <div class="section-title">
-                    <span>Today's Check-in Queue (<fmt:formatDate value="<%=new java.util.Date()%>" pattern="dd/MM/yyyy"/>)</span>
+                    <jsp:useBean id="today" class="java.util.Date" />
+                    <span>Today's Check-in Queue (<fmt:formatDate value="${today}" pattern="dd/MM/yyyy"/>)</span>
                 </div>
 
                 <c:if test="${empty todayList}">
@@ -199,53 +201,76 @@
                             <fmt:formatDate value="${t.startTime}" pattern="HH:mm"/>
                             </td>
                             <td class="col-id">#${t.apptId}</td>
-                            <td>
-                                <div>${t.ownerName}</div>
-                                <small style="color: #666;">Pet: ${t.petName}</small>
-                            </td>
-                            <td class="col-service">${t.type}</td>
-                            <td>${t.vetName}</td>
-                            <td>
-                                <c:choose>
-                                    <c:when test="${t.status == 'Confirmed'}">
-                                        <span style="background: #d1fae5; color: #065f46; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">Confirmed</span>
-                                    </c:when>
-                                    <c:when test="${t.status == 'Checked-in'}">
-                                        <span style="background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">Checked-in</span>
-                                    </c:when>
-                                    <c:when test="${t.status == 'No-show'}">
-                                        <span style="background: #f3f4f6; color: #374151; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">No-show</span>
-                                    </c:when>
-                                </c:choose>
+                                    <td>
+                                        <div>${t.ownerName}</div>
+                                        <small style="color: #666;">Pet: ${t.petName}</small>
+                                    </td>
+                                    <td class="col-service">${t.type}</td>
+                                    <td>${t.vetName}</td>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${t.status == 'Confirmed'}">
+                                                <span style="background: #d1fae5; color: #065f46; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
+                                                    Confirmed</span>
+                                            </c:when>
+                                            <c:when test="${t.status == 'Checked-in'}">
+                                                <span style="background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
+                                                    Checked-in</span>
+                                            </c:when>
+                                            <c:when test="${t.status == 'In-Progress'}">
+                                                <span style="background: #fde68a; color: #92400e; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
+                                                    In-Progress</span>
+                                            </c:when>
+                                            <c:when test="${t.status == 'Process'}">
+                                                <span style="background: #f3f4f6; color: #433751; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
+                                                    Process</span>
+                                            </c:when>
+                                            <c:when test="${t.status == 'Completed'}">
+                                                <span style="background: #fee2e2; color: #b91c1c; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
+                                                    Completed</span>
+                                            </c:when>
+                                        </c:choose>
 
-                                <c:if test="${isLate}">
-                                    <div style="color: red; font-size: 11px; margin-top: 2px;"><i class="fa-solid fa-circle-exclamation"></i> Late</div>
-                                </c:if>
-                            </td>
-                            <td style="text-align: center;">
-                                <c:if test="${t.status == 'Confirmed'}">
-                                    <div class="action-group">
-                                        <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${t.apptId}&status=Checked-in" 
-                                           class="btn btn-approve" 
-                                           title="Patient Arrived">
-                                            <i class="fa-solid fa-check-to-slot"></i> Check-in
-                                        </a>
+                                        <c:if test="${isLate}">
+                                            <div style="color: red; font-size: 11px; margin-top: 2px;"><i class="fa-solid fa-circle-exclamation"></i> Late</div>
+                                        </c:if>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <!-- Trường hợp chưa Check-in: hành động Check-in/No-show -->
+                                        <c:if test="${t.status == 'Confirmed'}">
+                                            <div class="action-group">
+                                                <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${t.apptId}&status=Checked-in" 
+                                                   class="btn btn-approve" 
+                                                   title="Patient Arrived">
+                                                    <i class="fa-solid fa-check-to-slot"></i> Check-in
+                                                </a>
 
-                                        <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${t.apptId}&status=No-show" 
-                                           class="btn btn-reject"
-                                           style="background-color: #64748b; color: white;"
-                                           title="Patient did not come"
-                                           onclick="return confirm('Mark this appointment as No-show?');">
-                                            <i class="fa-solid fa-user-slash"></i> No-show
-                                        </a>
-                                    </div>
-                                </c:if>
+                                                <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${t.apptId}&status=No-show" 
+                                                   class="btn btn-reject"
+                                                   style="background-color: #64748b; color: white;"
+                                                   title="Patient did not come"
+                                                   onclick="return confirm('Mark this appointment as No-show?');">
+                                                    <i class="fa-solid fa-user-slash"></i> No-show
+                                                </a>
+                                            </div>
+                                        </c:if>
 
-                                <c:if test="${t.status != 'Confirmed'}">
-                                    <span style="color: #94a3b8; font-style: italic;">Action taken</span>
-                                </c:if>
-                            </td>
-                            </tr>
+                                        <!-- Trường hợp đã Completed: cho phép tạo/xem hóa đơn -->
+                                        <c:if test="${t.status == 'Completed'}">
+                                            <a href="${pageContext.request.contextPath}/receptionist/invoice/create?apptId=${t.apptId}"
+                                               class="btn btn-approve"
+                                               style="text-decoration:none;"
+                                               title="Tạo hoặc xem hóa đơn cho cuộc hẹn này">
+                                                <i class="fa-regular fa-credit-card"></i> Tạo/Xem hóa đơn
+                                            </a>
+                                        </c:if>
+
+                                        <!-- Các trạng thái khác đã xử lý rồi thì hiển thị nhãn chung -->
+                                        <c:if test="${t.status != 'Confirmed' && t.status != 'Completed'}">
+                                            <span style="color: #94a3b8; font-style: italic;">Action taken</span>
+                                        </c:if>
+                                    </td>
+                                </tr>
                         </c:forEach>
                         </tbody>
                     </table>

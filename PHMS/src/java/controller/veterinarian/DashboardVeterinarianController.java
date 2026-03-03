@@ -30,7 +30,7 @@ public class DashboardVeterinarianController extends HttpServlet {
         HttpSession session = request.getSession();
         User account = (User) session.getAttribute("account");
         if (account == null || !"Veterinarian".equalsIgnoreCase(account.getRole())) {
-            response.sendRedirect(request.getContextPath() + "/views/auth/login.jsp");
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 

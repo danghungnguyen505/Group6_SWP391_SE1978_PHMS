@@ -16,7 +16,9 @@ public class Schedule {
     private int managerId;
     private Date workDate;
     private String shiftTime;
-    private String vetName; 
+    private String vetName;
+    // Optional: leave status for this schedule's date (e.g. Pending/Approved/Rejected)
+    private String leaveStatus;
 
     public Schedule() {
     }
@@ -76,6 +78,14 @@ public class Schedule {
 
     public void setVetName(String vetName) {
         this.vetName = vetName;
+    }
+
+    public String getLeaveStatus() {
+        return leaveStatus;
+    }
+
+    public void setLeaveStatus(String leaveStatus) {
+        this.leaveStatus = leaveStatus;
     }
 
 

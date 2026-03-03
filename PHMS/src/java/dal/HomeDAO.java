@@ -20,10 +20,12 @@ public class HomeDAO extends DBContext {
 
     public List<Service> getTopServices() {
         List<Service> list = new ArrayList<>();
-        String sql = "SELECT TOP 3 FROM ServiceList WHERE is_active = 1";
-        try {
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
+        // Lấy top 3 dịch vụ đang hoạt động từ bảng ServiceList
+        // Giữ nguyên cấu trúc bảng: service_id, name, base_price, description, is_active, managed_by
+        String sql = "SELECT TOP 3 service_id, name, base_price, description, is_active, managed_by "
+                   + "FROM ServiceList WHERE is_active = 1 ORDER BY service_id";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 list.add(new Service(
                     rs.getInt("service_id"),
@@ -31,10 +33,11 @@ public class HomeDAO extends DBContext {
                     rs.getDouble("base_price"), 
                     rs.getString("description"),
                     rs.getBoolean("is_active"),
-                    rs.getInt("manage_by")
+                    rs.getInt("managed_by")
                 ));
             }
         } catch (Exception e) {
+            System.out.println("Error getTopServices: " + e.getMessage());
         }
         return list;
     }

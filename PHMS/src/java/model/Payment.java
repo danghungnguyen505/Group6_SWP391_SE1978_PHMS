@@ -1,14 +1,27 @@
 package model;
 
+/**
+ * Payment entity mapped to table Payment.
+ */
 public class Payment {
     private int paymentId;
     private int invoiceId;
     private String transCode;
     private double amount;
-    private String method;
+    private String method; // Cash, VNPay, Transfer...
     private String status;
 
-    public Payment() {}
+    public Payment() {
+    }
+
+    public Payment(int paymentId, int invoiceId, String transCode, double amount, String method, String status) {
+        this.paymentId = paymentId;
+        this.invoiceId = invoiceId;
+        this.transCode = transCode;
+        this.amount = amount;
+        this.method = method;
+        this.status = status;
+    }
 
     public int getPaymentId() {
         return paymentId;
@@ -58,3 +71,4 @@ public class Payment {
         this.status = status;
     }
 }
+

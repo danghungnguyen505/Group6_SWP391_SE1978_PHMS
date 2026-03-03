@@ -1,14 +1,25 @@
 package model;
 
+/**
+ * Invoice entity mapped to table Invoice.
+ */
 public class Invoice {
     private int invoiceId;
     private int apptId;
     private int recepId;
     private double totalAmount;
-    private String status; // Unpaid, Paid
-private String ownerName;
-private String petName;
-    public Invoice() {}
+    private String status; // Unpaid, Paid, Partially Paid
+
+    public Invoice() {
+    }
+
+    public Invoice(int invoiceId, int apptId, int recepId, double totalAmount, String status) {
+        this.invoiceId = invoiceId;
+        this.apptId = apptId;
+        this.recepId = recepId;
+        this.totalAmount = totalAmount;
+        this.status = status;
+    }
 
     public int getInvoiceId() {
         return invoiceId;
@@ -49,21 +60,5 @@ private String petName;
     public void setStatus(String status) {
         this.status = status;
     }
-
-    public String getOwnerName() {
-        return ownerName;
-    }
-
-    public void setOwnerName(String ownerName) {
-        this.ownerName = ownerName;
-    }
-
-    public String getPetName() {
-        return petName;
-    }
-
-    public void setPetName(String petName) {
-        this.petName = petName;
-    }
-    
 }
+

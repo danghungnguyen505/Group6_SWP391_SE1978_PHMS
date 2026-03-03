@@ -31,14 +31,57 @@ public class ReceptionistRequestAppointmentController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/views/auth/login.jsp");
             return;
         }
-        // Lấy danh sách chờ duyệt từ DAO
-        dal.AppointmentDAO dao = new dal.AppointmentDAO();
-        List<model.Appointment> pendingList = dao.getPendingAppointments();
-        //Danh sách đã duyệt
-        List<model.Appointment> confirmedList = dao.getConfirmedAppointments();
-        request.setAttribute("confirmedList", confirmedList);
         
-        request.setAttribute("pendingList", pendingList);
+        // Get filter parameters
+        String filterDate = request.getParameter("filterDate");
+        String filterStatus = request.getParameter("filterStatus");
+        String filterVetIdStr = request.getParameter("filterVetId");
+        
+        Integer filterVetId = null;
+        if (util.ValidationUtils.isNotEmpty(filterVetIdStr) && util.ValidationUtils.isIntegerInRange(filterVetIdStr, 1, Integer.MAX_VALUE)) {
+            filterVetId = Integer.parseInt(filterVetIdStr);
+        }
+        
+        dal.AppointmentDAO dao = new dal.AppointmentDAO();
+        List<model.Appointment> allAppointments;
+        
+        // Apply filters if provided
+        if (util.ValidationUtils.isNotEmpty(filterDate) || util.ValidationUtils.isNotEmpty(filterStatus) || filterVetId != null) {
+            allAppointments = dao.getAppointmentsWithFilters(filterDate, filterDate, filterStatus, filterVetId);
+        } else {
+            // Default: show pending and confirmed
+            allAppointments = dao.getPendingAppointments();
+            allAppointments.addAll(dao.getConfirmedAppointments());
+        }
+        
+        // Get all veterinarians for filter dropdown
+        dal.UserDAO userDAO = new dal.UserDAO();
+        List<User> veterinarians = userDAO.getAllVeterinarians();
+        request.setAttribute("veterinarians", veterinarians);
+        
+        // Pagination
+        int page = 1;
+        int pageSize = 10;
+        String pageStr = request.getParameter("page");
+        if (pageStr != null && !pageStr.trim().isEmpty()) {
+            try {
+                page = Integer.parseInt(pageStr);
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+        }
+        int totalPages = util.PaginationUtils.getTotalPages(allAppointments, pageSize);
+        page = util.PaginationUtils.getValidPage(page, totalPages);
+        List<model.Appointment> appointmentList = util.PaginationUtils.getPage(allAppointments, page, pageSize);
+        
+        // Set attributes
+        request.setAttribute("appointments", appointmentList);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("totalItems", allAppointments.size());
+        request.setAttribute("filterDate", filterDate);
+        request.setAttribute("filterStatus", filterStatus);
+        request.setAttribute("filterVetId", filterVetIdStr);
         // Hiển thị thông báo sau Duyệt/Hủy (chỉ 1 lần)
         Object msg = session.getAttribute("actionMessage");
         if (msg != null) {

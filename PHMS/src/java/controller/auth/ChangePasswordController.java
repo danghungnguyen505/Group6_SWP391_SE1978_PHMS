@@ -82,23 +82,61 @@ public class ChangePasswordController extends HttpServlet {
         String oldPass = request.getParameter("oldPass");
         String newPass = request.getParameter("newPass");
         String confirmPass = request.getParameter("confirmPass");
-
-        if (!user.getPassword().equals(oldPass)) {
-            request.setAttribute("error", "Mật khẩu cũ không đúng!");
+        
+        // Validate input
+        if (oldPass == null || oldPass.trim().isEmpty() || 
+            newPass == null || newPass.trim().isEmpty() || 
+            confirmPass == null || confirmPass.trim().isEmpty()) {
+            request.setAttribute("error", "Vui lòng nhập đầy đủ thông tin!");
             request.getRequestDispatcher("views/auth/change-password.jsp").forward(request, response);
             return;
         }
+        
+        // Validate password strength
+        if (!util.ValidationUtils.isValidPassword(newPass)) {
+            request.setAttribute("error", "Mật khẩu mới phải có ít nhất 6 ký tự!");
+            request.getRequestDispatcher("views/auth/change-password.jsp").forward(request, response);
+            return;
+        }
+        
         if (!newPass.equals(confirmPass)) {
             request.setAttribute("error", "Mật khẩu mới không khớp!");
             request.getRequestDispatcher("views/auth/change-password.jsp").forward(request, response);
             return;
         }
+        
+        if (oldPass.equals(newPass)) {
+            request.setAttribute("error", "Mật khẩu mới phải khác mật khẩu cũ!");
+            request.getRequestDispatcher("views/auth/change-password.jsp").forward(request, response);
+            return;
+        }
 
         UserDAO dao = new UserDAO();
-        dao.changePassword(user.getUserId(), newPass);
+        // Get user with password hash from database
+        User dbUser = dao.getUserById(user.getUserId());
+        if (dbUser == null) {
+            request.setAttribute("error", "Không tìm thấy thông tin người dùng!");
+            request.getRequestDispatcher("views/auth/change-password.jsp").forward(request, response);
+            return;
+        }
         
-        user.setPassword(newPass);
-        session.setAttribute("account", user);
+        // Verify old password
+        String storedPassword = dbUser.getPassword();
+        boolean passwordMatches = false;
+        if (util.PasswordUtil.isValidHash(storedPassword)) {
+            passwordMatches = util.PasswordUtil.verifyPassword(oldPass, storedPassword);
+        } else {
+            // Legacy plain text support
+            passwordMatches = oldPass.equals(storedPassword);
+        }
+        
+        if (!passwordMatches) {
+            request.setAttribute("error", "Mật khẩu cũ không đúng!");
+            request.getRequestDispatcher("views/auth/change-password.jsp").forward(request, response);
+            return;
+        }
+        
+        dao.changePassword(user.getUserId(), newPass);
         
         request.setAttribute("message", "Đổi mật khẩu thành công!");
         request.getRequestDispatcher("views/auth/change-password.jsp").forward(request, response);

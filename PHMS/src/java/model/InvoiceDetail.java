@@ -1,18 +1,29 @@
 package model;
 
+/**
+ * Invoice detail row mapped to table InvoiceDetail.
+ */
 public class InvoiceDetail {
-
     private int detailId;
     private int invoiceId;
-    private String itemType;
+    private Integer medicineId; // nullable
+    private Integer serviceId;  // nullable
+    private String itemType;    // Medicine or Service
     private int quantity;
     private double unitPrice;
-    private double subtotal;
-
-    // Extra display-only field (from JOIN)
-    private String serviceName;
 
     public InvoiceDetail() {
+    }
+
+    public InvoiceDetail(int detailId, int invoiceId, Integer medicineId, Integer serviceId,
+                         String itemType, int quantity, double unitPrice) {
+        this.detailId = detailId;
+        this.invoiceId = invoiceId;
+        this.medicineId = medicineId;
+        this.serviceId = serviceId;
+        this.itemType = itemType;
+        this.quantity = quantity;
+        this.unitPrice = unitPrice;
     }
 
     public int getDetailId() {
@@ -29,6 +40,22 @@ public class InvoiceDetail {
 
     public void setInvoiceId(int invoiceId) {
         this.invoiceId = invoiceId;
+    }
+
+    public Integer getMedicineId() {
+        return medicineId;
+    }
+
+    public void setMedicineId(Integer medicineId) {
+        this.medicineId = medicineId;
+    }
+
+    public Integer getServiceId() {
+        return serviceId;
+    }
+
+    public void setServiceId(Integer serviceId) {
+        this.serviceId = serviceId;
     }
 
     public String getItemType() {
@@ -54,20 +81,5 @@ public class InvoiceDetail {
     public void setUnitPrice(double unitPrice) {
         this.unitPrice = unitPrice;
     }
-
-    public double getSubtotal() {
-        return subtotal;
-    }
-
-    public void setSubtotal(double subtotal) {
-        this.subtotal = subtotal;
-    }
-
-    public String getServiceName() {
-        return serviceName;
-    }
-
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
-    }
 }
+

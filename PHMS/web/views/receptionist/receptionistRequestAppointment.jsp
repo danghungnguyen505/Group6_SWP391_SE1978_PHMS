@@ -6,6 +6,7 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -92,22 +93,68 @@
                 </div>
             </c:if>
 
-            <!-- Main Card: Pending Requests -->
+            <!-- Filter Card -->
+            <div class="card" style="margin-bottom:20px;">
+                <div class="section-title">
+                    <span>Filter Appointments</span>
+                </div>
+                <form method="get" action="${pageContext.request.contextPath}/receptionist/appointment" 
+                      style="display:grid; grid-template-columns: 1fr 1fr 1fr auto; gap:10px; align-items:end;">
+                    <div>
+                        <label><b>Date</b></label>
+                        <input type="date" name="filterDate" value="${filterDate}" style="width:100%; padding:8px;">
+                    </div>
+                    <div>
+                        <label><b>Status</b></label>
+                        <select name="filterStatus" style="width:100%; padding:8px;">
+                            <option value="">All</option>
+                            <option value="Pending" ${filterStatus == 'Pending' ? 'selected' : ''}>Pending</option>
+                            <option value="Confirmed" ${filterStatus == 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+                            <option value="Checked-in" ${filterStatus == 'Checked-in' ? 'selected' : ''}>Checked-in</option>
+                            <option value="In-Progress" ${filterStatus == 'Checked-in' ? 'selected' : ''}>In-Progress</option>
+                            <option value="Completed" ${filterStatus == 'Completed' ? 'selected' : ''}>Completed</option>
+                            <option value="Cancelled" ${filterStatus == 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label><b>Veterinarian</b></label>
+                        <select name="filterVetId" style="width:100%; padding:8px;">
+                            <option value="">All</option>
+                            <c:forEach var="vet" items="${veterinarians}">
+                                <option value="${vet.userId}" ${filterVetId == vet.userId ? 'selected' : ''}>${vet.fullName}</option>
+                            </c:forEach>
+                        </select>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-approve" style="width:100%;">
+                            <i class="fa-solid fa-filter"></i> Filter
+                        </button>
+                    </div>
+                </form>
+                <c:if test="${not empty filterDate || not empty filterStatus || not empty filterVetId}">
+                    <a href="${pageContext.request.contextPath}/receptionist/appointment" 
+                       class="btn btn-secondary" style="margin-top:10px; text-decoration:none;">
+                        <i class="fa-solid fa-times"></i> Clear Filters
+                    </a>
+                </c:if>
+            </div>
+
+            <!-- Main Card: Appointments List -->
             <div class="card">
                 <div class="section-title">
-                    <span>Pending Requests</span>
+                    <span>Appointments List</span>
+                    <span style="float:right; font-size:14px; color:#6b7280;">Total: ${totalItems}</span>
                 </div>
 
                 <!-- Empty State -->
-                <c:if test="${empty pendingList}">
+                <c:if test="${empty appointments}">
                     <div class="empty-state">
                         <i class="fa-regular fa-calendar-times" style="font-size: 30px; margin-bottom: 10px;"></i>
-                        <p>No pending appointment requests found.</p>
+                        <p>No appointments found.</p>
                     </div>
                 </c:if>
-
                 <!-- Data Table -->
-                <c:if test="${not empty pendingList}">
+                <c:if test="${not empty appointments}">
                     <table>
                         <thead>
                             <tr>
@@ -117,98 +164,95 @@
                                 <th>Service</th>
                                 <th>Veterinarian</th>
                                 <th>Date & Time</th>
+                                <th>Status</th>
                                 <th>Notes</th>
                                 <th style="text-align: center;">Actions</th>
                             </tr>
                         </thead>
+                        
                         <tbody>
-                            <c:forEach items="${pendingList}" var="a">
+                            <c:forEach items="${appointments}" var="a">
                                 <tr>
                                     <td class="col-id">#${a.apptId}</td> 
                                     <td>${a.ownerName}</td>
                                     <td class="col-pet">${a.petName}</td>
                                     <td class="col-service">${a.type}</td>
                                     <td>${a.vetName}</td>
-                                    <td>${a.startTime}</td>
+                                    <td><fmt:formatDate value="${a.startTime}" pattern="dd/MM/yyyy HH:mm"/></td>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${a.status == 'Pending'}">
+                                                <span style="background:#fef3c7; color:#92400e; padding:4px 8px; border-radius:4px; font-size:12px;">Pending</span>
+                                            </c:when>
+                                            <c:when test="${a.status == 'Confirmed'}">
+                                                <span style="background:#d1fae5; color:#065f46; padding:4px 8px; border-radius:4px; font-size:12px;">Confirmed</span>
+                                            </c:when>
+                                            <c:when test="${a.status == 'Checked-in'}">
+                                                <span style="background:#dbeafe; color:#1e40af; padding:4px 8px; border-radius:4px; font-size:12px;">Checked-in</span>
+                                            </c:when>
+                                                <c:when test="${a.status == 'In-Progress'}">
+                                                <span style="background:#dbeafe; color:#1e40af; padding:4px 8px; border-radius:4px; font-size:12px;">In-Progress</span>
+                                            </c:when>
+                                            <c:when test="${a.status == 'Completed'}">
+                                                <span style="background:#dcfce7; color:#166534; padding:4px 8px; border-radius:4px; font-size:12px;">Completed</span>
+                                            </c:when>
+                                            <c:when test="${a.status == 'Cancelled'}">
+                                                <span style="background:#fee2e2; color:#991b1b; padding:4px 8px; border-radius:4px; font-size:12px;">Cancelled</span>
+                                            </c:when>
+                                        </c:choose>
+                                    </td>
                                     <td>
                                         <c:if test="${not empty a.notes}">
-                                            <button type="button" 
-                                                    class="btn-view-note" 
-                                                    data-note="${a.notes}" 
-                                                    onclick="openModal(this)">
+                                            <button type="button" class="btn-view-note" data-note="${a.notes}" onclick="openModal(this)">
                                                 <i class="fa-regular fa-eye"></i> View
                                             </button>
                                         </c:if>
                                         <c:if test="${empty a.notes}">
-                                            <span style="color: #999; font-style: italic;">Not note</span>
+                                            <span style="color: #999; font-style: italic;">No note</span>
                                         </c:if>
                                     </td>
                                     <td>
                                         <div class="action-group">
-                                            <!-- Approve Button -->
-                                            <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${a.apptId}&status=Confirmed" 
-                                               class="btn btn-approve">
-                                                Approve
-                                            </a>
-                                            <!-- Reject Button -->
-                                            <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${a.apptId}&status=Cancelled" 
-                                               class="btn btn-reject"
-                                               onclick="return confirm('Are you sure you want to reject this appointment?');">
-                                                Reject
-                                            </a>
+                                            <c:if test="${a.status == 'Pending'}">
+                                                <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${a.apptId}&status=Confirmed" 
+                                                   class="btn btn-approve">Approve</a>
+                                                <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${a.apptId}&status=Cancelled" 
+                                                   class="btn btn-reject"
+                                                   onclick="return confirm('Are you sure you want to reject this appointment?');">Reject</a>
+                                            </c:if>
+                                            <c:if test="${a.status == 'Confirmed'}">
+                                                <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${a.apptId}&status=Checked-in" 
+                                                   class="btn btn-approve">Check-in</a>
+                                            </c:if>
                                         </div>
                                     </td>
                                 </tr>
                             </c:forEach>
                         </tbody>
                     </table>
-                </c:if>
-            </div>
-            <!-- Main Card: Confirmed Requests -->
-            <div class="card" style="margin-top: 20px;">
-                <div class="section-title">
-                    <span>Upcoming Appointments (Confirmed)</span>
-                </div>
 
-                <c:if test="${empty confirmedList}">
-                    <div class="empty-state">
-                        <p>No confirmed appointments found.</p>
-                    </div>
-                </c:if>
-
-                <c:if test="${not empty confirmedList}">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Owner</th>
-                                <th>Pet</th>
-                                <th>Service</th>
-                                <th>Veterinarian</th>
-                                <th>Time</th>
-                                <th>Notes</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <c:forEach items="${confirmedList}" var="c">
-                                <tr>
-                                    <td class="col-id">#${c.apptId}</td> 
-                                    <td>${c.ownerName}</td>
-                                    <td class="col-pet">${c.petName}</td>
-                                    <td class="col-service">${c.type}</td>
-                                    <td>${c.vetName}</td>
-                                    <td>${c.startTime}</td>
-                                    <td class="col-notes">${c.notes}</td>
-                                    <td>
-                                        <span style="background-color: #d1fae5; color: #065f46; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
-                                            Confirmed
-                                        </span>
-                                    </td>
-                                </tr>
+                    <!-- Pagination -->
+                    <c:if test="${totalPages > 1}">
+                        <div style="display:flex; gap:6px; justify-content:flex-end; margin-top:12px;">
+                            <c:if test="${currentPage > 1}">
+                                <a class="btn btn-approve" style="text-decoration:none;" 
+                                   href="?page=${currentPage - 1}<c:if test='${not empty filterDate}'>&filterDate=${filterDate}</c:if><c:if test='${not empty filterStatus}'>&filterStatus=${filterStatus}</c:if><c:if test='${not empty filterVetId}'>&filterVetId=${filterVetId}</c:if>">
+                                    <i class="fa-solid fa-chevron-left"></i>
+                                </a>
+                            </c:if>
+                            <c:forEach begin="1" end="${totalPages}" var="i">
+                                <a class="btn ${currentPage == i ? 'btn-approve' : 'btn-reject'}"
+                                   style="text-decoration:none; ${currentPage == i ? '' : 'background:#e5e7eb;color:#111827;'}"
+                                   href="?page=${i}<c:if test='${not empty filterDate}'>&filterDate=${filterDate}</c:if><c:if test='${not empty filterStatus}'>&filterStatus=${filterStatus}</c:if><c:if test='${not empty filterVetId}'>&filterVetId=${filterVetId}</c:if>">${i}</a>
                             </c:forEach>
-                        </tbody>
-                    </table>
+                            <c:if test="${currentPage < totalPages}">
+                                <a class="btn btn-approve" style="text-decoration:none;" 
+                                   href="?page=${currentPage + 1}<c:if test='${not empty filterDate}'>&filterDate=${filterDate}</c:if><c:if test='${not empty filterStatus}'>&filterStatus=${filterStatus}</c:if><c:if test='${not empty filterVetId}'>&filterVetId=${filterVetId}</c:if>">
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </a>
+                            </c:if>
+                        </div>
+                    </c:if>
                 </c:if>
             </div>
         </main>

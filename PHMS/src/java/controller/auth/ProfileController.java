@@ -75,23 +75,71 @@ public class ProfileController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        //processRequest(request, response);
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("account");
         
-        String fullName = request.getParameter("fullname");
-        String phone = request.getParameter("phone");
-        String address = request.getParameter("address");
+        if (user == null) {
+            response.sendRedirect("login");
+            return;
+        }
         
+        // Get and sanitize input
+        String fullName = util.ValidationUtils.sanitize(request.getParameter("fullname"));
+        String phone = util.ValidationUtils.sanitize(request.getParameter("phone"));
+        String address = util.ValidationUtils.sanitize(request.getParameter("address"));
+        
+        // Validate input
+        if (!util.ValidationUtils.isNotEmpty(fullName) || !util.ValidationUtils.isLengthValid(fullName, 2, 100)) {
+            request.setAttribute("error", "Họ tên phải có từ 2 đến 100 ký tự!");
+            request.getRequestDispatcher("views/auth/profile.jsp").forward(request, response);
+            return;
+        }
+        
+        if (!util.ValidationUtils.isNotEmpty(phone) || !util.ValidationUtils.isValidPhone(phone)) {
+            request.setAttribute("error", "Số điện thoại không hợp lệ! (Ví dụ: 0912345678)");
+            request.getRequestDispatcher("views/auth/profile.jsp").forward(request, response);
+            return;
+        }
+        
+        if ("PetOwner".equalsIgnoreCase(user.getRole())) {
+            if (!util.ValidationUtils.isNotEmpty(address) || !util.ValidationUtils.isLengthValid(address, 5, 255)) {
+                request.setAttribute("error", "Địa chỉ phải có từ 5 đến 255 ký tự!");
+                request.getRequestDispatcher("views/auth/profile.jsp").forward(request, response);
+                return;
+            }
+        }
+        
+        // Uniqueness validation: phone must be unique across Users (excluding current user)
+        try {
+            UserDAO dao = new UserDAO();
+            if (dao.checkPhoneExistsForOther(user.getUserId(), phone)) {
+                request.setAttribute("error", "Số điện thoại này đã được sử dụng! Vui lòng dùng số khác.");
+                request.getRequestDispatcher("views/auth/profile.jsp").forward(request, response);
+                return;
+            }
+        } catch (Exception e) {
+            request.setAttribute("error", "Lỗi hệ thống khi kiểm tra số điện thoại: " + e.getMessage());
+            request.getRequestDispatcher("views/auth/profile.jsp").forward(request, response);
+            return;
+        }
+        
+        // Update user object
         user.setFullName(fullName);
         user.setPhone(phone);
-        user.setAddress(address);
+        if ("PetOwner".equalsIgnoreCase(user.getRole())) {
+            user.setAddress(address);
+        }
         
-        UserDAO dao = new UserDAO();
-        dao.updateProfile(user, address);
+        try {
+            UserDAO dao = new UserDAO();
+            dao.updateProfile(user, address);
+            
+            session.setAttribute("account", user);
+            request.setAttribute("message", "Cập nhật hồ sơ thành công!");
+        } catch (Exception e) {
+            request.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
+        }
         
-        session.setAttribute("account", user);
-        request.setAttribute("message", "Cập nhật hồ sơ thành công!");
         request.getRequestDispatcher("views/auth/profile.jsp").forward(request, response);
     }
 
