@@ -8,6 +8,7 @@ package controller.vnpayCommon;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import dal.InvoiceDAO;
+import dal.PaymentDAO;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -51,8 +52,11 @@ public class ajaxServlet extends HttpServlet {
         long amount = (long) (grandTotal * 100);
         // 3. Gọi DAO để INSERT vào DB và lấy về InvoiceId tự động
         InvoiceDAO invoiceDAO = new InvoiceDAO();
+        PaymentDAO paymentDAO = new PaymentDAO();
         int invoiceId = -99; // Giá trị mặc định để kiểm tra
         String act = req.getParameter("act");
+        String manualPaid = req.getParameter("manualPaid");
+        boolean isManualPaid = "true".equalsIgnoreCase(manualPaid);
         if ("create".equals(act)) {
             try {
                 invoiceId = invoiceDAO.createInvoice(apptId, recepId, grandTotal);
@@ -68,7 +72,6 @@ public class ajaxServlet extends HttpServlet {
             invoiceId = id;
         }
         
-
         if (invoiceId <= 0) {
             resp.setContentType("text/html;charset=UTF-8");
             resp.getWriter().write("<h1>LỖI DATABASE THẬT SỰ:</h1>");
@@ -77,6 +80,18 @@ public class ajaxServlet extends HttpServlet {
             return;
         }
 
+        // Trường hợp thanh toán thủ công: khách đã chuyển khoản/tiền mặt, không đi qua cổng VNPay
+        if (isManualPaid) {
+            // 1. Ghi nhận payment thành công
+            boolean ok = paymentDAO.createPayment(invoiceId, grandTotal, "Transfer", "Success", null);
+            if (ok) {
+                // 2. Cập nhật trạng thái hóa đơn = Paid
+                invoiceDAO.updateStatus(invoiceId, "Paid");
+            }
+            // 3. Quay lại màn chi tiết hóa đơn
+            resp.sendRedirect(req.getContextPath() + "/receptionist/invoice/detail?invoiceId=" + invoiceId);
+            return;
+        }
 
         String vnp_TxnRef = invoiceId + "_" + Config.getRandomNumber(8);
         String vnp_IpAddr = Config.getIpAddress(req);
