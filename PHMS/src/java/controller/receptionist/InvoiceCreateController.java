@@ -2,7 +2,11 @@ package controller.receptionist;
 
 import dal.AppointmentDAO;
 import dal.InvoiceDAO;
+<<<<<<< Updated upstream
 import dal.MedicineDAO;
+=======
+import dal.PrescriptionDAO;
+>>>>>>> Stashed changes
 import dal.ServiceDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -13,11 +17,18 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+<<<<<<< Updated upstream
 import java.util.List;
 import model.Appointment;
 import model.InvoiceDetail;
 import model.Medicine;
 import model.Service;
+=======
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import model.Appointment;
+>>>>>>> Stashed changes
 import model.User;
 
 /**
@@ -53,6 +64,7 @@ public class InvoiceCreateController extends HttpServlet {
             return;
         }
 
+<<<<<<< Updated upstream
         ServiceDAO serviceDAO = new ServiceDAO();
         MedicineDAO medicineDAO = new MedicineDAO();
 
@@ -62,6 +74,69 @@ public class InvoiceCreateController extends HttpServlet {
         request.setAttribute("appt", appt);
         request.setAttribute("services", services);
         request.setAttribute("medicines", medicines);
+=======
+        // Business rule: Do not allow creating duplicated invoice for the same appointment
+        InvoiceDAO invoiceDAO = new InvoiceDAO();
+        if (invoiceDAO.getInvoiceByAppointment(apptId) != null) {
+            session.setAttribute("toastMessage", "error|Cuộc hẹn này đã có hóa đơn. Vui lòng xem chi tiết hóa đơn hiện có.");
+            response.sendRedirect(request.getContextPath() + "/receptionist/invoice/detail?invoiceId="
+                    + invoiceDAO.getInvoiceByAppointment(apptId).getInvoiceId());
+            return;
+        }
+
+        // Build invoice preview data: main service based on appointment type
+        ServiceDAO serviceDAO = new ServiceDAO();
+        model.Service mainService = null;
+        if (appt.getType() != null && !appt.getType().trim().isEmpty()) {
+            mainService = serviceDAO.getActiveServiceByName(appt.getType());
+        }
+        if (mainService == null) {
+            mainService = serviceDAO.getFirstActiveService();
+        }
+
+        // Load prescription medicines for this appointment (for billing preview)
+        PrescriptionDAO presDAO = new PrescriptionDAO();
+        List<model.Prescription> rawPrescriptions = presDAO.getByApptId(apptId);
+
+        // Aggregate by medicine to show one line per medicine
+        Map<Integer, model.Prescription> agg = new LinkedHashMap<>();
+        for (model.Prescription p : rawPrescriptions) {
+            int medId = p.getMedicineId();
+            if (!agg.containsKey(medId)) {
+                agg.put(medId, p);
+            } else {
+                model.Prescription ex = agg.get(medId);
+                ex.setQuantity(ex.getQuantity() + p.getQuantity());
+            }
+        }
+        List<model.Prescription> prescriptions = new ArrayList<>(agg.values());
+
+        Double subtotal = null;
+        Double tax = null;
+        Double grandTotal = null;
+        if (mainService != null) {
+            double s = mainService.getBasePrice();
+            for (model.Prescription p : prescriptions) {
+                s += p.getQuantity() * p.getMedicinePrice();
+            }
+            subtotal = s;
+            tax = subtotal * 0.08; // 8% tax
+            grandTotal = subtotal + tax;
+        }
+
+        // Simple invoice number & date preview
+        java.time.LocalDate today = java.time.LocalDate.now();
+        String invoiceNumber = String.format("INV-%d-%03d", today.getYear(), apptId);
+
+        request.setAttribute("appt", appt);
+        request.setAttribute("mainService", mainService);
+        request.setAttribute("prescriptions", prescriptions);
+        request.setAttribute("subtotal", subtotal);
+        request.setAttribute("tax", tax);
+        request.setAttribute("grandTotal", grandTotal);
+        request.setAttribute("invoiceNumber", invoiceNumber);
+        request.setAttribute("invoiceDate", today.toString());
+>>>>>>> Stashed changes
         request.getRequestDispatcher("/views/receptionist/invoiceCreate.jsp").forward(request, response);
     }
 
@@ -84,6 +159,7 @@ public class InvoiceCreateController extends HttpServlet {
         }
         int apptId = Integer.parseInt(apptIdStr);
 
+<<<<<<< Updated upstream
         // Collect service items
         String[] serviceIds = request.getParameterValues("serviceId");
         String[] serviceQtys = request.getParameterValues("serviceQty");
@@ -140,11 +216,25 @@ public class InvoiceCreateController extends HttpServlet {
             session.setAttribute("toastMessage", "success|Tạo hóa đơn thành công.");
             response.sendRedirect(request.getContextPath() + "/receptionist/invoice/detail?invoiceId=" + invoiceId);
 =======
+=======
+        InvoiceDAO invoiceDAO = new InvoiceDAO();
+        try {
+            // Tự động sinh chi tiết hóa đơn từ dữ liệu khám (Appointment + Prescription)
+            Integer invoiceId = invoiceDAO.autoCreateInvoiceForAppointment(apptId, account.getUserId());
+            if (invoiceId == null) {
+                session.setAttribute("toastMessage", "error|Không thể tự động tạo hóa đơn (chưa có dịch vụ/thuốc hoặc đã tồn tại hóa đơn).");
+                response.sendRedirect(request.getContextPath() + "/receptionist/invoice/create?apptId=" + apptId);
+                return;
+            }
+>>>>>>> Stashed changes
             session.setAttribute("toastMessage", "success|Tạo hóa đơn thành công. Chuyển sang thanh toán VNPay.");
             // Sau khi tạo hóa đơn xong, chuyển ngay sang luồng thanh toán VNPay
             //response.sendRedirect(request.getContextPath() + "/payment/vnpay/checkout?invoiceId=" + invoiceId);
             session.setAttribute("toastMessage", "success|Hóa đơn đã được tạo. Vui lòng chọn phương thức thanh toán.");
             response.sendRedirect(request.getContextPath() + "/receptionist/payment/create?invoiceId=" + invoiceId);
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
         } catch (SQLException e) {
             e.printStackTrace();

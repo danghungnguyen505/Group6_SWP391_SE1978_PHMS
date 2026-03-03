@@ -115,6 +115,17 @@ public class MedicineUpdateController extends HttpServlet {
         double price = Double.parseDouble(priceStr);
         int stock = Integer.parseInt(stockStr);
         
+<<<<<<< Updated upstream
+=======
+        // Business validation: ensure name is unique for other medicines
+        if (medicineDAO.existsByNameForOther(id, name)) {
+            request.setAttribute("error", "Tên thuốc đã được sử dụng cho thuốc khác!");
+            request.setAttribute("medicine", medicine);
+            request.getRequestDispatcher("/views/admin/medicineUpdate.jsp").forward(request, response);
+            return;
+        }
+        
+>>>>>>> Stashed changes
         boolean ok = medicineDAO.updateMedicine(new Medicine(id, name, unit, price, stock));
         
         if (ok) {

@@ -35,7 +35,11 @@ public class EditServiceController extends HttpServlet {
         if (!util.ValidationUtils.isNotEmpty(idStr)
                 || !util.ValidationUtils.isIntegerInRange(idStr, 1, Integer.MAX_VALUE)) {
             session.setAttribute("toastMessage", "error|ID dịch vụ không hợp lệ!");
+<<<<<<< Updated upstream
             response.sendRedirect("dashboard");
+=======
+            response.sendRedirect("services");
+>>>>>>> Stashed changes
             return;
         }
 
@@ -43,7 +47,11 @@ public class EditServiceController extends HttpServlet {
         Service s = new ServiceDAO().getServiceById(id);
         if (s == null) {
             session.setAttribute("toastMessage", "error|Không tìm thấy dịch vụ!");
+<<<<<<< Updated upstream
             response.sendRedirect("dashboard");
+=======
+            response.sendRedirect("services");
+>>>>>>> Stashed changes
             return;
         }
 
@@ -72,7 +80,11 @@ public class EditServiceController extends HttpServlet {
         if (!util.ValidationUtils.isNotEmpty(idStr)
                 || !util.ValidationUtils.isIntegerInRange(idStr, 1, Integer.MAX_VALUE)) {
             session.setAttribute("toastMessage", "error|ID dịch vụ không hợp lệ!");
+<<<<<<< Updated upstream
             response.sendRedirect("dashboard");
+=======
+            response.sendRedirect("services");
+>>>>>>> Stashed changes
             return;
         }
         int id = Integer.parseInt(idStr);
@@ -105,10 +117,26 @@ public class EditServiceController extends HttpServlet {
             desc = "";
         }
 
+<<<<<<< Updated upstream
         try {
         new ServiceDAO().updateService(new Service(id, name, price, desc, true, account.getUserId()));
             session.setAttribute("toastMessage", "success|Cập nhật dịch vụ thành công!");
         response.sendRedirect("dashboard");
+=======
+        ServiceDAO serviceDAO = new ServiceDAO();
+        // Business validation: service name unique for other services
+        if (serviceDAO.existsByNameForOther(id, name)) {
+            request.setAttribute("error", "Tên dịch vụ đã được sử dụng bởi dịch vụ khác!");
+            request.setAttribute("s", new Service(id, name, price, desc, true, account.getUserId()));
+            request.getRequestDispatcher("/views/admin/editService.jsp").forward(request, response);
+            return;
+        }
+
+        try {
+            serviceDAO.updateService(new Service(id, name, price, desc, true, account.getUserId()));
+            session.setAttribute("toastMessage", "success|Cập nhật dịch vụ thành công!");
+            response.sendRedirect("services");
+>>>>>>> Stashed changes
         } catch (Exception e) {
             request.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
             request.setAttribute("s", new Service(id, name, price, desc, true, account.getUserId()));

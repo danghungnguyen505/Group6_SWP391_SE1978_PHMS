@@ -7,6 +7,7 @@ package dal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,28 @@ import java.util.List;
  * @author zoxy4
  */
 public class AppointmentDAO extends DBContext {
+
+    /**
+     * Check if a vet has any non-cancelled appointments on a specific date.
+     */
+    public boolean hasAppointmentsForVetOnDate(int vetId, Date workDate) {
+        String sql = "SELECT COUNT(*) AS cnt FROM Appointment "
+                + "WHERE vet_id = ? "
+                + "AND CAST(start_time AS DATE) = ? "
+                + "AND status <> 'Cancelled'";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, vetId);
+            st.setDate(2, workDate);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("cnt") > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error hasAppointmentsForVetOnDate: " + e.getMessage());
+        }
+        return false;
+    }
 
     public List<String> getBookedSlots(int vetId, String date) {
         List<String> list = new ArrayList<>();
@@ -335,7 +358,13 @@ public class AppointmentDAO extends DBContext {
         }
     }
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     //Checkin 1. Hàm lấy danh sách cuộc hẹn TRONG NGÀY HÔM NAY (Confirmed, Checked-in, Pending)
+=======
+
+    //Checkin 1. Hàm lấy danh sách cuộc hẹn TRONG NGÀY HÔM NAY cho lễ tân
+    // Bao gồm: Confirmed, Checked-in, No-show, Completed
+>>>>>>> Stashed changes
 =======
 
     //Checkin 1. Hàm lấy danh sách cuộc hẹn TRONG NGÀY HÔM NAY cho lễ tân
@@ -346,6 +375,7 @@ public class AppointmentDAO extends DBContext {
         // SQL: Lấy cuộc hẹn có ngày bắt đầu = ngày hiện tại
         String sql = "SELECT a.*, p.name AS pet_name, u.full_name AS vet_name, u_owner.full_name AS owner_name "
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                    + "FROM Appointment a "
                    + "JOIN Pet p ON a.pet_id = p.pet_id "
                    + "JOIN Users u ON a.vet_id = u.user_id "
@@ -354,6 +384,8 @@ public class AppointmentDAO extends DBContext {
                    + "AND a.status IN ('Confirmed', 'Checked-in', 'No-show') "
                    + "ORDER BY a.start_time ASC";
 =======
+=======
+>>>>>>> Stashed changes
                 + "FROM Appointment a "
                 + "JOIN Pet p ON a.pet_id = p.pet_id "
                 + "JOIN Users u ON a.vet_id = u.user_id "
@@ -361,6 +393,9 @@ public class AppointmentDAO extends DBContext {
                 + "WHERE CAST(a.start_time AS DATE) = CAST(GETDATE() AS DATE) " // Dùng GETDATE() cho SQL Server, hoặc CURDATE() cho MySQL
                 + "AND a.status IN ('Confirmed', 'Checked-in', 'In-Progress', 'No-show', 'Completed') "
                 + "ORDER BY a.start_time ASC";
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
         try {
             PreparedStatement st = connection.prepareStatement(sql);
@@ -436,9 +471,12 @@ public class AppointmentDAO extends DBContext {
 
     /**
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
      * Auto-cancel appointments for a staff (vet) on a specific date
      * when a leave request is approved.
 =======
+=======
+>>>>>>> Stashed changes
      * Mark appointment as Completed if it is not already Cancelled. Used after
      * successful invoice payment.
      */
@@ -456,6 +494,9 @@ public class AppointmentDAO extends DBContext {
     /**
      * Auto-cancel appointments for a staff (vet) on a specific date when a
      * leave request is approved.
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
      */
     public int cancelAppointmentsForEmpOnDate(int empId, java.sql.Date date) {
@@ -671,7 +712,10 @@ public class AppointmentDAO extends DBContext {
         return list;
     }
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 
     //Mark appointment as Completed for the assigned vet only when In-Progress.
     //Danh dau cuoc hen da Completed
@@ -687,5 +731,8 @@ public class AppointmentDAO extends DBContext {
             return false;
         }
     }
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 }

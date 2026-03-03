@@ -18,7 +18,7 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     </head>
     <body>
-
+        
         <!-- LEFT SIDEBAR -->
         <nav class="sidebar">
             <div class="brand">
@@ -202,6 +202,7 @@
                             </td>
                             <td class="col-id">#${t.apptId}</td>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                             <td>
                                 <div>${t.ownerName}</div>
                                 <small style="color: #666;">Pet: ${t.petName}</small>
@@ -221,6 +222,8 @@
                                     </c:when>
                                 </c:choose>
 =======
+=======
+>>>>>>> Stashed changes
                                     <td>
                                         <div>${t.ownerName}</div>
                                         <small style="color: #666;">Pet: ${t.petName}</small>
@@ -250,36 +253,51 @@
                                                     Completed</span>
                                             </c:when>
                                         </c:choose>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
-                                <c:if test="${isLate}">
-                                    <div style="color: red; font-size: 11px; margin-top: 2px;"><i class="fa-solid fa-circle-exclamation"></i> Late</div>
-                                </c:if>
-                            </td>
-                            <td style="text-align: center;">
-                                <c:if test="${t.status == 'Confirmed'}">
-                                    <div class="action-group">
-                                        <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${t.apptId}&status=Checked-in" 
-                                           class="btn btn-approve" 
-                                           title="Patient Arrived">
-                                            <i class="fa-solid fa-check-to-slot"></i> Check-in
-                                        </a>
+                                        <c:if test="${isLate}">
+                                            <div style="color: red; font-size: 11px; margin-top: 2px;"><i class="fa-solid fa-circle-exclamation"></i> Late</div>
+                                        </c:if>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <!-- Trường hợp chưa Check-in: hành động Check-in/No-show -->
+                                        <c:if test="${t.status == 'Confirmed'}">
+                                            <div class="action-group">
+                                                <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${t.apptId}&status=Checked-in" 
+                                                   class="btn btn-approve" 
+                                                   title="Patient Arrived">
+                                                    <i class="fa-solid fa-check-to-slot"></i> Check-in
+                                                </a>
 
-                                        <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${t.apptId}&status=No-show" 
-                                           class="btn btn-reject"
-                                           style="background-color: #64748b; color: white;"
-                                           title="Patient did not come"
-                                           onclick="return confirm('Mark this appointment as No-show?');">
-                                            <i class="fa-solid fa-user-slash"></i> No-show
-                                        </a>
-                                    </div>
-                                </c:if>
+                                                <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${t.apptId}&status=No-show" 
+                                                   class="btn btn-reject"
+                                                   style="background-color: #64748b; color: white;"
+                                                   title="Patient did not come"
+                                                   onclick="return confirm('Mark this appointment as No-show?');">
+                                                    <i class="fa-solid fa-user-slash"></i> No-show
+                                                </a>
+                                            </div>
+                                        </c:if>
 
-                                <c:if test="${t.status != 'Confirmed'}">
-                                    <span style="color: #94a3b8; font-style: italic;">Action taken</span>
-                                </c:if>
-                            </td>
-                            </tr>
+                                        <!-- Trường hợp đã Completed: cho phép tạo/xem hóa đơn -->
+                                        <c:if test="${t.status == 'Completed'}">
+                                            <a href="${pageContext.request.contextPath}/receptionist/invoice/create?apptId=${t.apptId}"
+                                               class="btn btn-approve"
+                                               style="text-decoration:none;"
+                                               title="Tạo hoặc xem hóa đơn cho cuộc hẹn này">
+                                                <i class="fa-regular fa-credit-card"></i> Tạo/Xem hóa đơn
+                                            </a>
+                                        </c:if>
+
+                                        <!-- Các trạng thái khác đã xử lý rồi thì hiển thị nhãn chung -->
+                                        <c:if test="${t.status != 'Confirmed' && t.status != 'Completed'}">
+                                            <span style="color: #94a3b8; font-style: italic;">Action taken</span>
+                                        </c:if>
+                                    </td>
+                                </tr>
                         </c:forEach>
                         </tbody>
                     </table>

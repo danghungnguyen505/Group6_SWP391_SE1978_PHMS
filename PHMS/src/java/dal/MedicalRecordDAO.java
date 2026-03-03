@@ -22,7 +22,11 @@ public class MedicalRecordDAO extends DBContext {
     public boolean createForVet(int apptId, int vetId, String diagnosis, String treatmentPlan) throws SQLException {
         String checkSql = "SELECT appt_id FROM Appointment WHERE appt_id = ? AND vet_id = ? AND status = 'Checked-in'";
         String insertSql = "INSERT INTO MedicalRecord (appt_id, diagnosis, treatment_plan) VALUES (?, ?, ?)";
+<<<<<<< Updated upstream
         String updateApptSql = "UPDATE Appointment SET status = 'Completed' WHERE appt_id = ? AND vet_id = ? AND status = 'Checked-in'";
+=======
+        String updateApptSql = "UPDATE Appointment SET status = 'In-Progress' WHERE appt_id = ? AND vet_id = ? AND status = 'Checked-in'";
+>>>>>>> Stashed changes
 
         boolean oldAutoCommit = connection.getAutoCommit();
         try {
@@ -73,7 +77,11 @@ public class MedicalRecordDAO extends DBContext {
      */
     public MedicalRecord getByIdForVet(int recordId, int vetId) {
         String sql = "SELECT mr.record_id, mr.appt_id, mr.diagnosis, mr.treatment_plan, mr.created_at, "
+<<<<<<< Updated upstream
                 + "a.start_time AS appt_start_time, a.vet_id, "
+=======
+                + "a.start_time AS appt_start_time, a.vet_id, a.status AS appt_status, "
+>>>>>>> Stashed changes
                 + "p.owner_id, p.name AS pet_name, "
                 + "u_owner.full_name AS owner_name, "
                 + "u_vet.full_name AS vet_name "
@@ -102,7 +110,11 @@ public class MedicalRecordDAO extends DBContext {
      */
     public MedicalRecord getByIdForOwner(int recordId, int ownerId) {
         String sql = "SELECT mr.record_id, mr.appt_id, mr.diagnosis, mr.treatment_plan, mr.created_at, "
+<<<<<<< Updated upstream
                 + "a.start_time AS appt_start_time, a.vet_id, "
+=======
+                + "a.start_time AS appt_start_time, a.vet_id, a.status AS appt_status, "
+>>>>>>> Stashed changes
                 + "p.owner_id, p.name AS pet_name, "
                 + "u_owner.full_name AS owner_name, "
                 + "u_vet.full_name AS vet_name "
@@ -132,7 +144,11 @@ public class MedicalRecordDAO extends DBContext {
     public List<MedicalRecord> listForVet(int vetId) {
         List<MedicalRecord> list = new ArrayList<>();
         String sql = "SELECT mr.record_id, mr.appt_id, mr.diagnosis, mr.treatment_plan, mr.created_at, "
+<<<<<<< Updated upstream
                 + "a.start_time AS appt_start_time, a.vet_id, "
+=======
+                + "a.start_time AS appt_start_time, a.vet_id, a.status AS appt_status, "
+>>>>>>> Stashed changes
                 + "p.owner_id, p.name AS pet_name, "
                 + "u_owner.full_name AS owner_name, "
                 + "u_vet.full_name AS vet_name "
@@ -162,7 +178,11 @@ public class MedicalRecordDAO extends DBContext {
     public List<MedicalRecord> listForOwner(int ownerId, Integer petId) {
         List<MedicalRecord> list = new ArrayList<>();
         String sql = "SELECT mr.record_id, mr.appt_id, mr.diagnosis, mr.treatment_plan, mr.created_at, "
+<<<<<<< Updated upstream
                 + "a.start_time AS appt_start_time, a.vet_id, "
+=======
+                + "a.start_time AS appt_start_time, a.vet_id, a.status AS appt_status, "
+>>>>>>> Stashed changes
                 + "p.owner_id, p.name AS pet_name, "
                 + "u_owner.full_name AS owner_name, "
                 + "u_vet.full_name AS vet_name "
@@ -192,12 +212,21 @@ public class MedicalRecordDAO extends DBContext {
 
     /**
      * Update medical record for vet (must own appointment).
+<<<<<<< Updated upstream
+=======
+     * Business rule:
+     * - Do NOT allow update when related appointment is not In-Progress.  
+>>>>>>> Stashed changes
      */
     public boolean updateForVet(int recordId, int vetId, String diagnosis, String treatmentPlan) {
         String sql = "UPDATE mr SET mr.diagnosis = ?, mr.treatment_plan = ? "
                 + "FROM MedicalRecord mr "
                 + "JOIN Appointment a ON mr.appt_id = a.appt_id "
+<<<<<<< Updated upstream
                 + "WHERE mr.record_id = ? AND a.vet_id = ?";
+=======
+                + "WHERE mr.record_id = ? AND a.vet_id = ? AND a.status = 'In-Progress'";
+>>>>>>> Stashed changes
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setString(1, diagnosis);
             st.setString(2, treatmentPlan);
@@ -218,7 +247,11 @@ public class MedicalRecordDAO extends DBContext {
         String sql = "DELETE mr "
                 + "FROM MedicalRecord mr "
                 + "JOIN Appointment a ON mr.appt_id = a.appt_id "
+<<<<<<< Updated upstream
                 + "WHERE mr.record_id = ? AND a.vet_id = ?";
+=======
+                + "WHERE mr.record_id = ? AND a.vet_id = ? AND a.status = 'In-Progress'";
+>>>>>>> Stashed changes
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, recordId);
             st.setInt(2, vetId);
@@ -242,6 +275,10 @@ public class MedicalRecordDAO extends DBContext {
         mr.setVetName(rs.getString("vet_name"));
         mr.setVetId(rs.getInt("vet_id"));
         mr.setOwnerId(rs.getInt("owner_id"));
+<<<<<<< Updated upstream
+=======
+        mr.setApptStatus(rs.getString("appt_status"));
+>>>>>>> Stashed changes
         return mr;
     }
 }

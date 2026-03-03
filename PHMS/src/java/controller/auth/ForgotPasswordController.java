@@ -96,7 +96,10 @@ public class ForgotPasswordController extends HttpServlet {
                 try {
                     util.SendMail.sendRecoveryOTP(getServletContext(), email, otp);
 
+                    long otpCreatedAt = System.currentTimeMillis();   // thời điểm tạo OTP
+
                     session.setAttribute("otp", otp);
+                    session.setAttribute("otpCreatedAt", otpCreatedAt); // lưu thời gian tạo OTP
                     session.setAttribute("resetEmail", email);
                     session.setAttribute("resetUserId", user.getUserId());
 
@@ -117,7 +120,9 @@ public class ForgotPasswordController extends HttpServlet {
         // STEP 2: Verify OTP and reset password
         if (otpInput != null && newPass != null) {
             String serverOtp = (String) session.getAttribute("otp");
+            Long otpCreatedAt = (Long) session.getAttribute("otpCreatedAt");
 
+<<<<<<< Updated upstream
             // Basic OTP validation
             if (!util.ValidationUtils.isNotEmpty(otpInput) || otpInput.length() > 10) {
                 request.setAttribute("step", "2");
@@ -145,13 +150,62 @@ public class ForgotPasswordController extends HttpServlet {
                     session.removeAttribute("resetEmail");
                     session.removeAttribute("resetUserId");
 
+=======
+            // Kiểm tra thời gian hết hạn OTP (5 phút)
+            long now = System.currentTimeMillis();
+            if (serverOtp == null || otpCreatedAt == null || (now - otpCreatedAt) > 5 * 60 * 1000) {
+                // Hết hạn => xoá session liên quan
+                session.removeAttribute("otp");
+                session.removeAttribute("otpCreatedAt");
+                session.removeAttribute("resetEmail");
+                session.removeAttribute("resetUserId");
+
+                request.setAttribute("step", "2");
+                request.setAttribute("error", "Mã OTP đã hết hạn! Vui lòng yêu cầu mã mới.");
+                request.getRequestDispatcher("views/auth/forgot-password.jsp").forward(request, response);
+                return;
+            }
+
+            // Basic OTP validation
+            if (!util.ValidationUtils.isNotEmpty(otpInput) || otpInput.length() > 10) {
+                request.setAttribute("step", "2");
+                request.setAttribute("error", "Mã OTP không hợp lệ!");
+                request.getRequestDispatcher("views/auth/forgot-password.jsp").forward(request, response);
+                return;
+            }
+
+            // Validate new password strength
+            if (!util.ValidationUtils.isValidPassword(newPass)) {
+                request.setAttribute("step", "2");
+                request.setAttribute("error", "Mật khẩu mới phải có ít nhất 6 ký tự!");
+                request.getRequestDispatcher("views/auth/forgot-password.jsp").forward(request, response);
+                return;
+            }
+
+            if (otpInput.equals(serverOtp)) {
+                Object userIdObj = session.getAttribute("resetUserId");
+                if (userIdObj instanceof Integer) {
+                    int userId = (Integer) userIdObj;
+
+                    dao.changePassword(userId, newPass);
+
+                    session.removeAttribute("otp");
+                    session.removeAttribute("otpCreatedAt");
+                    session.removeAttribute("resetEmail");
+                    session.removeAttribute("resetUserId");
+
+>>>>>>> Stashed changes
                     request.setAttribute("success", "Đổi mật khẩu thành công! Vui lòng đăng nhập.");
                 } else {
                     request.setAttribute("error", "Phiên đặt lại mật khẩu không hợp lệ. Vui lòng thử lại.");
                 }
             } else {
                 request.setAttribute("step", "2");
+<<<<<<< Updated upstream
                 request.setAttribute("error", "Mã OTP không đúng hoặc đã hết hạn!");
+=======
+                request.setAttribute("error", "Mã OTP không đúng!");
+>>>>>>> Stashed changes
             }
             request.getRequestDispatcher("views/auth/forgot-password.jsp").forward(request, response);
         }

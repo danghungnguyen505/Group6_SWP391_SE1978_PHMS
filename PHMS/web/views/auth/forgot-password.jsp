@@ -17,12 +17,12 @@
     <div class="back-home-floating">
         <a href="${pageContext.request.contextPath}/home" class="back-home-btn">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-            Về Trang chủ
+            Back to home
         </a>
     </div>
     <div class="login-wrapper">
         <div class="login-card">
-            <h2 class="login-title text-center">Khôi phục mật khẩu</h2>
+            <h2 class="login-title text-center">Password Recovery</h2>
             
             <p style="color:red; text-align:center">${error}</p>
             <p style="color:green; text-align:center">${message}</p>
@@ -35,20 +35,20 @@
                     <!-- BƯỚC 1: NHẬP EMAIL -->
                     <c:if test="${empty step}">
                         <div class="form-group">
-                            <label>Nhập Email đã đăng ký</label>
+                            <label>Enter your registered email address.</label>
                             <input type="email" name="email" required class="form-input" placeholder="example@gmail.com">
                         </div>
-                        <button type="submit" class="btn btn-primary btn-login">Gửi mã OTP</button>
+                        <button type="submit" class="btn btn-primary btn-login">Send OTP</button>
                     </c:if>
 
                     <!-- BƯỚC 2: NHẬP OTP & PASS MỚI -->
                     <c:if test="${step == '2'}">
                         <div class="form-group">
-                            <label>Nhập mã OTP (Kiểm tra Email)</label>
+                            <label>Input OTP (Check Email)</label>
                             <input type="text" name="otp" required class="form-input">
                         </div>
                         <div class="form-group">
-                            <label>Mật khẩu mới</label>
+                            <label>New Password</label>
                             <input type="password" name="newPass" required class="form-input">
                         </div>
                         <button type="submit" class="btn btn-primary btn-login">Đổi mật khẩu</button>
@@ -58,7 +58,7 @@
             </c:if>
 
             <div class="register-prompt" style="margin-top:20px;">
-                <a href="login">Quay lại Đăng nhập</a>
+                <a href="login">Back to login</a>
             </div>
         </div>
     </div>

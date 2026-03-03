@@ -5,30 +5,67 @@
 --%>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<nav class="admin-navbar">
-    <div class="nav-left">
-        <div class="admin-logo">
-            VetCare Admin
-        </div>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<aside class="sidebar">
+    <div class="logo">
+        <i class="fa-solid fa-square-plus"></i> VetCare Pro
     </div>
-    <div class="header-actions">
-        <div class="user-info">
-            <span>Xin chào, <strong class="user-name">${sessionScope.account.fullName}</strong></span>
-            <a href="${pageContext.request.contextPath}/logout" class="btn btn-sm btn-danger">
-                Đăng xuất
+
+    <div class="menu-label">Admin Menu</div>
+    <ul class="nav-menu">
+        <li class="nav-item">
+            <a href="${pageContext.request.contextPath}/admin/dashboard" 
+               class="nav-link ${param.activePage == 'dashboard' ? 'active' : ''}">
+                <i class="fa-solid fa-chart-pie"></i> Overview
             </a>
-        </div>
+        </li>
+        <li class="nav-item">
+            <a href="${pageContext.request.contextPath}/admin/services" 
+               class="nav-link ${param.activePage == 'services' ? 'active' : ''}">
+                <i class="fa-solid fa-file-medical"></i> Services
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="${pageContext.request.contextPath}/admin/medicine/list" 
+               class="nav-link ${param.activePage == 'pharmacy' ? 'active' : ''}">
+                <i class="fa-solid fa-capsules"></i> Pharmacy
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="${pageContext.request.contextPath}/admin/staff/list" 
+               class="nav-link ${param.activePage == 'staff' ? 'active' : ''}">
+                <i class="fa-solid fa-users-gear"></i> Staff Management
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="${pageContext.request.contextPath}/admin/reports" 
+               class="nav-link ${param.activePage == 'revenue' ? 'active' : ''}">
+                <i class="fa-solid fa-chart-line"></i> Revenue
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="${pageContext.request.contextPath}/admin/feedback/list" 
+               class="nav-link ${param.activePage == 'feedback' ? 'active' : ''}">
+                <i class="fa-solid fa-comment-dots"></i> Feedback
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="${pageContext.request.contextPath}/leavePending" 
+               class="nav-link ${param.activePage == 'leave' ? 'active' : ''}">
+                <i class="fa-solid fa-calendar-check"></i> Leave Requests
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="${pageContext.request.contextPath}/admin/doctor/schedule/list" 
+               class="nav-link ${param.activePage == 'scheduling' ? 'active' : ''}">
+                <i class="fa-solid fa-clock"></i> Scheduling
+            </a>
+        </li>
+    </ul>
+
+    <div class="help-box">
+        <p>Need help?</p>
+        <a href="#" class="btn-support">Contact Support</a>
     </div>
-</nav>
-
-<div class="admin-nav-links">
-    <a href="${pageContext.request.contextPath}/admin/dashboard" class="admin-nav-item active">
-        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
-        </svg>
-        Dashboard
-    </a>
-</div>
-
-
-
+</aside>

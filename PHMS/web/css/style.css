@@ -1,0 +1,285 @@
+/* --- RESET CSS --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    line-height: 1.6;
+    color: #333;
+    background-color: #fff;
+}
+
+/* --- COMMON CLASSES --- */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul {
+    list-style: none;
+}
+
+/* Button Styles */
+.btn-orange {
+    background-color: #E67E22; /* Màu cam */
+    color: white;
+    padding: 10px 25px;
+    border-radius: 20px;
+    font-weight: bold;
+    display: inline-block;
+    transition: 0.3s;
+}
+.btn-orange:hover {
+    background-color: #d35400;
+}
+
+.btn-blue {
+    background-color: #00264d; /* Màu xanh đậm */
+    color: white;
+    padding: 10px 25px;
+    border-radius: 20px;
+    font-weight: bold;
+    display: inline-block;
+    font-size: 14px;
+}
+.btn-blue i {
+    margin-left: 5px;
+}
+
+.btn-blueDown {
+    background-color: #018E98; /* Màu xanh nhạt */
+    color: white;
+    padding: 10px 25px;
+    border-radius: 20px;
+    font-weight: bold;
+    display: inline-block;
+    font-size: 14px;
+}
+.btn-blueDown i {
+    margin-left: 5px;
+}
+/* --- HEADER --- */
+.top-bar {
+    background-color: #fff;
+    padding: 10px 0;
+    font-size: 13px;
+    border-bottom: 1px solid #eee;
+}
+
+.top-bar .container {
+    display: flex;
+    justify-content: flex-end; /* Đẩy sang phải */
+    align-items: center;
+    gap: 20px;
+}
+
+.top-info span {
+    margin-left: 15px;
+    color: #555;
+}
+
+.top-info i {
+    color: #00264d;
+    margin-right: 5px;
+}
+
+.main-nav {
+    background-color: #fff;
+    padding: 15px 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo img {
+    height: 60px; /* Chiều cao logo */
+}
+
+.menu {
+    display: flex;
+    gap: 20px;
+}
+
+.menu li a {
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+    text-transform: uppercase;
+    transition: color 0.3s;
+}
+
+.menu li a:hover, .menu li a.active {
+    color: #018E98;
+}
+
+.logo{
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.logo img {
+    height: 50px;
+    width: auto;
+    display: block;
+}
+.logo-text{
+    color: #018E98;
+}
+
+/* --- HERO SECTION --- */
+.pet-section {
+    background-color: #f9f9f9;
+    padding: 50px 0;
+    position: relative;
+    /* Bạn có thể thêm background-image mờ mờ ở đây nếu muốn giống hệt */
+}
+
+.pet-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.pet-content {
+    width: 45%;
+}
+
+.pet-content h1 {
+    color: #018E98;
+    font-size: 36px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.pet-content p {
+    margin-bottom: 30px;
+    color: #555;
+    font-size: 15px;
+}
+
+.pet-image {
+    width: 50%;
+    text-align: right;
+}
+
+.pet-image img {
+    max-width: 100%;
+    border-radius: 10px;
+}
+
+/* --- ABOUT SECTION --- */
+.about-section {
+    padding: 60px 0;
+    background-color: #fff;
+}
+
+.about-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.about-image {
+    width: 50%;
+}
+
+.about-image img {
+    width: 100%;
+    border-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.about-content {
+    width: 50%;
+}
+
+.about-content h2 {
+    color: #018E98;
+    font-size: 32px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+.about-content p {
+    margin-bottom: 15px;
+    color: #555;
+    font-size: 15px;
+    text-align: justify;
+}
+
+/* --- FOOTER --- */
+footer {
+    background-color: #00264d; /* Xanh Navy đậm */
+    color: white;
+    padding-top: 50px;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 40px;
+    flex-wrap: wrap;
+}
+
+.footer-col {
+    width: 23%; /* Chia 4 cột */
+}
+
+.footer-col h3 {
+    font-size: 18px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    font-weight: bold;
+    border-bottom: 2px solid #E67E22; /* Gạch chân cam dưới tiêu đề */
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+.footer-col ul li {
+    margin-bottom: 12px;
+    font-size: 14px;
+    display: flex;
+    align-items: flex-start;
+}
+
+.footer-col ul li i {
+    margin-right: 10px;
+    margin-top: 4px;
+    width: 15px; /* Căn chỉnh icon */
+}
+.fanpage-box{
+    padding-right: 200px;
+    display: flex;
+    justify-content: center;
+}
+
+.fanpage-box img{
+    height: 100px;
+}
+/* Icon dấu tích trong footer */
+.check-list li i {
+    color: #fff; /* Hoặc để màu trắng như hình */
+}
+
+.copyright {
+    background-color: #001a35; /* Màu tối hơn cho dòng copyright */
+    text-align: center;
+    padding: 15px 0;
+    font-size: 13px;
+    color: #ccc;
+}

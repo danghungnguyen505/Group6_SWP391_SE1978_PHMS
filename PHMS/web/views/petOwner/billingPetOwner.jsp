@@ -12,11 +12,16 @@
         <title>Billing</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<<<<<<< Updated upstream
         <link href="${pageContext.request.contextPath}/assets/css/dashboardLeft.css" rel="stylesheet">
+=======
+        <link href="${pageContext.request.contextPath}/assets/css/pages/menuPetOwner.css" rel="stylesheet" type="text/css"/>
+>>>>>>> Stashed changes
         <link href="${pageContext.request.contextPath}/assets/css/petOwner/billingPetOwner.css" rel="stylesheet">
     </head>
     <body>
         <!--Dashboard left-->
+<<<<<<< Updated upstream
         <nav class="sidebar">
             <div class="brand">
                 <i class="fa-solid fa-plus"></i> VetCare Pro
@@ -44,11 +49,20 @@
                 <button class="btn-support">Contact Support</button>
             </div>
         </nav>
+=======
+        <jsp:include page="nav/navPetOwner.jsp" />
+>>>>>>> Stashed changes
         <!-- MAIN CONTENT -->
         <main class="main-content">
             <!-- Top Header (Sign Out) -->
             <header class="top-bar">
+<<<<<<< Updated upstream
                 <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
+=======
+                <a href="${pageContext.request.contextPath}/logout" class="btn btn-dark" style="background-color: #ef4444; border-color: #ef4444;">
+                    Logout
+                </a>
+>>>>>>> Stashed changes
             </header>
             <!-- Page Title Section -->
             <div class="page-header">

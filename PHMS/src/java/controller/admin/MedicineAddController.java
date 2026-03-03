@@ -93,6 +93,20 @@ public class MedicineAddController extends HttpServlet {
         int stock = Integer.parseInt(stockStr);
         
         MedicineDAO medicineDAO = new MedicineDAO();
+<<<<<<< Updated upstream
+=======
+        // Business validation: medicine name must be unique
+        if (medicineDAO.existsByName(name)) {
+            request.setAttribute("error", "Tên thuốc đã tồn tại trong kho! Vui lòng chọn tên khác.");
+            request.setAttribute("name", name);
+            request.setAttribute("unit", unit);
+            request.setAttribute("price", priceStr);
+            request.setAttribute("stockQuantity", stockStr);
+            doGet(request, response);
+            return;
+        }
+        
+>>>>>>> Stashed changes
         boolean ok = medicineDAO.addMedicine(new Medicine(0, name, unit, price, stock));
         
         if (ok) {

@@ -96,7 +96,11 @@ public class ProfileController extends HttpServlet {
         }
         
         if (!util.ValidationUtils.isNotEmpty(phone) || !util.ValidationUtils.isValidPhone(phone)) {
+<<<<<<< Updated upstream
             request.setAttribute("error", "Số điện thoại không hợp lệ! (Ví dụ: 0912345678 hoặc +84912345678)");
+=======
+            request.setAttribute("error", "Số điện thoại không hợp lệ! (Ví dụ: 0912345678)");
+>>>>>>> Stashed changes
             request.getRequestDispatcher("views/auth/profile.jsp").forward(request, response);
             return;
         }
@@ -109,6 +113,23 @@ public class ProfileController extends HttpServlet {
             }
         }
         
+<<<<<<< Updated upstream
+=======
+        // Uniqueness validation: phone must be unique across Users (excluding current user)
+        try {
+            UserDAO dao = new UserDAO();
+            if (dao.checkPhoneExistsForOther(user.getUserId(), phone)) {
+                request.setAttribute("error", "Số điện thoại này đã được sử dụng! Vui lòng dùng số khác.");
+                request.getRequestDispatcher("views/auth/profile.jsp").forward(request, response);
+                return;
+            }
+        } catch (Exception e) {
+            request.setAttribute("error", "Lỗi hệ thống khi kiểm tra số điện thoại: " + e.getMessage());
+            request.getRequestDispatcher("views/auth/profile.jsp").forward(request, response);
+            return;
+        }
+        
+>>>>>>> Stashed changes
         // Update user object
         user.setFullName(fullName);
         user.setPhone(phone);

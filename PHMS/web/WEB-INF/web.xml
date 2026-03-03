@@ -33,13 +33,20 @@
         <servlet-class>controller.auth.ForgotPasswordController</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>ServiceListController</servlet-name>
+        <servlet-class>controller.admin.ServiceListController</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>AddServiceController</servlet-name>
         <servlet-class>controller.admin.AddServiceController</servlet-class>
     </servlet>
+<<<<<<< Updated upstream
     <servlet>
         <servlet-name>EditServiceController</servlet-name>
         <servlet-class>controller.admin.EditServiceController</servlet-class>
     </servlet>
+=======
+>>>>>>> Stashed changes
     <servlet-mapping>
         <servlet-name>HomeController</servlet-name>
         <url-pattern>/home</url-pattern>
@@ -73,11 +80,18 @@
         <url-pattern>/forgot-password</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
+        <servlet-name>ServiceListController</servlet-name>
+        <url-pattern>/admin/services</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
         <servlet-name>AddServiceController</servlet-name>
         <url-pattern>/admin/add-service</url-pattern>
     </servlet-mapping>
+<<<<<<< Updated upstream
     <servlet-mapping>
         <servlet-name>EditServiceController</servlet-name>
         <url-pattern>/admin/edit-service</url-pattern>
     </servlet-mapping>
+=======
+>>>>>>> Stashed changes
 </web-app>

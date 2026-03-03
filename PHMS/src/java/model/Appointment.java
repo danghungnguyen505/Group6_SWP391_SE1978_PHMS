@@ -7,7 +7,7 @@ public class Appointment {
     private int petId;
     private int vetId;
     private Timestamp startTime;
-    private String status; // Pending, Confirmed, Completed, Cancelled, Pending Payment
+    private String status; // Pending, Confirmed, Checked-in, In-Progress, Completed, Cancelled, Pending Payment
     private String type; // Checkup, Surgery, Urgent
     private String petName;
     private String vetName;
