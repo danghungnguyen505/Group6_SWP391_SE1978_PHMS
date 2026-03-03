@@ -51,14 +51,14 @@
             </a>
         </li>
         <li class="nav-item">
-            <%-- Link xử lý Leave Requests đã được sửa --%>
-            <a href="#" 
+            <a href="${pageContext.request.contextPath}/leavePending" 
                class="nav-link ${param.activePage == 'leave' ? 'active' : ''}">
                 <i class="fa-solid fa-calendar-check"></i> Leave Requests
             </a>
         </li>
         <li class="nav-item">
-            <a href="#" class="nav-link ${param.activePage == 'scheduling' ? 'active' : ''}">
+            <a href="${pageContext.request.contextPath}/admin/doctor/schedule/list" 
+               class="nav-link ${param.activePage == 'scheduling' ? 'active' : ''}">
                 <i class="fa-solid fa-clock"></i> Scheduling
             </a>
         </li>

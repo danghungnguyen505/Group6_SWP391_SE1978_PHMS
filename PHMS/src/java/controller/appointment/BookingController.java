@@ -71,9 +71,14 @@ public class BookingController extends HttpServlet {
         if (dateStr != null && !dateStr.isEmpty()) {
             Date date = Date.valueOf(dateStr); // SQL Date
             List<Schedule> rawList = scheduleDAO.getSchedulesByDate(date);
-            // Gộp lịch trùng 
+            // Gộp lịch trùng và loại bỏ bác sĩ đã có đơn nghỉ trong ngày đó
             Map<Integer, Schedule> uniqueMap = new LinkedHashMap<>();
             for (Schedule s : rawList) {
+                String leaveStatus = scheduleDAO.getLeaveStatusByEmpAndDate(s.getEmpId(), date);
+                if (leaveStatus != null) {
+                    // Vet has a leave request on this date -> do not show for booking
+                    continue;
+                }
                 if (uniqueMap.containsKey(s.getEmpId())) {
                     Schedule existing = uniqueMap.get(s.getEmpId());
                     existing.setShiftTime(existing.getShiftTime() + " | " + s.getShiftTime());
@@ -110,6 +115,11 @@ public class BookingController extends HttpServlet {
                 closeTime.set(Calendar.HOUR_OF_DAY, 17); // Giờ đóng cửa: 17h chiều (5 PM)
                 closeTime.set(Calendar.MINUTE, 30);      // Tùy chỉnh (ví dụ 17:30)
                 closeTime.set(Calendar.SECOND, 0);
+                //chekc cung 1 ngay
+                java.sql.Date todayDate = new java.sql.Date(System.currentTimeMillis()); // Lấy ngày hôm nay
+                Calendar now = Calendar.getInstance(); // Lấy thời điểm hiện tại (Ngày + Giờ + Phút)
+                boolean isToday = date.toString().equals(todayDate.toString()); // Kiểm tra xem khách có chọn ngày hôm nay không
+                
                 // 3. Vòng lặp tạo ra TẤT CẢ các slot 30 phút trong ngày
                 while (cal.getTime().before(closeTime.getTime())) {
                     java.util.Date currentSlotTime = cal.getTime();
@@ -149,8 +159,24 @@ public class BookingController extends HttpServlet {
                     }
                     // 5. Kiểm tra: Giờ này có bị đặt trước chưa?
                     boolean isBooked = bookedTimes.contains(timeVal);
+                    //check gio cung 1  ngay
+                    boolean isPastTime = false;
+                    if (isToday) {
+                        // Tạo Calendar cho slot hiện tại để so sánh chính xác với 'now'
+                        Calendar slotCal = Calendar.getInstance();
+                        slotCal.setTime(currentSlotTime);
+                        // Cập nhật ngày tháng năm cho slotCal về đúng hôm nay (để so sánh chuẩn)
+                        slotCal.set(Calendar.YEAR, now.get(Calendar.YEAR));
+                        slotCal.set(Calendar.MONTH, now.get(Calendar.MONTH));
+                        slotCal.set(Calendar.DAY_OF_MONTH, now.get(Calendar.DAY_OF_MONTH));
+                        // Nếu giờ của slot nhỏ hơn giờ hiện tại -> Đã qua
+                        if (slotCal.before(now)) {
+                            isPastTime = true;
+                        }
+                    }
+                    
                     // 6. Kết luận: Available = (Trong ca làm việc) VÀ (Chưa bị đặt)
-                    boolean available = isWithinShift && !isBooked;
+                    boolean available = isWithinShift && !isBooked &&!isPastTime;
                     availableSlots.add(new TimeSlot(timeLbl, timeVal, available));
                     // Tăng thêm 30 phút
                     cal.add(Calendar.MINUTE, 30);

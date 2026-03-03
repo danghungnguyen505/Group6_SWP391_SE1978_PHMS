@@ -7,34 +7,18 @@
     <title>AI Health Guide - VetCare Pro</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="${pageContext.request.contextPath}/assets/css/dashboardLeft.css" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/assets/css/pages/menuPetOwner.css" rel="stylesheet" type="text/css"/>
     <link href="${pageContext.request.contextPath}/assets/css/petOwner/aiHealthGuide.css" rel="stylesheet">
 </head>
 <body>
 
-    <nav class="sidebar">
-        <div class="brand">
-            <i class="fa-solid fa-plus"></i> VetCare Pro
-        </div>
-        <div class="menu-label">Main Menu</div>
-        <ul class="menu">
-            <li><a href="${pageContext.request.contextPath}/dashboard" class="nav-link"><i class="fa-solid fa-border-all"></i> Dashboard</a></li>
-            <li><a href="${pageContext.request.contextPath}/booking" class="nav-link"><i class="fa-regular fa-calendar-check"></i> Appointments</a></li>
-            <li><a href="${pageContext.request.contextPath}/myAppointment" class="nav-link"><i class="fa-solid fa-calendar-check"></i> My Appointments</a></li>
-            <li><a href="${pageContext.request.contextPath}/myPetOwner" class="nav-link"><i class="fa-solid fa-paw"></i> My Pets</a></li>
-            <li><a href="${pageContext.request.contextPath}/my-medical-records" class="nav-link"><i class="fa-solid fa-file-medical"></i> Medical Records</a></li>
-            <li><a href="${pageContext.request.contextPath}/billing" class="nav-link"><i class="fa-regular fa-credit-card"></i> Billing</a></li>
-            <li><a href="${pageContext.request.contextPath}/aiHealthGuide" class="nav-link active"><i class="fa-solid fa-bolt"></i> AI Health Guide</a></li>
-        </ul>
-        <div class="support-box">
-            <p>Need help?</p>
-            <button class="btn-support">Contact Support</button>
-        </div>
-    </nav>
+    <jsp:include page="nav/navPetOwner.jsp" />
 
     <main class="main-content">
         <header class="top-bar">
-            <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
+            <a href="${pageContext.request.contextPath}/logout" class="btn btn-dark" style="background-color: #ef4444; border-color: #ef4444;">
+                Logout
+            </a>
         </header>
 
         <div class="ai-header-card">
@@ -94,16 +78,6 @@
                         </div>
 
                     </c:forEach>
-                </c:if>
-
-                <c:if test="${not empty answer}">
-                     <div class="message user-message" style="justify-content: flex-end;">
-                        <div class="message-content">${question}</div> <div class="message-icon" style="margin-left: 10px;"><i class="fa-solid fa-user"></i></div>
-                    </div>
-                    <div class="message bot-message">
-                        <div class="message-icon"><i class="fa-solid fa-robot"></i></div>
-                        <div class="message-content" style="white-space: pre-wrap;">${answer}</div>
-                    </div>
                 </c:if>
 
                 <div id="loadingBubble" class="loading-bubble">

@@ -6,27 +6,13 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>VetCare Pro - EMR Queue</title>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/pages/receptionistDashboard.css">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/views/veterinarian/nav/navVeterinarian.css">
     </head>
     <body>
-        <nav class="sidebar">
-            <div class="brand">
-                <i class="fa-solid fa-plus-square"></i> VetCare Pro
-            </div>
-            <ul class="menu">
-                <li><a href="${pageContext.request.contextPath}/veterinarian/dashboard">
-                        <i class="fa-solid fa-table-columns"></i> Dashboard</a></li>
-                <li><a href="${pageContext.request.contextPath}/veterinarian/emr/queue" class="active">
-                        <i class="fa-solid fa-stethoscope"></i> EMR Queue</a></li>
-                <li><a href="${pageContext.request.contextPath}/veterinarian/emr/records">
-                        <i class="fa-solid fa-file-medical"></i> Medical Records</a></li>
-            </ul>
-            <div class="help-box">
-                <div class="help-text">Need help?</div>
-                <a href="#" class="btn-contact">Contact Support</a>
-            </div>
-        </nav>
+        <jsp:include page="nav/navVeterinarian.jsp" />
 
         <main class="main-content">
             <div class="top-bar">

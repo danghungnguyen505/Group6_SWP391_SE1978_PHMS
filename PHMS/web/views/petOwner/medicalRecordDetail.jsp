@@ -13,20 +13,7 @@
         <link href="${pageContext.request.contextPath}/assets/css/pages/myAppointment.css" rel="stylesheet" type="text/css"/>
     </head>
     <body>
-        <aside class="sidebar">
-            <div class="brand">
-                <i class="fa-solid fa-plus"></i>
-                <span>VetCare Pro</span>
-            </div>
-            <div class="menu-label">Main Menu</div>
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="${pageContext.request.contextPath}/my-medical-records" class="nav-link active">
-                        <i class="fa-solid fa-file-medical"></i> Medical Records
-                    </a>
-                </li>
-            </ul>
-        </aside>
+        <jsp:include page="nav/navPetOwner.jsp" />
 
         <main class="main-content">
             <header class="top-bar">

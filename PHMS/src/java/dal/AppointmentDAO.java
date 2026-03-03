@@ -7,6 +7,7 @@ package dal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,28 @@ import java.util.List;
  * @author zoxy4
  */
 public class AppointmentDAO extends DBContext {
+
+    /**
+     * Check if a vet has any non-cancelled appointments on a specific date.
+     */
+    public boolean hasAppointmentsForVetOnDate(int vetId, Date workDate) {
+        String sql = "SELECT COUNT(*) AS cnt FROM Appointment "
+                + "WHERE vet_id = ? "
+                + "AND CAST(start_time AS DATE) = ? "
+                + "AND status <> 'Cancelled'";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, vetId);
+            st.setDate(2, workDate);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("cnt") > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error hasAppointmentsForVetOnDate: " + e.getMessage());
+        }
+        return false;
+    }
 
     public List<String> getBookedSlots(int vetId, String date) {
         List<String> list = new ArrayList<>();
