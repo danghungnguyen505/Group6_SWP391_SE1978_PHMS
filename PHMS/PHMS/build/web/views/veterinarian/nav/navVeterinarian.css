@@ -1,0 +1,195 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* --- 1. Global Variables --- */
+:root {
+    --primary-green: #10B981;
+    --primary-green-dark: #059669;
+    --bg-light: #F9FAFB;
+    --text-dark: #111827;
+    --text-gray: #6B7280;
+    --border-color: #E5E7EB;
+    --btn-dark: #1F2937;
+    --sidebar-width: 260px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg-light);
+    min-height: 100vh;
+    display: flex; /* Quan trọng để bố cục nav và main nằm ngang */
+}
+
+/* --- 2. Sidebar Layout --- */
+.sidebar {
+    width: var(--sidebar-width);
+    background: #ffffff;
+    height: 100vh;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border-color);
+    position: fixed; /* Cố định thanh menu */
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+/* --- 3. Brand / Logo --- */
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-dark); /* Sửa lại màu chữ chính */
+    margin-bottom: 32px;
+    padding-left: 8px;
+}
+
+.brand i {
+    background: var(--primary-green);
+    color: white;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.brand span {
+    color: var(--primary-green-dark);
+}
+
+/* --- 4. Menu Label --- */
+.menu-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--text-gray);
+    margin-bottom: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding-left: 12px;
+}
+
+/* --- 5. Navigation Menu (Đã sửa khớp với JSP) --- */
+.nav-menu {
+    list-style: none;
+    flex-grow: 1; /* Đẩy support box xuống đáy */
+    display: flex;
+    flex-direction: column;
+    gap: 4px; /* Khoảng cách giữa các item */
+}
+
+.nav-item {
+    width: 100%;
+}
+
+/* Style cho thẻ <a> có class .nav-link */
+.nav-link {
+    text-decoration: none;
+    color: var(--text-gray);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s ease-in-out;
+}
+
+.nav-link i {
+    font-size: 18px;
+    width: 20px; /* Cố định chiều rộng icon để text thẳng hàng */
+    text-align: center;
+}
+
+/* Hover & Active State */
+.nav-link:hover {
+    background-color: #ECFDF5; /* Màu xanh nhạt */
+    color: var(--primary-green-dark);
+}
+
+.nav-link.active {
+    background-color: var(--primary-green);
+    color: #ffffff;
+    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+}
+
+.nav-link.active i {
+    color: #ffffff;
+}
+
+/* --- 6. Support Box --- */
+.support-box {
+    background-color: var(--bg-light);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    margin-top: 20px;
+    text-align: center;
+}
+
+.support-box p {
+    font-size: 14px;
+    margin-bottom: 12px;
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+.btn-support {
+    width: 100%;
+    background-color: #ffffff;
+    color: var(--primary-green);
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.btn-support:hover {
+    border-color: var(--primary-green);
+    background-color: var(--primary-green);
+    color: white;
+}
+
+/* --- 7. Main Content Area --- */
+/* Class này áp dụng cho phần nội dung bên phải trong file dashBoardVeterinarian.jsp */
+.main-content {
+    margin-left: var(--sidebar-width); /* Đẩy nội dung sang phải bằng chiều rộng sidebar */
+    padding: 30px;
+    width: calc(100% - var(--sidebar-width));
+    min-height: 100vh;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.btn-signout {
+    text-decoration: none;
+    color: #EF4444; /* Màu đỏ */
+    font-weight: 600;
+    font-size: 14px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: 0.2s;
+}
+
+.btn-signout:hover {
+    background-color: #FEF2F2;
+}

@@ -25,10 +25,12 @@ import model.User;
 @WebServlet(name = "DoctorScheduleAddController", urlPatterns = {"/admin/doctor/schedule/add"})
 public class DoctorScheduleAddController extends HttpServlet {
 
-    private static final LocalTime SLOT_START = LocalTime.of(7, 0);
+    // Time slots from 09:00 AM to 05:30 PM
+    private static final LocalTime SLOT_START = LocalTime.of(9, 0);
     private static final LocalTime SLOT_END = LocalTime.of(17, 30);
     private static final int SLOT_MINUTES = 30;
-    private static final DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("HH:mm");
+    // Display & store time as 12-hour format with AM/PM (e.g. 09:00 AM)
+    private static final DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("hh:mm a");
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
