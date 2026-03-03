@@ -117,10 +117,14 @@
                     <div class="form-group">
                         <label>Service Type</label>
                         <select class="form-control" name="serviceType">
-                            <option value="general" ${param.serviceType == 'general' ? 'selected' : ''}>
-                                General Examination ($50 - $120)</option>
-                            <option value="vaccination" ${param.serviceType == 'vaccination' ? 'selected' : ''}>
-                                Vaccination ($30 - $80)</option>
+                            <c:if test="${empty services}">
+                                <option value="" disabled>Hiện chưa có dịch vụ khả dụng</option>
+                            </c:if>
+                            <c:forEach items="${services}" var="s">
+                                <option value="${s.name}" ${param.serviceType == s.name ? 'selected' : ''}>
+                                    ${s.name} - $${s.basePrice}
+                                </option>
+                            </c:forEach>
                         </select>
                     </div>
                     <div class="form-group">

@@ -1,0 +1,124 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Feb 2, 2026, 11:22:49 PM
+    Author     : zoxy4
+*/
+/* --- Global & Layout --- */
+/* style.css */
+:root {
+    --primary-green: #10B981;
+    --primary-green-dark: #059669;
+    --bg-light: #F9FAFB;
+    --text-dark: #111827;
+    --text-gray: #6B7280;
+    --border-color: #E5E7EB;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    --btn-dark: #1F2937;
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+body {
+    display: flex;
+    background-color: var(--bg-light);
+    height: 100vh;
+    overflow: hidden;
+    min-height: 100vh;
+}
+/* --- Sidebar --- */
+.sidebar {
+    width: 260px;
+    background: #fff;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #e5e7eb;
+}
+.brand {
+    font-size: 20px;
+    font-weight: 700;
+    color: #10b981;
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary-green);
+    margin-bottom: 40px;
+}
+
+.brand i {
+    background: var(--primary-green);
+    color: white;
+    padding: 6px;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.brand span {
+    color: var(--primary-green-dark);
+}
+.menu {
+    list-style: none;
+    flex-grow: 1;
+}
+.menu a {
+    text-decoration: none;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    border-radius: 8px;
+    font-weight: 549;
+    transition: 0.3s;
+}
+.menu a:hover, .menu a.active {
+    background-color: #ecfdf5;
+    color: #10b981;
+}
+.support-box {
+    background-color: #F9FAFB;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.support-box p {
+    font-size: 14px;
+    margin-bottom: 12px;
+    color: var(--text-gray);
+}
+
+.btn-support {
+    width: 100%;
+    background-color: var(--btn-dark);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.menu-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #9CA3AF;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+/*End style board left*/

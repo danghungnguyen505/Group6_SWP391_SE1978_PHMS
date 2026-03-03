@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
+    
+    <servlet>
+        <servlet-name>PetListController</servlet-name>
+        <servlet-class>controller.PetListController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PetListController</servlet-name>
+        <url-pattern>/pets</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>PetDetailController</servlet-name>
+        <servlet-class>controller.PetDetailController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PetDetailController</servlet-name>
+        <url-pattern>/pet-detail</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>Test</servlet-name>
+        <servlet-class>Test.Test</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Test</servlet-name>
+        <url-pattern>/Test</url-pattern>
+    </servlet-mapping>
+  <servlet>
+        <servlet-name>PetFormController</servlet-name>
+        <servlet-class>controller.PetFormController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PetFormController</servlet-name>
+        <url-pattern>/pet-form</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>PetDeleteController</servlet-name>
+        <servlet-class>controller.PetDeleteController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PetDeleteController</servlet-name>
+        <url-pattern>/pet-delete</url-pattern>
+    </servlet-mapping>
+</web-app>

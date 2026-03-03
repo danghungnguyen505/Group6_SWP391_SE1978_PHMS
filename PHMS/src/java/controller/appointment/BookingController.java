@@ -6,6 +6,7 @@ package controller.appointment;
 
 import dal.AppointmentDAO;
 import dal.ScheduleVeterianrianDAO;
+import dal.ServiceDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.sql.Date;
 import java.util.List;
 import model.Schedule;
+import model.Service;
 import dal.PetDAO;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpSession;
@@ -58,6 +60,10 @@ public class BookingController extends HttpServlet {
             List<model.Pet> pets = petDAO.getPetsByOwnerId(account.getUserId());
             request.setAttribute("pets", pets);
         }
+        // 1.2. Load danh sách dịch vụ đang hoạt động (Service Type)
+        ServiceDAO serviceDAO = new ServiceDAO();
+        List<Service> services = serviceDAO.getAllActiveServices();
+        request.setAttribute("services", services);
         // 2. Xử lý logic lọc Bác sĩ theo Ngày
         String dateStr = request.getParameter("selectedDate");
         ScheduleVeterianrianDAO scheduleDAO = new ScheduleVeterianrianDAO();
