@@ -1,0 +1,124 @@
+<%-- 
+    Document   : staffSchedulingVeterinarian
+    Created on : Feb 1, 2026, 11:47:01 PM
+    Author     : zoxy4
+--%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>VetCare Pro - My Schedule</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/pages/staffScheduling.css">
+    </head>
+    <body>
+        <nav class="sidebar">
+            <div class="brand"><i class="fa-solid fa-plus-square"></i> VetCare Pro</div>
+            <ul class="menu">
+                <li><a href="${pageContext.request.contextPath}/veterinarian/dashboard"><i class="fa-solid fa-table-columns"></i> Dashboard</a></li>
+                <li><a href="${pageContext.request.contextPath}/veterinarian/dashboard" class="text-danger"><i class="fa-solid fa-truck-medical"></i> Emergency Triage</a></li>
+                <li><a href="${pageContext.request.contextPath}/veterinarian/scheduling" class="active"><i class="fa-solid fa-truck-medical"></i> Staff Scheduling</a></li>
+                <li><a href="${pageContext.request.contextPath}/veterinarian/dashboard"><i class="fa-regular fa-calendar-check"></i> Appointments</a></li>
+                <li><a href="${pageContext.request.contextPath}/veterinarian/dashboard"><i class="fa-solid fa-paw"></i> My Pets</a></li>
+                <li><a href="${pageContext.request.contextPath}/veterinarian/dashboard"><i class="fa-solid fa-file-medical"></i> Medical Records</a></li>
+                <li><a href="${pageContext.request.contextPath}/veterinarian/dashboard"><i class="fa-regular fa-credit-card"></i> Billing</a></li>
+                <li><a href="${pageContext.request.contextPath}/veterinarian/dashboard"><i class="fa-solid fa-gear"></i> Administration</a></li>
+            </ul>
+            <div class="help-box">
+                <div class="help-text">Need help?</div>
+                <a href="#" class="btn-contact">Contact Support</a>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="header-section">
+                <div class="header-text">
+                    <h2>MY SCHEDULE</h2>
+                    <p>Manage your personal work shifts.</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary"><i class="fa-solid fa-plus"></i> Add Shift</button>
+                    <a href="${pageContext.request.contextPath}/logout" class="btn-signout" style="margin-left: 15px;">Sign Out</a>
+                </div>
+            </div>
+
+            <div class="controls-bar">
+                <div class="date-nav">
+                    <a href="?date=${currentDate.minusWeeks(1)}" class="nav-arrow"><i class="fa-solid fa-chevron-left"></i></a>
+                        <fmt:setLocale value="en_US"/>
+                    <span class="date-range">
+                        <fmt:parseDate value="${startOfWeek}" pattern="yyyy-MM-dd" var="parsedStart" type="date" />
+                        <fmt:parseDate value="${endOfWeek}" pattern="yyyy-MM-dd" var="parsedEnd" type="date" />
+                        <fmt:formatDate value="${parsedStart}" pattern="MMM dd"/> - <fmt:formatDate value="${parsedEnd}" pattern="MMM dd, yyyy"/>
+                    </span>
+                    <a href="?date=${currentDate.plusWeeks(1)}" class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></a>
+                </div>
+
+                <div style="font-size: 13px; color: #64748b;">
+                    Currently viewing: <span style="color: #1e293b; font-weight: 700;">${sessionScope.account.fullName}</span>
+                </div>
+            </div>
+            <div class="schedule-grid">
+                <jsp:useBean id="now" class="java.util.Date" />
+                <fmt:formatDate value="${now}" pattern="yyyy-MM-dd" var="todayStr"/>
+                <c:forEach var="entry" items="${weeklyMap}">
+                    <div class="day-column ${entry.key == todayStr ? 'today' : ''}">
+                        <div class="day-header">
+                            <fmt:parseDate value="${entry.key}" pattern="yyyy-MM-dd" var="colDate" />
+                            <span class="day-name"><fmt:formatDate value="${colDate}" pattern="EEEE"/></span>
+                            <span class="day-num"><fmt:formatDate value="${colDate}" pattern="dd"/></span>
+                        </div>
+                        <c:forEach var="shift" items="${entry.value}">
+                            <div class="shift-card">
+                                <div class="avatar-circle">
+                                    ${shift.staffName != null ? shift.staffName.charAt(0) : 'U'}
+                                </div>
+                                <div class="shift-info">
+                                    <h4>${shift.staffName}</h4>
+                                    <span class="role-badge vet">VETERINARIAN</span>
+                                    <div class="time">
+                                        <i class="fa-regular fa-clock"></i> 
+                                        <c:choose>
+                                            <c:when test="${shift.startTime.toString().startsWith('08')}">
+                                                <span>Morning (08:00 - 12:00)</span>
+                                            </c:when>
+                                            <c:when test="${shift.startTime.toString().startsWith('14')}">
+                                                <span>Afternoon (14:00 - 17:00)</span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span><fmt:formatDate value="${shift.startTime}" pattern="HH:mm"/> 4 Hours
+                                                    <fmt:formatDate value="${shift.endTime}" pattern="HH:mm"/></span>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </div>
+                                </div>
+                            </div>
+                        </c:forEach>
+                        <button class="add-another-btn" onclick="openAddShiftModal('${entry.key}')">
+                            <i class="fa-solid fa-plus"></i> Add Another
+                        </button>
+                    </div>
+                </c:forEach>
+            </div>
+            <br><br>
+        </main>
+        <div class="footer-stats">
+            <div class="stats-group">
+                <div class="stat-item">
+                    <span class="stat-label">Total Shifts</span>
+                    <span class="stat-value">18</span> </div>
+            </div>
+            <div class="warning-box">
+                <i class="fa-solid fa-triangle-exclamation" style="color: #fbbf24;"></i>
+                <div class="warning-text">
+                    <strong style="color:white; font-size:12px;">Staff Warning</strong>
+                    <span>Dr. James Chen is on leave.</span>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
