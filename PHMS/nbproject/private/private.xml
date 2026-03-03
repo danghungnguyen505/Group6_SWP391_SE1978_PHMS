@@ -3,11 +3,7 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/GitHub/Group6_SWP391_SE1978_PHMS/PHMS/web/views/petOwner/menuPetOwner.jsp</file>
-            <file>file:/D:/GitHub/Group6_SWP391_SE1978_PHMS/PHMS/src/java/controller/receptionist/DashboardReceptionistController.java</file>
-            <file>file:/D:/GitHub/Group6_SWP391_SE1978_PHMS/PHMS/src/java/controller/appointment/SaveAppointmentController.java</file>
-            <file>file:/D:/GitHub/Group6_SWP391_SE1978_PHMS/PHMS/src/java/controller/ai/AIChatController.java</file>
-            <file>file:/D:/GitHub/Group6_SWP391_SE1978_PHMS/PHMS/src/java/controller/petOwner/MyAppointmentController.java</file>
+            <file>file:/D:/GitHub/Group6_SWP391_SE1978_PHMS/PHMS/web/views/admin/common/navbar.jsp</file>
         </group>
     </open-files>
 </project-private>
