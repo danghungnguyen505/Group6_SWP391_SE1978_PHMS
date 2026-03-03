@@ -142,10 +142,10 @@
                                         </td>
                                         <td class="text-center">1</td>
                                         <td class="text-right">
-                                            <fmt:formatNumber value="${mainService.basePrice}" type="currency" currencySymbol="$"/>
+                                            <fmt:formatNumber value="${mainService.basePrice}" type="currency" currencySymbol="VND "/>
                                         </td>
                                         <td class="text-right fw-bold">
-                                            <fmt:formatNumber value="${mainService.basePrice}" type="currency" currencySymbol="$"/>
+                                            <fmt:formatNumber value="${mainService.basePrice}" type="currency" currencySymbol="VND "/>
                                         </td>
                                     </tr>
                                 </c:when>
@@ -168,10 +168,10 @@
                                             <c:out value="${p.quantity}"/>
                                         </td>
                                         <td class="text-right">
-                                            <fmt:formatNumber value="${p.medicinePrice}" type="currency" currencySymbol="$"/>
+                                            <fmt:formatNumber value="${p.medicinePrice}" type="currency" currencySymbol="VND "/>
                                         </td>
                                         <td class="text-right fw-bold">
-                                            <fmt:formatNumber value="${p.quantity * p.medicinePrice}" type="currency" currencySymbol="$"/>
+                                            <fmt:formatNumber value="${p.quantity * p.medicinePrice}" type="currency" currencySymbol="VND "/>
                                         </td>
                                     </tr>
                                 </c:forEach>
@@ -185,9 +185,9 @@
                             <span class="amount">
                                 <c:choose>
                                     <c:when test="${subtotal != null}">
-                                        <fmt:formatNumber value="${subtotal}" type="currency" currencySymbol="$"/>
+                                        <fmt:formatNumber value="${subtotal}" type="currency" currencySymbol="VND "/>
                                     </c:when>
-                                    <c:otherwise>$0.00</c:otherwise>
+                                    <c:otherwise>0&nbsp;VND</c:otherwise>
                                 </c:choose>
                             </span>
                         </div>
@@ -196,9 +196,9 @@
                             <span class="amount">
                                 <c:choose>
                                     <c:when test="${tax != null}">
-                                        <fmt:formatNumber value="${tax}" type="currency" currencySymbol="$"/>
+                                        <fmt:formatNumber value="${tax}" type="currency" currencySymbol="VND "/>
                                     </c:when>
-                                    <c:otherwise>$0.00</c:otherwise>
+                                    <c:otherwise>0&nbsp;VND</c:otherwise>
                                 </c:choose>
                             </span>
                         </div>
@@ -207,9 +207,9 @@
                             <span class="amount-green">
                                 <c:choose>
                                     <c:when test="${grandTotal != null}">
-                                        <fmt:formatNumber value="${grandTotal}" type="currency" currencySymbol="$"/>
+                                        <fmt:formatNumber value="${grandTotal}" type="currency" currencySymbol="VND "/>
                                     </c:when>
-                                    <c:otherwise>$0.00</c:otherwise>
+                                    <c:otherwise>0&nbsp;VND</c:otherwise>
                                 </c:choose>
                             </span>
                         </div>
@@ -264,16 +264,16 @@
                             Pay
                             <c:choose>
                                 <c:when test="${grandTotal != null}">
-                                    <fmt:formatNumber value="${grandTotal}" type="currency" currencySymbol="$"/>
+                                    <fmt:formatNumber value="${grandTotal}" type="currency" currencySymbol="VND "/>
                                 </c:when>
-                                <c:otherwise>$0.00</c:otherwise>
+                                <c:otherwise>0&nbsp;VND</c:otherwise>
                             </c:choose>
                         </button>
                     </form>
                     <!-- Installment Info -->
                     <div class="info-box">
                         <h5>Need an Installment Plan?</h5>
-                        <p>We offer 0% interest payment plans for surgeries over $500. Talk to our staff to learn more.</p>
+                        <p>We offer 0% interest payment plans for large bills. Talk to our staff to learn more.</p>
                         <a href="#">Learn more &rarr;</a>
                     </div>
                 </div>

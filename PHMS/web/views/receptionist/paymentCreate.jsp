@@ -47,7 +47,7 @@
                     <div class="d-flex justify-content-between mt-2">
                         <strong>Total Amount:</strong>
                         <span class="fs-4 fw-bold text-primary">
-                            <fmt:formatNumber value="${invoice.totalAmount}" type="currency" currencySymbol="$"/>
+                            <fmt:formatNumber value="${invoice.totalAmount}" type="currency" currencySymbol="VND "/>
                         </span>
                     </div>
                 </div>
