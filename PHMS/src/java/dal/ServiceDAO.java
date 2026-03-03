@@ -19,7 +19,7 @@ public class ServiceDAO extends DBContext {
 
     public List<Service> getAllActiveServices() {
         List<Service> services = new ArrayList<>();
-        String sql = "SELECT service_id, name, base_price, description, is_active FROM ServiceList WHERE is_active = 1 ORDER BY service_id DESC";
+        String sql = "SELECT service_id, name, base_price, description, is_active FROM ServiceList WHERE is_active = 1 ORDER BY service_id";
         PreparedStatement st = null;
         ResultSet rs = null;
         try {
@@ -54,7 +54,7 @@ public class ServiceDAO extends DBContext {
 
     public List<Service> getAllServices() {
         List<Service> list = new ArrayList<>();
-        String sql = "SELECT service_id, name, base_price, description, is_active, managed_by FROM ServiceList ORDER BY service_id DESC";
+        String sql = "SELECT service_id, name, base_price, description, is_active, managed_by FROM ServiceList";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();

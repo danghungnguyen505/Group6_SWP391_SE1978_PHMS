@@ -16,7 +16,6 @@ import java.util.List;
 import java.sql.Date;
 import java.sql.Time;
 import model.StaffScheduleVeterinarian;
-//chỉ đọc dữ liệu của lịch trình,đăng ký lịch ở ScheduleVeterianrianDAO
 public class StaffScheduleVeterinarianDAO extends DBContext{
     
     // Hàm lấy lịch theo StaffID và khoảng thời gian
@@ -45,16 +44,14 @@ public class StaffScheduleVeterinarianDAO extends DBContext{
                 sv.setStaffName(rs.getString("full_name"));
                 sv.setRole(rs.getString("role"));
                 String shiftTime = rs.getString("shift_time");
-                if (shiftTime != null && shiftTime.contains("-")) {
+                if (shiftTime != null && !shiftTime.contains("-")) {
                     String[] parts = shiftTime.split("-");
                     try {
                         String startStr = parts[0].trim().length() == 5 ? parts[0].trim() + ":00" : parts[0].trim();
                         String endStr = parts[1].trim().length() == 5 ? parts[1].trim() + ":00" : parts[1].trim();
                         sv.setStartTime(java.sql.Time.valueOf(startStr));
                         sv.setEndTime(java.sql.Time.valueOf(endStr));
-                    } catch (Exception e) {
-                        System.out.println("Format shift_time error: " + shiftTime);
-                    }
+                    } catch (Exception e) {}
                 }
                 sv.setStatus("Active");
                 list.add(sv);

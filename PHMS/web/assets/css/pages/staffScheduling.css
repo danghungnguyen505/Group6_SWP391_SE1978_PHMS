@@ -271,22 +271,3 @@ body {
 .add-another-btn:hover {
     background: #e2e8f0;
 }
-
-/* Viền vàng cho trạng thái Đang đợi (Pending) */
-.leave-pending {
-    border: 2px solid #fbbf24 !important;
-    background-color: #fffbeb !important; /* Thêm tí nền vàng nhạt cho dễ nhìn */
-}
-
-/* Viền đỏ cho trạng thái Đã duyệt (Approved) */
-.leave-approved {
-    border: 2px solid #ef4444 !important;
-    background-color: #fef2f2 !important; /* Thêm tí nền đỏ nhạt */
-}
-
-/* Trạng thái bị từ chối (Rejected) */
-.leave-rejected {
-    border: 2px dashed #9ca3af !important;
-    background-color: #f9fafb !important;
-    opacity: 0.85;
-}

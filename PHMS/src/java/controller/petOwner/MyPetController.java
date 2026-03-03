@@ -1,6 +1,11 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
+ */
+
 package controller.petOwner;
 
-import dal.PetDAO;
+import dal.PetDAO; 
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -8,134 +13,101 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.util.ArrayList;
 import java.util.List;
 import model.User;
 import model.Pet;
 import util.PaginationUtils;
 
 /**
- * Controller for displaying pet list and details
+ * Controller for displaying pet list with pagination
+ * Single Responsibility: Handle pet list display only
  */
-@WebServlet(name = "MyPetController", urlPatterns = {"/myPetOwner"})
+@WebServlet(name="MyPetController", urlPatterns={"/myPetOwner"})
 public class MyPetController extends HttpServlet {
-
-    private static final int PAGE_SIZE = 5; // Số lượng thú cưng mỗi trang (để 5 cho dễ nhìn)
-
+    
+    private static final int PAGE_SIZE = 10; // Number of pets per page
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         User account = (User) session.getAttribute("account");
 
-        // 1. Check Login & Role
+        // Check Login and Authorization
         if (account == null || !"PetOwner".equalsIgnoreCase(account.getRole())) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
-        PetDAO petDAO = new PetDAO();
-        String error = null;
-
         try {
-            // 2. Lấy tham số từ URL
+            // Get pagination parameters
             String pageStr = request.getParameter("page");
-            String search = request.getParameter("search");
-            String selectedPetIdStr = request.getParameter("selectedPetId");
-
-            // 3. Xử lý Search & List (Lấy danh sách tổng)
-            List<Pet> allPets;
-            if (search != null && !search.trim().isEmpty()) {
-                // Nếu có từ khóa tìm kiếm -> Gọi hàm searchPets
-                allPets = petDAO.searchPets(account.getUserId(), search.trim());
-            } else {
-                // Nếu không -> Lấy toàn bộ
-                allPets = petDAO.getPetsByOwnerId(account.getUserId());
-            }
-
-            if (allPets == null) {
-                allPets = new ArrayList<>();
-            }
-
-            // 4. Xử lý Phân trang (Pagination)
+            String search = request.getParameter("search"); // Lấy keyword search
             int currentPage = 1;
             if (pageStr != null && !pageStr.trim().isEmpty()) {
                 try {
                     currentPage = Integer.parseInt(pageStr);
+                    if (currentPage < 1) currentPage = 1;
                 } catch (NumberFormatException e) {
                     currentPage = 1;
                 }
             }
+            
+            // Get all pets for this owner
+            PetDAO petDAO = new PetDAO();
+            List<Pet> allPets = petDAO.getPetsByOwnerId(account.getUserId());
 
-            int totalPages = PaginationUtils.getTotalPages(allPets, PAGE_SIZE);
-            currentPage = PaginationUtils.getValidPage(currentPage, totalPages);
-            List<Pet> petsOnPage = PaginationUtils.getPage(allPets, currentPage, PAGE_SIZE);
-
-            // 5. Xử lý Selected Pet (Để hiển thị chi tiết cho chức năng VIEW/EDIT)
+            // Determine selected pet (for left panel display)
             Pet selectedPet = null;
-
+            String selectedPetIdStr = request.getParameter("selectedPetId");
             if (selectedPetIdStr != null && !selectedPetIdStr.trim().isEmpty()) {
                 try {
-                    int selectedId = Integer.parseInt(selectedPetIdStr);
-
-                    // Cách 1: Tìm trong list hiện có (nhanh, đỡ query lại DB)
+                    int selectedPetId = Integer.parseInt(selectedPetIdStr);
+                    // Tìm trong list hiện tại (đã filter)
                     for (Pet p : allPets) {
-                        if (p.getId() == selectedId) {
+                        if (p.getId() == selectedPetId) {
                             selectedPet = p;
                             break;
                         }
                     }
-
-                    // Cách 2: Nếu không tìm thấy trong list (VD: list đang filter), 
-                    // Query trực tiếp DB để đảm bảo hiển thị đúng
-                    if (selectedPet == null) {
-                        Pet dbPet = petDAO.getPetById(selectedId);
-                        // QUAN TRỌNG: Check xem pet này có đúng là của user đang login không?
-                        if (dbPet != null && dbPet.getOwnerId() == account.getUserId()) {
-                            selectedPet = dbPet;
-                        }
-                    }
-                } catch (NumberFormatException e) {
-                    // ID lỗi, bỏ qua
-                }
+                    // Nếu không tìm thấy trong list (do đang search cái khác), 
+                    // có thể query riêng để hiển thị bên trái nếu muốn.
+                    // Ở đây nếu null thì lát nữa sẽ lấy con đầu tiên của list search.
+                } catch (NumberFormatException ignored) {}
             }
-
-            // Fallback: Nếu chưa chọn con nào, mặc định lấy con đầu tiên trong danh sách (nếu có)
-            if (selectedPet == null && !allPets.isEmpty()) {
+            if (selectedPet == null && allPets != null && !allPets.isEmpty()) {
                 selectedPet = allPets.get(0);
             }
-
-            // 6. Set attributes để JSP dùng
-            request.setAttribute("pets", petsOnPage);       // List hiển thị bên trái (theo trang)
-            request.setAttribute("selectedPet", selectedPet); // Object hiển thị chi tiết bên phải (View/Edit)
-
-            request.setAttribute("search", search);         // Giữ lại từ khóa search trong ô input
+            
+            // Calculate pagination
+            int totalPages = PaginationUtils.getTotalPages(allPets, PAGE_SIZE);
+            currentPage = PaginationUtils.getValidPage(currentPage, totalPages);
+            
+            // Get page of pets
+            List<Pet> pets = PaginationUtils.getPage(allPets, currentPage, PAGE_SIZE);
+            
+            // Set attributes for JSP
+            request.setAttribute("pets", pets);
+            request.setAttribute("allPets", allPets); // for dropdown
+            request.setAttribute("selectedPet", selectedPet);
             request.setAttribute("currentPage", currentPage);
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("totalPets", allPets.size());
-
-            // Dùng Toast message nếu có (từ AddPetController chuyển sang)
-            String toastMessage = (String) session.getAttribute("toastMessage");
-            if (toastMessage != null) {
-                request.setAttribute("toastMessage", toastMessage);
-                session.removeAttribute("toastMessage");
-            }
-
+            request.setAttribute("pageSize", PAGE_SIZE);
+            
         } catch (Exception e) {
-            error = "Lỗi hệ thống: " + e.getMessage();
+            request.setAttribute("error", "Lỗi khi tải danh sách thú cưng: " + e.getMessage());
             e.printStackTrace();
         }
 
-        if (error != null) {
-            request.setAttribute("error", error);
-        }
-
+        // Forward to JSP
         request.getRequestDispatcher("/views/petOwner/myPetOwner.jsp").forward(request, response);
     }
-
+    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // POST not used for this controller
         doGet(request, response);
     }
 }

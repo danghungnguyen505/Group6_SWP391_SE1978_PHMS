@@ -15,7 +15,6 @@ import jakarta.servlet.http.HttpSession;
 import model.Appointment;
 import model.User;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 
 /**
  *
@@ -78,19 +77,19 @@ public class SaveAppointmentController extends HttpServlet {
             }
             
             // Validate date format and future date
-            try {
-                LocalDate selectedDate = LocalDate.parse(dateStr);
-                LocalDate today = LocalDate.now();
-                if (selectedDate.isBefore(today)) {
-                    request.setAttribute("error", "Không thể đặt lịch trong quá khứ!");
-                    response.sendRedirect(request.getContextPath() + "/booking");
-                    return;
-                }
-            } catch (IllegalArgumentException e) {
-                request.setAttribute("error", "Ngày không hợp lệ!");
-                response.sendRedirect(request.getContextPath() + "/booking");
-                return;
-            }
+//            try {
+//                java.sql.Date selectedDate = java.sql.Date.valueOf(dateStr);
+//                java.sql.Date today = new java.sql.Date(System.currentTimeMillis());
+//                if (selectedDate.before(today)) {
+//                    request.setAttribute("error", "Không thể đặt lịch trong quá khứ!");
+//                    response.sendRedirect(request.getContextPath() + "/booking");
+//                    return;
+//                }
+//            } catch (IllegalArgumentException e) {
+//                request.setAttribute("error", "Ngày không hợp lệ!");
+//                response.sendRedirect(request.getContextPath() + "/booking");
+//                return;
+//            }
             
             // Validate notes length
             if (notes != null && notes.length() > 500) {

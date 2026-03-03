@@ -18,7 +18,7 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     </head>
     <body>
-        
+
         <!-- LEFT SIDEBAR -->
         <nav class="sidebar">
             <div class="brand">
@@ -191,7 +191,7 @@
                                 <th style="text-align: center;">Check-in Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody>${todayList}
                             <c:forEach items="${todayList}" var="t">
                                 <jsp:useBean id="now" class="java.util.Date" />
                                 <c:set var="isLate" value="${t.startTime.time < now.time && t.status == 'Confirmed'}" />

@@ -140,14 +140,6 @@ public class StaffAccountUpdateController extends HttpServlet {
         }
         
         StaffAccountDAO staffDAO = new StaffAccountDAO();
-
-        // Không cho phép thay đổi role của chính tài khoản đang đăng nhập (dù có chỉnh sửa HTML ở phía client)
-        if (userId == account.getUserId()) {
-            User currentStaff = staffDAO.getStaffAccountById(userId);
-            if (currentStaff != null && currentStaff.getRole() != null) {
-                role = currentStaff.getRole();
-            }
-        }
         try {
             boolean ok = staffDAO.updateStaffAccount(userId, fullName, phone, role,
                     employeeCode, department, salaryBase, specialization, licenseNumber);

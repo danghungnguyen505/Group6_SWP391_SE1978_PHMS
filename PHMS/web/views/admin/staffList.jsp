@@ -398,24 +398,16 @@
                                         <c:set var="parts" value="${fn:split(staff.address, '|')}" />
 
                                         <td>
-    <%-- parts[0]: Code, parts[1]: Dept, parts[2]: Salary, parts[3]: Active --%>
-    <c:choose>
-        <%-- TRƯỜNG HỢP 1: Nếu là Admin thì luôn hiển thị Đang làm việc --%>
-        <c:when test="${staff.role == 'Admin'}">
-            <span class="status-badge status-active">Đang làm việc</span>
-        </c:when>
-
-        <%-- TRƯỜNG HỢP 2: Nếu không phải Admin thì mới kiểm tra giá trị parts[3] --%>
-        <c:when test="${parts[3] == '1'}">
-            <span class="status-badge status-active">Đang làm việc</span>
-        </c:when>
-
-        <%-- TRƯỜNG HỢP 3: Còn lại là Đã khóa --%>
-        <c:otherwise>
-            <span class="status-badge status-inactive">Đã khóa</span>
-        </c:otherwise>
-    </c:choose>
-</td>
+                                            <%-- parts[0]: Code, parts[1]: Dept, parts[2]: Salary, parts[3]: Active --%>
+                                            <c:choose>
+                                                <c:when test="${parts[3] == '1'}">
+                                                    <span class="status-badge status-active">Đang làm việc</span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="status-badge status-inactive">Đã khóa</span>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
 
                                         <td>
                                             <a href="${pageContext.request.contextPath}/admin/staff/update?id=${staff.userId}" class="btn-action" title="Edit">
@@ -427,39 +419,15 @@
                                                 <input type="hidden" name="id" value="${staff.userId}">
 
                                                 <c:choose>
-                                                    <%-- TRƯỜNG HỢP LÀ ADMIN: Không cho phép khóa --%>
-                                                    <c:when test="${staff.role == 'Admin'}">
-                                                        <button type="button" class="btn-action" 
-                                                                style="color: #ccc; cursor: not-allowed;" 
-                                                                title="Không thể khóa tài khoản Admin"
-                                                                onclick="alert('Lỗi: Đây là tài khoản Admin, không được phép thay đổi trạng thái!');">
-                                                            <i class="fa-solid fa-user-shield"></i> <!-- Icon bảo vệ/admin -->
+                                                    <c:when test="${parts[3] == '1'}">
+                                                        <button type="submit" class="btn-action btn-lock" title="Khóa tài khoản">
+                                                            <i class="fa-solid fa-lock"></i>
                                                         </button>
                                                     </c:when>
-
-                                                    <%-- TRƯỜNG HỢP CÒN LẠI: Hiển thị form Lock/Unlock bình thường --%>
                                                     <c:otherwise>
-                                                        <form method="post" action="${pageContext.request.contextPath}/admin/staff/lock" 
-                                                              style="display:inline;" 
-                                                              onsubmit="return confirm('Bạn có chắc chắn muốn thay đổi trạng thái tài khoản này?');">
-
-                                                            <input type="hidden" name="id" value="${staff.userId}">
-
-                                                            <c:choose>
-                                                                <%-- Nếu parts[3] là '1' (đang hoạt động) -> Hiện nút Khóa --%>
-                                                                <c:when test="${parts[3] == '1'}">
-                                                                    <button type="submit" class="btn-action btn-lock" title="Khóa tài khoản">
-                                                                        <i class="fa-solid fa-lock"></i>
-                                                                    </button>
-                                                                </c:when>
-                                                                <%-- Ngược lại -> Hiện nút Mở khóa --%>
-                                                                <c:otherwise>
-                                                                    <button type="submit" class="btn-action btn-unlock" title="Mở khóa tài khoản">
-                                                                        <i class="fa-solid fa-lock-open"></i>
-                                                                    </button>
-                                                                </c:otherwise>
-                                                            </c:choose>
-                                                        </form>
+                                                        <button type="submit" class="btn-action btn-unlock" title="Mở khóa tài khoản">
+                                                            <i class="fa-solid fa-lock-open"></i>
+                                                        </button>
                                                     </c:otherwise>
                                                 </c:choose>
                                             </form>

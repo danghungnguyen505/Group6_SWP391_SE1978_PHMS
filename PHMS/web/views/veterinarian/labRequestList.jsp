@@ -8,11 +8,19 @@
         <title>VetCare Pro - Lab Requests</title>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/pages/receptionistDashboard.css">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/views/veterinarian/nav/navVeterinarian.css">
     </head>
     <body>
-      <jsp:include page="nav/navVeterinarian.jsp" />
+        <nav class="sidebar">
+            <div class="brand">
+                <i class="fa-solid fa-plus-square"></i> VetCare Pro
+            </div>
+            <ul class="menu">
+                <li><a href="${pageContext.request.contextPath}/veterinarian/emr/records">
+                        <i class="fa-solid fa-file-medical"></i> Medical Records</a></li>
+                <li><a href="${pageContext.request.contextPath}/veterinarian/lab/requests" class="active">
+                        <i class="fa-solid fa-flask"></i> Lab Requests</a></li>
+            </ul>
+        </nav>
 
         <main class="main-content">
             <div class="top-bar">

@@ -153,6 +153,7 @@
                         <p>No appointments found.</p>
                     </div>
                 </c:if>
+                ${appointments}
                 <!-- Data Table -->
                 <c:if test="${not empty appointments}">
                     <table>

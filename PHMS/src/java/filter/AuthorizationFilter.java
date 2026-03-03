@@ -51,7 +51,12 @@ public class AuthorizationFilter implements Filter {
         String requestURI = httpRequest.getRequestURI();
         String contextPath = httpRequest.getContextPath();
         String path = requestURI.substring(contextPath.length());
-        
+        if (path.equals("/vnpay-return") 
+    || path.startsWith("/payment")
+    || path.startsWith("/receptionist/invoice/detail")) {
+    chain.doFilter(request, response);
+    return;
+}
         // Allow access to login and register pages
         if (path.equals("/login") || path.equals("/register") || path.equals("/forgot-password")) {
             chain.doFilter(request, response);
