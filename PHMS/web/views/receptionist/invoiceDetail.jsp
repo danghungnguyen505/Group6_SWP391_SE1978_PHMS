@@ -9,6 +9,25 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/components.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/pages/service-management.css">
+        <style>
+@media print {
+    .sidebar,
+    .top-bar,
+    .checkout-card,
+    .btn-print {
+        display: none !important;
+    }
+
+    .main-content {
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        background: white;
+    }
+}
+</style>
 </head>
 <body class="mgmt-page">
 <div class="mgmt-container">
