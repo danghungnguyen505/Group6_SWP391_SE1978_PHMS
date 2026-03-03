@@ -334,26 +334,13 @@ public class AppointmentDAO extends DBContext {
             return false;
         }
     }
-<<<<<<< Updated upstream
-    //Checkin 1. Hàm lấy danh sách cuộc hẹn TRONG NGÀY HÔM NAY (Confirmed, Checked-in, Pending)
-=======
 
     //Checkin 1. Hàm lấy danh sách cuộc hẹn TRONG NGÀY HÔM NAY cho lễ tân
     // Bao gồm: Confirmed, Checked-in, No-show, Completed
->>>>>>> Stashed changes
     public List<model.Appointment> getTodayAppointments() {
         List<model.Appointment> list = new ArrayList<>();
         // SQL: Lấy cuộc hẹn có ngày bắt đầu = ngày hiện tại
         String sql = "SELECT a.*, p.name AS pet_name, u.full_name AS vet_name, u_owner.full_name AS owner_name "
-<<<<<<< Updated upstream
-                   + "FROM Appointment a "
-                   + "JOIN Pet p ON a.pet_id = p.pet_id "
-                   + "JOIN Users u ON a.vet_id = u.user_id "
-                   + "JOIN Users u_owner ON p.owner_id = u_owner.user_id "
-                   + "WHERE CAST(a.start_time AS DATE) = CAST(GETDATE() AS DATE) " // Dùng GETDATE() cho SQL Server, hoặc CURDATE() cho MySQL
-                   + "AND a.status IN ('Confirmed', 'Checked-in', 'No-show') "
-                   + "ORDER BY a.start_time ASC";
-=======
                 + "FROM Appointment a "
                 + "JOIN Pet p ON a.pet_id = p.pet_id "
                 + "JOIN Users u ON a.vet_id = u.user_id "
@@ -361,7 +348,6 @@ public class AppointmentDAO extends DBContext {
                 + "WHERE CAST(a.start_time AS DATE) = CAST(GETDATE() AS DATE) " // Dùng GETDATE() cho SQL Server, hoặc CURDATE() cho MySQL
                 + "AND a.status IN ('Confirmed', 'Checked-in', 'In-Progress', 'No-show', 'Completed') "
                 + "ORDER BY a.start_time ASC";
->>>>>>> Stashed changes
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             ResultSet rs = st.executeQuery();
@@ -435,10 +421,6 @@ public class AppointmentDAO extends DBContext {
     }
 
     /**
-<<<<<<< Updated upstream
-     * Auto-cancel appointments for a staff (vet) on a specific date
-     * when a leave request is approved.
-=======
      * Mark appointment as Completed if it is not already Cancelled. Used after
      * successful invoice payment.
      */
@@ -456,7 +438,6 @@ public class AppointmentDAO extends DBContext {
     /**
      * Auto-cancel appointments for a staff (vet) on a specific date when a
      * leave request is approved.
->>>>>>> Stashed changes
      */
     public int cancelAppointmentsForEmpOnDate(int empId, java.sql.Date date) {
         String sql = "UPDATE Appointment SET status = 'Cancelled' "
@@ -670,8 +651,6 @@ public class AppointmentDAO extends DBContext {
         }
         return list;
     }
-<<<<<<< Updated upstream
-=======
 
     //Mark appointment as Completed for the assigned vet only when In-Progress.
     //Danh dau cuoc hen da Completed
@@ -687,5 +666,4 @@ public class AppointmentDAO extends DBContext {
             return false;
         }
     }
->>>>>>> Stashed changes
 }

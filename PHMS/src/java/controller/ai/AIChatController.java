@@ -17,7 +17,7 @@ import util.GeminiClient;
  * PetOwner AI chat controller using Gemini.
  * SRP: Handle chat (ask + show history) for current user.
  */
-@WebServlet(name = "AIChatController", urlPatterns = {"/ai/chat"})
+@WebServlet(name = "AIChatController", urlPatterns = {"/aiHealthGuide"})
 public class AIChatController extends HttpServlet {
 
     private static final int HISTORY_LIMIT = 20;
@@ -36,7 +36,7 @@ public class AIChatController extends HttpServlet {
         List<AIChatLog> history = dao.listByUser(account.getUserId(), HISTORY_LIMIT);
         request.setAttribute("history", history);
         request.setAttribute("geminiConfigured", GeminiClient.isConfigured());
-        request.getRequestDispatcher("/views/petOwner/aiChat.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/petOwner/aiHealthGuidePetOwner.jsp").forward(request, response);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class AIChatController extends HttpServlet {
 
         String question = util.ValidationUtils.sanitize(request.getParameter("question"));
         if (!util.ValidationUtils.isNotEmpty(question)
-                || !util.ValidationUtils.isLengthValid(question, 5, 2000)) {
+                || !util.ValidationUtils.isLengthValid(question, 1, 2000)) {
             request.setAttribute("error", "Câu hỏi phải có từ 5 đến 2000 ký tự.");
             doGet(request, response);
             return;
@@ -83,7 +83,7 @@ public class AIChatController extends HttpServlet {
         request.setAttribute("question", question);
         request.setAttribute("answer", answer);
         request.setAttribute("geminiConfigured", GeminiClient.isConfigured());
-        request.getRequestDispatcher("/views/petOwner/aiChat.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/petOwner/aiHealthGuidePetOwner.jsp").forward(request, response);
     }
 }
 

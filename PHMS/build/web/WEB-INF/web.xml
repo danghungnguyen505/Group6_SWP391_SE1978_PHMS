@@ -33,12 +33,12 @@
         <servlet-class>controller.auth.ForgotPasswordController</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>AddServiceController</servlet-name>
-        <servlet-class>controller.admin.AddServiceController</servlet-class>
+        <servlet-name>ServiceListController</servlet-name>
+        <servlet-class>controller.admin.ServiceListController</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>EditServiceController</servlet-name>
-        <servlet-class>controller.admin.EditServiceController</servlet-class>
+        <servlet-name>AddServiceController</servlet-name>
+        <servlet-class>controller.admin.AddServiceController</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>HomeController</servlet-name>
@@ -73,11 +73,11 @@
         <url-pattern>/forgot-password</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>AddServiceController</servlet-name>
-        <url-pattern>/admin/add-service</url-pattern>
+        <servlet-name>ServiceListController</servlet-name>
+        <url-pattern>/admin/services</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>EditServiceController</servlet-name>
-        <url-pattern>/admin/edit-service</url-pattern>
+        <servlet-name>AddServiceController</servlet-name>
+        <url-pattern>/admin/add-service</url-pattern>
     </servlet-mapping>
 </web-app>
