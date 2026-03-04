@@ -51,5 +51,30 @@ public class PaymentDAO extends DBContext {
         }
         return list;
     }
+    public List<Payment> getAllPayments() {
+    List<Payment> list = new ArrayList<>();
+    String sql = "SELECT payment_id, invoice_id, trans_code, amount, method, status "
+               + "FROM Payment ORDER BY payment_id DESC";
+
+    try (PreparedStatement st = connection.prepareStatement(sql);
+         ResultSet rs = st.executeQuery()) {
+
+        while (rs.next()) {
+            Payment p = new Payment();
+            p.setPaymentId(rs.getInt("payment_id"));
+            p.setInvoiceId(rs.getInt("invoice_id"));
+            p.setTransCode(rs.getString("trans_code"));
+            p.setAmount(rs.getDouble("amount"));
+            p.setMethod(rs.getString("method"));
+            p.setStatus(rs.getString("status"));
+            list.add(p);
+        }
+
+    } catch (SQLException e) {
+        System.out.println("Error getAllPayments: " + e.getMessage());
+    }
+
+    return list;
+}
 }
 
