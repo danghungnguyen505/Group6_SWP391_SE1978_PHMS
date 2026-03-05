@@ -227,6 +227,19 @@
                                         </div>
                                     </label>
                                 </div>
+                                <!-- VietQR Code -->
+<div style="text-align:center; margin-top:20px;">
+    <p><b>Scan QR to pay</b></p>
+
+    <img 
+        src="https://img.vietqr.io/image/TPBank-00001314982-compact.png?amount=${invoice.totalAmount}&addInfo=Invoice${invoice.invoiceId}"
+        width="250"
+    >
+
+    <p style="font-size:12px; color:gray;">
+        Bank Transfer using VietQR
+    </p>
+</div>
 
                                 <button type="submit" class="btn-pay">
                                     Confirm Payment: <fmt:formatNumber value="${invoice.totalAmount}" type="currency" currencySymbol="VND "/>

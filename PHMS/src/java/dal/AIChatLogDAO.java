@@ -27,13 +27,8 @@ public class AIChatLogDAO extends DBContext {
 
     public List<AIChatLog> listByUser(int userId, int limit) {
         List<AIChatLog> list = new ArrayList<>();
-        String sql = "SELECT * FROM (" +
-                 "    SELECT TOP (?) log_id, user_id, question_raw, ai_response, created_at " +
-                 "    FROM AIChatLog " +
-                 "    WHERE user_id = ? " +
-                 "    ORDER BY created_at DESC" +
-                 ") AS SubQuery " +
-                 "ORDER BY created_at ASC";
+        String sql = "SELECT TOP (?) log_id, user_id, question_raw, ai_response, created_at "
+                   + "FROM AIChatLog WHERE user_id = ? ORDER BY created_at DESC";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, limit);
             st.setInt(2, userId);

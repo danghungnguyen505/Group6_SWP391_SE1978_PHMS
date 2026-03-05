@@ -14,12 +14,12 @@ import model.LeaveRequest;
 public class LeaveRequestDAO extends DBContext {
 
     /**
-     * Create a new leave request for a single day. Current DB schema stores
-     * only start_date; we treat it as one-day leave.
+     * Create a new leave request for a single day.
+     * Current DB schema stores only start_date; we treat it as one-day leave.
      */
     public boolean createRequest(int empId, int managerId, Date startDate, String reason) {
         String sql = "INSERT INTO LeaveRequest (emp_id, manager_id, start_date, reason, status) "
-                + "VALUES (?, ?, ?, ?, 'Pending')";
+                   + "VALUES (?, ?, ?, ?, 'Pending')";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, empId);
             st.setInt(2, managerId);
@@ -35,7 +35,7 @@ public class LeaveRequestDAO extends DBContext {
     public List<LeaveRequest> listByEmployee(int empId) {
         List<LeaveRequest> list = new ArrayList<>();
         String sql = "SELECT leave_id, emp_id, manager_id, start_date, start_date AS end_date, reason, status "
-                + "FROM LeaveRequest WHERE emp_id = ? ORDER BY leave_id DESC";
+                   + "FROM LeaveRequest WHERE emp_id = ? ORDER BY leave_id DESC";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, empId);
             try (ResultSet rs = st.executeQuery()) {
@@ -52,8 +52,8 @@ public class LeaveRequestDAO extends DBContext {
     public List<LeaveRequest> listPendingForManager(int managerId) {
         List<LeaveRequest> list = new ArrayList<>();
         String sql = "SELECT leave_id, emp_id, manager_id, start_date, start_date AS end_date, reason, status "
-                + "FROM LeaveRequest WHERE manager_id = ? AND status = 'Pending' "
-                + "ORDER BY start_date ASC";
+                   + "FROM LeaveRequest WHERE manager_id = ? AND status = 'Pending' "
+                   + "ORDER BY start_date ASC";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, managerId);
             try (ResultSet rs = st.executeQuery()) {
@@ -69,7 +69,7 @@ public class LeaveRequestDAO extends DBContext {
 
     public LeaveRequest getByIdForManager(int leaveId, int managerId) {
         String sql = "SELECT leave_id, emp_id, manager_id, start_date, start_date AS end_date, reason, status "
-                + "FROM LeaveRequest WHERE leave_id = ? AND manager_id = ?";
+                   + "FROM LeaveRequest WHERE leave_id = ? AND manager_id = ?";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, leaveId);
             st.setInt(2, managerId);
@@ -114,7 +114,8 @@ public class LeaveRequestDAO extends DBContext {
      */
     public Integer getDefaultManagerId() {
         String sql = "SELECT TOP 1 emp_id FROM ClinicManager ORDER BY emp_id ASC";
-        try (PreparedStatement st = connection.prepareStatement(sql); ResultSet rs = st.executeQuery()) {
+        try (PreparedStatement st = connection.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
             if (rs.next()) {
                 return rs.getInt("emp_id");
             }
@@ -123,78 +124,5 @@ public class LeaveRequestDAO extends DBContext {
         }
         return null;
     }
-
-    //Đăng ký xin nghỉ
-// 1. Lấy danh sách đơn đang chờ (có phân trang cho SQL Server)
-    public List<LeaveRequest> getPendingLeaveRequests(int offset, int limit) {
-        List<LeaveRequest> list = new ArrayList<>();
-        String sql = "SELECT leave_id, emp_id, start_date, reason, status "
-                + "FROM LeaveRequest "
-                + "WHERE status = 'Pending' "
-                + "ORDER BY start_date ASC "
-                + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        try (PreparedStatement st = connection.prepareStatement(sql)) {
-            st.setInt(1, offset);
-            st.setInt(2, limit);
-            ResultSet rs = st.executeQuery();
-            while (rs.next()) {
-                LeaveRequest lr = new LeaveRequest();
-                lr.setLeaveId(rs.getInt("leave_id"));
-                lr.setEmpId(rs.getInt("emp_id"));
-                lr.setStartDate(rs.getDate("start_date"));
-                lr.setReason(rs.getString("reason"));
-                lr.setStatus(rs.getString("status"));
-                list.add(lr);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    // 2. Đếm tổng số đơn chờ để tính số trang
-    public int getTotalPendingRequests() {
-        String sql = "SELECT COUNT(*) FROM LeaveRequest WHERE status = 'Pending'";
-        try (PreparedStatement st = connection.prepareStatement(sql)) {
-            ResultSet rs = st.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
-    // 3. Cập nhật trạng thái duyệt/từ chối
-    public boolean updateLeaveStatus(int leaveId, String status) {
-        String sql = "UPDATE LeaveRequest SET status = ? WHERE leave_id = ?";
-        try (PreparedStatement st = connection.prepareStatement(sql)) {
-            st.setString(1, status);
-            st.setInt(2, leaveId);
-            int rows = st.executeUpdate();
-            return rows > 0;
-        } catch (SQLException e) {
-            System.out.println("Lỗi Update Status: " + e.getMessage());
-            return false;
-        }
-    }
-
-    // 4. Lấy chi tiết 1 đơn nghỉ để biết ngày và emp_id (phục vụ xóa lịch)
-    public LeaveRequest getLeaveRequestById(int leaveId) {
-        String sql = "SELECT emp_id, start_date FROM LeaveRequest WHERE leave_id = ?";
-        try (PreparedStatement st = connection.prepareStatement(sql)) {
-            st.setInt(1, leaveId);
-            ResultSet rs = st.executeQuery();
-            if (rs.next()) {
-                LeaveRequest lr = new LeaveRequest();
-                lr.setEmpId(rs.getInt("emp_id"));
-                lr.setStartDate(rs.getDate("start_date"));
-                return lr;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 }
+

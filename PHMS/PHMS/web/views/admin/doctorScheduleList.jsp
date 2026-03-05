@@ -292,10 +292,6 @@
             transition: 0.2s;
         }
 
-        .shift-card.schedule-click-delete {
-            cursor: pointer;
-        }
-
         .shift-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
@@ -474,25 +470,6 @@
     </jsp:include>
 
     <main class="main-content">
-        <c:if test="${not empty sessionScope.toastMessage}">
-            <c:set var="toast" value="${sessionScope.toastMessage}" />
-            <c:choose>
-                <c:when test="${fn:startsWith(toast, 'success|')}">
-                    <div style="background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:12px 16px;border-radius:10px;margin-bottom:16px;font-weight:600;">
-                        <i class="fa-solid fa-check-circle" style="margin-right: 8px;"></i>
-                        ${fn:substringAfter(toast, 'success|')}
-                    </div>
-                </c:when>
-                <c:when test="${fn:startsWith(toast, 'error|')}">
-                    <div style="background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:12px 16px;border-radius:10px;margin-bottom:16px;font-weight:600;">
-                        <i class="fa-solid fa-triangle-exclamation" style="margin-right: 8px;"></i>
-                        ${fn:substringAfter(toast, 'error|')}
-                    </div>
-                </c:when>
-            </c:choose>
-            <c:remove var="toastMessage" scope="session" />
-        </c:if>
-
         <div class="header-section">
             <div class="header-text">
                 <h2>LỊCH LÀM VIỆC BÁC SĨ</h2>
@@ -551,16 +528,7 @@
                     </div>
                     <c:forEach var="schedule" items="${entry.value}">
                         <c:set var="leaveStatus" value="${schedule.leaveStatus}" />
-                        <form id="deleteForm_${schedule.scheduleId}" method="post"
-                              action="${pageContext.request.contextPath}/admin/doctor/schedule/delete" style="display:none;">
-                            <input type="hidden" name="scheduleId" value="${schedule.scheduleId}">
-                            <input type="hidden" name="date" value="${currentDate}">
-                            <c:if test="${not empty selectedDoctorId}">
-                                <input type="hidden" name="doctorId" value="${selectedDoctorId}">
-                            </c:if>
-                        </form>
                         <div class="shift-card
-                             schedule-click-delete
                              ${leaveStatus == 'Pending' ? ' leave-pending' : ''}
                              ${leaveStatus == 'Approved' ? ' leave-approved' : ''}
                              ${leaveStatus == 'Rejected' ? ' leave-rejected' : ''}">
@@ -608,22 +576,6 @@
             </div>
         </div>
     </div>
-
-    <script>
-        // Click on a schedule card => confirm => POST delete
-        document.querySelectorAll('.shift-card.schedule-click-delete').forEach(function (card) {
-            card.addEventListener('click', function () {
-                // Find the hidden form right before this card
-                var form = this.previousElementSibling;
-                if (!form || form.tagName !== 'FORM') return;
-
-                var ok = confirm('Bạn có chắc muốn xoá ca làm việc này không?');
-                if (!ok) return;
-
-                form.submit();
-            });
-        });
-    </script>
 
 </body>
 </html>

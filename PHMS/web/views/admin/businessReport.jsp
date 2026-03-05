@@ -192,10 +192,29 @@
 </head>
 <body>
 
-    <!-- Sidebar (đồng bộ với các trang admin khác) -->
-    <jsp:include page="common/navbar.jsp">
-        <jsp:param name="activePage" value="revenue" />
-    </jsp:include>
+    <!-- Sidebar (Đồng bộ chuẩn 280px) -->
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fa-solid fa-square-plus"></i> VetCare Pro
+        </div>
+
+        <div class="menu-label">Admin Menu</div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="${pageContext.request.contextPath}/admin/dashboard" class="nav-link"><i class="fa-solid fa-chart-pie"></i> Overview</a></li>
+            <li class="nav-item"><a href="${pageContext.request.contextPath}/admin/services" class="nav-link"><i class="fa-solid fa-file-medical"></i> Services</a></li>
+            <li class="nav-item"><a href="${pageContext.request.contextPath}/admin/medicine/list" class="nav-link"><i class="fa-solid fa-capsules"></i> Pharmacy</a></li>
+            <li class="nav-item"><a href="${pageContext.request.contextPath}/admin/staff/list" class="nav-link"><i class="fa-solid fa-users-gear"></i> Staff Management</a></li>
+            <li class="nav-item"><a href="#" class="nav-link active"><i class="fa-solid fa-chart-line"></i> Revenue</a></li>
+            <li class="nav-item"><a href="${pageContext.request.contextPath}/admin/feedback/list" class="nav-link"><i class="fa-solid fa-comment-dots"></i> Feedback</a></li>
+            <li class="nav-item"><a href="${pageContext.request.contextPath}/admin/leave/pending" class="nav-link"><i class="fa-solid fa-calendar-check"></i> Leave Requests</a></li>
+            <li class="nav-item"><a href="#" class="nav-link"><i class="fa-solid fa-clock"></i> Scheduling</a></li>
+        </ul>
+
+        <div class="help-box">
+            <p>Need help?</p>
+            <a href="#" class="btn-support">Contact Support</a>
+        </div>
+    </aside>
 
     <!-- Main Content -->
     <main class="main-content">

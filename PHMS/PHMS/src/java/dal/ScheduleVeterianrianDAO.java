@@ -18,41 +18,6 @@ import java.sql.Date;
 
 public class ScheduleVeterianrianDAO extends DBContext {
 
-    /**
-     * Get minimal schedule info by schedule_id (emp_id, work_date, shift_time).
-     * Returns null if not found.
-     */
-    public Schedule getScheduleById(int scheduleId) {
-        String sql = "SELECT schedule_id, emp_id, work_date, shift_time FROM Schedule WHERE schedule_id = ?";
-        try (PreparedStatement st = connection.prepareStatement(sql)) {
-            st.setInt(1, scheduleId);
-            try (ResultSet rs = st.executeQuery()) {
-                if (rs.next()) {
-                    Schedule s = new Schedule();
-                    s.setScheduleId(rs.getInt("schedule_id"));
-                    s.setEmpId(rs.getInt("emp_id"));
-                    s.setWorkDate(rs.getDate("work_date"));
-                    s.setShiftTime(rs.getString("shift_time"));
-                    return s;
-                }
-            }
-        } catch (SQLException e) {
-            System.out.println("Error getScheduleById: " + e.getMessage());
-        }
-        return null;
-    }
-
-    public boolean deleteScheduleById(int scheduleId) {
-        String sql = "DELETE FROM Schedule WHERE schedule_id = ?";
-        try (PreparedStatement st = connection.prepareStatement(sql)) {
-            st.setInt(1, scheduleId);
-            return st.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.out.println("Error deleteScheduleById: " + e.getMessage());
-            return false;
-        }
-    }
-
     public List<Schedule> getAvailableSchedules() {
         List<Schedule> list = new ArrayList<>();
         // Query lấy lịch làm việc trong tương lai và kèm tên bác sĩ

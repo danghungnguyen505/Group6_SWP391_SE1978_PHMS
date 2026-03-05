@@ -15,10 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.sql.Date;
 import java.sql.Time;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.Locale;
 import model.StaffScheduleVeterinarian;
 //chỉ đọc dữ liệu của lịch trình,đăng ký lịch ở ScheduleVeterianrianDAO
 public class StaffScheduleVeterinarianDAO extends DBContext{
@@ -49,11 +45,16 @@ public class StaffScheduleVeterinarianDAO extends DBContext{
                 sv.setStaffName(rs.getString("full_name"));
                 sv.setRole(rs.getString("role"));
                 String shiftTime = rs.getString("shift_time");
-                sv.setShiftTime(shiftTime);
-                Time[] parsed = parseShiftTimeToSqlTimes(shiftTime);
-                if (parsed != null) {
-                    sv.setStartTime(parsed[0]);
-                    sv.setEndTime(parsed[1]);
+                if (shiftTime != null && shiftTime.contains("-")) {
+                    String[] parts = shiftTime.split("-");
+                    try {
+                        String startStr = parts[0].trim().length() == 5 ? parts[0].trim() + ":00" : parts[0].trim();
+                        String endStr = parts[1].trim().length() == 5 ? parts[1].trim() + ":00" : parts[1].trim();
+                        sv.setStartTime(java.sql.Time.valueOf(startStr));
+                        sv.setEndTime(java.sql.Time.valueOf(endStr));
+                    } catch (Exception e) {
+                        System.out.println("Format shift_time error: " + shiftTime);
+                    }
                 }
                 sv.setStatus("Active");
                 list.add(sv);
@@ -90,11 +91,17 @@ public class StaffScheduleVeterinarianDAO extends DBContext{
                 sv.setStaffName(rs.getString("full_name"));
                 sv.setRole(rs.getString("role"));
                 String shiftTime = rs.getString("shift_time");// Xử lý tách chuỗi shift_time ("08:00-16:00") thành Time object
-                sv.setShiftTime(shiftTime);
-                Time[] parsed = parseShiftTimeToSqlTimes(shiftTime);
-                if (parsed != null) {
-                    sv.setStartTime(parsed[0]);
-                    sv.setEndTime(parsed[1]);
+                if (shiftTime != null && shiftTime.contains("-")) {
+                    String[] parts = shiftTime.split("-");
+                    try {
+                        // Thêm ":00" để đúng định dạng Time SQL nếu thiếu
+                        String startStr = parts[0].trim().length() == 5 ? parts[0].trim() + ":00" : parts[0].trim();
+                        String endStr = parts[1].trim().length() == 5 ? parts[1].trim() + ":00" : parts[1].trim();
+                        sv.setStartTime(Time.valueOf(startStr));
+                        sv.setEndTime(Time.valueOf(endStr));
+                    } catch (Exception e) {
+                        System.out.println("Format shift_time error: " + shiftTime);
+                    }
                 }
                 sv.setStatus("Active"); // Bảng cũ không có status giả lập status dựa trên dữ liệu có sẵn
                 list.add(sv);
@@ -103,66 +110,6 @@ public class StaffScheduleVeterinarianDAO extends DBContext{
             System.out.println("Error getSchedulesByDateRange: " + e);
         }
         return list;
-    }
-
-    /**
-     * Supports both formats:
-     * - "HH:mm-HH:mm" or "HH:mm:SS-HH:mm:SS"
-     * - "hh:mm AM-hh:mm PM" (with or without spaces around '-')
-     */
-    private Time[] parseShiftTimeToSqlTimes(String shiftTime) {
-        if (shiftTime == null) {
-            return null;
-        }
-        String s = shiftTime.trim();
-        if (s.isEmpty() || !s.contains("-")) {
-            return null;
-        }
-
-        String[] parts = s.split("\\s*-\\s*");
-        if (parts.length != 2) {
-            return null;
-        }
-
-        LocalTime start = parseToLocalTime(parts[0].trim());
-        LocalTime end = parseToLocalTime(parts[1].trim());
-        if (start == null || end == null) {
-            return null;
-        }
-        return new Time[]{Time.valueOf(start), Time.valueOf(end)};
-    }
-
-    private LocalTime parseToLocalTime(String raw) {
-        if (raw == null) {
-            return null;
-        }
-        String t = raw.trim().toUpperCase(Locale.ENGLISH);
-        if (t.isEmpty()) {
-            return null;
-        }
-
-        // Try 24h formats first
-        try {
-            if (t.length() == 5) { // HH:mm
-                return LocalTime.parse(t, DateTimeFormatter.ofPattern("HH:mm"));
-            }
-            if (t.length() == 8) { // HH:mm:ss
-                return LocalTime.parse(t, DateTimeFormatter.ofPattern("HH:mm:ss"));
-            }
-        } catch (DateTimeParseException ignore) {
-        }
-
-        // Try 12h with AM/PM (e.g. 09:00 AM)
-        try {
-            return LocalTime.parse(t, DateTimeFormatter.ofPattern("hh:mm a", Locale.ENGLISH));
-        } catch (DateTimeParseException ignore) {
-        }
-        try {
-            return LocalTime.parse(t, DateTimeFormatter.ofPattern("h:mm a", Locale.ENGLISH));
-        } catch (DateTimeParseException ignore) {
-        }
-
-        return null;
     }
 
     // Đăng ký lịch (Gộp giờ thành chuỗi để lưu vào bảng cũ)

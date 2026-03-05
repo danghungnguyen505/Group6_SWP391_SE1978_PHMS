@@ -12,7 +12,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile - VetCare Pro</title>
+    <title>Hồ sơ cá nhân - VetCare Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/components.css">
@@ -22,7 +22,7 @@
     <div class="back-home-floating">
         <a href="${pageContext.request.contextPath}/home" class="back-home-btn">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-            Back to home
+            Về Trang chủ
         </a>
     </div>
     <div class="profile-wrapper">
@@ -80,7 +80,7 @@
                     </div>
                         
                     <div class="form-group">
-                        <label class="label-micro">Full name</label>
+                        <label class="label-micro">Họ và tên</label>
                         <div class="input-wrapper">
                             <div class="input-icon">
                                 <!-- Icon User -->
@@ -93,7 +93,7 @@
                     
 
                     <div class="form-group">
-                        <label class="label-micro">My phone</label>
+                        <label class="label-micro">Số điện thoại</label>
                         <div class="input-wrapper">
                             <div class="input-icon">
                                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
@@ -103,7 +103,7 @@
                     </div>
 
                     <div class="form-group full-width">
-                        <label class="label-micro">Address</label>
+                        <label class="label-micro">Địa chỉ</label>
                         <div class="input-wrapper">
                             <div class="input-icon">
                                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
@@ -113,7 +113,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="label-micro">Password</label>
+                        <label class="label-micro">Mật khẩu</label>
                         <div class="input-wrapper">
                             <div class="input-icon">
                                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
@@ -124,18 +124,18 @@
 
                     <div class="profile-actions">
                         <button type="submit" class="btn-save">
-                            Save profile changes
+                            Lưu thay đổi hồ sơ
                         </button>
                         </div>
                         <div class="secondary-nav">
                             <a href="${pageContext.request.contextPath}/change-password" class="nav-link security">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                                Security & Passwords
+                                Bảo mật & Mật khẩu
                             </a>
                             
                             <a href="${pageContext.request.contextPath}/home" class="nav-link">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                                Back to home
+                                Quay lại Trang chủ
                             </a>
                         </div>
                     </div>
