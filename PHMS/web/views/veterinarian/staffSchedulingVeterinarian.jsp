@@ -14,25 +14,11 @@
         <title>VetCare Pro - My Schedule</title>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/pages/staffScheduling.css">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/views/veterinarian/nav/navVeterinarian.css">
     </head>
     <body>
-        <nav class="sidebar">
-            <div class="brand"><i class="fa-solid fa-plus-square"></i> VetCare Pro</div>
-            <ul class="menu">
-                <li><a href="${pageContext.request.contextPath}/veterinarian/dashboard"><i class="fa-solid fa-table-columns"></i> Dashboard</a></li>
-                <li><a href="${pageContext.request.contextPath}/veterinarian/dashboard" class="text-danger"><i class="fa-solid fa-truck-medical"></i> Emergency Triage</a></li>
-                <li><a href="${pageContext.request.contextPath}/veterinarian/scheduling" class="active"><i class="fa-solid fa-truck-medical"></i> Staff Scheduling</a></li>
-                <li><a href="${pageContext.request.contextPath}/veterinarian/dashboard"><i class="fa-regular fa-calendar-check"></i> Appointments</a></li>
-                <li><a href="${pageContext.request.contextPath}/veterinarian/dashboard"><i class="fa-solid fa-paw"></i> My Pets</a></li>
-                <li><a href="${pageContext.request.contextPath}/veterinarian/dashboard"><i class="fa-solid fa-file-medical"></i> Medical Records</a></li>
-                <li><a href="${pageContext.request.contextPath}/veterinarian/dashboard"><i class="fa-regular fa-credit-card"></i> Billing</a></li>
-                <li><a href="${pageContext.request.contextPath}/veterinarian/dashboard"><i class="fa-solid fa-gear"></i> Administration</a></li>
-            </ul>
-            <div class="help-box">
-                <div class="help-text">Need help?</div>
-                <a href="#" class="btn-contact">Contact Support</a>
-            </div>
-        </nav>
+        <jsp:include page="nav/navVeterinarian.jsp" />
 
         <main class="main-content">
             <div class="header-section">
@@ -73,25 +59,57 @@
                             <span class="day-num"><fmt:formatDate value="${colDate}" pattern="dd"/></span>
                         </div>
                         <c:forEach var="shift" items="${entry.value}">
-                            <div class="shift-card">
+                            <c:set var="leaveStatus" value="${leaveMap[entry.key]}" />
+                            <c:set var="shiftTypeLabel">
+                                <c:choose>
+                                    <c:when test="${not empty shift.startTime && shift.startTime.toString().startsWith('08')}">morning</c:when>
+                                    <c:when test="${not empty shift.startTime && shift.startTime.toString().startsWith('14')}">afternoon</c:when>
+                                    <c:otherwise>custom</c:otherwise>
+                                </c:choose>
+                            </c:set>
+                            <div class="shift-card
+                                 ${leaveStatus == 'Pending' ? ' leave-pending' : ''}
+                                 ${leaveStatus == 'Approved' ? ' leave-approved' : ''}
+                                 ${leaveStatus == 'Rejected' ? ' leave-rejected' : ''}
+                                 ${empty leaveStatus ? ' clickable' : ' non-clickable'}"
+                                 <c:if test="${empty leaveStatus}">
+                                     onclick="window.location.href = '${pageContext.request.contextPath}/requestLeaveVeterinarian?date=${entry.key}&shiftType=${shiftTypeLabel}'"
+                                 </c:if>>
                                 <div class="avatar-circle">
                                     ${shift.staffName != null ? shift.staffName.charAt(0) : 'U'}
                                 </div>
                                 <div class="shift-info">
                                     <h4>${shift.staffName}</h4>
                                     <span class="role-badge vet">VETERINARIAN</span>
+                                    <c:if test="${not empty leaveStatus}">
+                                        <div style="font-size: 11px; font-weight: bold; margin-top: 5px;
+                                             color:
+                                             ${leaveStatus == 'Pending' ? '#d97706' :
+                                               leaveStatus == 'Approved' ? '#dc2626' : '#6b7280'};">
+                                            [Leave: ${leaveStatus}]
+                                        </div>
+                                    </c:if>
                                     <div class="time">
                                         <i class="fa-regular fa-clock"></i> 
                                         <c:choose>
-                                            <c:when test="${shift.startTime.toString().startsWith('08')}">
+                                            <c:when test="${not empty shift.startTime && shift.startTime.toString().startsWith('08')}">
                                                 <span>Morning (08:00 - 12:00)</span>
                                             </c:when>
-                                            <c:when test="${shift.startTime.toString().startsWith('14')}">
+                                            <c:when test="${not empty shift.startTime && shift.startTime.toString().startsWith('14')}">
                                                 <span>Afternoon (14:00 - 17:00)</span>
                                             </c:when>
                                             <c:otherwise>
-                                                <span><fmt:formatDate value="${shift.startTime}" pattern="HH:mm"/> 4 Hours
-                                                    <fmt:formatDate value="${shift.endTime}" pattern="HH:mm"/></span>
+                                                <c:choose>
+                                                    <c:when test="${not empty shift.shiftTime}">
+                                                        <span>${shift.shiftTime}</span>
+                                                    </c:when>
+                                                    <c:when test="${not empty shift.startTime && not empty shift.endTime}">
+                                                        <span><fmt:formatDate value="${shift.startTime}" pattern="HH:mm"/> - <fmt:formatDate value="${shift.endTime}" pattern="HH:mm"/></span>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span>(No shift time)</span>
+                                                    </c:otherwise>
+                                                </c:choose>
                                             </c:otherwise>
                                         </c:choose>
                                     </div>

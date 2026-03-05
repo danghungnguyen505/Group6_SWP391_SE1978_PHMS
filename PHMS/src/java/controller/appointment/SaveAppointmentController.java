@@ -5,6 +5,7 @@
 package controller.appointment;
 
 import dal.AppointmentDAO;
+import dal.ScheduleVeterianrianDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -15,6 +16,7 @@ import jakarta.servlet.http.HttpSession;
 import model.Appointment;
 import model.User;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 
 /**
  *
@@ -77,20 +79,31 @@ public class SaveAppointmentController extends HttpServlet {
             }
             
             // Validate date format and future date
-//            try {
-//                java.sql.Date selectedDate = java.sql.Date.valueOf(dateStr);
-//                java.sql.Date today = new java.sql.Date(System.currentTimeMillis());
-//                if (selectedDate.before(today)) {
-//                    request.setAttribute("error", "Không thể đặt lịch trong quá khứ!");
-//                    response.sendRedirect(request.getContextPath() + "/booking");
-//                    return;
-//                }
-//            } catch (IllegalArgumentException e) {
-//                request.setAttribute("error", "Ngày không hợp lệ!");
-//                response.sendRedirect(request.getContextPath() + "/booking");
-//                return;
-//            }
+            try {
+                LocalDate selectedDate = LocalDate.parse(dateStr);
+                LocalDate today = LocalDate.now();
+                if (selectedDate.isBefore(today)) {
+                    request.setAttribute("error", "Không thể đặt lịch trong quá khứ!");
+                    response.sendRedirect(request.getContextPath() + "/booking");
+                    return;
+                }
+            } catch (IllegalArgumentException e) {
+                request.setAttribute("error", "Ngày không hợp lệ!");
+                response.sendRedirect(request.getContextPath() + "/booking");
+                return;
+            }
             
+            // Business rule: do not allow booking if vet has leave request on that date
+            int vetId = Integer.parseInt(vetIdStr);
+            java.sql.Date sqlDate = java.sql.Date.valueOf(dateStr);
+            ScheduleVeterianrianDAO scheduleDao = new ScheduleVeterianrianDAO();
+            String leaveStatus = scheduleDao.getLeaveStatusByEmpAndDate(vetId, sqlDate);
+            if (leaveStatus != null) {
+                session.setAttribute("toastMessage", "error|Bác sĩ đã đăng ký nghỉ trong ngày này, vui lòng chọn ngày hoặc bác sĩ khác.");
+                response.sendRedirect(request.getContextPath() + "/booking?selectedDate=" + dateStr + "&vetId=" + vetIdStr);
+                return;
+            }
+
             // Validate notes length
             if (notes != null && notes.length() > 500) {
                 request.setAttribute("error", "Ghi chú không được vượt quá 500 ký tự!");

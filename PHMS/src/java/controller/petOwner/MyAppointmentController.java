@@ -70,7 +70,7 @@ public class MyAppointmentController extends HttpServlet {
 //        }
         // Phân trang
         int page = 1;
-        int pageSize = 3;
+        int pageSize = 5;
         if (request.getParameter("page") != null) {
             try {
                 page = Integer.parseInt(request.getParameter("page"));
