@@ -16,9 +16,20 @@ public class Schedule {
     private int managerId;
     private Date workDate;
     private String shiftTime;
-    private String vetName; 
+    private String scheduleIds;
+    private String vetName;
+    // Optional: leave status for this schedule's date (e.g. Pending/Approved/Rejected)
+    private String leaveStatus;
 
     public Schedule() {
+    }
+
+    public String getScheduleIds() {
+        return scheduleIds;
+    }
+
+    public void setScheduleIds(String scheduleIds) {
+        this.scheduleIds = scheduleIds;
     }
 
     public Schedule(int scheduleId, int empId, int managerId, Date workDate, String shiftTime, String vetName) {
@@ -76,6 +87,14 @@ public class Schedule {
 
     public void setVetName(String vetName) {
         this.vetName = vetName;
+    }
+
+    public String getLeaveStatus() {
+        return leaveStatus;
+    }
+
+    public void setLeaveStatus(String leaveStatus) {
+        this.leaveStatus = leaveStatus;
     }
 
 

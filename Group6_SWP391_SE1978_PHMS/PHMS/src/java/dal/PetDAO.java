@@ -4,6 +4,7 @@
  */
 package dal;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,24 +16,31 @@ import model.Pet;
  *
  * @author zoxy4
  */
-public class PetDAO extends DBContext{
-    // 1. Lấy danh sách thú cưng của một chủ sở hữu (Dùng cho Booking & Dashboard)
+public class PetDAO extends DBContext {
+
+    // 1. Lấy danh sách thú cưng của một chủ sở hữu
     public List<Pet> getPetsByOwnerId(int ownerId) {
         List<Pet> list = new ArrayList<>();
-        String sql = "SELECT * FROM Pet WHERE owner_id = ?";
+        String sql = "SELECT * FROM Pet WHERE owner_id = ? ORDER BY pet_id DESC";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, ownerId);
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                Pet p = new Pet(
-                    rs.getInt("pet_id"),
-                    rs.getInt("owner_id"),
-                    rs.getString("name"),
-                    rs.getString("species"),
-                    rs.getString("history_summary"),
-                        rs.getString("gender")
-                );
+                Pet p = new Pet();
+                // Map dữ liệu từ DB (tên cột SQL) vào Object (tên thuộc tính Java)
+                p.setId(rs.getInt("pet_id"));
+                p.setOwnerId(rs.getInt("owner_id"));
+                p.setName(rs.getString("name"));
+                p.setSpecies(rs.getString("species"));
+                p.setHistorySummary(rs.getString("history_summary"));
+
+                // Các trường mới theo ALTER TABLE
+                p.setBreed(rs.getString("breed"));
+                p.setWeight(rs.getDouble("weight"));
+                p.setBirthDate(rs.getDate("dob")); // LƯU Ý: Trong SQL cột là 'dob'
+                p.setGender(rs.getString("gender"));
+
                 list.add(p);
             }
         } catch (SQLException e) {
@@ -40,7 +48,8 @@ public class PetDAO extends DBContext{
         }
         return list;
     }
-    // 2. Lấy thông tin chi tiết 1 thú cưng theo ID (Dùng khi xem chi tiết hoặc sửa)
+
+    // 2. Lấy thông tin chi tiết 1 thú cưng theo ID
     public Pet getPetById(int petId) {
         String sql = "SELECT * FROM Pet WHERE pet_id = ?";
         try {
@@ -48,30 +57,46 @@ public class PetDAO extends DBContext{
             st.setInt(1, petId);
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
-                return new Pet(
-                    rs.getInt("pet_id"),
-                    rs.getInt("owner_id"),
-                    rs.getString("name"),
-                    rs.getString("species"),
-                    rs.getString("history_summary"),
-                        rs.getString("gender")
-                );
+                Pet p = new Pet();
+                p.setId(rs.getInt("pet_id"));
+                p.setOwnerId(rs.getInt("owner_id"));
+                p.setName(rs.getString("name"));
+                p.setSpecies(rs.getString("species"));
+                p.setHistorySummary(rs.getString("history_summary"));
+
+                p.setBreed(rs.getString("breed"));
+                p.setWeight(rs.getDouble("weight"));
+                p.setBirthDate(rs.getDate("dob")); // Map 'dob' sang birthDate
+                p.setGender(rs.getString("gender"));
+
+                return p;
             }
         } catch (SQLException e) {
             System.out.println("Error getPetById: " + e);
         }
         return null;
     }
-    // 3. Thêm thú cưng mới (Add New Pet)
-    public boolean addPet(int ownerId, String name, String species, String history, String gender) {
-        String sql = "INSERT INTO Pet (owner_id, name, species, history_summary, gender) VALUES (?, ?, ?, ?,?)";
+
+    // 3. Thêm thú cưng mới 
+    public boolean addPet(int ownerId, String name, String species, String history,
+            String breed, double weight, Date birthDate, String gender) {
+
+        // Cập nhật câu lệnh SQL khớp với tên cột trong DB
+        String sql = "INSERT INTO Pet (owner_id, name, species, history_summary, breed, weight, dob, gender) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, ownerId);
             st.setString(2, name);
             st.setString(3, species);
-            st.setString(4, history);
-            st.setString(5, gender);
+            st.setString(4, history); // Map vào history_summary
+
+            // Set các tham số mới
+            st.setString(5, breed);
+            st.setDouble(6, weight);
+            st.setDate(7, birthDate); // Map vào cột dob
+            st.setString(8, gender);
+
             int rows = st.executeUpdate();
             return rows > 0;
         } catch (SQLException e) {
@@ -79,15 +104,25 @@ public class PetDAO extends DBContext{
         }
         return false;
     }
-    // 4. Cập nhật thông tin thú cưng (Update Pet Info)
+
+    // 4. Cập nhật thông tin thú cưng
     public boolean updatePet(Pet p) {
-        String sql = "UPDATE Pet SET name = ?, species = ?, history_summary = ? WHERE pet_id = ?";
+        String sql = "UPDATE Pet SET name = ?, species = ?, history_summary = ?, "
+                + "breed = ?, weight = ?, dob = ?, gender = ? "
+                + "WHERE pet_id = ?";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setString(1, p.getName());
             st.setString(2, p.getSpecies());
             st.setString(3, p.getHistorySummary());
-            st.setInt(4, p.getId());
+
+            st.setString(4, p.getBreed());
+            st.setDouble(5, p.getWeight());
+            st.setDate(6, p.getBirthDate()); // Map vào cột dob
+            st.setString(7, p.getGender());
+
+            st.setInt(8, p.getId());
+
             int rows = st.executeUpdate();
             return rows > 0;
         } catch (SQLException e) {
@@ -95,7 +130,8 @@ public class PetDAO extends DBContext{
         }
         return false;
     }
-    // 5. Xóa thú cưng (Delete Pet)
+
+    // 5. Xóa thú cưng
     public boolean deletePet(int petId) {
         String sql = "DELETE FROM Pet WHERE pet_id = ?";
         try {
@@ -108,38 +144,33 @@ public class PetDAO extends DBContext{
         }
         return false;
     }
-    
-    // Hàm main để test thử DAO 
-//    public static void main(String[] args) {
-//        PetDAO dao = new PetDAO();
-//        int ownerIdTest = 5; 
-//        System.out.println("Danh sách thú cưng của User ID " + ownerIdTest + ":");
-//        List<Pet> list = dao.getPetsByOwnerId(ownerIdTest);
-//        
-//        for (Pet p : list) {
-//            System.out.println("- " + p.getName() + " (" + p.getSpecies() + ")");
-//        }
-//    }
-    // 6. Tìm kiếm thú cưng theo Tên hoặc Loài (Search Pet)
+
+    // 6. Tìm kiếm thú cưng (Tìm theo Tên, Loài hoặc Giống)
     public List<Pet> searchPets(int ownerId, String keyword) {
         List<Pet> list = new ArrayList<>();
-        // Tìm kiếm gần đúng (LIKE) theo tên hoặc loài, và PHẢI thuộc về owner đó
-        String sql = "SELECT * FROM Pet WHERE owner_id = ? AND (name LIKE ? OR species LIKE ?)";
+        String sql = "SELECT * FROM Pet WHERE owner_id = ? AND (name LIKE ? OR species LIKE ? OR breed LIKE ?)";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, ownerId);
             String pattern = "%" + keyword + "%";
             st.setString(2, pattern);
             st.setString(3, pattern);
+            st.setString(4, pattern);
+
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                Pet p = new Pet(
-                        rs.getInt("pet_id"),
-                        rs.getInt("owner_id"),
-                        rs.getString("name"),
-                        rs.getString("species"),
-                        rs.getString("history_summary"), rs.getString("gender")
-                );
+                Pet p = new Pet();
+                p.setId(rs.getInt("pet_id"));
+                p.setOwnerId(rs.getInt("owner_id"));
+                p.setName(rs.getString("name"));
+                p.setSpecies(rs.getString("species"));
+                p.setHistorySummary(rs.getString("history_summary"));
+
+                p.setBreed(rs.getString("breed"));
+                p.setWeight(rs.getDouble("weight"));
+                p.setBirthDate(rs.getDate("dob")); // Map 'dob'
+                p.setGender(rs.getString("gender"));
+
                 list.add(p);
             }
         } catch (SQLException e) {
@@ -147,5 +178,4 @@ public class PetDAO extends DBContext{
         }
         return list;
     }
-    
 }

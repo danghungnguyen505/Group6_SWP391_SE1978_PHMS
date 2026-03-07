@@ -5,6 +5,7 @@
 package controller.appointment;
 
 import dal.AppointmentDAO;
+import dal.ScheduleVeterianrianDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -92,6 +93,17 @@ public class SaveAppointmentController extends HttpServlet {
                 return;
             }
             
+            // Business rule: do not allow booking if vet has leave request on that date
+            int vetId = Integer.parseInt(vetIdStr);
+            java.sql.Date sqlDate = java.sql.Date.valueOf(dateStr);
+            ScheduleVeterianrianDAO scheduleDao = new ScheduleVeterianrianDAO();
+            String leaveStatus = scheduleDao.getLeaveStatusByEmpAndDate(vetId, sqlDate);
+            if (leaveStatus != null) {
+                session.setAttribute("toastMessage", "error|Bác sĩ đã đăng ký nghỉ trong ngày này, vui lòng chọn ngày hoặc bác sĩ khác.");
+                response.sendRedirect(request.getContextPath() + "/booking?selectedDate=" + dateStr + "&vetId=" + vetIdStr);
+                return;
+            }
+
             // Validate notes length
             if (notes != null && notes.length() > 500) {
                 request.setAttribute("error", "Ghi chú không được vượt quá 500 ký tự!");

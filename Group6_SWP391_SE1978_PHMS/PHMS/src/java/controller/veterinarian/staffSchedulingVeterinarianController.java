@@ -28,7 +28,7 @@ import model.User;
  *
  * @author zoxy4
  */
-@WebServlet(name = "staffSchedulingVeterinarianController", urlPatterns = {"/veterinarian/scheduling"})
+@WebServlet(name = "staffSchedulingVeterinarianController", urlPatterns = { "/veterinarian/scheduling" })
 public class staffSchedulingVeterinarianController extends HttpServlet {
 
     @Override
@@ -48,14 +48,13 @@ public class staffSchedulingVeterinarianController extends HttpServlet {
         }
         LocalDate startOfWeek = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         LocalDate endOfWeek = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
-        // 2. Gọi DAO 
+        // 2. Gọi DAO
         StaffScheduleVeterinarianDAO dao = new StaffScheduleVeterinarianDAO();
         ScheduleVeterianrianDAO daoForStatusResgister = new ScheduleVeterianrianDAO();
         List<StaffScheduleVeterinarian> mySchedules = dao.getSchedulesByStaffIdAndDateRange(
                 account.getUserId(), // ID của bác sĩ đang login
                 Date.valueOf(startOfWeek),
-                Date.valueOf(endOfWeek)
-        );
+                Date.valueOf(endOfWeek));
         // 3. Gom nhóm dữ liệu
         Map<String, List<StaffScheduleVeterinarian>> weeklyMap = new LinkedHashMap<>();
         LocalDate current = startOfWeek;
@@ -63,14 +62,58 @@ public class staffSchedulingVeterinarianController extends HttpServlet {
             weeklyMap.put(current.toString(), new ArrayList<>());
             current = current.plusDays(1);
         }
+
+        Map<String, List<StaffScheduleVeterinarian>> tempGrouping = new LinkedHashMap<>();
         for (StaffScheduleVeterinarian s : mySchedules) {
             String key = s.getWorkDate().toString();
-            if (weeklyMap.containsKey(key)) {
-                weeklyMap.get(key).add(s);
+            tempGrouping.computeIfAbsent(key, k -> new ArrayList<>()).add(s);
+        }
+
+        for (Map.Entry<String, List<StaffScheduleVeterinarian>> entry : tempGrouping.entrySet()) {
+            List<StaffScheduleVeterinarian> sList = entry.getValue();
+            if (sList.isEmpty())
+                continue;
+
+            StaffScheduleVeterinarian first = sList.get(0);
+            String dateKey = first.getWorkDate().toString();
+
+            List<StaffScheduleVeterinarian> morningList = new ArrayList<>();
+            List<StaffScheduleVeterinarian> afternoonList = new ArrayList<>();
+
+            for (StaffScheduleVeterinarian s : sList) {
+                if (s.getShiftTime() != null && s.getShiftTime().contains("AM")
+                        && !s.getShiftTime().startsWith("12:")) {
+                    morningList.add(s);
+                } else if (s.getShiftTime() != null
+                        && (!s.getShiftTime().contains("AM") || s.getShiftTime().startsWith("12:"))) {
+                    afternoonList.add(s);
+                }
+            }
+
+            if (!morningList.isEmpty()) {
+                StaffScheduleVeterinarian m = new StaffScheduleVeterinarian();
+                m.setScheduleId(morningList.get(0).getScheduleId());
+                m.setEmpId(first.getEmpId());
+                m.setStaffName(first.getStaffName());
+                m.setWorkDate(first.getWorkDate());
+                m.setShiftTime("Morning (09:00 - 12:00)");
+                m.setStartTime(java.sql.Time.valueOf("09:00:00"));
+                weeklyMap.get(dateKey).add(m);
+            }
+
+            if (!afternoonList.isEmpty()) {
+                StaffScheduleVeterinarian a = new StaffScheduleVeterinarian();
+                a.setScheduleId(afternoonList.get(0).getScheduleId());
+                a.setEmpId(first.getEmpId());
+                a.setStaffName(first.getStaffName());
+                a.setWorkDate(first.getWorkDate());
+                a.setShiftTime("Afterning (14:00 - 17:00)");
+                a.setStartTime(java.sql.Time.valueOf("14:00:00"));
+                weeklyMap.get(dateKey).add(a);
             }
         }
         java.util.Map<String, String> leaveMap = daoForStatusResgister.getLeaveStatusMap(account.getUserId());
-        
+
         request.setAttribute("weeklyMap", weeklyMap);
         request.setAttribute("startOfWeek", startOfWeek);
         request.setAttribute("endOfWeek", endOfWeek);
@@ -92,7 +135,7 @@ public class staffSchedulingVeterinarianController extends HttpServlet {
             s.setWorkDate(Date.valueOf(dateStr));
             if ("morning".equals(shiftType)) {
                 s.setStartTime(java.sql.Time.valueOf("08:00:00"));
-                s.setEndTime(java.sql.Time.valueOf("11:00:00"));
+                s.setEndTime(java.sql.Time.valueOf("12:00:00"));
             } else if ("afternoon".equals(shiftType)) {
                 s.setStartTime(java.sql.Time.valueOf("14:00:00"));
                 s.setEndTime(java.sql.Time.valueOf("17:00:00"));

@@ -7,41 +7,46 @@
         <title>Hàng đợi cấp cứu - Bác sĩ</title>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/components.css">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/pages/service-management.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/views/veterinarian/nav/navVeterinarian.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/veterinarian/veterinarianList.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/pages/staffScheduling.css">
     </head>
     <body>
+        <c:set var="activePage" value="emergencyQueue" scope="request" />
         <jsp:include page="nav/navVeterinarian.jsp" />
         <main class="main-content">
-            <div class="mgmt-page">
-                <div class="mgmt-container">
-                    <header class="mgmt-header">
-                        <div>
-                            <h1 class="mgmt-title">My emergency queue</h1>
-                            <p class="mgmt-subtitle">Emergency cases have been triaged and assigned to you.</p>
-                        </div>
-                    </header>
+            <div class="top-bar">
+                <div class="page-header">
+                    <h2>My Emergency Queue</h2>
+                    <p>Emergency cases have been triaged and assigned to you.</p>
+                </div>
+                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
+            </div>
 
-                    <c:if test="${empty appointments}">
+            <div class="card">
+                <div class="section-title">
+                    <span>Emergency Waiting List</span>
+                </div>
+
+                <c:if test="${empty appointments}">
+                    <div class="empty-state">
                         <p>There are currently no emergency cases in the waiting list.</p>
-                    </c:if>
+                    </div>
+                </c:if>
 
-                    <c:if test="${not empty appointments}">
-                        <div class="data-table-container">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Pet</th>
-                                        <th>Pet Owner</th>
-                                        <th>Time</th>
-                                        <th>Level</th>
-                                        <th>Initial symptoms</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                <c:if test="${not empty appointments}">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Pet</th>
+                                <th>Pet Owner</th>
+                                <th>Time</th>
+                                <th>Level</th>
+                                <th>Initial symptoms</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                                     <c:forEach var="a" items="${appointments}">
                                         <c:set var="triage" value="${triageMap[a.apptId]}" />
                                         <tr>
@@ -74,9 +79,7 @@
                                     </c:forEach>
                                 </tbody>
                             </table>
-                        </div>
-                    </c:if>
-                </div>
+                </c:if>
             </div>
         </main>
     </body>

@@ -176,20 +176,50 @@ body {
 .top-bar {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 30px;
+}
+
+.page-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 5px;
+}
+
+.page-header p {
+    color: #64748b;
+    font-size: 14px;
+    margin: 0;
 }
 
 .btn-signout {
     text-decoration: none;
     color: #EF4444; /* Màu đỏ */
+    background-color: #fff;
+    border: 1px solid #e2e8f0;
     font-weight: 600;
     font-size: 14px;
     padding: 8px 16px;
     border-radius: 6px;
     transition: 0.2s;
+    cursor: pointer;
 }
 
 .btn-signout:hover {
     background-color: #FEF2F2;
+    border-color: #fca5a5;
+}
+
+/* Emergency Queue Danger Text Link */
+.nav-menu .nav-link.text-danger {
+    color: #ef4444;
+}
+.nav-menu .nav-link.text-danger:hover {
+    background-color: #fef2f2;
+}
+
+.nav-menu .nav-link.text-danger.active {
+    background-color: #ef4444;
+    color: white;
 }

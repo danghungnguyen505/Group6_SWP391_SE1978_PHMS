@@ -34,6 +34,29 @@ public class DashboardVeterinarianController extends HttpServlet {
             return;
         }
 
+        int vetId = account.getUserId();
+        AppointmentDAO apptDAO = new AppointmentDAO();
+        dal.LabTestDAO labDAO = new dal.LabTestDAO();
+
+        // Fetch dashboard data
+        List<model.Appointment> todaySchedule = apptDAO.getTodayAppointmentsForVet(vetId);
+        int patientsToday = todaySchedule.size();
+        
+        int emrUpdatesReq = 0;
+        for (model.Appointment a : todaySchedule) {
+            if ("In-Progress".equals(a.getStatus())) {
+                emrUpdatesReq++;
+            }
+        }
+
+        int pendingLabResults = labDAO.getPendingLabResultsCountForVet(vetId);
+
+        // Pass data to JSP
+        request.setAttribute("todaySchedule", todaySchedule);
+        request.setAttribute("patientsToday", patientsToday);
+        request.setAttribute("emrUpdatesReq", emrUpdatesReq);
+        request.setAttribute("pendingLabResults", pendingLabResults);
+
         request.getRequestDispatcher("/views/veterinarian/dashBoardVeterinarian.jsp").forward(request, response);
     } 
 

@@ -13,54 +13,12 @@
 
     <div class="menu-label">MAIN MENU</div>
     <ul class="nav-menu">
-        <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/veterinarian/dashboard"
-               class="nav-link ${uri.contains('dashboard') ? 'active' : ''}">
-                <i class="fa-solid fa-table-columns"></i> Dashboard
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/veterinarian/emergency/queue"
-               class="nav-link ${uri.contains('emergency') ? 'active' : ''}">
-                <i class="fa-solid fa-truck-medical"></i> Emergency Queue
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/veterinarian/emr/queue"
-               class="nav-link ${uri.contains('emr/queue') || uri.contains('emrqueue') ? 'active' : ''}">
-                <i class="fa-solid fa-stethoscope"></i> EMR Queue
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/veterinarian/emr/records"
-               class="nav-link ${uri.contains('medicalrecord') || uri.contains('emr/records') || uri.contains('emr/detail') ? 'active' : ''}">
-                <i class="fa-solid fa-file-medical"></i> Medical Records
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/veterinarian/lab/requests"
-               class="nav-link ${uri.contains('lab') ? 'active' : ''}">
-                <i class="fa-solid fa-vial"></i> Lab Requests
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/veterinarian/prescription/list"
-               class="nav-link ${uri.contains('prescription') ? 'active' : ''}">
-                <i class="fa-solid fa-prescription-bottle-medical"></i> Prescriptions
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a href="${pageContext.request.contextPath}/veterinarian/scheduling"
-               class="nav-link ${uri.contains('scheduling') ? 'active' : ''}">
-                <i class="fa-solid fa-calendar-days"></i> Staff Scheduling
-            </a>
-        </li>
+        <li class="nav-item"><a href="${pageContext.request.contextPath}/veterinarian/dashboard" class="nav-link ${requestScope.activePage == 'dashboard' ? 'active' : ''}"><i class="fa-solid fa-table-columns"></i> Dashboard</a></li>
+        <li class="nav-item"><a href="${pageContext.request.contextPath}/veterinarian/emergency/queue" class="nav-link text-danger ${requestScope.activePage == 'emergencyQueue' ? 'active' : ''}"><i class="fa-solid fa-truck-medical"></i> Emergency Queue</a></li>
+        <li class="nav-item"><a href="${pageContext.request.contextPath}/veterinarian/emr/queue" class="nav-link ${requestScope.activePage == 'emrQueue' ? 'active' : ''}"><i class="fa-solid fa-stethoscope"></i> EMR Queue</a></li>
+        <li class="nav-item"><a href="${pageContext.request.contextPath}/veterinarian/emr/records" class="nav-link ${requestScope.activePage == 'medicalRecords' ? 'active' : ''}"><i class="fa-solid fa-notes-medical"></i> Medical Records</a></li>
+        <li class="nav-item"><a href="${pageContext.request.contextPath}/veterinarian/lab/requests" class="nav-link ${requestScope.activePage == 'labRequests' ? 'active' : ''}"><i class="fa-solid fa-vial"></i> Lab Requests</a></li>
+        <li class="nav-item"><a href="${pageContext.request.contextPath}/veterinarian/scheduling" class="nav-link ${requestScope.activePage == 'staffScheduling' ? 'active' : ''}"><i class="fa-solid fa-calendar-days"></i> Staff Scheduling</a></li>
     </ul>
 
     <div class="support-box">

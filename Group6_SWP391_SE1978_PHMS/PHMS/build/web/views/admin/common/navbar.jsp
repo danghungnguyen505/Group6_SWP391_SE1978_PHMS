@@ -57,7 +57,8 @@
             </a>
         </li>
         <li class="nav-item">
-            <a href="#" class="nav-link ${param.activePage == 'scheduling' ? 'active' : ''}">
+            <a href="${pageContext.request.contextPath}/admin/doctor/schedule/list" 
+               class="nav-link ${param.activePage == 'scheduling' ? 'active' : ''}">
                 <i class="fa-solid fa-clock"></i> Scheduling
             </a>
         </li>

@@ -71,9 +71,14 @@ public class BookingController extends HttpServlet {
         if (dateStr != null && !dateStr.isEmpty()) {
             Date date = Date.valueOf(dateStr); // SQL Date
             List<Schedule> rawList = scheduleDAO.getSchedulesByDate(date);
-            // Gộp lịch trùng 
+            // Gộp lịch trùng và loại bỏ bác sĩ đã có đơn nghỉ trong ngày đó
             Map<Integer, Schedule> uniqueMap = new LinkedHashMap<>();
             for (Schedule s : rawList) {
+                String leaveStatus = scheduleDAO.getLeaveStatusByEmpAndDate(s.getEmpId(), date);
+                if (leaveStatus != null) {
+                    // Vet has a leave request on this date -> do not show for booking
+                    continue;
+                }
                 if (uniqueMap.containsKey(s.getEmpId())) {
                     Schedule existing = uniqueMap.get(s.getEmpId());
                     existing.setShiftTime(existing.getShiftTime() + " | " + s.getShiftTime());

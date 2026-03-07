@@ -55,22 +55,24 @@
                 <table class="table-custom">
                     <thead>
                         <tr>
-                            <th>#ID</th>
+                            <th>ID</th>
                             <th>Date & Time</th>
                             <th>Pet</th>
                             <th>Service</th>
                             <th>Doctor</th>
                             <th>Status</th>
                             <th>Notes</th>
-                            <th>Actions</th>
+                            <th class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <c:forEach items="${upcomingList}" var="u">
+                        <c:forEach items="${upcomingList}" var="u" varStatus="status">
                             <tr>
-                                <td><b>#${u.apptId}</b></td>
+                                <c:set var="itemIndex" value="${(empty param.page ? 0 : param.page - 1) * 5 + status.count}" />
+                                <td><b>${itemIndex}</b></td>
                                 <td>
-                                    <i class="fa-regular fa-calendar"></i> <fmt:formatDate value="${u.startTime}" pattern="dd-MM-yyyy HH:mm"/>
+<!--                                    <i class="fa-regular fa-calendar"></i> -->
+                                    <fmt:formatDate value="${u.startTime}" pattern="dd-MM-yyyy HH:mm"/>
                                 </td>
                                 <td>${u.petName}</td>
                                 <td>${u.type}</td>
@@ -91,7 +93,7 @@
                                         <span style="color: #9ca3af; font-style: italic; font-size: 0.9em;">No notes</span>
                                     </c:if>
                                 </td>
-                                <td style="text-align: center;">
+                                <td class="d-flex flex-column align-items-center">
                                     <jsp:useBean id="now" class="java.util.Date" />
                                     <c:set var="currentTime" value="${now.time}" />
                                     <c:set var="startTimeMs" value="${u.startTime.time}" />
@@ -111,23 +113,25 @@
                                             </a>
                                         </div>
 
-                                        <div style="font-size: 0.75rem; color: #666; margin-top: 5px; text-align: left;">
-                                            Bạn có thể hủy/đổi lịch trước giờ hẹn ít nhất 5 tiếng. Còn khoảng: <fmt:formatNumber value="${hoursUntilStart}" maxFractionDigits="0"/>h
+                                        <div style="font-size: 0.65rem; color: #666; margin-top: 5px; text-align: left;">
+                                            Approximately: <fmt:formatNumber value="${hoursUntilStart}" maxFractionDigits="0"/>h
                                         </div>
+                                        
                                     </c:if>
 
                                     <c:if test="${!isActionAllowed}">
-                                        <div style="color: #9ca3af; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 5px; background: #f3f4f6; padding: 5px; border-radius: 4px;">
+                                        <div style="color: #9ca3af; font-size: 0.85rem; display: flex; align-items: center; 
+                                             justify-content: center; gap: 5px; background: #f3f4f6; padding: 5px; border-radius: 4px;">
                                             <i class="fa-solid fa-lock"></i> Locked
                                         </div>
-                                    </c:if>
+                                    </c:if>         
                                 </td>
                             </tr>
                         </c:forEach>
                     </tbody>
                 </table>
             </c:if>
-
+            <div class="text-end"> You can reschedule/cancel your appointment at least 5 hours in advance.</div>
             <div class="section-header" style="margin-top: 40px;">
                 <i class="fa-solid fa-history text-secondary"></i> History
             </div>
@@ -142,7 +146,7 @@
                 <table class="table-custom">
                     <thead>
                         <tr>
-                            <th>#ID</th>
+                            <th>ID</th>
                             <th>Date & Time</th>
                             <th>Pet</th>
                             <th>Service</th>
@@ -151,9 +155,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <c:forEach items="${historyList}" var="h">
+                        <c:forEach items="${historyList}" var="h" varStatus="status">
                             <tr>
-                                <td>#${h.apptId}</td>
+                                <c:set var="itemIndex" value="${(empty param.page ? 0 : param.page - 1) * 5 + status.count}" />
+                                <td><b>${itemIndex}</b></td>
                                 <td style="color: #666;">
                                     <fmt:formatDate value="${h.startTime}" pattern="dd-MM-yyyy HH:mm"/>
                                 </td>

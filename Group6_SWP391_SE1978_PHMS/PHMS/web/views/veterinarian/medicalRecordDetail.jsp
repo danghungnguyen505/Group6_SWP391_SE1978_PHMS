@@ -7,7 +7,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>VetCare Pro - Medical Record Detail</title>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/pages/receptionistDashboard.css">
+        <link href="${pageContext.request.contextPath}/assets/css/veterinarian/dashboardVeterinarian.css" rel="stylesheet">
     </head>
     <body>
         <nav class="sidebar">

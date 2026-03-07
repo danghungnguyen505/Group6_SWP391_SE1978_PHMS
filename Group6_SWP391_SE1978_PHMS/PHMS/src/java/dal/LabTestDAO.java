@@ -267,13 +267,35 @@ public class LabTestDAO extends DBContext {
 
         lt.setRecordCreatedAt(rs.getTimestamp("record_created_at"));
         lt.setApptId(rs.getInt("appt_id"));
-        lt.setApptStartTime(rs.getTimestamp("appt_start_time"));
         lt.setVetId(rs.getInt("vet_id"));
         lt.setOwnerId(rs.getInt("owner_id"));
         lt.setOwnerName(rs.getString("owner_name"));
         lt.setVetName(rs.getString("vet_name"));
         lt.setPetName(rs.getString("pet_name"));
         return lt;
+    }
+
+    /**
+     * Dashboard: Get count of pending lab results for this vet.
+     */
+    public int getPendingLabResultsCountForVet(int vetId) {
+        String sql = "SELECT COUNT(lt.test_id) AS cnt "
+                + "FROM LabTest lt "
+                + "JOIN MedicalRecord mr ON lt.record_id = mr.record_id "
+                + "JOIN Appointment a ON mr.appt_id = a.appt_id "
+                + "WHERE a.vet_id = ? "
+                + "AND lt.status IN ('Requested', 'In Progress')";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, vetId);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("cnt");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getPendingLabResultsCountForVet: " + e.getMessage());
+        }
+        return 0;
     }
 }
 

@@ -4,31 +4,44 @@
  */
 package model;
 
+import java.sql.Date;
+
 /**
  *
  * @author zoxy4
  */
 public class Pet {
-    private int id;       
-    private int ownerId;     
-    private String name;       
-    private String species;    
+
+    private int id;
+    private int ownerId;
+    private String name;
+    private String species;
     private String historySummary;
+
+    // Các trường mới thêm
+    private String breed;
+    private double weight;
+    private Date birthDate;
     private String gender;
 
-    public Pet(int id, int ownerId, String name, String species, String historySummary, String string3) {
+    // 1. Constructor rỗng (Bắt buộc phải có để tạo đối tượng rồi set sau)
+    public Pet() {
+    }
+
+    public Pet(int id, int ownerId, String name, String species, String historySummary,
+            String breed, double weight, Date birthDate, String gender) {
         this.id = id;
         this.ownerId = ownerId;
         this.name = name;
         this.species = species;
         this.historySummary = historySummary;
+        this.breed = breed;
+        this.weight = weight;
+        this.birthDate = birthDate;
         this.gender = gender;
     }
 
-    
-    public Pet() {
-    }
-
+    // Getters và Setters
     public int getId() {
         return id;
     }
@@ -69,6 +82,30 @@ public class Pet {
         this.historySummary = historySummary;
     }
 
+    public String getBreed() {
+        return breed;
+    }
+
+    public void setBreed(String breed) {
+        this.breed = breed;
+    }
+
+    public double getWeight() {
+        return weight;
+    }
+
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
+
+    public Date getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
+    }
+
     public String getGender() {
         return gender;
     }
@@ -77,4 +114,8 @@ public class Pet {
         this.gender = gender;
     }
 
+    @Override
+    public String toString() {
+        return "Pet{" + "id=" + id + ", name=" + name + ", species=" + species + ", breed=" + breed + '}';
+    }
 }

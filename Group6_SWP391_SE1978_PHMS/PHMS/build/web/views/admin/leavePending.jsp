@@ -36,65 +36,20 @@
                 min-height: 100vh;
             }
 
-            /* --- SIDEBAR (ĐỒNG BỘ) --- */
-            .sidebar {
-                width: var(--sidebar-width);
-                background: #ffffff;
-                height: 100vh;
-                position: fixed;
-                left: 0;
-                top: 0;
-                padding: 35px 25px;
-                display: flex;
-                flex-direction: column;
-                border-right: 1px solid #edf2f7;
-                z-index: 1000;
-            }
-            .logo {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                color: var(--primary-green);
-                font-weight: 800;
-                font-size: 22px;
-                margin-bottom: 50px;
-                padding-left: 10px;
-            }
-            .menu-label {
-                color: #a0aec0;
-                font-size: 11px;
-                font-weight: 700;
-                text-transform: uppercase;
-                letter-spacing: 1.2px;
-                margin-bottom: 20px;
-                padding-left: 10px;
-            }
-            .nav-link {
-                display: flex;
-                align-items: center;
-                gap: 15px;
-                padding: 12px 18px;
-                text-decoration: none;
-                color: var(--text-muted);
-                font-weight: 500;
-                font-size: 15px;
-                border-radius: 12px;
-                transition: 0.2s;
-            }
-            .nav-link:hover {
-                background: #f7fafc;
-                color: var(--text-main);
-            }
-            .nav-link.active {
-                background: #f0fff4;
-                color: var(--primary-green);
-                font-weight: 600;
-            }
-            .nav-link i {
-                width: 22px;
-                font-size: 18px;
-                text-align: center;
-            }
+            /* --- SIDEBAR --- */
+        .sidebar {
+            width: var(--sidebar-width); background: #ffffff; height: 100vh; position: fixed;
+            left: 0; top: 0; padding: 35px 25px; display: flex; flex-direction: column;
+            border-right: 1px solid #edf2f7; z-index: 1000;
+        }
+        .logo { display: flex; align-items: center; gap: 12px; color: var(--primary-green); font-weight: 800; font-size: 22px; margin-bottom: 50px; padding-left: 10px; }
+        .menu-label { color: #a0aec0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 20px; padding-left: 10px; }
+        .nav-menu { list-style: none; flex: 1; }
+        .nav-item { margin-bottom: 6px; }
+        .nav-link { display: flex; align-items: center; gap: 15px; padding: 12px 18px; text-decoration: none; color: var(--text-muted); font-weight: 500; font-size: 15px; border-radius: 12px; transition: 0.2s; }
+        .nav-link:hover { background: #f7fafc; color: var(--text-main); }
+        .nav-link.active { background: #f0fff4; color: var(--primary-green); font-weight: 600; }
+        .nav-link i { width: 22px; font-size: 18px; text-align: center; }
 
             /* --- MAIN CONTENT --- */
             .main-content {
@@ -112,11 +67,7 @@
                 text-transform: uppercase;
                 letter-spacing: -0.5px;
             }
-            .page-header p {
-                color: var(--text-muted);
-                margin-top: 5px;
-                font-size: 15px;
-            }
+            .page-header p { color: var(--text-muted); margin-top: 5px; font-size: 15px; }
 
             /* --- TABLE CARD --- */
             .table-container {
@@ -254,30 +205,10 @@
                 color: white;
             }
 
-            .help-box {
-                margin-top: auto;
-                background: #f8fafc;
-                padding: 20px;
-                border-radius: 16px;
-                border: 1px solid #edf2f7;
-            }
-            .btn-support {
-                display: block;
-                background: #0f172a;
-                color: white;
-                text-align: center;
-                padding: 10px;
-                border-radius: 8px;
-                text-decoration: none;
-                font-weight: 700;
-                font-size: 12px;
-                margin-top: 8px;
-            }
-            ul, ol {
-                list-style-type: none;
-                margin: 0;
-                padding: 0;
-            }
+            .help-box { margin-top: auto; background: #f8fafc; padding: 20px; border-radius: 16px; border: 1px solid #edf2f7; }
+            .help-box p { font-size: 13px; font-weight: 600; margin-bottom: 12px; }
+            .btn-support { display: block; background: #0f172a; color: white; text-align: center; padding: 10px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 12px; margin-top: 8px; }
+            
         </style>
     </head>
     <body>

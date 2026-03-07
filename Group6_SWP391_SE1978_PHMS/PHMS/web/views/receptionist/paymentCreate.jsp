@@ -18,15 +18,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="${pageContext.request.contextPath}/assets/css/dashboardLeft.css" rel="stylesheet">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/views/receptionist/nav/navReceptionist.css">
     <link href="${pageContext.request.contextPath}/assets/css/petOwner/billingPetOwner.css" rel="stylesheet">
 </head>
 <body>
-    <nav class="sidebar">
-        <div class="brand"><i class="fa-solid fa-plus-square"></i> VetCare Pro</div>
-        <ul class="menu">
-             <li><a href="${pageContext.request.contextPath}/receptionist/dashboard"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a></li>
-        </ul>
-    </nav>
+    <c:set var="activePage" value="billing" scope="request" />
+    <jsp:include page="nav/navReceptionist.jsp" />
 
     <main class="main-content">
         <div class="page-header">
@@ -47,7 +44,7 @@
                     <div class="d-flex justify-content-between mt-2">
                         <strong>Total Amount:</strong>
                         <span class="fs-4 fw-bold text-primary">
-                            <fmt:formatNumber value="${invoice.totalAmount}" type="currency" currencySymbol="$"/>
+                            <fmt:formatNumber value="${invoice.totalAmount}" type="currency" currencySymbol="VND "/>
                         </span>
                     </div>
                 </div>

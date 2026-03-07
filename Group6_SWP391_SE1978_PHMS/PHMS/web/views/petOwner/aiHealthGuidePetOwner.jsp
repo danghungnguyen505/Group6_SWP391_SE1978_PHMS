@@ -80,16 +80,6 @@
                     </c:forEach>
                 </c:if>
 
-                <c:if test="${not empty answer}">
-                     <div class="message user-message" style="justify-content: flex-end;">
-                        <div class="message-content">${question}</div> <div class="message-icon" style="margin-left: 10px;"><i class="fa-solid fa-user"></i></div>
-                    </div>
-                    <div class="message bot-message">
-                        <div class="message-icon"><i class="fa-solid fa-robot"></i></div>
-                        <div class="message-content" style="white-space: pre-wrap;">${answer}</div>
-                    </div>
-                </c:if>
-
                 <div id="loadingBubble" class="loading-bubble">
                     <i class="fa-solid fa-spinner fa-spin"></i> AI đang soạn câu trả lời...
                 </div>

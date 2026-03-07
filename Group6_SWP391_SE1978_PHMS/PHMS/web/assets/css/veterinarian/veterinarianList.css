@@ -1,0 +1,142 @@
+/*
+    Styles for Veterinarian Lists/Queues
+    Includes EMR Queue, Medical Records, Lab Requests
+*/
+
+/* --- MAIN CARD --- */
+.card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    padding: 30px;
+    border: 1px solid #E5E7EB;
+    margin-bottom: 24px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* --- TABLE STYLING --- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead th {
+    text-align: left;
+    font-size: 13px;
+    text-transform: uppercase;
+    color: #64748b;
+    letter-spacing: 0.5px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e2e8f0;
+    font-weight: 700;
+}
+
+tbody tr {
+    border-bottom: 1px solid #f1f5f9;
+    transition: background-color 0.2s ease;
+}
+
+tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+tbody tr:last-child {
+    border-bottom: none;
+}
+
+tbody td {
+    padding: 16px 8px;
+    font-size: 14px;
+    vertical-align: middle;
+    color: #334155;
+}
+
+/* Specific Columns */
+.col-id {
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.col-pet {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.col-service {
+    color: #10b981;
+    font-weight: 600;
+}
+
+/* --- ACTION BUTTONS --- */
+.btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.btn-approve {
+    background-color: #10b981;
+    color: #ffffff;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+}
+
+.btn-approve:hover {
+    background-color: #059669;
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.btn-reject {
+    background-color: #ffffff;
+    border: 1px solid #ef4444;
+    color: #ef4444;
+}
+
+.btn-reject:hover {
+    background-color: #fef2f2;
+}
+
+.action-group {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+/* Pagination container inside card */
+.pagination-container {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+}
+
+/* --- EMPTY STATE --- */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #64748b;
+    font-size: 15px;
+    background-color: #f8fafc;
+    border-radius: 12px;
+    border: 1px dashed #cbd5e1;
+}

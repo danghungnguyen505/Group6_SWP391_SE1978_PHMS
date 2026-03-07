@@ -5,6 +5,7 @@
 package controller.veterinarian;
 
 import dal.ScheduleVeterianrianDAO;
+import dal.AppointmentDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -44,6 +45,19 @@ public class requestLeaveVeterinarianController extends HttpServlet {
         }
         try {
             int empId = Integer.parseInt(empIdStr);
+
+            // Business rule: do not allow leave request if vet already has appointments on that date
+            AppointmentDAO apptDao = new AppointmentDAO();
+            java.sql.Date workDate = java.sql.Date.valueOf(startDate);
+            boolean hasAppt = apptDao.hasAppointmentsForVetOnDate(empId, workDate);
+            if (hasAppt) {
+                request.setAttribute("status", "error");
+                request.setAttribute("message", "Không thể xin nghỉ vì bạn đã có cuộc hẹn trong ngày này.");
+                request.setAttribute("date", startDate);
+                request.getRequestDispatcher("/views/veterinarian/requestLeaveVeterinarian.jsp").forward(request, response);
+                return;
+            }
+
             ScheduleVeterianrianDAO dao = new ScheduleVeterianrianDAO();
             boolean isSuccess = dao.insertLeaveRequest(empId, startDate, reason);
             if (isSuccess) {

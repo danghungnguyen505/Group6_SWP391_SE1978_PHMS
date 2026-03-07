@@ -18,6 +18,60 @@ import java.sql.Date;
 
 public class ScheduleVeterianrianDAO extends DBContext {
 
+    /**
+     * Get minimal schedule info by schedule_id (emp_id, work_date, shift_time).
+     * Returns null if not found.
+     */
+    public Schedule getScheduleById(int scheduleId) {
+        String sql = "SELECT schedule_id, emp_id, work_date, shift_time FROM Schedule WHERE schedule_id = ?";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, scheduleId);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    Schedule s = new Schedule();
+                    s.setScheduleId(rs.getInt("schedule_id"));
+                    s.setEmpId(rs.getInt("emp_id"));
+                    s.setWorkDate(rs.getDate("work_date"));
+                    s.setShiftTime(rs.getString("shift_time"));
+                    return s;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getScheduleById: " + e.getMessage());
+        }
+        return null;
+    }
+
+    public boolean deleteSchedulesByIds(List<Integer> ids) {
+        if(ids == null || ids.isEmpty()) return false;
+        StringBuilder placeholders = new StringBuilder();
+        for(int i=0; i<ids.size(); i++) {
+            placeholders.append("?");
+            if(i < ids.size()-1) placeholders.append(",");
+        }
+        String sql = "DELETE FROM Schedule WHERE schedule_id IN (" + placeholders.toString() + ")";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            for(int i=0; i<ids.size(); i++) {
+                st.setInt(i+1, ids.get(i));
+            }
+            return st.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Error deleteSchedulesByIds: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean deleteScheduleById(int scheduleId) {
+        String sql = "DELETE FROM Schedule WHERE schedule_id = ?";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, scheduleId);
+            return st.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Error deleteScheduleById: " + e.getMessage());
+            return false;
+        }
+    }
+
     public List<Schedule> getAvailableSchedules() {
         List<Schedule> list = new ArrayList<>();
         // Query lấy lịch làm việc trong tương lai và kèm tên bác sĩ
@@ -42,6 +96,25 @@ public class ScheduleVeterianrianDAO extends DBContext {
             System.out.println("Error getAvailableSchedules: " + e);
         }
         return list;
+    }
+
+    /**
+     * Get leave request status for a specific employee and date, if any.
+     * Returns one of Pending/Approved/Rejected (or other DB value), or null if no leave.
+     */
+    public String getLeaveStatusByEmpAndDate(int empId, Date workDate) {
+        String sql = "SELECT TOP 1 status FROM LeaveRequest WHERE emp_id = ? AND start_date = ? ORDER BY leave_id DESC";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, empId);
+            st.setDate(2, workDate);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                return rs.getString("status");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getLeaveStatusByEmpAndDate: " + e.getMessage());
+        }
+        return null;
     }
 
     // Hàm lấy danh sách bác sĩ theo ngày cụ thể
@@ -142,5 +215,100 @@ public class ScheduleVeterianrianDAO extends DBContext {
             System.out.println("Error getLeaveStatusMap: " + e.getMessage());
         }
         return leaveMap;
+    }
+    
+    /**
+     * Insert a schedule for a doctor.
+     * @param empId Employee ID (doctor ID)
+     * @param managerId Manager ID (admin who creates the schedule)
+     * @param workDate Work date
+     * @param shiftTime Time range in format "HH:mm-HH:mm"
+     * @return true if inserted successfully, false otherwise
+     */
+    public boolean insertSchedule(int empId, int managerId, Date workDate, String shiftTime) {
+        // Check if schedule already exists
+        String checkSql = "SELECT COUNT(*) FROM Schedule WHERE emp_id = ? AND work_date = ? AND shift_time = ?";
+        try (PreparedStatement checkSt = connection.prepareStatement(checkSql)) {
+            checkSt.setInt(1, empId);
+            checkSt.setDate(2, workDate);
+            checkSt.setString(3, shiftTime);
+            ResultSet rs = checkSt.executeQuery();
+            if (rs.next() && rs.getInt(1) > 0) {
+                // Schedule already exists, skip insertion
+                return false;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error checking existing schedule: " + e.getMessage());
+            return false;
+        }
+        
+        // Insert new schedule
+        String sql = "INSERT INTO Schedule (emp_id, manager_id, work_date, shift_time) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, empId);
+            st.setInt(2, managerId);
+            st.setDate(3, workDate);
+            st.setString(4, shiftTime);
+            return st.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Error insertSchedule: " + e.getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Get schedules with optional filters for date and doctor.
+     * @param date Optional date filter (null for all dates)
+     * @param doctorId Optional doctor ID filter (0 for all doctors)
+     * @return List of schedules
+     */
+    public List<Schedule> getSchedulesWithFilters(Date date, int doctorId) {
+        List<Schedule> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+            "SELECT s.schedule_id, s.emp_id, s.manager_id, s.work_date, s.shift_time, u.full_name "
+            + "FROM Schedule s "
+            + "JOIN Users u ON s.emp_id = u.user_id "
+            + "WHERE 1=1 "
+        );
+        
+        List<Object> params = new ArrayList<>();
+        
+        if (date != null) {
+            sql.append("AND s.work_date = ? ");
+            params.add(date);
+        }
+        
+        if (doctorId > 0) {
+            sql.append("AND s.emp_id = ? ");
+            params.add(doctorId);
+        }
+        
+        sql.append("ORDER BY s.work_date DESC, u.full_name ASC, s.shift_time ASC");
+        
+        try {
+            PreparedStatement st = connection.prepareStatement(sql.toString());
+            for (int i = 0; i < params.size(); i++) {
+                Object param = params.get(i);
+                if (param instanceof Date) {
+                    st.setDate(i + 1, (Date) param);
+                } else if (param instanceof Integer) {
+                    st.setInt(i + 1, (Integer) param);
+                }
+            }
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                Schedule s = new Schedule();
+                s.setScheduleId(rs.getInt("schedule_id"));
+                s.setEmpId(rs.getInt("emp_id"));
+                s.setManagerId(rs.getInt("manager_id"));
+                s.setWorkDate(rs.getDate("work_date"));
+                s.setShiftTime(rs.getString("shift_time"));
+                s.setVetName(rs.getString("full_name"));
+                list.add(s);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getSchedulesWithFilters: " + e.getMessage());
+        }
+        return list;
     }
 }

@@ -7,6 +7,7 @@ package dal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,28 @@ import java.util.List;
  * @author zoxy4
  */
 public class AppointmentDAO extends DBContext {
+
+    /**
+     * Check if a vet has any non-cancelled appointments on a specific date.
+     */
+    public boolean hasAppointmentsForVetOnDate(int vetId, Date workDate) {
+        String sql = "SELECT COUNT(*) AS cnt FROM Appointment "
+                + "WHERE vet_id = ? "
+                + "AND CAST(start_time AS DATE) = ? "
+                + "AND status <> 'Cancelled'";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, vetId);
+            st.setDate(2, workDate);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("cnt") > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error hasAppointmentsForVetOnDate: " + e.getMessage());
+        }
+        return false;
+    }
 
     public List<String> getBookedSlots(int vetId, String date) {
         List<String> list = new ArrayList<>();
@@ -369,10 +392,6 @@ public class AppointmentDAO extends DBContext {
         return list;
     }
 
-    /**
-     * Veterinarian queue: appointments for TODAY assigned to this vet that are
-     * Checked-in.
-     */
     public List<model.Appointment> getTodayCheckedInAppointmentsForVet(int vetId) {
         List<model.Appointment> list = new ArrayList<>();
         String sql = "SELECT a.*, p.name AS pet_name, u_owner.full_name AS owner_name "
@@ -402,6 +421,47 @@ public class AppointmentDAO extends DBContext {
             }
         } catch (SQLException e) {
             System.out.println("Error getTodayCheckedInAppointmentsForVet: " + e.getMessage());
+        }
+        return list;
+    }
+
+    /**
+     * Dashboard: Fetch ALL today's appointments for this vet (Confirmed, Checked-in, In-Progress, Completed)
+     */
+    public List<model.Appointment> getTodayAppointmentsForVet(int vetId) {
+        List<model.Appointment> list = new ArrayList<>();
+        String sql = "SELECT a.*, p.name AS pet_name, u.full_name AS vet_name, u_owner.full_name AS owner_name "
+                + "FROM Appointment a "
+                + "JOIN Pet p ON a.pet_id = p.pet_id "
+                + "JOIN Users u ON a.vet_id = u.user_id "
+                + "JOIN Users u_owner ON p.owner_id = u_owner.user_id "
+                + "WHERE CAST(a.start_time AS DATE) = CAST(GETDATE() AS DATE) "
+                + "AND a.vet_id = ? "
+                + "AND a.status IN ('Confirmed', 'Checked-in', 'In-Progress', 'Completed') "
+                + "ORDER BY CASE a.status "
+                + "  WHEN 'In-Progress' THEN 1 "
+                + "  WHEN 'Checked-in' THEN 2 "
+                + "  WHEN 'Confirmed' THEN 3 "
+                + "  WHEN 'Completed' THEN 4 "
+                + "  ELSE 5 END ASC, a.start_time ASC";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, vetId);
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    model.Appointment a = new model.Appointment();
+                    a.setApptId(rs.getInt("appt_id"));
+                    a.setStartTime(rs.getTimestamp("start_time"));
+                    a.setStatus(rs.getString("status"));
+                    a.setType(rs.getString("type"));
+                    a.setNotes(rs.getString("notes"));
+                    a.setPetName(rs.getString("pet_name"));
+                    a.setVetName(rs.getString("vet_name"));
+                    a.setOwnerName(rs.getString("owner_name"));
+                    list.add(a);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getTodayAppointmentsForVet: " + e.getMessage());
         }
         return list;
     }
