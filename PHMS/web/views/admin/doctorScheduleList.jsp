@@ -553,7 +553,7 @@
                         <c:set var="leaveStatus" value="${schedule.leaveStatus}" />
                         <form id="deleteForm_${schedule.scheduleId}" method="post"
                               action="${pageContext.request.contextPath}/admin/doctor/schedule/delete" style="display:none;">
-                            <input type="hidden" name="scheduleId" value="${schedule.scheduleId}">
+                            <input type="hidden" name="scheduleId" value="${schedule.scheduleIds}">
                             <input type="hidden" name="date" value="${currentDate}">
                             <c:if test="${not empty selectedDoctorId}">
                                 <input type="hidden" name="doctorId" value="${selectedDoctorId}">

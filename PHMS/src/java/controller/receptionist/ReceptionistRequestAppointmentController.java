@@ -45,14 +45,8 @@ public class ReceptionistRequestAppointmentController extends HttpServlet {
         dal.AppointmentDAO dao = new dal.AppointmentDAO();
         List<model.Appointment> allAppointments;
         
-        // Apply filters if provided
-        if (util.ValidationUtils.isNotEmpty(filterDate) || util.ValidationUtils.isNotEmpty(filterStatus) || filterVetId != null) {
-            allAppointments = dao.getAppointmentsWithFilters(filterDate, filterDate, filterStatus, filterVetId);
-        } else {
-            // Default: show pending and confirmed
-            allAppointments = dao.getPendingAppointments();
-            allAppointments.addAll(dao.getConfirmedAppointments());
-        }
+        // Always use filter method (sorts by newest DESC); pass nulls when no filter
+        allAppointments = dao.getAppointmentsWithFilters(filterDate, filterDate, filterStatus, filterVetId);
         
         // Get all veterinarians for filter dropdown
         dal.UserDAO userDAO = new dal.UserDAO();

@@ -34,9 +34,10 @@
             <label>Mức độ ưu tiên</label>
             <select name="conditionLevel" class="form-input" required>
                 <option value="">-- Chọn mức độ --</option>
-                <option value="Red" ${triage != null && triage.conditionLevel == 'Red' ? 'selected' : ''}>Red - Nguy kịch</option>
-                <option value="Yellow" ${triage != null && triage.conditionLevel == 'Yellow' ? 'selected' : ''}>Yellow - Khẩn</option>
-                <option value="Green" ${triage != null && triage.conditionLevel == 'Green' ? 'selected' : ''}>Green - Ổn định</option>
+                <option value="Critical" ${triage != null && triage.conditionLevel == 'Critical' ? 'selected' : ''}>Critical - Nguy kịch</option>
+                <option value="High" ${triage != null && triage.conditionLevel == 'High' ? 'selected' : ''}>High - Khẩn</option>
+                <option value="Medium" ${triage != null && triage.conditionLevel == 'Medium' ? 'selected' : ''}>Medium - Trung bình</option>
+                <option value="Low" ${triage != null && triage.conditionLevel == 'Low' ? 'selected' : ''}>Low - Ổn định</option>
             </select>
         </div>
 

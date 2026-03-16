@@ -1,5 +1,6 @@
 package controller.admin;
 
+import dal.AppointmentDAO;
 import dal.ScheduleVeterianrianDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -16,7 +17,7 @@ import model.User;
  * Admin deletes a single schedule by schedule_id.
  * Triggered from weekly scheduling UI (click on a shift card).
  */
-@WebServlet(name = "DoctorScheduleDeleteController", urlPatterns = {"/admin/doctor/schedule/delete"})
+@WebServlet(name = "DoctorScheduleDeleteController", urlPatterns = { "/admin/doctor/schedule/delete" })
 public class DoctorScheduleDeleteController extends HttpServlet {
 
     @Override
@@ -30,21 +31,55 @@ public class DoctorScheduleDeleteController extends HttpServlet {
             return;
         }
 
-        String scheduleIdStr = request.getParameter("scheduleId");
+        String scheduleIdsStr = request.getParameter("scheduleId");
         String date = request.getParameter("date");
         String doctorId = request.getParameter("doctorId");
 
-        int scheduleId;
+        if (scheduleIdsStr == null || scheduleIdsStr.trim().isEmpty()) {
+            session.setAttribute("toastMessage", "error|Dữ liệu không hợp lệ (không có scheduleId).");
+            response.sendRedirect(buildReturnUrl(request, date, doctorId));
+            return;
+        }
+
+        java.util.List<Integer> ids = new java.util.ArrayList<>();
         try {
-            scheduleId = Integer.parseInt(scheduleIdStr);
+            for (String idPart : scheduleIdsStr.split(",")) {
+                if (!idPart.trim().isEmpty()) {
+                    ids.add(Integer.parseInt(idPart.trim()));
+                }
+            }
         } catch (Exception e) {
-            session.setAttribute("toastMessage", "error|Dữ liệu không hợp lệ (scheduleId).");
+            session.setAttribute("toastMessage", "error|Dữ liệu không hợp lệ (lỗi format scheduleId).");
+            response.sendRedirect(buildReturnUrl(request, date, doctorId));
+            return;
+        }
+
+        if (ids.isEmpty()) {
+            session.setAttribute("toastMessage", "error|Không có lịch nào để xoá.");
             response.sendRedirect(buildReturnUrl(request, date, doctorId));
             return;
         }
 
         ScheduleVeterianrianDAO dao = new ScheduleVeterianrianDAO();
-        boolean ok = dao.deleteScheduleById(scheduleId);
+        // Check the first schedule to validate date & empId
+        model.Schedule firstSchedule = dao.getScheduleById(ids.get(0));
+        if (firstSchedule == null) {
+            session.setAttribute("toastMessage", "error|Không tìm thấy lịch cần xoá (có thể đã bị xoá).");
+            response.sendRedirect(buildReturnUrl(request, date, doctorId));
+            return;
+        }
+
+        // Block deletion if that vet already has any (non-cancelled) appointment on
+        // that date
+        AppointmentDAO apptDao = new AppointmentDAO();
+        if (firstSchedule.getWorkDate() != null
+                && apptDao.hasAppointmentsForVetOnDate(firstSchedule.getEmpId(), firstSchedule.getWorkDate())) {
+            session.setAttribute("toastMessage", "error|Không thể xoá lịch vì bác sĩ đã có cuộc hẹn trong ngày này.");
+            response.sendRedirect(buildReturnUrl(request, date, doctorId));
+            return;
+        }
+
+        boolean ok = dao.deleteSchedulesByIds(ids);
         if (ok) {
             session.setAttribute("toastMessage", "success|Đã xoá lịch làm việc thành công.");
         } else {
@@ -71,4 +106,3 @@ public class DoctorScheduleDeleteController extends HttpServlet {
         return url.toString();
     }
 }
-

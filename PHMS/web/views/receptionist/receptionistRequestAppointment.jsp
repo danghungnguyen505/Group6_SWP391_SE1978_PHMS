@@ -7,6 +7,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -32,40 +33,40 @@
                     </a>
                 </li>
                 <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/dashboard" class="text-danger">
-                        <i class="fa-solid fa-truck-medical"></i> Emergency Triage
+                    <a href="${pageContext.request.contextPath}/receptionist/emergency/create" class="text-danger">
+                        <i class="fa-solid fa-truck-medical"></i> ${L == 'en' ? 'Emergency Triage' : 'Cấp cứu'}
                     </a>
                 </li>
-                <li>
+<!--                <li>
                     <a href="${pageContext.request.contextPath}/receptionist/scheduling">
                         <i class="fa-solid fa-truck-medical"></i> Staff Scheduling
                     </a>
-                </li>
+                </li>-->
                 <li>
                     <a href="${pageContext.request.contextPath}/receptionist/appointment" class="active">
                         <i class="fa-regular fa-calendar-check"></i> Appointments
                     </a>
                 </li>
-                <li>
+<!--                <li>
                     <a href="${pageContext.request.contextPath}/receptionist/dashboard">
                         <i class="fa-solid fa-paw"></i> My Pets
                     </a>
-                </li>
-                <li>
+                </li>-->
+<!--                <li>
                     <a href="${pageContext.request.contextPath}/receptionist/dashboard">
                         <i class="fa-solid fa-file-medical"></i> Medical Records
                     </a>
-                </li>
-                <li>
+                </li>-->
+<!--                <li>
                     <a href="${pageContext.request.contextPath}/receptionist/dashboard">
                         <i class="fa-regular fa-credit-card"></i> Billing
                     </a>
-                </li>
-                <li>
+                </li>-->
+<!--                <li>
                     <a href="${pageContext.request.contextPath}/receptionist/dashboard">
                         <i class="fa-solid fa-gear"></i> Administration
                     </a>
-                </li>
+                </li>-->
             </ul>
 
             <div class="help-box">
@@ -166,8 +167,7 @@
                                 <th>Date & Time</th>
                                 <th>Status</th>
                                 <th>Notes</th>
-                                <th style="text-align: center;">Actions</th>
-                            </tr>
+                                                            </tr>
                         </thead>
                         
                         <tbody>
@@ -212,19 +212,14 @@
                                         </c:if>
                                     </td>
                                     <td>
-                                        <div class="action-group">
-                                            <c:if test="${a.status == 'Pending'}">
-                                                <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${a.apptId}&status=Confirmed" 
-                                                   class="btn btn-approve">Approve</a>
-                                                <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${a.apptId}&status=Cancelled" 
-                                                   class="btn btn-reject"
-                                                   onclick="return confirm('Are you sure you want to reject this appointment?');">Reject</a>
-                                            </c:if>
-                                            <c:if test="${a.status == 'Confirmed'}">
-                                                <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${a.apptId}&status=Checked-in" 
-                                                   class="btn btn-approve">Check-in</a>
-                                            </c:if>
-                                        </div>
+                                        <c:if test="${not empty a.notes}">
+                                            <button type="button" class="btn-view-note" data-note="${a.notes}" onclick="openModal(this)">
+                                                <i class="fa-regular fa-eye"></i> View
+                                            </button>
+                                        </c:if>
+                                        <c:if test="${empty a.notes}">
+                                            <span style="color: #999; font-style: italic;">No note</span>
+                                        </c:if>
                                     </td>
                                 </tr>
                             </c:forEach>

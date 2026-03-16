@@ -128,6 +128,100 @@ public class UserDAO extends DBContext {
     }
 
     /**
+     * Get PetOwner account by phone number.
+     */
+    public User getPetOwnerByPhone(String phone) {
+        String sql = "SELECT u.*, po.address, po.email "
+                + "FROM Users u "
+                + "JOIN PetOwner po ON u.user_id = po.user_id "
+                + "WHERE u.phone = ? AND u.role = 'PetOwner'";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, phone);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                User user = new User();
+                user.setUserId(rs.getInt("user_id"));
+                user.setUsername(rs.getString("username"));
+                user.setFullName(rs.getString("full_name"));
+                user.setRole(rs.getString("role"));
+                user.setPhone(rs.getString("phone"));
+                user.setEmail(rs.getString("email"));
+                user.setAddress(rs.getString("address"));
+                return user;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getPetOwnerByPhone: " + e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * Get PetOwner account by email.
+     */
+    public User getPetOwnerByEmail(String email) {
+        String sql = "SELECT u.*, po.address, po.email "
+                + "FROM Users u "
+                + "JOIN PetOwner po ON u.user_id = po.user_id "
+                + "WHERE po.email = ? AND u.role = 'PetOwner'";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                User user = new User();
+                user.setUserId(rs.getInt("user_id"));
+                user.setUsername(rs.getString("username"));
+                user.setFullName(rs.getString("full_name"));
+                user.setRole(rs.getString("role"));
+                user.setPhone(rs.getString("phone"));
+                user.setEmail(rs.getString("email"));
+                user.setAddress(rs.getString("address"));
+                return user;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getPetOwnerByEmail: " + e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * Create a PetOwner account and return new user_id.
+     * Password will be BCrypt-hashed before storing.
+     */
+    public int insertPetOwnerReturnId(String username, String password, String fullName, String email, String phone, String address) {
+        String sqlUser = "INSERT INTO Users (username, password, full_name, phone, role) VALUES (?, ?, ?, ?, 'PetOwner')";
+        String sqlOwner = "INSERT INTO PetOwner (user_id, address, email) VALUES (?, ?, ?)";
+
+        try {
+            String hashedPassword = PasswordUtil.hashPassword(password);
+
+            PreparedStatement ps = connection.prepareStatement(sqlUser, PreparedStatement.RETURN_GENERATED_KEYS);
+            ps.setString(1, username);
+            ps.setString(2, hashedPassword);
+            ps.setString(3, fullName);
+            ps.setString(4, phone);
+            ps.executeUpdate();
+
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                int userId = rs.getInt(1);
+
+                PreparedStatement psOwner = connection.prepareStatement(sqlOwner);
+                psOwner.setInt(1, userId);
+                psOwner.setString(2, address);
+                psOwner.setString(3, email);
+                psOwner.executeUpdate();
+                return userId;
+            }
+        } catch (Exception e) {
+            System.out.println("Error insertPetOwnerReturnId: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    /**
      * Register a new pet owner with BCrypt password hashing
      */
     public void registerOwner(String username, String password, String fullName, String email, String phone, String address) {

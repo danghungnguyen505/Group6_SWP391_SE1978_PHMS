@@ -1,4 +1,4 @@
-<%-- 
+<%--
     Document   : myAppointment
     Created on : Jan 31, 2026
     Author     : zoxy4
@@ -7,13 +7,14 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
 
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>My Appointments - VetCare Pro</title>
+        <title>${t_my_appts} - VetCare Pro</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <link href="${pageContext.request.contextPath}/assets/css/pages/menuPetOwner.css" rel="stylesheet" type="text/css"/>
@@ -27,27 +28,27 @@
         <main class="main-content">
             <header class="top-bar">
                 <a href="${pageContext.request.contextPath}/logout" class="btn btn-dark" style="background-color: #ef4444; border-color: #ef4444;">
-                    Logout
+                    ${t_logout}
                 </a>
             </header>
 
             <div class="page-header">
                 <div class="page-title">
-                    <h1>My Appointments</h1>
-                    <p>Track your upcoming visits and view past history.</p>
+                    <h1>${t_my_appts}</h1>
+                    <p>${t_my_appts_sub}</p>
                 </div>
                 <a href="${pageContext.request.contextPath}/home" class="btn btn-outline-secondary" style="text-decoration: none;">
-                    <i class="fa-solid fa-arrow-left me-2"></i> Back to Home
+                    <i class="fa-solid fa-arrow-left me-2"></i> ${t_back_home}
                 </a>
             </div>
 
             <div class="section-header">
-                <i class="fa-regular fa-clock text-primary"></i> Upcoming Appointments
+                <i class="fa-regular fa-clock text-primary"></i> ${t_upcoming}
             </div>
 
             <c:if test="${empty upcomingList}">
                 <div class="empty-state">
-                    You have no upcoming appointments.
+                    ${t_no_upcoming}
                 </div>
             </c:if>
 
@@ -56,13 +57,13 @@
                     <thead>
                         <tr>
                             <th>#ID</th>
-                            <th>Date & Time</th>
-                            <th>Pet</th>
-                            <th>Service</th>
-                            <th>Doctor</th>
-                            <th>Status</th>
-                            <th>Notes</th>
-                            <th>Actions</th>
+                            <th>${t_date_time}</th>
+                            <th>${t_pet}</th>
+                            <th>${t_service}</th>
+                            <th>${t_doctor}</th>
+                            <th>${t_status}</th>
+                            <th>${t_notes_col}</th>
+                            <th>${t_actions}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -84,11 +85,11 @@
                                 <td>
                                     <c:if test="${not empty u.notes}">
                                         <button type="button" class="btn-view-note" data-note="${u.notes}" onclick="openModal(this)">
-                                            <i class="fa-regular fa-eye"></i> View
+                                            <i class="fa-regular fa-eye"></i> ${L == 'en' ? 'View' : 'Xem'}
                                         </button>
                                     </c:if>
                                     <c:if test="${empty u.notes}">
-                                        <span style="color: #9ca3af; font-style: italic; font-size: 0.9em;">No notes</span>
+                                        <span style="color: #9ca3af; font-style: italic; font-size: 0.9em;">${t_no_notes}</span>
                                     </c:if>
                                 </td>
                                 <td style="text-align: center;">
@@ -112,13 +113,13 @@
                                         </div>
 
                                         <div style="font-size: 0.75rem; color: #666; margin-top: 5px; text-align: left;">
-                                            Bạn có thể hủy/đổi lịch trước giờ hẹn ít nhất 5 tiếng. Còn khoảng: <fmt:formatNumber value="${hoursUntilStart}" maxFractionDigits="0"/>h
+                                            ${L == 'en' ? 'You can cancel/reschedule at least 5 hours before. Remaining:' : 'Bạn có thể hủy/đổi lịch trước giờ hẹn ít nhất 5 tiếng. Còn khoảng:'} <fmt:formatNumber value="${hoursUntilStart}" maxFractionDigits="0"/>h
                                         </div>
                                     </c:if>
 
                                     <c:if test="${!isActionAllowed}">
                                         <div style="color: #9ca3af; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 5px; background: #f3f4f6; padding: 5px; border-radius: 4px;">
-                                            <i class="fa-solid fa-lock"></i> Locked
+                                            <i class="fa-solid fa-lock"></i> ${t_locked}
                                         </div>
                                     </c:if>
                                 </td>
@@ -129,12 +130,12 @@
             </c:if>
 
             <div class="section-header" style="margin-top: 40px;">
-                <i class="fa-solid fa-history text-secondary"></i> History
+                <i class="fa-solid fa-history text-secondary"></i> ${t_history}
             </div>
 
             <c:if test="${empty historyList}">
                 <div class="empty-state">
-                    No past appointment history found.
+                    ${t_no_history}
                 </div>
             </c:if>
 
@@ -143,11 +144,11 @@
                     <thead>
                         <tr>
                             <th>#ID</th>
-                            <th>Date & Time</th>
-                            <th>Pet</th>
-                            <th>Service</th>
-                            <th>Doctor</th>
-                            <th>Status</th>
+                            <th>${t_date_time}</th>
+                            <th>${t_pet}</th>
+                            <th>${t_service}</th>
+                            <th>${t_doctor}</th>
+                            <th>${t_status}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -161,10 +162,25 @@
                                 <td>${h.type}</td>
                                 <td>${h.vetName}</td>
                                 <td>
-                                    <span class="status-badge
-                                          ${h.status == 'Completed' ? 'status-completed' : 'status-cancelled'}">
+                                    <span class="status-badge ${h.status == 'Completed' ? 'status-completed' : 'status-cancelled'}">
                                         ${h.status}
                                     </span>
+                                    <c:if test="${h.status == 'Completed'}">
+                                        <c:choose>
+                                            <c:when test="${feedbackedApptIds.contains(h.apptId)}">
+                                                <span style="display:inline-flex; align-items:center; gap:4px; margin-top:5px; font-size:12px; color:#059669; background:#d1fae5; padding:3px 10px; border-radius:20px; font-weight:600;">
+                                                    <i class="fa-solid fa-check-circle"></i> ${t_reviewed}
+                                                </span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <a href="${pageContext.request.contextPath}/feedback/create?apptId=${h.apptId}"
+                                                   style="display:inline-flex; align-items:center; gap:4px; margin-top:5px; font-size:12px; color:#fff; background:#f59e0b; padding:4px 12px; border-radius:20px; font-weight:600; text-decoration:none; transition:0.2s;"
+                                                   onmouseover="this.style.background='#d97706'" onmouseout="this.style.background='#f59e0b'">
+                                                    <i class="fa-solid fa-star"></i> ${t_feedback}
+                                                </a>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </c:if>
                                 </td>
                             </tr>
                         </c:forEach>
@@ -216,7 +232,7 @@
                     <div class="modal-content">
                         <span class="close-btn" onclick="closeModal()"></span>
                         <h2 class="modal-title">
-                            <i class="fa-solid fa-clipboard-list"></i> Appointment Notes
+                            <i class="fa-solid fa-clipboard-list"></i> ${t_appt_notes_title}
                         </h2>
                         <div id="modalNoteContent" class="modal-body">
                         </div>

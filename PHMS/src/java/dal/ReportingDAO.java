@@ -18,20 +18,25 @@ public class ReportingDAO extends DBContext {
     /**
      * Get revenue report by date range.
      * Returns total revenue, total invoices, paid invoices count.
+     * Calculates revenue from InvoiceDetail (actual service prices) instead of total_amount.
      */
     public Map<String, Object> getRevenueReport(Timestamp startDate, Timestamp endDate) {
         Map<String, Object> report = new HashMap<>();
+        // Calculate from InvoiceDetail (service prices in invoice) instead of total_amount
         String sql = "SELECT " +
-                     "COUNT(*) AS total_invoices, " +
-                     "SUM(CASE WHEN status = 'Paid' THEN total_amount ELSE 0 END) AS total_revenue, " +
-                     "SUM(CASE WHEN status = 'Paid' THEN 1 ELSE 0 END) AS paid_invoices, " +
-                     "SUM(CASE WHEN status = 'Unpaid' THEN 1 ELSE 0 END) AS unpaid_invoices " +
-                     "FROM Invoice " +
-                     "WHERE CAST(created_at AS DATE) >= CAST(? AS DATE) " +
-                     "AND CAST(created_at AS DATE) <= CAST(? AS DATE)";
+                     "(SELECT COUNT(*) FROM Invoice WHERE CAST(created_at AS DATE) >= CAST(? AS DATE) AND CAST(created_at AS DATE) <= CAST(? AS DATE)) AS total_invoices, " +
+                     "COALESCE((SELECT SUM(id.subtotal) FROM InvoiceDetail id INNER JOIN Invoice inv ON id.invoice_id = inv.invoice_id WHERE inv.status = 'Paid' AND CAST(inv.created_at AS DATE) >= CAST(? AS DATE) AND CAST(inv.created_at AS DATE) <= CAST(? AS DATE)), 0) AS total_revenue, " +
+                     "(SELECT COUNT(*) FROM Invoice WHERE status = 'Paid' AND CAST(created_at AS DATE) >= CAST(? AS DATE) AND CAST(created_at AS DATE) <= CAST(? AS DATE)) AS paid_invoices, " +
+                     "(SELECT COUNT(*) FROM Invoice WHERE status = 'Unpaid' AND CAST(created_at AS DATE) >= CAST(? AS DATE) AND CAST(created_at AS DATE) <= CAST(? AS DATE)) AS unpaid_invoices";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setTimestamp(1, startDate);
             st.setTimestamp(2, endDate);
+            st.setTimestamp(3, startDate);
+            st.setTimestamp(4, endDate);
+            st.setTimestamp(5, startDate);
+            st.setTimestamp(6, endDate);
+            st.setTimestamp(7, startDate);
+            st.setTimestamp(8, endDate);
             try (ResultSet rs = st.executeQuery()) {
                 if (rs.next()) {
                     report.put("totalInvoices", rs.getInt("total_invoices"));
@@ -57,10 +62,11 @@ public class ReportingDAO extends DBContext {
     
     /**
      * Get appointment statistics by date range.
-     * Returns count by status.
+     * Returns count by status with proper keys for JSP.
      */
     public Map<String, Integer> getAppointmentStats(Timestamp startDate, Timestamp endDate) {
         Map<String, Integer> stats = new HashMap<>();
+        int total = 0, completed = 0, pending = 0, cancelled = 0;
         String sql = "SELECT status, COUNT(*) AS cnt " +
                      "FROM Appointment " +
                      "WHERE CAST(start_time AS DATE) >= CAST(? AS DATE) " +
@@ -71,12 +77,25 @@ public class ReportingDAO extends DBContext {
             st.setTimestamp(2, endDate);
             try (ResultSet rs = st.executeQuery()) {
                 while (rs.next()) {
-                    stats.put(rs.getString("status"), rs.getInt("cnt"));
+                    String status = rs.getString("status");
+                    int count = rs.getInt("cnt");
+                    total += count;
+                    if ("Completed".equalsIgnoreCase(status)) {
+                        completed = count;
+                    } else if ("Pending".equalsIgnoreCase(status)) {
+                        pending = count;
+                    } else if ("Cancelled".equalsIgnoreCase(status)) {
+                        cancelled = count;
+                    }
                 }
             }
         } catch (SQLException e) {
             System.out.println("Error getAppointmentStats: " + e.getMessage());
         }
+        stats.put("totalAppointments", total);
+        stats.put("completedAppointments", completed);
+        stats.put("pendingAppointments", pending);
+        stats.put("cancelledAppointments", cancelled);
         return stats;
     }
     
@@ -104,7 +123,7 @@ public class ReportingDAO extends DBContext {
                     Map<String, Object> item = new HashMap<>();
                     item.put("serviceId", rs.getInt("service_id"));
                     item.put("serviceName", rs.getString("name"));
-                    item.put("usageCount", rs.getInt("usage_count"));
+                    item.put("appointmentCount", rs.getInt("usage_count"));
                     item.put("totalRevenue", rs.getDouble("total_revenue"));
                     list.add(item);
                 }
@@ -145,17 +164,19 @@ public class ReportingDAO extends DBContext {
     
     /**
      * Get monthly revenue summary.
+     * Calculates from InvoiceDetail subtotals instead of total_amount.
      */
     public List<Map<String, Object>> getMonthlyRevenue(Timestamp startDate, Timestamp endDate) {
         List<Map<String, Object>> list = new ArrayList<>();
         String sql = "SELECT " +
-                     "FORMAT(created_at, 'yyyy-MM') AS month, " +
-                     "SUM(CASE WHEN status = 'Paid' THEN total_amount ELSE 0 END) AS revenue, " +
-                     "COUNT(*) AS invoice_count " +
-                     "FROM Invoice " +
-                     "WHERE CAST(created_at AS DATE) >= CAST(? AS DATE) " +
-                     "AND CAST(created_at AS DATE) <= CAST(? AS DATE) " +
-                     "GROUP BY FORMAT(created_at, 'yyyy-MM') " +
+                     "FORMAT(inv.created_at, 'yyyy-MM') AS month, " +
+                     "COALESCE(SUM(CASE WHEN inv.status = 'Paid' THEN id.subtotal ELSE 0 END), 0) AS revenue, " +
+                     "COUNT(DISTINCT inv.invoice_id) AS invoice_count " +
+                     "FROM Invoice inv " +
+                     "LEFT JOIN InvoiceDetail id ON inv.invoice_id = id.invoice_id " +
+                     "WHERE CAST(inv.created_at AS DATE) >= CAST(? AS DATE) " +
+                     "AND CAST(inv.created_at AS DATE) <= CAST(? AS DATE) " +
+                     "GROUP BY FORMAT(inv.created_at, 'yyyy-MM') " +
                      "ORDER BY month ASC";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setTimestamp(1, startDate);

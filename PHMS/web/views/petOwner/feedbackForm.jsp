@@ -42,6 +42,7 @@
                         <div><b>Pet:</b> ${appt.petName}</div>
                         <div><b>Veterinarian:</b> ${appt.vetName}</div>
                         <div><b>Service:</b> ${appt.type}</div>
+                        <div><b>Receptionist:</b> ${not empty appt.receptionistName ? appt.receptionistName : 'N/A'}</div>
                     </div>
                 </div>
             </c:if>

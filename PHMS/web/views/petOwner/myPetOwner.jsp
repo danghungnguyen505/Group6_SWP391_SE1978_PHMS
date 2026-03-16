@@ -1,13 +1,14 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="${L}">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>My Pets - VetCare Pro</title>
+        <title>${t_my_pets} - VetCare Pro</title>
         <!-- Bootstrap 5 -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <!-- Font Awesome -->
@@ -57,13 +58,13 @@
             </c:if>
 
             <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
-                <a href="${pageContext.request.contextPath}/logout" class="btn btn-outline-secondary btn-sm">Sign Out</a>
+                <a href="${pageContext.request.contextPath}/logout" class="btn btn-dark" style="background-color: #ef4444; border-color: #ef4444;">${t_logout}</a>
             </div>
 
             <div class="pet-header">
                 <div>
-                    <h1>Pet Profile & History</h1>
-                    <p>Comprehensive overview of your pet's health records.</p>
+                    <h1>${t_pet_profile}</h1>
+                    <p>${t_pet_profile_sub}</p>
                 </div>
 
                 <!-- Dropdown chọn nhanh -->
@@ -73,7 +74,7 @@
                     </c:if>
                     <select class="switch-pet-dropdown" name="selectedPetId" onchange="this.form.submit()">
                         <c:if test="${empty allPets}">
-                            <option value="">No pets found</option>
+                            <option value="">${t_no_pets_found}</option>
                         </c:if>
                         <c:forEach items="${allPets}" var="p">
                             <option value="${p.id}" ${selectedPet != null && selectedPet.id == p.id ? 'selected' : ''}>
@@ -107,8 +108,8 @@
 
                         <!-- Tên & Loài -->
                         <c:if test="${empty selectedPet}">
-                            <div class="pet-name">No pets</div>
-                            <div class="pet-breed">Add a pet or clear search</div>
+                            <div class="pet-name">${t_no_pets}</div>
+                            <div class="pet-breed">${L == 'en' ? 'Add a pet or clear search' : 'Thêm thú cưng hoặc xóa tìm kiếm'}</div>
                         </c:if>
                         <c:if test="${not empty selectedPet}">
                             <div class="pet-name">${selectedPet.name}</div>
@@ -123,30 +124,30 @@
                             </div>
 
                             <div class="stat-box">
-                                <span class="stat-label">Breed (Giống)</span>
+                                <span class="stat-label">${t_breed}</span>
                                 <div class="stat-value"><c:out value="${selectedPet != null ? selectedPet.breed : '-'}"/></div>
                             </div>
 
                             <div class="stat-box">
-                                <span class="stat-label">Gender</span>
+                                <span class="stat-label">${t_gender}</span>
                                 <div class="stat-value">
                                     <c:choose>
-                                        <c:when test="${selectedPet.gender == 'Male'}"><i class="fa-solid fa-mars text-primary"></i> Male</c:when>
-                                        <c:when test="${selectedPet.gender == 'Female'}"><i class="fa-solid fa-venus text-danger"></i> Female</c:when>
+                                        <c:when test="${selectedPet.gender == 'Male'}"><i class="fa-solid fa-mars text-primary"></i> ${L == 'en' ? 'Male' : 'Đực'}</c:when>
+                                        <c:when test="${selectedPet.gender == 'Female'}"><i class="fa-solid fa-venus text-danger"></i> ${L == 'en' ? 'Female' : 'Cái'}</c:when>
                                         <c:otherwise>-</c:otherwise>
                                     </c:choose>
                                 </div>
                             </div>
 
                             <div class="stat-box">
-                                <span class="stat-label">Weight</span>
+                                <span class="stat-label">${t_weight}</span>
                                 <div class="stat-value">
                                     <c:out value="${selectedPet != null ? selectedPet.weight : '0'}"/> kg
                                 </div>
                             </div>
 
                             <div class="stat-box">
-                                <span class="stat-label">Birth Date</span>
+                                <span class="stat-label">${t_birth_date}</span>
                                 <div class="stat-value">
                                     <c:if test="${selectedPet != null && selectedPet.birthDate != null}">
                                         <fmt:formatDate value="${selectedPet.birthDate}" pattern="dd/MM/yyyy"/>
@@ -156,17 +157,17 @@
                                 </div>
 
                                 <div class="stat-box">
-                                    <span class="stat-label">Status</span>
-                                    <div class="stat-value text-success">Active</div>
+                                    <span class="stat-label">${t_status}</span>
+                                    <div class="stat-value text-success">${L == 'en' ? 'Active' : 'Hoạt động'}</div>
                                 </div>
                             </div>
 
                             <!-- Bệnh sử -->
                             <div class="alert-box">
-                                <div class="alert-title"><i class="fa-solid fa-notes-medical"></i> History Summary</div>
+                                <div class="alert-title"><i class="fa-solid fa-notes-medical"></i> ${t_history_summary}</div>
                                 <div class="alert-content">
                                 <c:if test="${empty selectedPet || empty selectedPet.historySummary}">
-                                    <span style="color:#94a3b8; font-style: italic;">No history summary available.</span>
+                                    <span style="color:#94a3b8; font-style: italic;">${t_no_history_sum}</span>
                                 </c:if>
                                 <c:if test="${not empty selectedPet && not empty selectedPet.historySummary}">
                                     <c:out value="${selectedPet.historySummary}"/>
@@ -176,11 +177,12 @@
 
                         <!-- Nút Xóa -->
                         <c:if test="${not empty selectedPet}">
+                            <c:set var="confirmMsg" value="${L == 'en' ? 'Are you sure you want to delete' : 'Bạn chắc chắn muốn xóa hồ sơ thú cưng'}" />
                             <form action="${pageContext.request.contextPath}/pet/delete" method="post" style="margin-top: 15px; text-align: center;">
                                 <input type="hidden" name="id" value="${selectedPet.id}">
                                 <button type="submit" class="btn btn-sm btn-outline-danger w-100"
-                                        onclick="return confirm('Bạn chắc chắn muốn xóa hồ sơ thú cưng ${selectedPet.name}? Hành động này không thể hoàn tác!');">
-                                    <i class="fa-solid fa-trash-can me-1"></i> Delete Profile
+                                        onclick="return confirm('${confirmMsg} ${selectedPet.name}?');">
+                                    <i class="fa-solid fa-trash-can me-1"></i> ${t_delete_profile}
                                 </button>
                             </form>
                         </c:if>
@@ -194,26 +196,26 @@
 
                         <!-- Header & Search -->
                         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                            <h3 style="margin:0;">My Pets List</h3>
+                            <h3 style="margin:0;">${t_pets_list}</h3>
 
                             <div class="d-flex gap-2">
                                 <form action="${pageContext.request.contextPath}/myPetOwner" method="get" class="d-flex">
                                     <div class="input-group input-group-sm">
-                                        <input type="text" name="search" class="form-control" 
-                                               placeholder="Search..." 
+                                        <input type="text" name="search" class="form-control"
+                                               placeholder="${t_search}"
                                                value="${search}">
                                         <button class="btn btn-outline-primary" type="submit">
                                             <i class="fa-solid fa-magnifying-glass"></i>
                                         </button>
                                         <c:if test="${not empty search}">
-                                            <a href="${pageContext.request.contextPath}/myPetOwner" class="btn btn-outline-secondary" title="Clear Search">
+                                            <a href="${pageContext.request.contextPath}/myPetOwner" class="btn btn-outline-secondary" title="${t_cancel}">
                                                 <i class="fa-solid fa-xmark"></i>
                                             </a>
                                         </c:if>
                                     </div>
                                 </form>
                                 <a class="btn btn-primary btn-sm d-flex align-items-center" href="${pageContext.request.contextPath}/pet/add">
-                                    <i class="fa-solid fa-plus me-1"></i> Add New Pet
+                                    <i class="fa-solid fa-plus me-1"></i> ${t_add_pet}
                                 </a>
                             </div>
                         </div>
@@ -222,7 +224,7 @@
                         <c:if test="${empty pets}">
                             <div class="text-center p-4 text-muted border rounded bg-light">
                                 <i class="fa-solid fa-box-open fa-2x mb-2"></i>
-                                <p class="mb-0">No pets found matching your search.</p>
+                                <p class="mb-0">${t_no_pets_found}</p>
                             </div>
                         </c:if>
 
@@ -232,9 +234,9 @@
                                     <thead>
                                         <tr>
                                             <th>ID</th>
-                                            <th>Name</th>
-                                            <th>Species</th>
-                                            <th class="text-end">Actions</th>
+                                            <th>${L == 'en' ? 'Name' : 'Tên'}</th>
+                                            <th>${t_species}</th>
+                                            <th class="text-end">${t_actions}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -305,15 +307,15 @@
                     <div class="history-section">
                         <ul class="nav nav-tabs mb-3">
                             <li class="nav-item">
-                                <a class="nav-link active" href="#">Medical Visits</a>
+                                <a class="nav-link active" href="#">${t_medical_visits}</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#">Vaccinations</a>
+                                <a class="nav-link" href="#">${t_vaccinations}</a>
                             </li>
                         </ul>
                         <div class="text-center text-muted p-3">
                             <i class="fa-solid fa-laptop-medical fa-2x mb-2 text-secondary"></i>
-                            <p>Medical history functionality will be implemented soon.</p>
+                            <p>${L == 'en' ? 'Medical history functionality will be implemented soon.' : 'Chức năng lịch sử y tế sẽ được triển khai sớm.'}</p>
                         </div>
                     </div>
 
