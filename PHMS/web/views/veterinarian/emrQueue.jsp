@@ -199,6 +199,21 @@
                 transition: 0.2s;
             }
             .btn-submit:hover { background: #059669; }
+            .btn-complete {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 7px 14px;
+                background: #2563eb;
+                border: none;
+                border-radius: 8px;
+                color: #fff;
+                font-size: 13px;
+                font-weight: 600;
+                text-decoration: none;
+                transition: 0.2s;
+            }
+            .btn-complete:hover { background: #1d4ed8; }
 
             /* Empty state */
             .empty-state {
@@ -332,10 +347,19 @@
                                                href="${pageContext.request.contextPath}/veterinarian/emr/queue/edit?apptId=${a.apptId}">
                                                 <i class="fa-solid fa-pen-to-square"></i> Edit EMR
                                             </a>
-                                            <a class="btn-submit"
-                                               href="${pageContext.request.contextPath}/veterinarian/emr/submit?apptId=${a.apptId}">
-                                                <i class="fa-solid fa-paper-plane"></i> Submit
-                                            </a>
+                                            <c:if test="${a.status == 'Checked-in'}">
+                                                <a class="btn-submit"
+                                                   href="${pageContext.request.contextPath}/veterinarian/emr/submit?apptId=${a.apptId}">
+                                                    <i class="fa-solid fa-paper-plane"></i> Submit
+                                                </a>
+                                            </c:if>
+                                            <c:if test="${a.status == 'In-Progress'}">
+                                                <a class="btn-complete"
+                                                   href="${pageContext.request.contextPath}/veterinarian/emr/complete?apptId=${a.apptId}"
+                                                   onclick="return confirm('Mark this appointment as Completed?');">
+                                                    <i class="fa-solid fa-check-circle"></i> Complete
+                                                </a>
+                                            </c:if>
                                         </div>
                                     </td>
                                 </tr>

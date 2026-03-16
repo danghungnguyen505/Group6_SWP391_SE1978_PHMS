@@ -365,7 +365,7 @@
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th class="col-id">ID</th>
+                                    <th class="col-id">STT</th>
                                     <th>Username</th>
                                     <th>Full Name</th>
                                     <th>Role</th>
@@ -376,9 +376,9 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <c:forEach var="staff" items="${staffAccounts}">
+                                <c:forEach var="staff" items="${staffAccounts}" varStatus="st">
                                     <tr>
-                                        <td class="col-id">#${staff.userId}</td>
+                                        <td class="col-id">${st.index + 1}</td>
                                         <td class="col-username">${staff.username}</td>
                                         <td class="col-fullname">${staff.fullName}</td>
                                         <td>

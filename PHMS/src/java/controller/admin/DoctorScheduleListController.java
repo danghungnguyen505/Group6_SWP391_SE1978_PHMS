@@ -46,6 +46,7 @@ public class DoctorScheduleListController extends HttpServlet {
         // Get filter parameters
         String dateStr = request.getParameter("date");
         String doctorIdStr = request.getParameter("doctorId");
+        String shiftFilter = request.getParameter("shift"); // "morning", "afternoon", or null/empty for all
 
         // Determine which week to show
         LocalDate today = LocalDate.now();
@@ -122,7 +123,7 @@ public class DoctorScheduleListController extends HttpServlet {
             }
 
             // Create Morning Schedule group
-            if (!morningIds.isEmpty()) {
+            if (!morningIds.isEmpty() && (shiftFilter == null || shiftFilter.isEmpty() || "morning".equals(shiftFilter))) {
                 Schedule m = new Schedule();
                 m.setScheduleId(morningIds.get(0));
                 m.setEmpId(first.getEmpId());
@@ -138,7 +139,7 @@ public class DoctorScheduleListController extends HttpServlet {
             }
 
             // Create Afternoon Schedule group
-            if (!afternoonIds.isEmpty()) {
+            if (!afternoonIds.isEmpty() && (shiftFilter == null || shiftFilter.isEmpty() || "afternoon".equals(shiftFilter))) {
                 Schedule a = new Schedule();
                 a.setScheduleId(afternoonIds.get(0));
                 a.setEmpId(first.getEmpId());
@@ -180,6 +181,7 @@ public class DoctorScheduleListController extends HttpServlet {
         request.setAttribute("nextWeek", nextWeek.toString());
         request.setAttribute("selectedDoctorId", doctorIdStr);
         request.setAttribute("selectedDoctorName", selectedDoctorName);
+        request.setAttribute("selectedShift", shiftFilter);
         request.setAttribute("totalShifts", totalShifts);
 
         request.getRequestDispatcher("/views/admin/doctorScheduleList.jsp").forward(request, response);

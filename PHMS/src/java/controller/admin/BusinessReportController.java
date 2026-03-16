@@ -106,7 +106,21 @@ public class BusinessReportController extends HttpServlet {
         Map<String, Integer> appointmentStats = reportingDAO.getAppointmentStats(startTimestamp, endTimestamp);
         List<Map<String, Object>> topServices = reportingDAO.getTopServicesByRevenue(startTimestamp, endTimestamp, 5);
         List<Map<String, Object>> dailyAppointments = reportingDAO.getDailyAppointmentCount(startTimestamp, endTimestamp);
-        List<Map<String, Object>> monthlyRevenue = reportingDAO.getMonthlyRevenue(startTimestamp, endTimestamp);
+
+        // Always get last 6 months for chart
+        Calendar cal6 = Calendar.getInstance();
+        cal6.add(Calendar.MONTH, -5);
+        cal6.set(Calendar.DAY_OF_MONTH, 1);
+        cal6.set(Calendar.HOUR_OF_DAY, 0);
+        cal6.set(Calendar.MINUTE, 0);
+        cal6.set(Calendar.SECOND, 0);
+        cal6.set(Calendar.MILLISECOND, 0);
+        Timestamp chartStart = new Timestamp(cal6.getTime().getTime());
+        Timestamp chartEnd = new Timestamp(System.currentTimeMillis());
+        List<Map<String, Object>> monthlyRevenue = reportingDAO.getMonthlyRevenue(chartStart, chartEnd);
+
+        // Growth percentage
+        Map<String, Object> revenueGrowth = reportingDAO.getRevenueGrowth(startTimestamp, endTimestamp);
 
         FeedbackDAO feedbackDAO = new FeedbackDAO();
         List<model.Feedback> feedbacks = feedbackDAO.getAllFeedbacks(1, 4);
@@ -119,6 +133,7 @@ public class BusinessReportController extends HttpServlet {
         request.setAttribute("dailyAppointments", dailyAppointments);
         request.setAttribute("monthlyRevenue", monthlyRevenue);
         request.setAttribute("feedbacks", feedbacks);
+        request.setAttribute("revenueGrowth", revenueGrowth);
 
         request.getRequestDispatcher("/views/admin/businessReport.jsp").forward(request, response);
     }

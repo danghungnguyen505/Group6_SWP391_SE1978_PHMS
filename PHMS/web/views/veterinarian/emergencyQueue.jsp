@@ -33,7 +33,7 @@
                             <table class="data-table">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
+                                        <th>STT</th>
                                         <th>Pet</th>
                                         <th>Pet Owner</th>
                                         <th>Time</th>
@@ -42,26 +42,29 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <c:forEach var="a" items="${appointments}">
+                                    <c:forEach var="a" items="${appointments}" varStatus="loop">
                                         <c:set var="triage" value="${triageMap[a.apptId]}" />
                                         <tr>
-                                            <td>#${a.apptId}</td>
+                                            <td>${loop.index + 1}</td>
                                             <td>${a.petName}</td>
                                             <td>${a.ownerName}</td>
                                             <td>${a.startTime}</td>
                                             <td>
                                                 <c:choose>
-                                                    <c:when test="${triage != null && triage.conditionLevel eq 'Red'}">
-                                                        <span class="badge badge-active" style="background:#b91c1c;">Red</span>
+                                                    <c:when test="${triage != null && triage.conditionLevel eq 'Critical'}">
+                                                        <span class="badge" style="background:#dc2626;color:#fff;">Critical</span>
                                                     </c:when>
-                                                    <c:when test="${triage != null && triage.conditionLevel eq 'Yellow'}">
-                                                        <span class="badge badge-warning">Yellow</span>
+                                                    <c:when test="${triage != null && triage.conditionLevel eq 'High'}">
+                                                        <span class="badge" style="background:#ea580c;color:#fff;">High</span>
                                                     </c:when>
-                                                    <c:when test="${triage != null && triage.conditionLevel eq 'Green'}">
-                                                        <span class="badge" style="background:#16a34a;color:#fff;">Green</span>
+                                                    <c:when test="${triage != null && triage.conditionLevel eq 'Medium'}">
+                                                        <span class="badge" style="background:#ca8a04;color:#fff;">Medium</span>
+                                                    </c:when>
+                                                    <c:when test="${triage != null && triage.conditionLevel eq 'Low'}">
+                                                        <span class="badge" style="background:#16a34a;color:#fff;">Low</span>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <span class="badge badge-inactive">Chưa triage</span>
+                                                        <span class="badge badge-inactive">Not triaged</span>
                                                     </c:otherwise>
                                                 </c:choose>
                                             </td>
@@ -69,7 +72,15 @@
                                                 <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
                                                     <c:choose>
                                                         <c:when test="${a.status eq 'In-Progress'}">
-                                                            <span class="badge" style="background:#0ea5e9;color:#fff;">Agreed</span>
+                                                            <span class="badge" style="background:#0ea5e9;color:#fff;">In Progress</span>
+                                                            <a href="${pageContext.request.contextPath}/veterinarian/emergency/complete?apptId=${a.apptId}"
+                                                               class="btn btn-approve"
+                                                               style="padding:6px 10px; line-height:1; border-radius:10px; font-size:12px;">
+                                                                Complete
+                                                            </a>
+                                                        </c:when>
+                                                        <c:when test="${a.status eq 'Completed'}">
+                                                            <span class="badge" style="background:#16a34a;color:#fff;">Completed</span>
                                                         </c:when>
                                                         <c:otherwise>
                                                             <span class="badge badge-inactive">${a.status}</span>

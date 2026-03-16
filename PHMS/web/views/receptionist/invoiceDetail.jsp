@@ -1,19 +1,16 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
 <!DOCTYPE html>
 <html lang="vi">
     <head>
         <meta charset="UTF-8">
         <title>Chi tiết hóa đơn - PHMS</title>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/components.css">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/pages/service-management.css">
-        <link href="${pageContext.request.contextPath}/assets/css/dashboardLeft.css" rel="stylesheet">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <link href="${pageContext.request.contextPath}/assets/css/dashboardLeft.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/pages/receptionistDashboard.css">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
         <link href="${pageContext.request.contextPath}/assets/css/petOwner/billingPetOwner.css" rel="stylesheet">
         <style>
             /* Style popup VietQR đồng bộ với trang tạo hóa đơn */
@@ -78,50 +75,42 @@
 
             <ul class="menu">
                 <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/dashboard" class="active">
-                        <i class="fa-solid fa-table-columns"></i> Dashboard
+                    <a href="${pageContext.request.contextPath}/receptionist/dashboard">
+                        <i class="fa-solid fa-table-columns"></i> ${L == 'en' ? 'Dashboard' : 'Bảng điều khiển'}
                     </a>
                 </li>
                 <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/dashboard" class="text-danger">
-                        <i class="fa-solid fa-truck-medical"></i> Emergency Triage
-                    </a>
-                </li>
-                <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/scheduling">
-                        <i class="fa-solid fa-truck-medical"></i> Staff Scheduling
+                    <a href="${pageContext.request.contextPath}/receptionist/emergency/queue" class="text-danger">
+                        <i class="fa-solid fa-truck-medical"></i> ${L == 'en' ? 'Emergency Triage' : 'Cấp cứu'}
                     </a>
                 </li>
                 <li>
                     <a href="${pageContext.request.contextPath}/receptionist/appointment">
-                        <i class="fa-regular fa-calendar-check"></i> Appointments
+                        <i class="fa-regular fa-calendar-check"></i> ${L == 'en' ? 'Appointments' : 'Cuộc hẹn'}
                     </a>
                 </li>
                 <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/dashboard">
-                        <i class="fa-solid fa-paw"></i> My Pets
-                    </a>
-                <li>
-                </li>
-                <a href="${pageContext.request.contextPath}/receptionist/dashboard">
-                    <i class="fa-solid fa-file-medical"></i> Medical Records
-                </a>
-                </li>
-                <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/dashboard">
-                        <i class="fa-regular fa-credit-card"></i> Billing
-                    </a>
-                </li>
-                <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/dashboard">
-                        <i class="fa-solid fa-gear"></i> Administration
+                    <a href="${pageContext.request.contextPath}/receptionist/invoice/create" class="active">
+                        <i class="fa-regular fa-credit-card"></i> ${L == 'en' ? 'Billing' : 'Thanh toán'}
                     </a>
                 </li>
             </ul>
 
+            <!-- Language Switcher -->
+            <div style="padding: 12px; margin-top: auto;">
+                <div style="display:flex; background:#f1f5f9; border-radius:8px; padding:3px; gap:2px;">
+                    <a href="${pageContext.request.contextPath}/language?lang=vi"
+                       style="padding:5px 10px; border-radius:6px; font-size:11px; font-weight:700; text-decoration:none; flex:1; text-align:center;
+                              ${L == 'vi' ? 'background:#10b981; color:#fff;' : 'color:#64748b;'}">VI</a>
+                    <a href="${pageContext.request.contextPath}/language?lang=en"
+                       style="padding:5px 10px; border-radius:6px; font-size:11px; font-weight:700; text-decoration:none; flex:1; text-align:center;
+                              ${L == 'en' ? 'background:#10b981; color:#fff;' : 'color:#64748b;'}">EN</a>
+                </div>
+            </div>
+
             <div class="help-box">
-                <div class="help-text">Need help?</div>
-                <a href="#" class="btn-contact">Contact Support</a>
+                <div class="help-text">${L == 'en' ? 'Need help?' : 'Cần hỗ trợ?'}</div>
+                <a href="#" class="btn-contact">${L == 'en' ? 'Contact Support' : 'Liên hệ hỗ trợ'}</a>
             </div>
         </nav>
 
@@ -167,13 +156,42 @@
                     <!-- Thông tin bổ sung (nếu có trong object invoice) -->
                     <div class="customer-info-row">
                         <div class="info-group">
+                            <label>OWNER NAME</label>
+                            <div class="info-value"><c:out value="${appt.ownerName}" default="-"/></div>
+                        </div>
+                        <div class="info-group">
+                            <label>PET NAME</label>
+                            <div class="info-value"><c:out value="${appt.petName}" default="-"/></div>
+                        </div>
+                    </div>
+                    <div class="customer-info-row" style="margin-top:10px;">
+                        <div class="info-group">
+                            <label>VETERINARIAN</label>
+                            <div class="info-value"><c:out value="${appt.vetName}" default="-"/></div>
+                        </div>
+                        <div class="info-group">
+                            <label>TYPE</label>
+                            <div class="info-value">
+                                <c:choose>
+                                    <c:when test="${appt.type == 'Urgent'}">
+                                        <span style="color:#dc2626; font-weight:600;">Emergency</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <c:out value="${appt.type}" default="-"/>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="customer-info-row" style="margin-top:10px;">
+                        <div class="info-group">
                             <label>PAYMENT STATUS</label>
                             <div class="info-value">${invoice.status}</div>
                         </div>
                         <div class="info-group">
                             <label>TOTAL AMOUNT</label>
                             <div class="info-value">
-                                <fmt:formatNumber value="${invoice.totalAmount}" type="currency" currencySymbol="VND "/>
+                                <fmt:formatNumber value="${invoice.totalAmount * 1.08}" type="currency" currencySymbol="VND "/>
                             </div>
                         </div>
                     </div>
@@ -183,7 +201,7 @@
                         <thead>
                             <tr>
                                 <th>TYPE</th>
-                                <th>ITEM ID / NAME</th>
+                                <th>ITEM NAME</th>
                                 <th class="text-center">QTY</th>
                                 <th class="text-right">UNIT PRICE</th>
                                 <th class="text-right">SUBTOTAL</th>
@@ -194,12 +212,7 @@
                             <c:forEach var="d" items="${details}">
                                 <tr>
                                     <td><span class="badge ${d.itemType eq 'Service' ? 'bg-info' : 'bg-success'}">${d.itemType}</span></td>
-                                    <td>
-                                        <c:choose>
-                                            <c:when test="${d.itemType eq 'Service'}">${d.serviceId}</c:when>
-                                            <c:otherwise>${d.medicineId}</c:otherwise>
-                                        </c:choose>
-                                    </td>
+                                    <td>${d.itemName}</td>
                                     <td class="text-center">${d.quantity}</td>
                                     <td class="text-right">
                                         <fmt:formatNumber value="${d.unitPrice}" type="currency" currencySymbol=""/>
@@ -218,7 +231,7 @@
                         <div class="total-row grand-total">
                             <span>Grand Total</span>
                             <span class="amount-green">
-                                <fmt:formatNumber value="${invoice.totalAmount}" type="currency" currencySymbol="VND "/>
+                                <fmt:formatNumber value="${invoice.totalAmount * 1.08}" type="currency" currencySymbol="VND "/>
                             </span>
                         </div>
                     </div>
@@ -265,7 +278,7 @@
 
                                 <button type="button" class="btn-pay" onclick="openVietqrModal()">
                                     Pay
-                                    <fmt:formatNumber value="${invoice.totalAmount}" type="currency" currencySymbol="VND "/>
+                                    <fmt:formatNumber value="${invoice.totalAmount * 1.08}" type="currency" currencySymbol="VND "/>
                                 </button>
                             </form>
 
@@ -318,12 +331,12 @@
                         <p class="mb-3">
                             Vui lòng quét mã QR để thanh toán:<br>
                             <span class="fs-4 fw-bold text-success">
-                                <fmt:formatNumber value="${invoice.totalAmount}" type="currency" currencySymbol="VND "/>
+                                <fmt:formatNumber value="${invoice.totalAmount * 1.08}" type="currency" currencySymbol="VND "/>
                             </span>
                         </p>
 
                         <div class="qr-wrapper mb-3">
-                            <img src="https://img.vietqr.io/image/techcombank-1999992707-compact.png?amount=${invoice.totalAmount}&addInfo=INV${invoice.invoiceId}&accountName=PHAM CONG HUY"
+                            <img src="https://img.vietqr.io/image/techcombank-1999992707-compact.png?amount=${invoice.totalAmount * 1.08}&addInfo=INV${invoice.invoiceId}&accountName=PHAM CONG HUY"
                                  alt="VietQR" class="img-fluid" style="width: 280px;">
                         </div>
 
@@ -335,7 +348,7 @@
                                 <div class="payment-item">
                                     <span>Số tiền:</span>
                                     <strong class="text-success">
-                                        <fmt:formatNumber value="${invoice.totalAmount}" type="currency" currencySymbol="VND "/>
+                                        <fmt:formatNumber value="${invoice.totalAmount * 1.08}" type="currency" currencySymbol="VND "/>
                                     </strong>
                                 </div>
 

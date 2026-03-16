@@ -76,6 +76,7 @@ public class ForgotPasswordController extends HttpServlet {
         String email = util.ValidationUtils.sanitize(request.getParameter("email"));
         String otpInput = util.ValidationUtils.sanitize(request.getParameter("otp"));
         String newPass = request.getParameter("newPass"); // keep raw for strength validation
+        String confirmPass = request.getParameter("confirmPass");
 
         HttpSession session = request.getSession();
         UserDAO dao = new UserDAO();
@@ -153,6 +154,14 @@ public class ForgotPasswordController extends HttpServlet {
                 return;
             }
 
+            // Validate confirm password matches
+            if (confirmPass == null || !confirmPass.equals(newPass)) {
+                request.setAttribute("step", "2");
+                request.setAttribute("error", "Mật khẩu xác nhận không khớp!");
+                request.getRequestDispatcher("views/auth/forgot-password.jsp").forward(request, response);
+                return;
+            }
+
             if (otpInput.equals(serverOtp)) {
                 Object userIdObj = session.getAttribute("resetUserId");
                 if (userIdObj instanceof Integer) {
@@ -165,7 +174,7 @@ public class ForgotPasswordController extends HttpServlet {
                     session.removeAttribute("resetEmail");
                     session.removeAttribute("resetUserId");
 
-                    request.setAttribute("success", "Đổi mật khẩu thành công! Vui lòng đăng nhập.");
+                    request.setAttribute("success", "Đổi mật khẩu thành công! Trở lại trang đăng nhập sau 5s.");
                 } else {
                     request.setAttribute("error", "Phiên đặt lại mật khẩu không hợp lệ. Vui lòng thử lại.");
                 }

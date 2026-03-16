@@ -7,6 +7,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -22,10 +23,49 @@
 </head>
 <body>
     <nav class="sidebar">
-        <div class="brand"><i class="fa-solid fa-plus-square"></i> VetCare Pro</div>
+        <div class="brand">
+            <i class="fa-solid fa-plus-square"></i> VetCare Pro
+        </div>
+
         <ul class="menu">
-             <li><a href="${pageContext.request.contextPath}/receptionist/dashboard"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a></li>
+            <li>
+                <a href="${pageContext.request.contextPath}/receptionist/dashboard">
+                    <i class="fa-solid fa-table-columns"></i> ${L == 'en' ? 'Dashboard' : 'Bảng điều khiển'}
+                </a>
+            </li>
+            <li>
+                <a href="${pageContext.request.contextPath}/receptionist/emergency/queue" class="text-danger">
+                    <i class="fa-solid fa-truck-medical"></i> ${L == 'en' ? 'Emergency Triage' : 'Cấp cứu'}
+                </a>
+            </li>
+            <li>
+                <a href="${pageContext.request.contextPath}/receptionist/appointment">
+                    <i class="fa-regular fa-calendar-check"></i> ${L == 'en' ? 'Appointments' : 'Cuộc hẹn'}
+                </a>
+            </li>
+            <li>
+                <a href="${pageContext.request.contextPath}/receptionist/invoice/create" class="active">
+                    <i class="fa-regular fa-credit-card"></i> ${L == 'en' ? 'Billing' : 'Thanh toán'}
+                </a>
+            </li>
         </ul>
+
+        <!-- Language Switcher -->
+        <div style="padding: 12px; margin-top: auto;">
+            <div style="display:flex; background:#f1f5f9; border-radius:8px; padding:3px; gap:2px;">
+                <a href="${pageContext.request.contextPath}/language?lang=vi"
+                   style="padding:5px 10px; border-radius:6px; font-size:11px; font-weight:700; text-decoration:none; flex:1; text-align:center;
+                          ${L == 'vi' ? 'background:#10b981; color:#fff;' : 'color:#64748b;'}">VI</a>
+                <a href="${pageContext.request.contextPath}/language?lang=en"
+                   style="padding:5px 10px; border-radius:6px; font-size:11px; font-weight:700; text-decoration:none; flex:1; text-align:center;
+                          ${L == 'en' ? 'background:#10b981; color:#fff;' : 'color:#64748b;'}">EN</a>
+            </div>
+        </div>
+
+        <div class="help-box">
+            <div class="help-text">${L == 'en' ? 'Need help?' : 'Cần hỗ trợ?'}</div>
+            <a href="#" class="btn-contact">${L == 'en' ? 'Contact Support' : 'Liên hệ hỗ trợ'}</a>
+        </div>
     </nav>
 
     <main class="main-content">

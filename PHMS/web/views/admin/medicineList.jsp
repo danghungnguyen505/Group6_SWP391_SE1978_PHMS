@@ -357,7 +357,7 @@
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th class="col-id">ID</th>
+                                    <th class="col-id">STT</th>
                                     <th style="width: 25%;">Medicine Name</th>
                                     <th style="width: 20%;">Unit</th>
                                     <th style="width: 15%;">Price</th>
@@ -366,9 +366,9 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <c:forEach var="med" items="${medicines}">
+                                <c:forEach var="med" items="${medicines}" varStatus="st">
                                     <tr>
-                                        <td class="col-id">#${med.medicineId}</td>
+                                        <td class="col-id">${st.index + 1}</td>
                                         <td class="col-name">${med.name}</td>
                                         <td class="col-unit">"${med.unit}"</td>
                                         <td class="col-price">

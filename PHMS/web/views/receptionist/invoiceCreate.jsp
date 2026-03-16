@@ -1,19 +1,15 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
 <!DOCTYPE html>
 <html lang="vi">
     <head>
         <meta charset="UTF-8">
         <title>Tạo hóa đơn - PHMS</title>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/components.css">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/pages/service-management.css">
-        <link href="${pageContext.request.contextPath}/assets/css/dashboardLeft.css" rel="stylesheet">
-        <!-- Bootstrap 5 CSS -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/pages/receptionistDashboard.css">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
         <link href="${pageContext.request.contextPath}/assets/css/petOwner/billingPetOwner.css" rel="stylesheet">
 
         <style>
@@ -76,19 +72,45 @@
             <div class="brand">
                 <i class="fa-solid fa-plus-square"></i> VetCare Pro
             </div>
+
             <ul class="menu">
-                <li><a href="${pageContext.request.contextPath}/receptionist/dashboard"><i class="fa-solid fa-table-columns"></i> Dashboard</a></li>
-                <li><a href="#" class="text-danger"><i class="fa-solid fa-truck-medical"></i> Emergency Triage</a></li>
-                <li><a href="${pageContext.request.contextPath}/receptionist/scheduling"><i class="fa-solid fa-truck-medical"></i> Staff Scheduling</a></li>
-                <li><a href="${pageContext.request.contextPath}/receptionist/appointment"><i class="fa-regular fa-calendar-check"></i> Appointments</a></li>
-                <li><a href="#"><i class="fa-solid fa-paw"></i> My Pets</a></li>
-                <li><a href="#"><i class="fa-solid fa-file-medical"></i> Medical Records</a></li>
-                <li><a href="#" class="active"><i class="fa-regular fa-credit-card"></i> Billing</a></li>
-                <li><a href="#"><i class="fa-solid fa-gear"></i> Administration</a></li>
+                <li>
+                    <a href="${pageContext.request.contextPath}/receptionist/dashboard">
+                        <i class="fa-solid fa-table-columns"></i> ${L == 'en' ? 'Dashboard' : 'Bảng điều khiển'}
+                    </a>
+                </li>
+                <li>
+                    <a href="${pageContext.request.contextPath}/receptionist/emergency/queue" class="text-danger">
+                        <i class="fa-solid fa-truck-medical"></i> ${L == 'en' ? 'Emergency Triage' : 'Cấp cứu'}
+                    </a>
+                </li>
+                <li>
+                    <a href="${pageContext.request.contextPath}/receptionist/appointment">
+                        <i class="fa-regular fa-calendar-check"></i> ${L == 'en' ? 'Appointments' : 'Cuộc hẹn'}
+                    </a>
+                </li>
+                <li>
+                    <a href="${pageContext.request.contextPath}/receptionist/invoice/create" class="active">
+                        <i class="fa-regular fa-credit-card"></i> ${L == 'en' ? 'Billing' : 'Thanh toán'}
+                    </a>
+                </li>
             </ul>
+
+            <!-- Language Switcher -->
+            <div style="padding: 12px; margin-top: auto;">
+                <div style="display:flex; background:#f1f5f9; border-radius:8px; padding:3px; gap:2px;">
+                    <a href="${pageContext.request.contextPath}/language?lang=vi"
+                       style="padding:5px 10px; border-radius:6px; font-size:11px; font-weight:700; text-decoration:none; flex:1; text-align:center;
+                              ${L == 'vi' ? 'background:#10b981; color:#fff;' : 'color:#64748b;'}">VI</a>
+                    <a href="${pageContext.request.contextPath}/language?lang=en"
+                       style="padding:5px 10px; border-radius:6px; font-size:11px; font-weight:700; text-decoration:none; flex:1; text-align:center;
+                              ${L == 'en' ? 'background:#10b981; color:#fff;' : 'color:#64748b;'}">EN</a>
+                </div>
+            </div>
+
             <div class="help-box">
-                <div class="help-text">Need help?</div>
-                <a href="#" class="btn-contact">Contact Support</a>
+                <div class="help-text">${L == 'en' ? 'Need help?' : 'Cần hỗ trợ?'}</div>
+                <a href="#" class="btn-contact">${L == 'en' ? 'Contact Support' : 'Liên hệ hỗ trợ'}</a>
             </div>
         </nav>
 
@@ -132,6 +154,25 @@
                         <div class="info-group">
                             <label>PET NAME</label>
                             <div class="info-value"><c:out value="${appt.petName}"/></div>
+                        </div>
+                    </div>
+                    <div class="customer-info-row" style="margin-top:10px;">
+                        <div class="info-group">
+                            <label>VETERINARIAN</label>
+                            <div class="info-value"><c:out value="${appt.vetName}"/></div>
+                        </div>
+                        <div class="info-group">
+                            <label>TYPE</label>
+                            <div class="info-value">
+                                <c:choose>
+                                    <c:when test="${appt.type == 'Urgent'}">
+                                        <span style="color:#dc2626; font-weight:600;">Emergency</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <c:out value="${appt.type}"/>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
                         </div>
                     </div>
 

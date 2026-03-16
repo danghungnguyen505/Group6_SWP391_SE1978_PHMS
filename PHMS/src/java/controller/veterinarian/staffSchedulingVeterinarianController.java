@@ -56,17 +56,22 @@ public class staffSchedulingVeterinarianController extends HttpServlet {
                 Date.valueOf(startOfWeek),
                 Date.valueOf(endOfWeek)
         );
-        // 3. Gom nhóm dữ liệu
-        Map<String, List<StaffScheduleVeterinarian>> weeklyMap = new LinkedHashMap<>();
+        // 3. Gom nhóm dữ liệu theo ngày -> ca (chỉ giữ 1 entry/ca)
+        Map<String, Map<String, StaffScheduleVeterinarian>> weeklyMap = new LinkedHashMap<>();
         LocalDate current = startOfWeek;
         while (!current.isAfter(endOfWeek)) {
-            weeklyMap.put(current.toString(), new ArrayList<>());
+            Map<String, StaffScheduleVeterinarian> shiftMap = new LinkedHashMap<>();
+            weeklyMap.put(current.toString(), shiftMap);
             current = current.plusDays(1);
         }
         for (StaffScheduleVeterinarian s : mySchedules) {
             String key = s.getWorkDate().toString();
             if (weeklyMap.containsKey(key)) {
-                weeklyMap.get(key).add(s);
+                String shiftType = s.getShiftType() != null ? s.getShiftType() : "morning";
+                // Chỉ giữ entry đầu tiên cho mỗi ca
+                if (!weeklyMap.get(key).containsKey(shiftType)) {
+                    weeklyMap.get(key).put(shiftType, s);
+                }
             }
         }
         java.util.Map<String, String> leaveMap = daoForStatusResgister.getLeaveStatusMap(account.getUserId());

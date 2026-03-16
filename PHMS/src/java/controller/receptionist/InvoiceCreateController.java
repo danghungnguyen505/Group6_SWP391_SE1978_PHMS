@@ -4,6 +4,8 @@ import dal.AppointmentDAO;
 import dal.InvoiceDAO;
 import dal.PrescriptionDAO;
 import dal.ServiceDAO;
+import dal.TriageRecordDAO;
+import model.TriageRecord;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -64,8 +66,22 @@ public class InvoiceCreateController extends HttpServlet {
         // Build invoice preview data: main service based on appointment type
         ServiceDAO serviceDAO = new ServiceDAO();
         model.Service mainService = null;
-        if (appt.getType() != null && !appt.getType().trim().isEmpty()) {
+
+        // For emergency (Urgent) appointments, use triage level to find the correct emergency service
+        if ("Urgent".equalsIgnoreCase(appt.getType())) {
+            TriageRecordDAO triageDAO = new TriageRecordDAO();
+            TriageRecord triage = triageDAO.getByAppointment(apptId);
+            if (triage != null && triage.getConditionLevel() != null) {
+                mainService = serviceDAO.getServiceByTriageLevel(triage.getConditionLevel());
+            }
+        }
+
+        // For non-emergency or if triage lookup failed, try matching by appointment type name
+        if (mainService == null && appt.getType() != null && !appt.getType().trim().isEmpty()) {
             mainService = serviceDAO.getActiveServiceByName(appt.getType());
+            if (mainService == null) {
+                mainService = serviceDAO.getActiveServiceByNameLike(appt.getType());
+            }
         }
         if (mainService == null) {
             mainService = serviceDAO.getFirstActiveService();

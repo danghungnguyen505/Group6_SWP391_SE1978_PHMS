@@ -120,7 +120,18 @@ public class DashboardController extends HttpServlet {
         Map<String, Object> revenueReport = reportingDAO.getRevenueReport(startTimestamp, endTimestamp);
         Map<String, Integer> appointmentStats = reportingDAO.getAppointmentStats(startTimestamp, endTimestamp);
         List<Map<String, Object>> topServices = reportingDAO.getTopServicesByRevenue(startTimestamp, endTimestamp, 5);
-        List<Map<String, Object>> monthlyRevenue = reportingDAO.getMonthlyRevenue(startTimestamp, endTimestamp);
+
+        // Always get 12 months for chart display
+        Calendar cal12 = Calendar.getInstance();
+        cal12.add(Calendar.MONTH, -11);
+        cal12.set(Calendar.DAY_OF_MONTH, 1);
+        cal12.set(Calendar.HOUR_OF_DAY, 0);
+        cal12.set(Calendar.MINUTE, 0);
+        cal12.set(Calendar.SECOND, 0);
+        cal12.set(Calendar.MILLISECOND, 0);
+        Timestamp chartStart = new Timestamp(cal12.getTime().getTime());
+        Timestamp chartEnd = new Timestamp(System.currentTimeMillis());
+        List<Map<String, Object>> monthlyRevenue = reportingDAO.getMonthlyRevenue(chartStart, chartEnd);
 
         StaffAccountDAO staffDAO = new StaffAccountDAO();
         List<User> staffAccounts = staffDAO.getAllStaffAccounts(1, 1000, "", "", "");

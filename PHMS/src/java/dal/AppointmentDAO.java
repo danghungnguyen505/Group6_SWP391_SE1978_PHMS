@@ -692,7 +692,7 @@ public class AppointmentDAO extends DBContext {
                 + "JOIN Users u_vet ON a.vet_id = u_vet.user_id "
                 + "JOIN Users u_owner ON p.owner_id = u_owner.user_id "
                 + "WHERE a.type = 'Urgent' "
-                + "AND a.status IN ('Pending','Confirmed','Checked-in','In-Progress') "
+                + "AND a.status IN ('Pending','Confirmed','Checked-in','In-Progress','Completed') "
                 + "ORDER BY a.start_time ASC";
         try (PreparedStatement st = connection.prepareStatement(sql); ResultSet rs = st.executeQuery()) {
             while (rs.next()) {
@@ -725,7 +725,7 @@ public class AppointmentDAO extends DBContext {
                 + "JOIN Users u_owner ON p.owner_id = u_owner.user_id "
                 + "WHERE a.type = 'Urgent' "
                 + "AND a.vet_id = ? "
-                + "AND a.status IN ('Confirmed','Checked-in','In-Progress') "
+                + "AND a.status IN ('Pending','Confirmed','Checked-in','In-Progress','Completed') "
                 + "ORDER BY a.start_time ASC";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, vetId);
