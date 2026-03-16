@@ -66,6 +66,11 @@
                         <i class="fa-solid fa-gear"></i> Administration
                     </a>
                 </li>
+                <li>
+    <a href="${pageContext.request.contextPath}/ReceptionistChatController">
+        <i class="fa-solid fa-comments"></i> Customer Chat
+    </a>
+</li>
             </ul>
 
             <div class="help-box">

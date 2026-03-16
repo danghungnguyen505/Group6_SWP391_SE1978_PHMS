@@ -38,6 +38,11 @@
                         <i class="fa-regular fa-credit-card"></i> Billing</a></li>
                 <li><a href="${pageContext.request.contextPath}/aiHealthGuide"class="nav-link">
                         <i class="fa-solid fa-bolt"></i> AI Health Guide</a></li>
+                        <li>
+    <a href="${pageContext.request.contextPath}/ChatRedirectController" class="nav-link">
+        <i class="fa-solid fa-comments"></i> Chat
+    </a>
+</li>
             </ul>
             <div class="support-box">
                 <p>Need help?</p>

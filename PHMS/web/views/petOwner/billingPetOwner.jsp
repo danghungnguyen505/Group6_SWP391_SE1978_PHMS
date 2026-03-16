@@ -52,23 +52,53 @@
 
 <div class="invoice-card">
 
+    <div class="page-header">
     <h2>Billing History</h2>
-    <p>View all your invoices and payment status.</p>
+    <p class="text-muted">View all your invoices and payment status.</p>
+</div>
 
-    <!-- SUMMARY -->
-    <div class="summary-box mb-4">
-        <p><strong>Total Invoices:</strong> ${totalInvoices}</p>
-        <p><strong>Paid:</strong> ${paidCount}</p>
-        <p><strong>Unpaid:</strong> ${unpaidCount}</p>
-        <p><strong>Total Spent:</strong> $${totalSpent}</p>
+   <div class="row summary-cards">
+
+    <div class="col-md-3">
+        <div class="summary-card">
+            <i class="fa-solid fa-file-invoice"></i>
+            <h3>${totalInvoices}</h3>
+            <p>Total Invoices</p>
+        </div>
     </div>
+
+    <div class="col-md-3">
+        <div class="summary-card paid">
+            <i class="fa-solid fa-circle-check"></i>
+            <h3>${paidCount}</h3>
+            <p>Paid</p>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="summary-card unpaid">
+            <i class="fa-solid fa-circle-xmark"></i>
+            <h3>${unpaidCount}</h3>
+            <p>Unpaid</p>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="summary-card money">
+            <i class="fa-solid fa-dollar-sign"></i>
+            <h3>$${totalSpent}</h3>
+            <p>Total Spent</p>
+        </div>
+    </div>
+
+</div>
 
     <c:if test="${empty invoiceList}">
         <h4>No invoices available.</h4>
     </c:if>
 
     <c:if test="${not empty invoiceList}">
-        <table class="invoice-table">
+       <table class="table table-hover invoice-table">
             <thead>
                 <tr>
                     <th>Invoice ID</th>
@@ -83,7 +113,7 @@
                         <td>INV-${inv.invoiceId}</td>
                         <td>$${inv.totalAmount}</td>
                         <td>
-                            <span class="status-badge ${inv.status == 'Paid' ? 'paid' : 'unpaid'}">
+                            <span class="badge ${inv.status == 'Paid' ? 'bg-success' : 'bg-danger'}">
                                 ${inv.status}
                             </span>
                         </td>
