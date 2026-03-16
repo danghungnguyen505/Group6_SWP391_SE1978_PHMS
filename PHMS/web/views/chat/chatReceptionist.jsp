@@ -123,11 +123,11 @@ background:#e2e8f0;
 <div class="customer-list">
 
 <c:forEach var="u" items="${users}">
+<div class="customer" onclick="openChat(${u.userId})">
 
-<div class="customer" onclick="openChat(${u})">
-User ${u}
+<b>${u.fullName}</b>
+
 </div>
-
 </c:forEach>
 
 </div>

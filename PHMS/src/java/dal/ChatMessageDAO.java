@@ -3,27 +3,29 @@ package dal;
 import java.sql.*;
 import java.util.*;
 import model.ChatMessage;
+import model.User;
 
 public class ChatMessageDAO extends DBContext {
 
     public void sendMessage(ChatMessage msg) {
 
-        String sql = "INSERT INTO ChatMessage(sender_id, receiver_id, message_text) VALUES (?, ?, ?)";
+    String sql = "INSERT INTO ChatMessage(sender_id, receiver_id, message_text, sent_time) VALUES (?, ?, ?, ?)";
 
-        try {
+    try {
 
-            PreparedStatement ps = connection.prepareStatement(sql);
+        PreparedStatement ps = connection.prepareStatement(sql);
 
-            ps.setInt(1, msg.getSenderId());
-            ps.setInt(2, msg.getReceiverId());
-            ps.setString(3, msg.getMessageText());
+        ps.setInt(1, msg.getSenderId());
+        ps.setInt(2, msg.getReceiverId());
+        ps.setString(3, msg.getMessageText());
+        ps.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
 
-            ps.executeUpdate();
+        ps.executeUpdate();
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+}
 
     public List<ChatMessage> getConversation(int user1, int user2) {
 
@@ -70,38 +72,34 @@ public class ChatMessageDAO extends DBContext {
         return list;
     }
 
-    public List<Integer> getCustomersWhoMessaged(int receptionistId){
+    public List<User> getCustomersWhoMessaged(int receptionistId) {
 
-        List<Integer> list = new ArrayList<>();
+    List<User> list = new ArrayList<>();
 
-        String sql = """
-        SELECT DISTINCT 
-        CASE 
-            WHEN sender_id = ? THEN receiver_id
-            ELSE sender_id
-        END as user_id
-        FROM ChatMessage
-        WHERE sender_id = ? OR receiver_id = ?
-        """;
+   String sql = """
+    SELECT DISTINCT u.user_id, u.full_name
+    FROM ChatMessage m
+    JOIN Users u ON m.sender_id = u.user_id
+    WHERE m.receiver_id = ?
+""";
 
-        try{
+    try {
+        PreparedStatement ps = connection.prepareStatement(sql);
+        ps.setInt(1, receptionistId);
 
-            PreparedStatement st = connection.prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
 
-            st.setInt(1, receptionistId);
-            st.setInt(2, receptionistId);
-            st.setInt(3, receptionistId);
-
-            ResultSet rs = st.executeQuery();
-
-            while(rs.next()){
-                list.add(rs.getInt("user_id"));
-            }
-
-        }catch(Exception e){
-            e.printStackTrace();
+        while(rs.next()){
+            User u = new User();
+            u.setUserId(rs.getInt("user_id"));
+            u.setFullName(rs.getString("full_name"));
+            list.add(u);
         }
 
-        return list;
+    } catch(Exception e){
+        e.printStackTrace();
     }
+
+    return list;
+}
 }

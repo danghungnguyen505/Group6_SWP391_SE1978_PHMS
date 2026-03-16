@@ -73,8 +73,7 @@ public class ReceptionistChatController extends HttpServlet {
         return;
     }
 
-    List<Integer> users = dao.getCustomersWhoMessaged(user.getUserId());
-
+   List<User> users = dao.getCustomersWhoMessaged(user.getUserId());
     request.setAttribute("users", users);
 
     request.getRequestDispatcher("/views/chat/chatReceptionist.jsp")
