@@ -15,6 +15,25 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <link href="${pageContext.request.contextPath}/assets/css/dashboardLeft.css" rel="stylesheet">
         <link href="${pageContext.request.contextPath}/assets/css/petOwner/billingPetOwner.css" rel="stylesheet">
+        <style>
+@media print {
+    .sidebar,
+    .top-bar,
+    .checkout-card,
+    .btn-print {
+        display: none !important;
+    }
+
+    .main-content {
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        background: white;
+    }
+}
+</style>
     </head>
     <body>
         <!-- LEFT SIDEBAR -->
@@ -208,6 +227,19 @@
                                         </div>
                                     </label>
                                 </div>
+                                <!-- VietQR Code -->
+<div style="text-align:center; margin-top:20px;">
+    <p><b>Scan QR to pay</b></p>
+
+    <img 
+        src="https://img.vietqr.io/image/TPBank-00001314982-compact.png?amount=${invoice.totalAmount}&addInfo=Invoice${invoice.invoiceId}"
+        width="250"
+    >
+
+    <p style="font-size:12px; color:gray;">
+        Bank Transfer using VietQR
+    </p>
+</div>
 
                                 <button type="submit" class="btn-pay">
                                     Confirm Payment: <fmt:formatNumber value="${invoice.totalAmount}" type="currency" currencySymbol="VND "/>

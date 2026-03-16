@@ -34,8 +34,42 @@
     </head>
     <body>
 
-        <!-- SIDEBAR (shared navigation for PetOwner) -->
-        <jsp:include page="nav/navPetOwner.jsp" />
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="brand">
+                <i class="fa-solid fa-plus"></i>
+                <span>VetCare Pro</span>
+            </div>
+
+            <div class="menu-label">Main Menu</div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fa-solid fa-border-all"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="${pageContext.request.contextPath}/booking" class="nav-link">
+                        <i class="fa-regular fa-calendar-check"></i> Appointments
+                    </a>
+                </li>
+                <li class="nav-item" style="font-size: 13px;" >
+                    <a href="${pageContext.request.contextPath}/myAppointment" class="nav-link">
+                        <i class="fa-solid fa-calendar-check"></i> My Appointments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="${pageContext.request.contextPath}/myPetOwner" class="nav-link active">
+                        <i class="fa-solid fa-paw"></i> My Pets
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="${pageContext.request.contextPath}/my-medical-records" class="nav-link">
+                        <i class="fa-solid fa-file-medical"></i> Medical Records
+                    </a>
+                </li>
+            </ul>
+        </aside>
 
         <!-- MAIN CONTENT -->
         <main class="main-content">

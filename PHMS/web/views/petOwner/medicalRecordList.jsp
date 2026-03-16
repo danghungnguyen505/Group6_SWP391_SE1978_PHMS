@@ -13,7 +13,49 @@
         <link href="${pageContext.request.contextPath}/assets/css/pages/myAppointment.css" rel="stylesheet" type="text/css"/>
     </head>
     <body>
-        <jsp:include page="nav/navPetOwner.jsp" />
+        <aside class="sidebar">
+            <div class="brand">
+                <i class="fa-solid fa-plus"></i>
+                <span>VetCare Pro</span>
+            </div>
+            <div class="menu-label">Main Menu</div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="${pageContext.request.contextPath}/booking" class="nav-link">
+                        <i class="fa-regular fa-calendar-check"></i> Appointments
+                    </a>
+                </li>
+                <li class="nav-item" style="font-size: 13px;" >
+                    <a href="${pageContext.request.contextPath}/myAppointment" class="nav-link">
+                        <i class="fa-solid fa-calendar-check"></i> My Appointments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="${pageContext.request.contextPath}/myPetOwner" class="nav-link">
+                        <i class="fa-solid fa-paw"></i> My Pets
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="${pageContext.request.contextPath}/my-medical-records" class="nav-link active">
+                        <i class="fa-solid fa-file-medical"></i> Medical Records
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="${pageContext.request.contextPath}/billing" class="nav-link">
+                        <i class="fa-regular fa-credit-card"></i> Billing
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="${pageContext.request.contextPath}/aiHealthGuide" class="nav-link">
+                        <i class="fa-solid fa-bolt"></i> AI Health Guide
+                    </a>
+                </li>
+            </ul>
+            <div class="support-box">
+                <p>Need help?</p>
+                <button class="btn-support">Contact Support</button>
+            </div>
+        </aside>
 
         <main class="main-content">
             <header class="top-bar">
@@ -65,7 +107,7 @@
                                     <td style="text-align:center;">
                                         <a class="btn-action btn-reschedule" style="text-decoration:none;"
                                            href="${pageContext.request.contextPath}/my-medical-records/detail?id=${r.recordId}">
-                                            <i class="fa-regular fa-eye"></i>
+                                            View
                                         </a>
                                     </td>
                                 </tr>
@@ -74,46 +116,25 @@
                     </table>
                 </c:if>
 
-            <!--Paging của History-->           
-            <c:if test="${totalPages > 1}">
-                <div class="pagination-container">
-                    <!-- Previous -->
-                    <c:if test="${currentPage > 1}">
-                        <a href="?page=${currentPage - 1}" class="page-link">
-                            <i class="fa-solid fa-chevron-left"></i>
-                        </a>
-                    </c:if>
-                    <!-- Trang 1 -->
-                    <a href="?page=1" class="page-link ${currentPage == 1 ? 'active' : ''}">1</a>
-                    <!-- Dấu ... bên trái -->
-                    <c:if test="${currentPage > 4}">
-                        <span class="page-dots">...</span>
-                    </c:if>
-                    <!-- Vòng lặp các trang ở giữa (Current - 2 đến Current + 2) -->
-                    <c:forEach begin="2" end="${totalPages - 1}" var="i">
-                        <c:if test="${i >= currentPage - 2 && i <= currentPage + 2}">
-                            <a href="?page=${i}" class="page-link ${currentPage == i ? 'active' : ''}">
-                                ${i}
+                <c:if test="${totalPages > 1}">
+                    <div class="pagination-container">
+                        <c:if test="${currentPage > 1}">
+                            <a href="?page=${currentPage - 1}&petId=${selectedPetId}" class="page-link">
+                                <i class="fa-solid fa-chevron-left"></i>
                             </a>
                         </c:if>
-                    </c:forEach>
-                    <!-- Dấu ... bên phải -->
-                    <c:if test="${currentPage < totalPages - 3}">
-                        <span class="page-dots">...</span>
-                    </c:if>
-                    <!-- Trang cuối (nếu tổng trang > 1) -->
-                    <c:if test="${totalPages > 1}">
-                        <a href="?page=${totalPages}" class="page-link ${currentPage == totalPages ? 'active' : ''}">
-                            ${totalPages}
-                        </a>
-                    </c:if>
-                    <!-- Next -->
-                    <c:if test="${currentPage < totalPages}">
-                        <a href="?page=${currentPage + 1}" class="page-link">
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </a>
-                    </c:if>   
-                </c:if> 
+                        <c:forEach begin="1" end="${totalPages}" var="i">
+                            <a href="?page=${i}&petId=${selectedPetId}" class="page-link ${currentPage == i ? 'active' : ''}">
+                                ${i}
+                            </a>
+                        </c:forEach>
+                        <c:if test="${currentPage < totalPages}">
+                            <a href="?page=${currentPage + 1}&petId=${selectedPetId}" class="page-link">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </a>
+                        </c:if>
+                    </div>
+                </c:if>
             </div>
         </main>
     </body>

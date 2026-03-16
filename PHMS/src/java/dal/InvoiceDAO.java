@@ -352,4 +352,31 @@ public class InvoiceDAO extends DBContext {
         inv.setStatus(rs.getString("status"));
         return inv;
     }
+
+public List<Invoice> getInvoicesByOwnerId(int ownerId) {
+    List<Invoice> list = new ArrayList<>();
+
+    String sql = """
+        SELECT i.invoice_id, i.appt_id, i.recep_id,
+               i.total_amount, i.status
+        FROM Invoice i
+        JOIN Appointment a ON i.appt_id = a.appt_id
+        JOIN Pet p ON a.pet_id = p.pet_id
+        WHERE p.owner_id = ?
+        ORDER BY i.invoice_id DESC
+    """;
+
+    try (PreparedStatement st = connection.prepareStatement(sql)) {
+        st.setInt(1, ownerId);
+        try (ResultSet rs = st.executeQuery()) {
+            while (rs.next()) {
+                list.add(mapInvoice(rs));
+            }
+        }
+    } catch (SQLException e) {
+        System.out.println("Error getInvoicesByOwnerId: " + e.getMessage());
+    }
+
+    return list;
+}
 }

@@ -16,7 +16,6 @@ private int scheduleId;
     private String staffName; // Lấy từ bảng Users/Employee
     private String role;      // Lấy từ bảng Users/Employee
     private Date workDate;
-    private String shiftTime; // Raw shift_time from DB (e.g. "09:00 AM-09:30 AM")
     private Time startTime;   // Dùng để hiển thị trên lịch
     private Time endTime;     // Dùng để hiển thị trên lịch
     private String status;    // Thêm status 
@@ -39,9 +38,6 @@ private int scheduleId;
 
     public Date getWorkDate() { return workDate; }
     public void setWorkDate(Date workDate) { this.workDate = workDate; }
-
-    public String getShiftTime() { return shiftTime; }
-    public void setShiftTime(String shiftTime) { this.shiftTime = shiftTime; }
 
     public Time getStartTime() { return startTime; }
     public void setStartTime(Time startTime) { this.startTime = startTime; }

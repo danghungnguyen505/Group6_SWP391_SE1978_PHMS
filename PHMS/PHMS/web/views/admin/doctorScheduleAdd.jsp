@@ -250,7 +250,7 @@
             border: 1px solid #edf2f7;
             background: #f8fafc;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             gap: 10px;
             max-height: 320px;
             overflow: auto;
@@ -412,7 +412,7 @@
 
                 <div class="form-group">
                     <label class="form-label">Chọn Slot Làm Việc *</label>
-                    <p class="info-text">Khung giờ từ 09:00 AM đến 05:30 PM, mỗi slot 30 phút. Có thể chọn nhiều slot trong 1 lần.</p>
+                    <p class="info-text">Khung giờ từ 07:00 đến 17:30, mỗi slot 30 phút. Có thể chọn nhiều slot trong 1 lần.</p>
 
                     <div class="slot-toolbar">
                         <div class="slot-actions">

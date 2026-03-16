@@ -41,7 +41,7 @@ public class DBContext {
             
             String url = props.getProperty("url", "jdbc:sqlserver://localhost:1433;databaseName=PHMS_DB;encrypt=true;trustServerCertificate=true;");
             String user = props.getProperty("userID", "sa");
-            String pass = props.getProperty("password", "123");
+            String pass = props.getProperty("password", "123456");
             
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             connection = DriverManager.getConnection(url, user, pass);

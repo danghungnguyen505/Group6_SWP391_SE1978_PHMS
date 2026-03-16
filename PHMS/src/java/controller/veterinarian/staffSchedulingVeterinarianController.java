@@ -4,7 +4,6 @@
  */
 package controller.veterinarian;
 
-import dal.ScheduleVeterianrianDAO;
 import dal.StaffScheduleVeterinarianDAO;
 import java.io.IOException;
 import java.sql.Date;
@@ -50,7 +49,6 @@ public class staffSchedulingVeterinarianController extends HttpServlet {
         LocalDate endOfWeek = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
         // 2. Gọi DAO 
         StaffScheduleVeterinarianDAO dao = new StaffScheduleVeterinarianDAO();
-        ScheduleVeterianrianDAO daoForStatusResgister = new ScheduleVeterianrianDAO();
         List<StaffScheduleVeterinarian> mySchedules = dao.getSchedulesByStaffIdAndDateRange(
                 account.getUserId(), // ID của bác sĩ đang login
                 Date.valueOf(startOfWeek),
@@ -69,13 +67,10 @@ public class staffSchedulingVeterinarianController extends HttpServlet {
                 weeklyMap.get(key).add(s);
             }
         }
-        java.util.Map<String, String> leaveMap = daoForStatusResgister.getLeaveStatusMap(account.getUserId());
-        
         request.setAttribute("weeklyMap", weeklyMap);
         request.setAttribute("startOfWeek", startOfWeek);
         request.setAttribute("endOfWeek", endOfWeek);
         request.setAttribute("currentDate", today);
-        request.setAttribute("leaveMap", leaveMap);
         request.getRequestDispatcher("/views/veterinarian/staffSchedulingVeterinarian.jsp").forward(request, response);
     }
 

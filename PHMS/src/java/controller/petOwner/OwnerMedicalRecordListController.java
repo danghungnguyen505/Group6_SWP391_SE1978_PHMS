@@ -22,7 +22,7 @@ import util.PaginationUtils;
 @WebServlet(name = "OwnerMedicalRecordListController", urlPatterns = {"/my-medical-records"})
 public class OwnerMedicalRecordListController extends HttpServlet {
 
-    private static final int PAGE_SIZE = 5;
+    private static final int PAGE_SIZE = 10;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

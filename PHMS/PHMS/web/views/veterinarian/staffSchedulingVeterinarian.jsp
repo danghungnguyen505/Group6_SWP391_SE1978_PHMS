@@ -62,8 +62,8 @@
                             <c:set var="leaveStatus" value="${leaveMap[entry.key]}" />
                             <c:set var="shiftTypeLabel">
                                 <c:choose>
-                                    <c:when test="${not empty shift.startTime && shift.startTime.toString().startsWith('08')}">morning</c:when>
-                                    <c:when test="${not empty shift.startTime && shift.startTime.toString().startsWith('14')}">afternoon</c:when>
+                                    <c:when test="${shift.startTime.toString().startsWith('08')}">morning</c:when>
+                                    <c:when test="${shift.startTime.toString().startsWith('14')}">afternoon</c:when>
                                     <c:otherwise>custom</c:otherwise>
                                 </c:choose>
                             </c:set>
@@ -92,30 +92,24 @@
                                     <div class="time">
                                         <i class="fa-regular fa-clock"></i> 
                                         <c:choose>
-                                            <c:when test="${not empty shift.startTime && shift.startTime.toString().startsWith('08')}">
+                                            <c:when test="${shift.startTime.toString().startsWith('08')}">
                                                 <span>Morning (08:00 - 12:00)</span>
                                             </c:when>
-                                            <c:when test="${not empty shift.startTime && shift.startTime.toString().startsWith('14')}">
+                                            <c:when test="${shift.startTime.toString().startsWith('14')}">
                                                 <span>Afternoon (14:00 - 17:00)</span>
                                             </c:when>
                                             <c:otherwise>
-                                                <c:choose>
-                                                    <c:when test="${not empty shift.shiftTime}">
-                                                        <span>${shift.shiftTime}</span>
-                                                    </c:when>
-                                                    <c:when test="${not empty shift.startTime && not empty shift.endTime}">
-                                                        <span><fmt:formatDate value="${shift.startTime}" pattern="HH:mm"/> - <fmt:formatDate value="${shift.endTime}" pattern="HH:mm"/></span>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <span>(No shift time)</span>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </c:otherwise>
-                                        </c:choose>
+                                                <span><fmt:formatDate value="${shift.startTime}" pattern="HH:mm"/> 4 Hours
+                                                    <fmt:formatDate value="${shift.endTime}" pattern="HH:mm"/></span>
+                                                </c:otherwise>
+                                            </c:choose>
                                     </div>
                                 </div>
                             </div>
                         </c:forEach>
+                        <button class="add-another-btn" onclick="openAddShiftModal('${entry.key}')">
+                            <i class="fa-solid fa-plus"></i> Add Another
+                        </button>
                     </div>
                 </c:forEach>
             </div>
