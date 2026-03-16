@@ -116,9 +116,6 @@
                                 </div>
                             </div>
                         </c:forEach>
-                        <button class="add-another-btn" onclick="openAddShiftModal('${entry.key}')">
-                            <i class="fa-solid fa-plus"></i> Add Another
-                        </button>
                     </div>
                 </c:forEach>
             </div>

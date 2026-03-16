@@ -13,9 +13,17 @@
 <body class="mgmt-page">
 <div class="mgmt-container">
     <header class="mgmt-header">
-        <div>
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+            <div>
             <h1 class="mgmt-title">Emergency queue</h1>
             <p class="mgmt-subtitle">List of emergency cases awaiting examination.</p>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <a href="${pageContext.request.contextPath}/receptionist/dashboard" class="btn btn-secondary"
+                   style="text-decoration:none;">
+                    Back
+                </a>
+            </div>
         </div>
     </header>
 

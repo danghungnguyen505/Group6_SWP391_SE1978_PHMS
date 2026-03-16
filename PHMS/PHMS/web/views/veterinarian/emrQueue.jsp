@@ -65,9 +65,13 @@
                                         </c:if>
                                     </td>
                                     <td style="text-align:center;">
-                                        <a class="btn btn-approve" style="text-decoration:none;"
-                                           href="${pageContext.request.contextPath}/veterinarian/emr/create?apptId=${a.apptId}">
-                                            <i class="fa-solid fa-pen-to-square"></i> Examine
+                                        <a class="btn btn-approve" style="text-decoration:none; margin-right:6px;"
+                                           href="${pageContext.request.contextPath}/veterinarian/emr/queue/edit?apptId=${a.apptId}">
+                                            <i class="fa-solid fa-pen-to-square"></i> Edit
+                                        </a>
+                                        <a class="btn btn-approve" style="text-decoration:none; background:#10b981; border-color:#10b981;"
+                                           href="${pageContext.request.contextPath}/veterinarian/emr/submit?apptId=${a.apptId}">
+                                            <i class="fa-solid fa-paper-plane"></i> Submit
                                         </a>
                                     </td>
                                 </tr>

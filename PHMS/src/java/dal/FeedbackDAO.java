@@ -178,4 +178,22 @@ public class FeedbackDAO extends DBContext {
         f.setApptDate(rs.getString("appt_date"));
         return f;
     }
+
+    /**
+     * Check if an appointment already has feedback.
+     */
+    public boolean hasFeedback(int apptId) {
+        String sql = "SELECT COUNT(*) FROM Feedback WHERE appt_id = ?";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, apptId);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error hasFeedback: " + e.getMessage());
+        }
+        return false;
+    }
 }

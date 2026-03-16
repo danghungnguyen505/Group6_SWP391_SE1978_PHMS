@@ -5,7 +5,11 @@
 
 package controller.admin;
 
+import dal.FeedbackDAO;
+import dal.ReportingDAO;
 import dal.ServiceDAO;
+import dal.StaffAccountDAO;
+import dal.LeaveRequestDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -13,65 +17,132 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
-import model.Service;
+import java.util.Map;
 import model.User;
+import model.Service;
+import model.LeaveRequest;
 
 /**
  *
  * @author Nguyen Dang Hung
  */
 public class DashboardController extends HttpServlet {
-   
-    /** 
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet AdminDashboardController</title>");  
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet AdminDashboardController at " + request.getContextPath () + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    } 
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /** 
-     * Handles the HTTP <code>GET</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        //processRequest(request, response);
         HttpSession session = request.getSession();
         User account = (User) session.getAttribute("account");
-        
+
         if (account == null) {
             response.sendRedirect("../login");
             return;
         }
 
-        ServiceDAO dao = new ServiceDAO();
-        List<Service> list = dao.getAllServices();
-        
-        request.setAttribute("services", list);
-        
+        // --- Filter logic (like Shopee) ---
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar cal = Calendar.getInstance();
+        Date endDate = cal.getTime();
+        Date startDate;
+
+        String filter = request.getParameter("filter");
+        String startDateStr = request.getParameter("startDate");
+        String endDateStr = request.getParameter("endDate");
+
+        if (filter == null && startDateStr == null) {
+            filter = "month"; // default: this month
+        }
+
+        if (filter != null) {
+            cal = Calendar.getInstance();
+            switch (filter) {
+                case "today":
+                    startDate = cal.getTime();
+                    endDate = cal.getTime();
+                    break;
+                case "week":
+                    cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
+                    startDate = cal.getTime();
+                    cal = Calendar.getInstance();
+                    endDate = cal.getTime();
+                    break;
+                case "month":
+                    cal.set(Calendar.DAY_OF_MONTH, 1);
+                    startDate = cal.getTime();
+                    cal = Calendar.getInstance();
+                    endDate = cal.getTime();
+                    break;
+                case "quarter":
+                    int month = cal.get(Calendar.MONTH);
+                    int quarterStart = (month / 3) * 3;
+                    cal.set(Calendar.MONTH, quarterStart);
+                    cal.set(Calendar.DAY_OF_MONTH, 1);
+                    startDate = cal.getTime();
+                    cal = Calendar.getInstance();
+                    endDate = cal.getTime();
+                    break;
+                case "year":
+                    cal.set(Calendar.DAY_OF_YEAR, 1);
+                    startDate = cal.getTime();
+                    cal = Calendar.getInstance();
+                    endDate = cal.getTime();
+                    break;
+                default:
+                    cal.set(Calendar.DAY_OF_MONTH, 1);
+                    startDate = cal.getTime();
+                    cal = Calendar.getInstance();
+                    endDate = cal.getTime();
+            }
+        } else {
+            cal.set(Calendar.DAY_OF_MONTH, 1);
+            startDate = cal.getTime();
+            cal = Calendar.getInstance();
+            endDate = cal.getTime();
+            if (util.ValidationUtils.isNotEmpty(startDateStr)) {
+                try { startDate = sdf.parse(startDateStr); } catch (ParseException e) { /* default */ }
+            }
+            if (util.ValidationUtils.isNotEmpty(endDateStr)) {
+                try { endDate = sdf.parse(endDateStr); } catch (ParseException e) { /* default */ }
+            }
+        }
+
+        Timestamp startTimestamp = new Timestamp(startDate.getTime());
+        Timestamp endTimestamp = new Timestamp(endDate.getTime());
+
+        // --- Fetch all data ---
+        ReportingDAO reportingDAO = new ReportingDAO();
+        Map<String, Object> revenueReport = reportingDAO.getRevenueReport(startTimestamp, endTimestamp);
+        Map<String, Integer> appointmentStats = reportingDAO.getAppointmentStats(startTimestamp, endTimestamp);
+        List<Map<String, Object>> topServices = reportingDAO.getTopServicesByRevenue(startTimestamp, endTimestamp, 5);
+        List<Map<String, Object>> monthlyRevenue = reportingDAO.getMonthlyRevenue(startTimestamp, endTimestamp);
+
+        StaffAccountDAO staffDAO = new StaffAccountDAO();
+        List<User> staffAccounts = staffDAO.getAllStaffAccounts(1, 1000, "", "", "");
+
+        FeedbackDAO feedbackDAO = new FeedbackDAO();
+        List<model.Feedback> feedbacks = feedbackDAO.getAllFeedbacks(1, 10);
+
+        LeaveRequestDAO leaveDAO = new LeaveRequestDAO();
+        List<LeaveRequest> requests = leaveDAO.getPendingLeaveRequests(0, 10);
+
+        // --- Set attributes ---
+        request.setAttribute("filter", filter);
+        request.setAttribute("startDate", sdf.format(startDate));
+        request.setAttribute("endDate", sdf.format(endDate));
+        request.setAttribute("revenueReport", revenueReport);
+        request.setAttribute("appointmentStats", appointmentStats);
+        request.setAttribute("topServices", topServices);
+        request.setAttribute("monthlyRevenue", monthlyRevenue);
+        request.setAttribute("staffAccounts", staffAccounts);
+        request.setAttribute("feedbacks", feedbacks);
+        request.setAttribute("requests", requests);
+
         request.getRequestDispatcher("/views/admin/dashboard.jsp").forward(request, response);
     } 
 
