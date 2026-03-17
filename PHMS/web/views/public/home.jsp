@@ -119,7 +119,7 @@
                         </div>
                         <h3 class="mb-4 service-title">${service.name}</h3>
                         <p class="mb-8 service-description">${service.description}</p>
-                        <p class="service-price-tag">${t_from} $${service.basePrice}</p>
+                        <p class="service-price-tag">${t_from} ${service.basePrice} VND</p>
                     </div>
                 </c:forEach>
             </div>

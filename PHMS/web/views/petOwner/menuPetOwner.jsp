@@ -5,6 +5,7 @@
 --%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
 <!DOCTYPE html>
 <html lang="${L}">
@@ -64,7 +65,7 @@
                             </c:if>
                             <c:forEach items="${services}" var="s">
                                 <option value="${s.name}" ${param.serviceType == s.name ? 'selected' : ''}>
-                                    ${s.name} - $${s.basePrice}
+                                    ${s.name} - <fmt:formatNumber value="${s.basePrice}" pattern="#,###"/>₫
                                 </option>
                             </c:forEach>
                         </select>

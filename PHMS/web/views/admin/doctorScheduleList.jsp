@@ -507,16 +507,16 @@
 
         <div class="controls-bar">
             <div class="date-nav">
-                <a href="?date=${prevWeek}${not empty selectedDoctorId ? '&doctorId='.concat(selectedDoctorId) : ''}" class="nav-arrow">
+                <a href="?date=${prevWeek}${not empty selectedDoctorId ? '&doctorId='.concat(selectedDoctorId) : ''}${not empty selectedShift ? '&shift='.concat(selectedShift) : ''}" class="nav-arrow">
                     <i class="fa-solid fa-chevron-left"></i>
                 </a>
                 <span class="date-range">
                     <fmt:parseDate value="${startOfWeek}" pattern="yyyy-MM-dd" var="parsedStart" />
                     <fmt:parseDate value="${endOfWeek}" pattern="yyyy-MM-dd" var="parsedEnd" />
-                    <fmt:formatDate value="${parsedStart}" pattern="MMM dd"/> - 
+                    <fmt:formatDate value="${parsedStart}" pattern="MMM dd"/> -
                     <fmt:formatDate value="${parsedEnd}" pattern="MMM dd, yyyy"/>
                 </span>
-                <a href="?date=${nextWeek}${not empty selectedDoctorId ? '&doctorId='.concat(selectedDoctorId) : ''}" class="nav-arrow">
+                <a href="?date=${nextWeek}${not empty selectedDoctorId ? '&doctorId='.concat(selectedDoctorId) : ''}${not empty selectedShift ? '&shift='.concat(selectedShift) : ''}" class="nav-arrow">
                     <i class="fa-solid fa-chevron-right"></i>
                 </a>
             </div>
@@ -526,6 +526,7 @@
                 <strong>${selectedDoctorName}</strong>
                 <form method="get" action="${pageContext.request.contextPath}/admin/doctor/schedule/list" style="display: inline;">
                     <input type="hidden" name="date" value="${startOfWeek}">
+                    <input type="hidden" name="shift" value="${selectedShift}">
                     <select name="doctorId" onchange="this.form.submit()" style="margin-left: 8px;">
                         <option value="">Tất cả bác sĩ</option>
                         <c:forEach var="vet" items="${veterinarians}">
@@ -534,6 +535,17 @@
                                 ${vet.fullName}
                             </option>
                         </c:forEach>
+                    </select>
+                </form>
+                <form method="get" action="${pageContext.request.contextPath}/admin/doctor/schedule/list" style="display: inline;">
+                    <input type="hidden" name="date" value="${startOfWeek}">
+                    <c:if test="${not empty selectedDoctorId}">
+                        <input type="hidden" name="doctorId" value="${selectedDoctorId}">
+                    </c:if>
+                    <select name="shift" onchange="this.form.submit()" style="margin-left: 8px;">
+                        <option value="">Tất cả ca</option>
+                        <option value="morning" ${selectedShift == 'morning' ? 'selected' : ''}>Ca Sáng</option>
+                        <option value="afternoon" ${selectedShift == 'afternoon' ? 'selected' : ''}>Ca Chiều</option>
                     </select>
                 </form>
             </div>

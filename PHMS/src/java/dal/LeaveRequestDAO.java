@@ -125,22 +125,42 @@ public class LeaveRequestDAO extends DBContext {
     }
 
     //Đăng ký xin nghỉ
-// 1. Lấy danh sách đơn đang chờ (có phân trang cho SQL Server)
-    public List<LeaveRequest> getPendingLeaveRequests(int offset, int limit) {
+// 1. Lấy danh sách đơn nghỉ (có phân trang, search, filter cho SQL Server)
+    public List<LeaveRequest> getLeaveRequests(String search, String statusFilter, int offset, int limit) {
         List<LeaveRequest> list = new ArrayList<>();
-        String sql = "SELECT leave_id, emp_id, start_date, reason, status "
-                + "FROM LeaveRequest "
-                + "WHERE status = 'Pending' "
-                + "ORDER BY start_date ASC "
-                + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-        try (PreparedStatement st = connection.prepareStatement(sql)) {
-            st.setInt(1, offset);
-            st.setInt(2, limit);
+        StringBuilder sql = new StringBuilder(
+            "SELECT lr.leave_id, lr.emp_id, u.full_name, lr.start_date, lr.reason, lr.status "
+            + "FROM LeaveRequest lr "
+            + "JOIN Users u ON lr.emp_id = u.user_id "
+            + "WHERE 1=1 "
+        );
+
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append("AND u.full_name LIKE ? ");
+        }
+        if (statusFilter != null && !statusFilter.isEmpty() && !statusFilter.equals("all")) {
+            sql.append("AND lr.status = ? ");
+        }
+
+        sql.append("ORDER BY lr.start_date DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+
+        try (PreparedStatement st = connection.prepareStatement(sql.toString())) {
+            int paramIndex = 1;
+            if (search != null && !search.trim().isEmpty()) {
+                st.setString(paramIndex++, "%" + search.trim() + "%");
+            }
+            if (statusFilter != null && !statusFilter.isEmpty() && !statusFilter.equals("all")) {
+                st.setString(paramIndex++, statusFilter);
+            }
+            st.setInt(paramIndex++, offset);
+            st.setInt(paramIndex++, limit);
+
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 LeaveRequest lr = new LeaveRequest();
                 lr.setLeaveId(rs.getInt("leave_id"));
                 lr.setEmpId(rs.getInt("emp_id"));
+                lr.setEmpName(rs.getString("full_name"));
                 lr.setStartDate(rs.getDate("start_date"));
                 lr.setReason(rs.getString("reason"));
                 lr.setStatus(rs.getString("status"));
@@ -152,10 +172,27 @@ public class LeaveRequestDAO extends DBContext {
         return list;
     }
 
-    // 2. Đếm tổng số đơn chờ để tính số trang
-    public int getTotalPendingRequests() {
-        String sql = "SELECT COUNT(*) FROM LeaveRequest WHERE status = 'Pending'";
-        try (PreparedStatement st = connection.prepareStatement(sql)) {
+    // 2. Đếm tổng số đơn nghỉ để tính số trang
+    public int getTotalLeaveRequests(String search, String statusFilter) {
+        StringBuilder sql = new StringBuilder(
+            "SELECT COUNT(*) FROM LeaveRequest lr JOIN Users u ON lr.emp_id = u.user_id WHERE 1=1 "
+        );
+
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append("AND u.full_name LIKE ? ");
+        }
+        if (statusFilter != null && !statusFilter.isEmpty() && !statusFilter.equals("all")) {
+            sql.append("AND lr.status = ? ");
+        }
+
+        try (PreparedStatement st = connection.prepareStatement(sql.toString())) {
+            int paramIndex = 1;
+            if (search != null && !search.trim().isEmpty()) {
+                st.setString(paramIndex++, "%" + search.trim() + "%");
+            }
+            if (statusFilter != null && !statusFilter.isEmpty() && !statusFilter.equals("all")) {
+                st.setString(paramIndex++, statusFilter);
+            }
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
                 return rs.getInt(1);
@@ -166,12 +203,22 @@ public class LeaveRequestDAO extends DBContext {
         return 0;
     }
 
+    // Alias for backward compatibility
+    public List<LeaveRequest> getPendingLeaveRequests(int offset, int limit) {
+        return getLeaveRequests(null, "Pending", offset, limit);
+    }
+
+    public int getTotalPendingRequests() {
+        return getTotalLeaveRequests(null, "Pending");
+    }
+
     // 3. Cập nhật trạng thái duyệt/từ chối
-    public boolean updateLeaveStatus(int leaveId, String status) {
-        String sql = "UPDATE LeaveRequest SET status = ? WHERE leave_id = ?";
+    public boolean updateLeaveStatus(int leaveId, int managerId, String status) {
+        String sql = "UPDATE LeaveRequest SET status = ?, manager_id = ? WHERE leave_id = ?";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setString(1, status);
-            st.setInt(2, leaveId);
+            st.setInt(2, managerId);
+            st.setInt(3, leaveId);
             int rows = st.executeUpdate();
             return rows > 0;
         } catch (SQLException e) {

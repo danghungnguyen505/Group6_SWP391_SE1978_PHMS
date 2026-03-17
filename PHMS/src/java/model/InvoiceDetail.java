@@ -12,6 +12,10 @@ public class InvoiceDetail {
     private int quantity;
     private double unitPrice;
 
+    // Display names (populated via JOIN queries)
+    private String serviceName;
+    private String medicineName;
+
     public InvoiceDetail() {
     }
 
@@ -26,6 +30,7 @@ public class InvoiceDetail {
         this.unitPrice = unitPrice;
     }
 
+    // Getters and Setters for detail fields
     public int getDetailId() {
         return detailId;
     }
@@ -80,6 +85,35 @@ public class InvoiceDetail {
 
     public void setUnitPrice(double unitPrice) {
         this.unitPrice = unitPrice;
+    }
+
+    // Getters and Setters for display names
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    public String getMedicineName() {
+        return medicineName;
+    }
+
+    public void setMedicineName(String medicineName) {
+        this.medicineName = medicineName;
+    }
+
+    /**
+     * Get display name for this detail item (service name or medicine name)
+     */
+    public String getItemName() {
+        if ("Service".equalsIgnoreCase(itemType)) {
+            return serviceName != null ? serviceName : (serviceId != null ? "Service #" + serviceId : "Unknown Service");
+        } else if ("Medicine".equalsIgnoreCase(itemType)) {
+            return medicineName != null ? medicineName : (medicineId != null ? "Medicine #" + medicineId : "Unknown Medicine");
+        }
+        return "Unknown Item";
     }
 }
 

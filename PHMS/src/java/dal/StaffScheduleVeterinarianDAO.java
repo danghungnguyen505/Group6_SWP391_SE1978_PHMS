@@ -54,6 +54,11 @@ public class StaffScheduleVeterinarianDAO extends DBContext{
                 if (parsed != null) {
                     sv.setStartTime(parsed[0]);
                     sv.setEndTime(parsed[1]);
+                    // Determine shift type: morning if start before 12:00, afternoon otherwise
+                    int hour = parsed[0].toLocalTime().getHour();
+                    sv.setShiftType(hour < 12 ? "morning" : "afternoon");
+                } else {
+                    sv.setShiftType("morning"); // default
                 }
                 sv.setStatus("Active");
                 list.add(sv);

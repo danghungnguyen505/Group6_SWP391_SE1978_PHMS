@@ -10,7 +10,8 @@ public class Feedback {
     private int apptId;
     private int rating;
     private String comment;
-    
+    private String status; // New, Read, Flagged
+
     // Additional fields from JOIN
     private String customerName;
     private String petName;
@@ -89,5 +90,13 @@ public class Feedback {
     
     public void setApptDate(String apptDate) {
         this.apptDate = apptDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

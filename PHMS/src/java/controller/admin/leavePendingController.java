@@ -25,21 +25,31 @@ public class leavePendingController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Thiết lập số lượng bản ghi trên 1 trang
-        int recordsPerPage = 5;
+        int recordsPerPage = 10;
         int currentPage = 1;
         String pageParam = request.getParameter("page");
         if (pageParam != null && !pageParam.isEmpty()) {
             currentPage = Integer.parseInt(pageParam);
         }
+
+        String search = request.getParameter("search");
+        String statusFilter = request.getParameter("status");
+        if (statusFilter == null) {
+            statusFilter = "all";
+        }
+
         int offset = (currentPage - 1) * recordsPerPage;
         LeaveRequestDAO dao = new LeaveRequestDAO();
-        List<LeaveRequest> list = dao.getPendingLeaveRequests(offset, recordsPerPage);
-        int totalRecords = dao.getTotalPendingRequests();
+        List<LeaveRequest> list = dao.getLeaveRequests(search, statusFilter, offset, recordsPerPage);
+        int totalRecords = dao.getTotalLeaveRequests(search, statusFilter);
         int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+
         request.setAttribute("requests", list);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("currentPage", currentPage);
+        request.setAttribute("search", search != null ? search : "");
+        request.setAttribute("statusFilter", statusFilter);
+
         request.getRequestDispatcher("/views/admin/leavePending.jsp").forward(request, response);
     }
 

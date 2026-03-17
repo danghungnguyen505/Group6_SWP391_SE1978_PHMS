@@ -53,6 +53,35 @@
                         <h4>Treatment Plan</h4>
                         <div style="white-space: pre-wrap;">${record.treatmentPlan}</div>
                     </div>
+
+                    <div style="margin-top: 20px;">
+                        <h4>Prescription</h4>
+                        <c:if test="${empty prescriptions}">
+                            <div class="text-muted">No prescriptions for this visit.</div>
+                        </c:if>
+                        <c:if test="${not empty prescriptions}">
+                            <div class="table-responsive mt-2">
+                                <table class="table table-bordered table-sm">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Medicine</th>
+                                            <th>Quantity</th>
+                                            <th>Dosage Instructions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <c:forEach items="${prescriptions}" var="p">
+                                            <tr>
+                                                <td><strong>${p.medicineName}</strong></td>
+                                                <td>${p.quantity} ${p.medicineUnit}</td>
+                                                <td>${p.dosage}</td>
+                                            </tr>
+                                        </c:forEach>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </c:if>
+                    </div>
                 </c:if>
             </div>
         </main>

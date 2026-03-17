@@ -10,6 +10,7 @@ import model.Invoice;
 import model.InvoiceDetail;
 import model.Medicine;
 import model.Service;
+import model.TriageRecord;
 
 /**
  * DAO for Invoice and InvoiceDetail.
@@ -35,7 +36,20 @@ public class InvoiceDAO extends DBContext {
     public static String SQL_ERROR_LOG = "";
 
     public int createInvoice(int apptId, int recepId, double totalAmount) {
-        String sql = "INSERT INTO Invoice (appt_id, recep_id, total_amount, status) VALUES (?, ?, ?, 'Unpaid')";
+        // First try to auto-create invoice with details (same logic as autoCreateInvoiceForAppointment)
+        // This ensures InvoiceDetail records are created
+        try {
+            Integer invoiceId = autoCreateInvoiceForAppointment(apptId, recepId);
+            if (invoiceId != null && invoiceId > 0) {
+                return invoiceId;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error autoCreateInvoiceForAppointment in createInvoice: " + e.getMessage());
+            // Fallback to simple invoice creation if auto-create fails
+        }
+
+        // Fallback: simple invoice creation without details (legacy behavior)
+        String sql = "INSERT INTO Invoice (appt_id, recep_id, total_amount, status, created_at) VALUES (?, ?, ?, 'Unpaid', GETDATE())";
         try {
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, apptId);
@@ -65,8 +79,8 @@ public class InvoiceDAO extends DBContext {
             return null;
         }
 
-        String insertInvoiceSql = "INSERT INTO Invoice (appt_id, recep_id, total_amount, status) "
-                + "VALUES (?, ?, 0, 'Unpaid')";
+        String insertInvoiceSql = "INSERT INTO Invoice (appt_id, recep_id, total_amount, status, created_at) "
+                + "VALUES (?, ?, 0, 'Unpaid', GETDATE())";
         String insertDetailSql = "INSERT INTO InvoiceDetail "
                 + "(invoice_id, medicine_id, service_id, item_type, quantity, unit_price) "
                 + "VALUES (?, ?, ?, ?, ?, ?)";
@@ -199,41 +213,51 @@ public class InvoiceDAO extends DBContext {
         }
 
         boolean hasMainService = false;
+        ServiceDAO serviceDAO = new ServiceDAO();
 
-        // 2. Map Appointment.type -> ServiceList (dịch vụ chính) nếu có
-        if (apptType != null && !apptType.trim().isEmpty()) {
-            String serviceSql = "SELECT service_id FROM ServiceList WHERE name = ? AND is_active = 1";
-            try (PreparedStatement st = connection.prepareStatement(serviceSql)) {
-                st.setString(1, apptType);
-                try (ResultSet rs = st.executeQuery()) {
-                    if (rs.next()) {
-                        InvoiceDetail serviceDetail = new InvoiceDetail();
-                        serviceDetail.setServiceId(rs.getInt("service_id"));
-                        serviceDetail.setItemType("Service");
-                        serviceDetail.setQuantity(1); // 1 lần dịch vụ chính cho cuộc hẹn
-                        autoDetails.add(serviceDetail);
-                        hasMainService = true;
-                    }
-                }
-            } catch (SQLException e) {
-                System.out.println("Error autoCreateInvoiceForAppointment - load main service: " + e.getMessage());
-            }
-        }
-
-        // 2b. Nếu không map được theo type, fallback: lấy dịch vụ active đầu tiên làm dịch vụ chính
-        if (!hasMainService) {
-            String fallbackSql = "SELECT TOP 1 service_id FROM ServiceList WHERE is_active = 1 ORDER BY service_id ASC";
-            try (PreparedStatement st = connection.prepareStatement(fallbackSql); ResultSet rs = st.executeQuery()) {
-                if (rs.next()) {
+        // 2. For emergency (Urgent) appointments, use triage level to find the correct service
+        if ("Urgent".equalsIgnoreCase(apptType)) {
+            TriageRecordDAO triageDAO = new TriageRecordDAO();
+            TriageRecord triage = triageDAO.getByAppointment(apptId);
+            if (triage != null && triage.getConditionLevel() != null) {
+                Service triageService = serviceDAO.getServiceByTriageLevel(triage.getConditionLevel());
+                if (triageService != null) {
                     InvoiceDetail serviceDetail = new InvoiceDetail();
-                    serviceDetail.setServiceId(rs.getInt("service_id"));
+                    serviceDetail.setServiceId(triageService.getServiceId());
                     serviceDetail.setItemType("Service");
                     serviceDetail.setQuantity(1);
                     autoDetails.add(serviceDetail);
                     hasMainService = true;
                 }
-            } catch (SQLException e) {
-                System.out.println("Error autoCreateInvoiceForAppointment - fallback main service: " + e.getMessage());
+            }
+        }
+
+        // 2b. For non-emergency or if triage lookup failed, try matching by appointment type name
+        if (!hasMainService && apptType != null && !apptType.trim().isEmpty()) {
+            Service svc = serviceDAO.getActiveServiceByName(apptType);
+            if (svc == null) {
+                svc = serviceDAO.getActiveServiceByNameLike(apptType);
+            }
+            if (svc != null) {
+                InvoiceDetail serviceDetail = new InvoiceDetail();
+                serviceDetail.setServiceId(svc.getServiceId());
+                serviceDetail.setItemType("Service");
+                serviceDetail.setQuantity(1);
+                autoDetails.add(serviceDetail);
+                hasMainService = true;
+            }
+        }
+
+        // 2c. Final fallback: first active service
+        if (!hasMainService) {
+            Service fallback = serviceDAO.getFirstActiveService();
+            if (fallback != null) {
+                InvoiceDetail serviceDetail = new InvoiceDetail();
+                serviceDetail.setServiceId(fallback.getServiceId());
+                serviceDetail.setItemType("Service");
+                serviceDetail.setQuantity(1);
+                autoDetails.add(serviceDetail);
+                hasMainService = true;
             }
         }
 
@@ -306,8 +330,13 @@ public class InvoiceDAO extends DBContext {
 
     public List<InvoiceDetail> getDetailsByInvoice(int invoiceId) {
         List<InvoiceDetail> list = new ArrayList<>();
-        String sql = "SELECT detail_id, invoice_id, medicine_id, service_id, item_type, quantity, unit_price "
-                + "FROM InvoiceDetail WHERE invoice_id = ?";
+        // JOIN with ServiceList and Medicine to get names
+        String sql = "SELECT d.detail_id, d.invoice_id, d.medicine_id, d.service_id, d.item_type, d.quantity, d.unit_price, "
+                + "       s.name AS service_name, m.name AS medicine_name "
+                + "FROM InvoiceDetail d "
+                + "LEFT JOIN ServiceList s ON d.service_id = s.service_id "
+                + "LEFT JOIN Medicine m ON d.medicine_id = m.medicine_id "
+                + "WHERE d.invoice_id = ?";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, invoiceId);
             try (ResultSet rs = st.executeQuery()) {
@@ -322,6 +351,9 @@ public class InvoiceDAO extends DBContext {
                     d.setItemType(rs.getString("item_type"));
                     d.setQuantity(rs.getInt("quantity"));
                     d.setUnitPrice(rs.getDouble("unit_price"));
+                    // Set display names
+                    d.setServiceName(rs.getString("service_name"));
+                    d.setMedicineName(rs.getString("medicine_name"));
                     list.add(d);
                 }
             }
@@ -339,6 +371,94 @@ public class InvoiceDAO extends DBContext {
             return st.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Error updateStatus Invoice: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Tái tạo InvoiceDetail cho hóa đơn cũ (dùng khi hóa đơn không có chi tiết)
+     */
+    public boolean regenerateInvoiceDetails(int invoiceId) {
+        // Lấy apptId từ invoice
+        Invoice inv = getInvoiceById(invoiceId);
+        if (inv == null) {
+            return false;
+        }
+        int apptId = inv.getApptId();
+
+        // Lấy appointment type
+        String apptType = null;
+        String apptSql = "SELECT type FROM Appointment WHERE appt_id = ?";
+        try (PreparedStatement st = connection.prepareStatement(apptSql)) {
+            st.setInt(1, apptId);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    apptType = rs.getString("type");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error regenerateInvoiceDetails - load appointment: " + e.getMessage());
+            return false;
+        }
+
+        if (apptType == null) {
+            return false;
+        }
+
+        ServiceDAO serviceDAO = new ServiceDAO();
+        Service mainService = null;
+
+        // Tìm service theo triage (cho cấp cứu) hoặc type name
+        if ("Urgent".equalsIgnoreCase(apptType)) {
+            TriageRecordDAO triageDAO = new TriageRecordDAO();
+            TriageRecord triage = triageDAO.getByAppointment(apptId);
+            if (triage != null && triage.getConditionLevel() != null) {
+                mainService = serviceDAO.getServiceByTriageLevel(triage.getConditionLevel());
+            }
+        }
+        if (mainService == null) {
+            mainService = serviceDAO.getActiveServiceByName(apptType);
+            if (mainService == null) {
+                mainService = serviceDAO.getActiveServiceByNameLike(apptType);
+            }
+        }
+        if (mainService == null) {
+            mainService = serviceDAO.getFirstActiveService();
+        }
+
+        // Xóa details cũ và thêm mới
+        String deleteSql = "DELETE FROM InvoiceDetail WHERE invoice_id = ?";
+        String insertSql = "INSERT INTO InvoiceDetail (invoice_id, medicine_id, service_id, item_type, quantity, unit_price) VALUES (?, NULL, ?, 'Service', 1, ?)";
+
+        try {
+            // Xóa details cũ
+            try (PreparedStatement st = connection.prepareStatement(deleteSql)) {
+                st.setInt(1, invoiceId);
+                st.executeUpdate();
+            }
+
+            // Thêm service mới
+            if (mainService != null) {
+                try (PreparedStatement st = connection.prepareStatement(insertSql)) {
+                    st.setInt(1, invoiceId);
+                    st.setInt(2, mainService.getServiceId());
+                    st.setDouble(3, mainService.getBasePrice());
+                    st.executeUpdate();
+                }
+            }
+
+            // Cập nhật total amount
+            double total = mainService != null ? mainService.getBasePrice() : 0;
+            String updateTotal = "UPDATE Invoice SET total_amount = ? WHERE invoice_id = ?";
+            try (PreparedStatement st = connection.prepareStatement(updateTotal)) {
+                st.setDouble(1, total);
+                st.setInt(2, invoiceId);
+                st.executeUpdate();
+            }
+
+            return true;
+        } catch (SQLException e) {
+            System.out.println("Error regenerateInvoiceDetails: " + e.getMessage());
             return false;
         }
     }

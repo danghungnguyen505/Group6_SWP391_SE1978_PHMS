@@ -53,7 +53,7 @@
                 <div class="stat-card">
                     <div class="stat-icon orange-bg"><i class="fa-solid fa-file-invoice-dollar"></i></div>
                     <div class="stat-info">
-                        <h3>$0.00</h3>
+                        <h3>0 ₫</h3>
                         <p>Unpaid Bills</p>
                     </div>
                 </div>
