@@ -4,6 +4,8 @@ import dal.AppointmentDAO;
 import dal.InvoiceDAO;
 import dal.PrescriptionDAO;
 import dal.ServiceDAO;
+import dal.TriageRecordDAO;
+import model.TriageRecord;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -64,8 +66,22 @@ public class InvoiceCreateController extends HttpServlet {
         // Build invoice preview data: main service based on appointment type
         ServiceDAO serviceDAO = new ServiceDAO();
         model.Service mainService = null;
-        if (appt.getType() != null && !appt.getType().trim().isEmpty()) {
+
+        // For emergency (Urgent) appointments, use triage level to find the correct emergency service
+        if ("Urgent".equalsIgnoreCase(appt.getType())) {
+            TriageRecordDAO triageDAO = new TriageRecordDAO();
+            TriageRecord triage = triageDAO.getByAppointment(apptId);
+            if (triage != null && triage.getConditionLevel() != null) {
+                mainService = serviceDAO.getServiceByTriageLevel(triage.getConditionLevel());
+            }
+        }
+
+        // For non-emergency or if triage lookup failed, try matching by appointment type name
+        if (mainService == null && appt.getType() != null && !appt.getType().trim().isEmpty()) {
             mainService = serviceDAO.getActiveServiceByName(appt.getType());
+            if (mainService == null) {
+                mainService = serviceDAO.getActiveServiceByNameLike(appt.getType());
+            }
         }
         if (mainService == null) {
             mainService = serviceDAO.getFirstActiveService();
@@ -103,6 +119,8 @@ public class InvoiceCreateController extends HttpServlet {
 
         // Simple invoice number & date preview
         java.time.LocalDate today = java.time.LocalDate.now();
+        java.time.LocalTime now = java.time.LocalTime.now();
+        java.time.format.DateTimeFormatter timeFormatter = java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss");
         String invoiceNumber = String.format("INV-%d-%03d", today.getYear(), apptId);
 
         request.setAttribute("appt", appt);
@@ -113,6 +131,9 @@ public class InvoiceCreateController extends HttpServlet {
         request.setAttribute("grandTotal", grandTotal);
         request.setAttribute("invoiceNumber", invoiceNumber);
         request.setAttribute("invoiceDate", today.toString());
+        request.setAttribute("invoiceTime", now.format(timeFormatter));
+        request.setAttribute("invoiceDateTime", today + " " + now.format(timeFormatter));
+        request.setAttribute("staffName", account.getFullName() != null ? account.getFullName() : account.getUsername());
         request.getRequestDispatcher("/views/receptionist/invoiceCreate.jsp").forward(request, response);
     }
 

@@ -162,6 +162,28 @@ public class ServiceDAO extends DBContext {
     }
 
     /**
+     * Get active service by partial name match (e.g. "Urgent" -> "Urgent Care")
+     */
+    public Service getActiveServiceByNameLike(String name) {
+        if (name == null || name.trim().isEmpty()) return null;
+        String sql = "SELECT TOP 1 service_id, name, base_price, description, is_active, managed_by "
+                + "FROM ServiceList WHERE is_active = 1 AND name LIKE ? ORDER BY base_price DESC";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, "%" + name + "%");
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new Service(rs.getInt("service_id"), rs.getString("name"),
+                            rs.getDouble("base_price"), rs.getString("description"),
+                            rs.getBoolean("is_active"), rs.getInt("managed_by"));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getActiveServiceByNameLike: " + e.getMessage());
+        }
+        return null;
+    }
+
+    /**
      * Fallback: lấy 1 dịch vụ active đầu tiên.
      */
     public Service getFirstActiveService() {
@@ -215,5 +237,65 @@ public class ServiceDAO extends DBContext {
             System.out.println("Error existsByNameForOther: " + e.getMessage());
         }
         return false;
+    }
+
+    /**
+     * Get emergency service by triage condition level.
+     * Maps triage levels to service name keywords:
+     * - Critical -> "Emergency" or "Critical" or "Cấp cứu"
+     * - High -> "Urgent" or "Khẩn" or "Cấp cứu"
+     * - Medium -> "Emergency" or "Cấp cứu"
+     * - Low -> "Emergency" or "Cấp cứu"
+     * Returns the first matching active service.
+     */
+    public Service getServiceByTriageLevel(String conditionLevel) {
+        if (conditionLevel == null || conditionLevel.trim().isEmpty()) {
+            return null;
+        }
+        String level = conditionLevel.trim();
+
+        // Define search keywords based on triage level priority
+        String[] keywords;
+        switch (level) {
+            case "Critical":
+                keywords = new String[]{"Critical", "Nguy kịch", "Cấp cứu đặc biệt", "Emergency"};
+                break;
+            case "High":
+                keywords = new String[]{"Urgent", "Khẩn cấp", "Cấp cứu ưu tiên", "Emergency"};
+                break;
+            case "Medium":
+                keywords = new String[]{"Emergency", "Cấp cứu", "Urgent"};
+                break;
+            case "Low":
+                keywords = new String[]{"Emergency", "Cấp cứu", "Urgent"};
+                break;
+            default:
+                keywords = new String[]{"Emergency", "Cấp cứu", "Urgent"};
+        }
+
+        // Try each keyword in order of priority
+        for (String keyword : keywords) {
+            String sql = "SELECT TOP 1 service_id, name, base_price, description, is_active, managed_by "
+                    + "FROM ServiceList WHERE is_active = 1 AND name LIKE ? "
+                    + "ORDER BY service_id ASC";
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                ps.setString(1, "%" + keyword + "%");
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return new Service(
+                                rs.getInt("service_id"),
+                                rs.getString("name"),
+                                rs.getDouble("base_price"),
+                                rs.getString("description"),
+                                rs.getBoolean("is_active"),
+                                rs.getInt("managed_by")
+                        );
+                    }
+                }
+            } catch (SQLException e) {
+                System.out.println("Error getServiceByTriageLevel: " + e.getMessage());
+            }
+        }
+        return null;
     }
 }

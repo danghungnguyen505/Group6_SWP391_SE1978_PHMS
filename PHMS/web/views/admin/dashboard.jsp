@@ -191,10 +191,11 @@
                                         <c:if test="${m.revenue > maxRev}"><c:set var="maxRev" value="${m.revenue}" /></c:if>
                                     </c:forEach>
                                     <c:forEach var="month" items="${monthlyRevenue}">
+                                        <c:set var="monthNum" value="${fn:substring(month.month, 5, 7)}" />
                                         <div class="chart-col">
                                             <span class="chart-value"><fmt:formatNumber value="${month.revenue}" pattern="#,###"/>₫</span>
                                             <div class="chart-bar" style="height: ${month.revenue > 0 ? (month.revenue / maxRev) * 140 : 4}px;"></div>
-                                            <span class="chart-label">T${month.month}</span>
+                                            <span class="chart-label">T${monthNum}</span>
                                         </div>
                                     </c:forEach>
                                 </c:when>
@@ -218,7 +219,7 @@
                                             <div class="service-rank ${st.index < 3 ? 'top3' : ''}">${st.index + 1}</div>
                                             <div class="service-info">
                                                 <div class="service-name">${svc.serviceName}</div>
-                                                <div class="service-count">${svc.appointmentCount} ${t_appointments}</div>
+                                                <div class="service-count"><fmt:formatNumber value="${svc.price}" pattern="#,###"/>₫ · ${svc.appointmentCount} ${t_appointments}</div>
                                             </div>
                                             <div class="service-revenue">
                                                 <fmt:formatNumber value="${svc.totalRevenue}" pattern="#,###"/>₫
@@ -257,16 +258,17 @@
                                                 <span>${r.reason}</span>
                                             </div>
                                             <div class="req-btns">
-                                                <form action="${pageContext.request.contextPath}/admin/leave/update-status" method="post" style="display:inline;">
+                                                <form action="${pageContext.request.contextPath}/updateLeaveStatus" method="post" style="display:inline;">
                                                     <input type="hidden" name="id" value="${r.leaveId}">
                                                     <input type="hidden" name="action" value="approve">
                                                     <button type="submit" class="btn-circle btn-approve"><i class="fa-solid fa-check"></i></button>
                                                 </form>
-                                                <form action="${pageContext.request.contextPath}/admin/leave/update-status" method="post" style="display:inline;">
+                                                <form action="${pageContext.request.contextPath}/updateLeaveStatus" method="post" style="display:inline;">
                                                     <input type="hidden" name="id" value="${r.leaveId}">
                                                     <input type="hidden" name="action" value="reject">
                                                     <button type="submit" class="btn-circle btn-reject"><i class="fa-solid fa-xmark"></i></button>
                                                 </form>
+                                                    
                                             </div>
                                         </div>
                                     </c:if>

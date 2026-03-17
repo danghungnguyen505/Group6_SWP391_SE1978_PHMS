@@ -53,6 +53,8 @@
             .badge-no-show     { background: #f3f4f6; color: #6b7280; }
             .badge-pending     { background: #fef9c3; color: #854d0e; }
             .badge-cancelled   { background: #fce7f3; color: #9d174d; }
+            .action-group { display: flex; gap: 6px; flex-wrap: wrap; }
+            .action-group .btn { padding: 5px 10px; font-size: 11px; }
             .section-tabs {
                 display: flex;
                 gap: 10px;
@@ -92,18 +94,18 @@
                     </a>
                 </li>
                 <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/emergency/create" class="text-danger">
+                    <a href="${pageContext.request.contextPath}/receptionist/emergency/queue" class="text-danger">
                         <i class="fa-solid fa-truck-medical"></i> ${L == 'en' ? 'Emergency Triage' : 'Cấp cứu'}
                     </a>
                 </li>
                 <li>
-<!--                    <a href="${pageContext.request.contextPath}/receptionist/scheduling">
-                        <i class="fa-solid fa-calendar-alt"></i> ${L == 'en' ? 'Staff Scheduling' : 'Lịch làm việc'}
-                    </a>-->
-                </li>
-                <li>
                     <a href="${pageContext.request.contextPath}/receptionist/appointment">
                         <i class="fa-regular fa-calendar-check"></i> ${L == 'en' ? 'Appointments' : 'Cuộc hẹn'}
+                    </a>
+                </li>
+                <li>
+                    <a href="${pageContext.request.contextPath}/receptionist/invoice/create">
+                        <i class="fa-regular fa-credit-card"></i> ${L == 'en' ? 'Billing' : 'Thanh toán'}
                     </a>
                 </li>
             </ul>
@@ -163,7 +165,7 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>ID</th>
+                                <th>${L == 'en' ? 'No.' : 'STT'}</th>
                                 <th>Owner Name</th>
                                 <th>Pet Name</th>
                                 <th>Service</th>
@@ -174,9 +176,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <c:forEach items="${pendingList}" var="a">
+                            <c:forEach items="${pendingList}" var="a" varStatus="loop">
                                 <tr>
-                                    <td class="col-id">#${a.apptId}</td>
+                                    <td>${loop.index + 1}<input type="hidden" value="${a.apptId}" /></td>
                                     <td>${a.ownerName}</td>
                                     <td class="col-pet">${a.petName}</td>
                                     <td class="col-service">${a.type}</td>
@@ -233,22 +235,23 @@
                     <table>
                         <thead>
                             <tr>
+                                <th>${L == 'en' ? 'No.' : 'STT'}</th>
                                 <th>Time</th>
-                                <th>ID</th>
                                 <th>Owner &amp; Pet</th>
                                 <th>Service</th>
                                 <th>Doctor</th>
                                 <th>Status</th>
                                 <th>Notes</th>
+                                <th style="text-align: center;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <c:forEach items="${pagedTodayList}" var="t">
+                            <c:forEach items="${pagedTodayList}" var="t" varStatus="loop">
                                 <tr>
+                                    <td>${loop.index + 1}<input type="hidden" value="${t.apptId}" /></td>
                                     <td style="font-weight: bold; color: #10b981;">
                                         <fmt:formatDate value="${t.startTime}" pattern="HH:mm"/>
                                     </td>
-                                    <td class="col-id">#${t.apptId}</td>
                                     <td>
                                         <div style="font-weight:600;">${t.ownerName}</div>
                                         <small style="color: #666;">Pet: ${t.petName}</small>
@@ -286,6 +289,43 @@
                                         <c:if test="${empty t.notes}">
                                             <span style="color:#999; font-style:italic;">No note</span>
                                         </c:if>
+                                    </td>
+                                    <td>
+                                        <div class="action-group">
+                                            <c:if test="${t.status == 'Confirmed'}">
+                                                <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${t.apptId}&status=Checked-in"
+                                                   class="btn btn-approve" style="font-size:12px;">
+                                                    <i class="fa-solid fa-clipboard-check"></i> Check-in
+                                                </a>
+                                                <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${t.apptId}&status=No-show"
+                                                   class="btn btn-reject" style="font-size:12px;"
+                                                   onclick="return confirm('Mark as No-show?');">
+                                                    <i class="fa-solid fa-user-slash"></i> No-show
+                                                </a>
+                                            </c:if>
+                                            <c:if test="${t.status == 'Completed'}">
+                                                <c:choose>
+                                                    <c:when test="${invoiceMap[t.apptId] != null && invoiceMap[t.apptId].status == 'Paid'}">
+                                                        <a href="${pageContext.request.contextPath}/receptionist/invoice/detail?invoiceId=${invoiceMap[t.apptId].invoiceId}"
+                                                           class="btn btn-approve" style="font-size:12px;">
+                                                            <i class="fa-solid fa-eye"></i> View Invoice
+                                                        </a>
+                                                    </c:when>
+                                                    <c:when test="${invoiceMap[t.apptId] != null && invoiceMap[t.apptId].status == 'Unpaid'}">
+                                                        <a href="${pageContext.request.contextPath}/receptionist/invoice/detail?invoiceId=${invoiceMap[t.apptId].invoiceId}"
+                                                           class="btn btn-approve" style="font-size:12px; background:#f59e0b; border-color:#f59e0b;">
+                                                            <i class="fa-solid fa-credit-card"></i> Pay Invoice
+                                                        </a>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <a href="${pageContext.request.contextPath}/receptionist/invoice/create?apptId=${t.apptId}"
+                                                           class="btn btn-approve" style="font-size:12px;">
+                                                            <i class="fa-solid fa-file-invoice-dollar"></i> Create Invoice
+                                                        </a>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </c:if>
+                                        </div>
                                     </td>
                                 </tr>
                             </c:forEach>

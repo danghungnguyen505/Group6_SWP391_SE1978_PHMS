@@ -58,7 +58,10 @@ public class NurseLabUpdateController extends HttpServlet {
             return;
         }
 
+        // Check if test can be updated (not Completed or Cancelled)
+        boolean canUpdate = dao.canUpdate(testId);
         request.setAttribute("test", lt);
+        request.setAttribute("canUpdate", canUpdate);
         request.getRequestDispatcher("/views/nurse/labUpdate.jsp").forward(request, response);
     }
 
@@ -73,8 +76,8 @@ public class NurseLabUpdateController extends HttpServlet {
         }
 
         String idStr = request.getParameter("testId");
-        String status = util.ValidationUtils.sanitize(request.getParameter("status"));
-        String resultText = util.ValidationUtils.sanitize(request.getParameter("resultText"));
+        String status = request.getParameter("status");
+        String resultText = request.getParameter("resultText");
 
         if (!util.ValidationUtils.isNotEmpty(idStr) || !util.ValidationUtils.isIntegerInRange(idStr, 1, Integer.MAX_VALUE)) {
             session.setAttribute("toastMessage", "error|Invalid lab test ID.");
@@ -83,14 +86,32 @@ public class NurseLabUpdateController extends HttpServlet {
         }
         int testId = Integer.parseInt(idStr);
 
+        // Block update if test is already Completed or Cancelled
+        LabTestDAO daoCheck = new LabTestDAO();
+        if (!daoCheck.canUpdate(testId)) {
+            session.setAttribute("toastMessage", "error|This lab test is already completed or cancelled and cannot be updated.");
+            response.sendRedirect(request.getContextPath() + "/nurse/lab/queue");
+            return;
+        }
+
+        // Validate status
+        if (!util.ValidationUtils.isNotEmpty(status)) {
+            session.setAttribute("toastMessage", "error|Status is required.");
+            response.sendRedirect(request.getContextPath() + "/nurse/lab/update?id=" + testId);
+            return;
+        }
         if (!("Requested".equals(status) || "In Progress".equals(status) || "Completed".equals(status))) {
-            request.setAttribute("error", "Invalid status.");
+            session.setAttribute("toastMessage", "error|Invalid status.");
             response.sendRedirect(request.getContextPath() + "/nurse/lab/update?id=" + testId);
             return;
         }
 
-        if (resultText != null && resultText.length() > 4000) {
-            request.setAttribute("error", "Result text must be <= 4000 characters.");
+        // Sanitize resultText after validation
+        if (resultText == null) resultText = "";
+        resultText = resultText.trim();
+
+        if (resultText.length() > 4000) {
+            session.setAttribute("toastMessage", "error|Result text must be <= 4000 characters.");
             response.sendRedirect(request.getContextPath() + "/nurse/lab/update?id=" + testId);
             return;
         }

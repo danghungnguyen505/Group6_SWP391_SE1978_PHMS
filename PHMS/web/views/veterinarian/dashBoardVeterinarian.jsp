@@ -297,7 +297,7 @@
                                 </div>
                                 <i class="fa-solid fa-chevron-right" style="margin-left:auto; color:#cbd5e0;"></i>
                             </a>
-                            <a href="${pageContext.request.contextPath}/veterinarian/medical-records" class="quick-btn">
+                            <a href="${pageContext.request.contextPath}/veterinarian/emr/records" class="quick-btn">
                                 <div class="quick-btn-icon" style="background:#dbeafe; color:#2563eb;">
                                     <i class="fa-solid fa-file-medical"></i>
                                 </div>
@@ -307,7 +307,7 @@
                                 </div>
                                 <i class="fa-solid fa-chevron-right" style="margin-left:auto; color:#cbd5e0;"></i>
                             </a>
-                            <a href="${pageContext.request.contextPath}/doctor/schedule" class="quick-btn">
+                            <a href="${pageContext.request.contextPath}/veterinarian/scheduling" class="quick-btn">
                                 <div class="quick-btn-icon" style="background:#fef3c7; color:#d97706;">
                                     <i class="fa-solid fa-calendar-alt"></i>
                                 </div>
@@ -317,7 +317,7 @@
                                 </div>
                                 <i class="fa-solid fa-chevron-right" style="margin-left:auto; color:#cbd5e0;"></i>
                             </a>
-                            <a href="${pageContext.request.contextPath}/hrm/leave/create" class="quick-btn">
+                            <a href="${pageContext.request.contextPath}/veterinarian/scheduling" class="quick-btn">
                                 <div class="quick-btn-icon" style="background:#ede9fe; color:#7c3aed;">
                                     <i class="fa-solid fa-umbrella-beach"></i>
                                 </div>

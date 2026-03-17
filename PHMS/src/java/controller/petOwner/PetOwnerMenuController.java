@@ -36,9 +36,9 @@ public class PetOwnerMenuController extends HttpServlet {
             // 1. Lấy danh sách thú cưng của User
             PetDAO petDao = new PetDAO();
             request.setAttribute("pets", petDao.getPetsByOwnerId(account.getUserId())); 
-            // 2. Lấy danh sách Dịch vụ
+            // 2. Lấy danh sách Dịch vụ (chỉ lấy các dịch vụ đang hoạt động)
             ServiceDAO serviceDao = new ServiceDAO();
-            request.setAttribute("services", serviceDao.getAllServices());
+            request.setAttribute("services", serviceDao.getAllActiveServices());
             // 3. Lấy danh sách Lịch làm việc của Bác sĩ 
             ScheduleVeterianrianDAO scheduleDao = new ScheduleVeterianrianDAO();
             List<Schedule> schedules = scheduleDao.getAvailableSchedules();

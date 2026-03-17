@@ -208,7 +208,75 @@
             .help-box { margin-top: auto; background: #f8fafc; padding: 20px; border-radius: 16px; border: 1px solid #edf2f7; }
             .help-box p { font-size: 13px; font-weight: 600; margin-bottom: 12px; }
             .btn-support { display: block; background: #0f172a; color: white; text-align: center; padding: 10px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 12px; margin-top: 8px; }
-            
+
+            /* Search & Filter */
+            .filter-bar {
+                display: flex;
+                gap: 15px;
+                margin-bottom: 25px;
+                align-items: center;
+            }
+            .search-box {
+                flex: 1;
+                max-width: 400px;
+                position: relative;
+            }
+            .search-box input {
+                width: 100%;
+                padding: 12px 20px 12px 45px;
+                border: 1px solid #e2e8f0;
+                border-radius: 10px;
+                font-size: 14px;
+                outline: none;
+            }
+            .search-box input:focus {
+                border-color: var(--primary-green);
+            }
+            .search-box i {
+                position: absolute;
+                left: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #94a3b8;
+            }
+            .filter-select {
+                padding: 12px 20px;
+                border: 1px solid #e2e8f0;
+                border-radius: 10px;
+                font-size: 14px;
+                outline: none;
+                background: white;
+                min-width: 150px;
+            }
+            .filter-select:focus {
+                border-color: var(--primary-green);
+            }
+            .filter-tabs {
+                display: flex;
+                gap: 10px;
+            }
+            .filter-tab {
+                padding: 10px 20px;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                background: white;
+                color: var(--text-muted);
+                text-decoration: none;
+                font-size: 13px;
+                font-weight: 600;
+                transition: 0.2s;
+            }
+            .filter-tab:hover, .filter-tab.active {
+                background: var(--primary-green);
+                color: white;
+                border-color: var(--primary-green);
+            }
+            .bg-rejected {
+                background: #fef2f2;
+                color: #dc2626;
+            }
+            .action-btns { display: flex; gap: 8px; justify-content: flex-end; }
+
         </style>
     </head>
     <body>
@@ -218,55 +286,85 @@
         <!-- Main Content -->
         <main class="main-content">
             <header class="page-header">
-                <h1>Leave approval</h1>
+                <h1>Leave Management</h1>
                 <p>Review and manage staff absence requests.</p>
             </header>
+
+            <!-- Filter & Search Bar (Single Row) -->
+            <div class="filter-bar" style="margin-bottom: 25px;">
+                <!-- Filter Tabs -->
+                <div class="filter-tabs">
+                    <a href="${pageContext.request.contextPath}/leavePending?status=all&search=${search}" class="filter-tab ${statusFilter == 'all' ? 'active' : ''}">All</a>
+                    <a href="${pageContext.request.contextPath}/leavePending?status=Pending&search=${search}" class="filter-tab ${statusFilter == 'Pending' ? 'active' : ''}">Pending</a>
+                    <a href="${pageContext.request.contextPath}/leavePending?status=Approved&search=${search}" class="filter-tab ${statusFilter == 'Approved' ? 'active' : ''}">Approved</a>
+                    <a href="${pageContext.request.contextPath}/leavePending?status=Rejected&search=${search}" class="filter-tab ${statusFilter == 'Rejected' ? 'active' : ''}">Rejected</a>
+                </div>
+
+                <!-- Search -->
+                <form method="get" action="${pageContext.request.contextPath}/leavePending" style="display: flex; gap: 10px; flex: 1; justify-content: flex-end;">
+                    <input type="hidden" name="status" value="${statusFilter}">
+                    <div class="search-box" style="flex: 0 1 300px;">
+                        <i class="fa-solid fa-search"></i>
+                        <input type="text" name="search" value="${search}" placeholder="Search by employee name...">
+                    </div>
+                    <button type="submit" class="btn-approve" style="padding: 12px 24px; font-size: 12px;">
+                        <i class="fa-solid fa-search"></i> Search
+                    </button>
+                </form>
+            </div>
 
             <div class="table-container">
                 <c:choose>
                     <c:when test="${empty requests}">
                         <div style="text-align:center; padding:60px; color:var(--text-muted);">
                             <i class="fa-solid fa-calendar-xmark" style="font-size: 48px; margin-bottom: 20px; opacity: 0.3;"></i>
-                            <p>There are currently no leave requests pending approval.</p>
+                            <p>No leave requests found.</p>
                         </div>
                     </c:when>
                     <c:otherwise>
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th class="col-id">Mã yêu cầu</th>
-                                    <th>Nhân viên</th>
-                                    <th>Ngày nghỉ</th>
-                                    <th>Lý do</th>
+                                    <th class="col-id">STT</th>
+                                    <th>Employee</th>
+                                    <th>Leave Date</th>
+                                    <th>Reason</th>
                                     <th>Status</th>
                                     <th style="text-align:right;">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <c:forEach var="r" items="${requests}">
+                                <c:forEach var="r" items="${requests}" varStatus="st">
                                     <tr>
-                                        <td class="col-id">LR-${r.leaveId}</td>
+                                        <td class="col-id">${st.index + 1}</td>
                                         <td>
-                                            <div class="col-emp">${r.empId}</div>
-                                            <div class="col-role">NHÂN VIÊN</div> <%-- Thay bằng role thật nếu có --%>
+                                            <div class="col-emp">${not empty r.empName ? r.empName : r.empId}</div>
                                         </td>
-                                        <td class="col-date">${r.startDate}</td>
+                                        <td class="col-date"><fmt:formatDate value="${r.startDate}" pattern="dd/MM/yyyy"/></td>
                                         <td class="col-reason">${r.reason}</td>
                                         <td>
-                                            <%-- Logic hiển thị badge dựa trên status (nếu có trường status) --%>
-                                            <span class="badge bg-pending">Pending</span>
+                                            <c:choose>
+                                                <c:when test="${r.status == 'Pending'}"><span class="badge bg-pending">Pending</span></c:when>
+                                                <c:when test="${r.status == 'Approved'}"><span class="badge bg-approved">Approved</span></c:when>
+                                                <c:when test="${r.status == 'Rejected'}"><span class="badge bg-rejected">Rejected</span></c:when>
+                                                <c:otherwise><span class="badge">${r.status}</span></c:otherwise>
+                                            </c:choose>
                                         </td>
-                                        <td style="text-align:right;">
-                                            <form action="${pageContext.request.contextPath}/updateLeaveStatus" method="post" style="display:inline;">
-                                                <input type="hidden" name="id" value="${r.leaveId}">
-                                                <input type="hidden" name="action" value="approve">
-                                                <button type="submit" class="btn-approve">Approve</button>
-                                            </form>
-                                            <form action="${pageContext.request.contextPath}/updateLeaveStatus" method="post" style="display:inline;">
-                                                <input type="hidden" name="id" value="${r.leaveId}">
-                                                <input type="hidden" name="action" value="reject">
-                                                <button type="submit" class="btn-reject">Reject</button>
-                                            </form>
+                                        <td>
+                                            <c:if test="${r.status == 'Pending'}">
+                                                <div class="action-btns">
+                                                    <form action="${pageContext.request.contextPath}/updateLeaveStatus" method="post">
+                                                        <input type="hidden" name="id" value="${r.leaveId}">
+                                                        <input type="hidden" name="action" value="approve">
+                                                        <button type="submit" class="btn-approve">Approve</button>
+                                                    </form>
+                                                    <form action="${pageContext.request.contextPath}/updateLeaveStatus" method="post">
+                                                        <input type="hidden" name="id" value="${r.leaveId}">
+                                                        <input type="hidden" name="action" value="reject">
+                                                        <button type="submit" class="btn-reject">Reject</button>
+                                                    </form>
+                                                </div>
+                                            </c:if>
                                         </td>
                                     </tr>
                                 </c:forEach>
@@ -277,7 +375,7 @@
                         <c:if test="${totalPages > 1}">
                             <div class="pagination">
                                 <c:forEach begin="1" end="${totalPages}" var="i">
-                                    <a href="${pageContext.request.contextPath}/leavePending?page=${i}"
+                                    <a href="${pageContext.request.contextPath}/leavePending?page=${i}&status=${statusFilter}&search=${search}"
                                        class="page-btn ${i == currentPage ? 'active' : ''}">
                                         ${i}
                                     </a>

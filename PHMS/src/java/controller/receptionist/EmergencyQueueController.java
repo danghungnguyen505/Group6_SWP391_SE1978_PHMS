@@ -1,6 +1,7 @@
 package controller.receptionist;
 
 import dal.AppointmentDAO;
+import dal.InvoiceDAO;
 import dal.TriageRecordDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -12,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import model.Appointment;
+import model.Invoice;
 import model.TriageRecord;
 import model.User;
 import util.PaginationUtils;
@@ -63,8 +65,19 @@ public class EmergencyQueueController extends HttpServlet {
             }
         }
 
+        // Map apptId -> Invoice (if exists)
+        InvoiceDAO invoiceDAO = new InvoiceDAO();
+        Map<Integer, Invoice> invoiceMap = new HashMap<>();
+        for (Appointment a : list) {
+            Invoice inv = invoiceDAO.getInvoiceByAppointment(a.getApptId());
+            if (inv != null) {
+                invoiceMap.put(a.getApptId(), inv);
+            }
+        }
+
         request.setAttribute("appointments", list);
         request.setAttribute("triageMap", triageMap);
+        request.setAttribute("invoiceMap", invoiceMap);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         request.getRequestDispatcher("/views/receptionist/emergencyQueue.jsp").forward(request, response);

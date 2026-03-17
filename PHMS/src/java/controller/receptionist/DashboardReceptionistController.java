@@ -1,6 +1,7 @@
 package controller.receptionist;
 
 import dal.AppointmentDAO;
+import dal.InvoiceDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -10,8 +11,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import model.Appointment;
+import model.Invoice;
 import model.User;
 
 @WebServlet(name = "DashboardReceptionistController", urlPatterns = {"/receptionist/dashboard"})
@@ -72,10 +76,21 @@ public class DashboardReceptionistController extends HttpServlet {
                 ? java.util.Collections.emptyList()
                 : todayList.subList(fromIndex, toIndex);
 
+        // Map apptId -> Invoice (if exists)
+        InvoiceDAO invoiceDAO = new InvoiceDAO();
+        Map<Integer, Invoice> invoiceMap = new HashMap<>();
+        for (Appointment a : pagedList) {
+            Invoice inv = invoiceDAO.getInvoiceByAppointment(a.getApptId());
+            if (inv != null) {
+                invoiceMap.put(a.getApptId(), inv);
+            }
+        }
+
         request.setAttribute("pagedTodayList", pagedList);
         request.setAttribute("todayCurrentPage", currentPage);
         request.setAttribute("totalTodayPages", totalPages);
         request.setAttribute("totalTodayItems", totalItems);
+        request.setAttribute("invoiceMap", invoiceMap);
 
         request.getRequestDispatcher("/views/receptionist/dashboardReceptionist.jsp").forward(request, response);
     }
