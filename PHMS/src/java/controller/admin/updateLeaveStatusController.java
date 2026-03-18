@@ -27,13 +27,17 @@ public class updateLeaveStatusController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        User account = (User) session.getAttribute("account");
+
         int leaveId = Integer.parseInt(request.getParameter("id"));
-        String action = request.getParameter("action"); 
+        String action = request.getParameter("action");
         String newStatus = "approve".equals(action) ? "Approved" : "Rejected";
+
         dal.LeaveRequestDAO leaveDao = new dal.LeaveRequestDAO();
-        // Gọi hàm update DAO (chỉ truyền 2 tham số)
-        boolean isUpdated = leaveDao.updateLeaveStatus(leaveId, newStatus);
-        // TODO: Có thể hiển thị thông báo theo isUpdated nếu cần
+        int managerId = account.getUserId();
+        boolean isUpdated = leaveDao.updateLeaveStatus(leaveId, managerId, newStatus);
+
         response.sendRedirect(request.getContextPath() + "/leavePending");
     }
 }

@@ -6,6 +6,7 @@
 package controller.veterinarian;
 
 import dal.AppointmentDAO;
+import dal.LabTestDAO;
 import dal.MedicalRecordDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -43,7 +44,7 @@ public class AppointmentCompleteController extends HttpServlet {
         String recordIdStr = request.getParameter("recordId");
         if (!util.ValidationUtils.isNotEmpty(recordIdStr)
                 || !util.ValidationUtils.isIntegerInRange(recordIdStr, 1, Integer.MAX_VALUE)) {
-            session.setAttribute("toastMessage", "error|Medical record không hợp lệ.");
+            session.setAttribute("toastMessage", "error|Invalid medical record ID.");
             response.sendRedirect(request.getContextPath() + "/veterinarian/emr/records");
             return;
         }
@@ -58,6 +59,14 @@ public class AppointmentCompleteController extends HttpServlet {
         }
         if (!"In-Progress".equalsIgnoreCase(record.getApptStatus())) {
             session.setAttribute("toastMessage", "error|Appointment is not In-Progress, cannot complete.");
+            response.sendRedirect(request.getContextPath() + "/veterinarian/emr/detail?id=" + recordId);
+            return;
+        }
+
+        LabTestDAO labTestDAO = new LabTestDAO();
+        boolean hasPendingLab = labTestDAO.hasPendingByRecordForVet(recordId, account.getUserId());
+        if (hasPendingLab) {
+            session.setAttribute("toastMessage", "error|Cannot complete yet. Waiting for Lab Test result (Requested/In Progress).");
             response.sendRedirect(request.getContextPath() + "/veterinarian/emr/detail?id=" + recordId);
             return;
         }

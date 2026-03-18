@@ -7,6 +7,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -28,49 +29,41 @@
             <ul class="menu">
                 <li>
                     <a href="${pageContext.request.contextPath}/receptionist/dashboard">
-                        <i class="fa-solid fa-table-columns"></i> Dashboard
+                        <i class="fa-solid fa-table-columns"></i> ${L == 'en' ? 'Dashboard' : 'Bảng điều khiển'}
                     </a>
                 </li>
                 <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/dashboard" class="text-danger">
-                        <i class="fa-solid fa-truck-medical"></i> Emergency Triage
-                    </a>
-                </li>
-                <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/scheduling">
-                        <i class="fa-solid fa-truck-medical"></i> Staff Scheduling
+                    <a href="${pageContext.request.contextPath}/receptionist/emergency/queue" class="text-danger">
+                        <i class="fa-solid fa-truck-medical"></i> ${L == 'en' ? 'Emergency Triage' : 'Cấp cứu'}
                     </a>
                 </li>
                 <li>
                     <a href="${pageContext.request.contextPath}/receptionist/appointment" class="active">
-                        <i class="fa-regular fa-calendar-check"></i> Appointments
+                        <i class="fa-regular fa-calendar-check"></i> ${L == 'en' ? 'Appointments' : 'Cuộc hẹn'}
                     </a>
                 </li>
                 <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/dashboard">
-                        <i class="fa-solid fa-paw"></i> My Pets
-                    </a>
-                </li>
-                <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/dashboard">
-                        <i class="fa-solid fa-file-medical"></i> Medical Records
-                    </a>
-                </li>
-                <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/dashboard">
-                        <i class="fa-regular fa-credit-card"></i> Billing
-                    </a>
-                </li>
-                <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/dashboard">
-                        <i class="fa-solid fa-gear"></i> Administration
+                    <a href="${pageContext.request.contextPath}/receptionist/invoice/create">
+                        <i class="fa-regular fa-credit-card"></i> ${L == 'en' ? 'Billing' : 'Thanh toán'}
                     </a>
                 </li>
             </ul>
 
+            <!-- Language Switcher -->
+            <div style="padding: 12px; margin-top: auto;">
+                <div style="display:flex; background:#f1f5f9; border-radius:8px; padding:3px; gap:2px;">
+                    <a href="${pageContext.request.contextPath}/language?lang=vi"
+                       style="padding:5px 10px; border-radius:6px; font-size:11px; font-weight:700; text-decoration:none; flex:1; text-align:center;
+                              ${L == 'vi' ? 'background:#10b981; color:#fff;' : 'color:#64748b;'}">VI</a>
+                    <a href="${pageContext.request.contextPath}/language?lang=en"
+                       style="padding:5px 10px; border-radius:6px; font-size:11px; font-weight:700; text-decoration:none; flex:1; text-align:center;
+                              ${L == 'en' ? 'background:#10b981; color:#fff;' : 'color:#64748b;'}">EN</a>
+                </div>
+            </div>
+
             <div class="help-box">
-                <div class="help-text">Need help?</div>
-                <a href="#" class="btn-contact">Contact Support</a>
+                <div class="help-text">${L == 'en' ? 'Need help?' : 'Cần hỗ trợ?'}</div>
+                <a href="#" class="btn-contact">${L == 'en' ? 'Contact Support' : 'Liên hệ hỗ trợ'}</a>
             </div>
         </nav>
 
@@ -94,49 +87,44 @@
             </c:if>
 
             <!-- Filter Card -->
-            <div class="card" style="margin-bottom:20px;">
-                <div class="section-title">
-                    <span>Filter Appointments</span>
-                </div>
-                <form method="get" action="${pageContext.request.contextPath}/receptionist/appointment" 
-                      style="display:grid; grid-template-columns: 1fr 1fr 1fr auto; gap:10px; align-items:end;">
+            <div class="card" style="margin-bottom: 20px; padding: 15px;">
+                <form method="get" action="${pageContext.request.contextPath}/receptionist/appointment" style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:10px; align-items:end;">
                     <div>
-                        <label><b>Date</b></label>
-                        <input type="date" name="filterDate" value="${filterDate}" style="width:100%; padding:8px;">
+                        <label style="font-size:12px; color:#64748b; display:block; margin-bottom:4px;">${L == 'en' ? 'Date' : 'Ngày'}</label>
+                        <input type="date" name="filterDate" value="${filterDate}" style="width:100%; padding:8px 12px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px;">
                     </div>
                     <div>
-                        <label><b>Status</b></label>
-                        <select name="filterStatus" style="width:100%; padding:8px;">
-                            <option value="">All</option>
+                        <label style="font-size:12px; color:#64748b; display:block; margin-bottom:4px;">${L == 'en' ? 'Status' : 'Trạng thái'}</label>
+                        <select name="filterStatus" style="width:100%; padding:8px 12px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px;">
+                            <option value="">${L == 'en' ? 'All' : 'Tất cả'}</option>
                             <option value="Pending" ${filterStatus == 'Pending' ? 'selected' : ''}>Pending</option>
                             <option value="Confirmed" ${filterStatus == 'Confirmed' ? 'selected' : ''}>Confirmed</option>
                             <option value="Checked-in" ${filterStatus == 'Checked-in' ? 'selected' : ''}>Checked-in</option>
-                            <option value="In-Progress" ${filterStatus == 'Checked-in' ? 'selected' : ''}>In-Progress</option>
+                            <option value="In-Progress" ${filterStatus == 'In-Progress' ? 'selected' : ''}>In-Progress</option>
                             <option value="Completed" ${filterStatus == 'Completed' ? 'selected' : ''}>Completed</option>
                             <option value="Cancelled" ${filterStatus == 'Cancelled' ? 'selected' : ''}>Cancelled</option>
                         </select>
                     </div>
                     <div>
-                        <label><b>Veterinarian</b></label>
-                        <select name="filterVetId" style="width:100%; padding:8px;">
-                            <option value="">All</option>
+                        <label style="font-size:12px; color:#64748b; display:block; margin-bottom:4px;">${L == 'en' ? 'Veterinarian' : 'Bác sĩ'}</label>
+                        <select name="filterVetId" style="width:100%; padding:8px 12px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px;">
+                            <option value="">${L == 'en' ? 'All' : 'Tất cả'}</option>
                             <c:forEach var="vet" items="${veterinarians}">
                                 <option value="${vet.userId}" ${filterVetId == vet.userId ? 'selected' : ''}>${vet.fullName}</option>
                             </c:forEach>
                         </select>
                     </div>
-                    <div>
-                        <button type="submit" class="btn btn-approve" style="width:100%;">
-                            <i class="fa-solid fa-filter"></i> Filter
+                    <div style="display:flex; gap:8px;">
+                        <button type="submit" style="flex:1; padding:8px 16px; background:#10b981; color:#fff; border:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer;">
+                            <i class="fa-solid fa-search"></i> ${L == 'en' ? 'Search' : 'Tìm kiếm'}
                         </button>
+                        <c:if test="${not empty filterDate || not empty filterStatus || not empty filterVetId}">
+                            <a href="${pageContext.request.contextPath}/receptionist/appointment" style="flex:1; padding:8px 16px; background:#f1f5f9; color:#64748b; border:none; border-radius:8px; font-size:13px; font-weight:600; text-decoration:none; text-align:center;">
+                                <i class="fa-solid fa-rotate-left"></i> ${L == 'en' ? 'Reset' : 'Đặt lại'}
+                            </a>
+                        </c:if>
                     </div>
                 </form>
-                <c:if test="${not empty filterDate || not empty filterStatus || not empty filterVetId}">
-                    <a href="${pageContext.request.contextPath}/receptionist/appointment" 
-                       class="btn btn-secondary" style="margin-top:10px; text-decoration:none;">
-                        <i class="fa-solid fa-times"></i> Clear Filters
-                    </a>
-                </c:if>
             </div>
 
             <!-- Main Card: Appointments List -->
@@ -158,7 +146,7 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>ID</th>
+                                <th>${L == 'en' ? 'No.' : 'STT'}</th>
                                 <th>Owner Name</th>
                                 <th>Pet Name</th>
                                 <th>Service</th>
@@ -166,14 +154,13 @@
                                 <th>Date & Time</th>
                                 <th>Status</th>
                                 <th>Notes</th>
-                                <th style="text-align: center;">Actions</th>
-                            </tr>
+                                                            </tr>
                         </thead>
                         
                         <tbody>
-                            <c:forEach items="${appointments}" var="a">
+                            <c:forEach items="${appointments}" var="a" varStatus="loop">
                                 <tr>
-                                    <td class="col-id">#${a.apptId}</td> 
+                                    <td>${loop.index + 1}<input type="hidden" value="${a.apptId}" /></td> 
                                     <td>${a.ownerName}</td>
                                     <td class="col-pet">${a.petName}</td>
                                     <td class="col-service">${a.type}</td>
@@ -210,21 +197,6 @@
                                         <c:if test="${empty a.notes}">
                                             <span style="color: #999; font-style: italic;">No note</span>
                                         </c:if>
-                                    </td>
-                                    <td>
-                                        <div class="action-group">
-                                            <c:if test="${a.status == 'Pending'}">
-                                                <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${a.apptId}&status=Confirmed" 
-                                                   class="btn btn-approve">Approve</a>
-                                                <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${a.apptId}&status=Cancelled" 
-                                                   class="btn btn-reject"
-                                                   onclick="return confirm('Are you sure you want to reject this appointment?');">Reject</a>
-                                            </c:if>
-                                            <c:if test="${a.status == 'Confirmed'}">
-                                                <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${a.apptId}&status=Checked-in" 
-                                                   class="btn btn-approve">Check-in</a>
-                                            </c:if>
-                                        </div>
                                     </td>
                                 </tr>
                             </c:forEach>

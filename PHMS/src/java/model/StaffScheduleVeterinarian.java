@@ -19,7 +19,8 @@ private int scheduleId;
     private String shiftTime; // Raw shift_time from DB (e.g. "09:00 AM-09:30 AM")
     private Time startTime;   // Dùng để hiển thị trên lịch
     private Time endTime;     // Dùng để hiển thị trên lịch
-    private String status;    // Thêm status 
+    private String status;    // Thêm status
+    private String shiftType; // "morning" or "afternoon"
 
     public StaffScheduleVeterinarian() {
     }
@@ -51,4 +52,7 @@ private int scheduleId;
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public String getShiftType() { return shiftType; }
+    public void setShiftType(String shiftType) { this.shiftType = shiftType; }
 }

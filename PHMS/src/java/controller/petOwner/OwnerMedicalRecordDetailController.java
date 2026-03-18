@@ -50,7 +50,11 @@ public class OwnerMedicalRecordDetailController extends HttpServlet {
             return;
         }
 
+        dal.PrescriptionDAO presDAO = new dal.PrescriptionDAO();
+        java.util.List<model.Prescription> prescriptions = presDAO.getByRecordIdForOwner(recordId, account.getUserId());
+
         request.setAttribute("record", mr);
+        request.setAttribute("prescriptions", prescriptions);
         request.getRequestDispatcher("/views/petOwner/medicalRecordDetail.jsp").forward(request, response);
     }
 }

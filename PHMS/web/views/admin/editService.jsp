@@ -91,7 +91,7 @@
 
     <jsp:include page="common/navbar.jsp">
     <jsp:param name="activePage" value="services" />
-</jsp:include>
+    </jsp:include>
 
     <!-- Main Content -->
     <main class="main-content">

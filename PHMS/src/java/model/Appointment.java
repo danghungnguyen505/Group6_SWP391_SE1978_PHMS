@@ -17,7 +17,16 @@ public class Appointment {
     private String ownerEmail;
     private String notes;
     private String ownerName;
-    
+    private String receptionistName;
+
+    public String getReceptionistName() {
+        return receptionistName;
+    }
+
+    public void setReceptionistName(String receptionistName) {
+        this.receptionistName = receptionistName;
+    }
+
     public String getNotes() {
         return notes;
     }

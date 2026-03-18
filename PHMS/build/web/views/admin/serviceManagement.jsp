@@ -226,7 +226,7 @@
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th class="col-id">ID</th>
+                        <th class="col-id">STT</th>
                         <th class="col-name">Service Name</th>
                         <th class="col-desc">Description</th>
                         <th class="col-price">Base Price (VND)</th>
@@ -235,9 +235,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <c:forEach var="service" items="${services}">
+                    <c:forEach var="service" items="${services}" varStatus="st">
                         <tr>
-                            <td class="col-id">#${service.serviceId}</td>
+                            <td class="col-id">${st.index + 1}</td>
                             <td class="col-name">${service.name}</td>
                             <td class="col-desc">"${service.description}"</td>
                             <td class="col-price">

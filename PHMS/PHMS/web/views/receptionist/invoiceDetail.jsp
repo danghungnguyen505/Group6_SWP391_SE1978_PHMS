@@ -15,6 +15,59 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <link href="${pageContext.request.contextPath}/assets/css/dashboardLeft.css" rel="stylesheet">
         <link href="${pageContext.request.contextPath}/assets/css/petOwner/billingPetOwner.css" rel="stylesheet">
+        <style>
+            /* Style popup VietQR đồng bộ với trang tạo hóa đơn */
+            .qr-wrapper {
+                background: #f8f9fa;
+                padding: 20px;
+                border-radius: 15px;
+                border: 2px dashed #dee2e6;
+                display: inline-block;
+            }
+            .modal-content {
+                border-radius: 20px;
+                border: none;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            }
+            .btn-vnpay-custom {
+                background-color: #005baa;
+                color: white;
+                border: none;
+            }
+            .btn-vnpay-custom:hover {
+                background-color: #004480;
+                color: white;
+            }
+            .payment-info-list {
+                margin-top: 1.5rem;
+            }
+            .payment-title-center {
+                font-size: 20px; /* Chữ to hơn */
+                font-weight: 700;
+                text-align: center; /* Căn giữa */
+                margin-bottom: 10px;
+                display: block; /* Đảm bảo chiếm hết chiều ngang để căn giữa */
+            }
+
+            .payment-item {
+                display: flex;
+                justify-content: space-between; /* Đẩy nội dung sang 2 bên */
+                padding: 10px 0;
+                border-bottom: 1px solid #eee; /* Đường kẻ mờ giữa các dòng */
+            }
+
+            .payment-item:last-child {
+                border-bottom: none; /* Dòng cuối không cần gạch chân */
+            }
+
+            .payment-item span:first-child {
+                color: #666; /* Màu nhạt hơn cho tiêu đề bên trái (tùy chọn) */
+            }
+
+            .payment-item strong {
+                text-align: right;
+            }
+        </style>
     </head>
     <body>
         <!-- LEFT SIDEBAR -->
@@ -176,41 +229,43 @@
                     <c:choose>
                         <c:when test="${invoice.status ne 'Paid'}">
                             <h3>Process Payment</h3>
-                            <form action="${pageContext.request.contextPath}/payment" method="POST">
-                                <input type="hidden" name="apptId" value="${invoice.apptId}"/>
-                                <input type="hidden" name="grandTotal" value="${invoice.totalAmount}"/>
-                                <input type="hidden" name="invoiceId" value="${invoice.invoiceId}">
-                                <input type="hidden" name="act" value="detail">
+                            <form id="paymentForm"
+                                  action="${pageContext.request.contextPath}/receptionist/payment/create"
+                                  method="POST">
+                                <input type="hidden" name="invoiceId" value="${invoice.invoiceId}"/>
+                                <input type="hidden" name="paymentMethod" id="paymentMethodInput" value="vnpay"/>
+
                                 <div class="method-section">
                                     <label class="section-label">SELECT METHOD</label>
 
-                                    <!-- Cash Option -->
+                                    <!-- Cash Option (manual confirm sau khi khách quét QR) -->
                                     <label class="payment-option disabled">
-                                        <input type="radio" name="method" value="Cash" checked>
+                                        <input type="radio" name="paymentMethodRadio" value="cash" disabled>
                                         <div class="option-content">
                                             <div class="icon-box gray"><i class="fa-solid fa-wallet"></i></div>
                                             <div class="text-box">
-                                                <span class="method-name">Cash</span>
-                                                <span class="method-desc">Pay directly at counter</span>
+                                                <span class="method-name">Cash / POS</span>
+                                                <span class="method-desc">Pay at the reception</span>
                                             </div>
                                         </div>
                                     </label>
 
-                                    <!-- Transfer/VNPay Option -->
+                                    <!-- VNPay / VietQR Option -->
                                     <label class="payment-option active">
-                                        <input type="radio" name="method" value="Transfer">
+                                        <input type="radio" name="paymentMethodRadio" value="vnpay" checked>
                                         <div class="option-content">
                                             <div class="icon-box green"><i class="fa-solid fa-qrcode"></i></div>
                                             <div class="text-box">
-                                                <span class="method-name">VNPay / Transfer</span>
-                                                <span class="method-desc">Online banking or QR Code</span>
+                                                <span class="method-name">Online / VietQR / VNPay</span>
+                                                <span class="method-desc">Scan QR Code instantly</span>
                                             </div>
                                         </div>
                                     </label>
                                 </div>
 
-                                <button type="submit" class="btn-pay">
-                                    Confirm Payment: <fmt:formatNumber value="${invoice.totalAmount}" type="currency" currencySymbol="VND "/>
+                                <button type="button" class="btn-pay" onclick="openVietqrModal()">
+                                    Pay
+                                    <fmt:formatNumber value="${invoice.totalAmount}" type="currency" currencySymbol="VND "/>
                                 </button>
                             </form>
 
@@ -250,5 +305,103 @@
                 </div>
             </div>
         </main>
+        
+        <!-- MODAL VIETQR (đồng bộ với trang tạo hóa đơn) -->
+        <div class="modal fade" id="vietqrModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title fw-bold">Thanh toán VietQR</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <p class="mb-3">
+                            Vui lòng quét mã QR để thanh toán:<br>
+                            <span class="fs-4 fw-bold text-success">
+                                <fmt:formatNumber value="${invoice.totalAmount}" type="currency" currencySymbol="VND "/>
+                            </span>
+                        </p>
+
+                        <div class="qr-wrapper mb-3">
+                            <img src="https://img.vietqr.io/image/techcombank-1999992707-compact.png?amount=${invoice.totalAmount}&addInfo=INV${invoice.invoiceId}&accountName=PHAM CONG HUY"
+                                 alt="VietQR" class="img-fluid" style="width: 280px;">
+                        </div>
+
+                        <div class="alert alert-light border-0 small">
+                            <div class="payment-info-list">
+                                <span class="payment-title-center"> Thông tin thanh toán</span>
+
+
+                                <div class="payment-item">
+                                    <span>Số tiền:</span>
+                                    <strong class="text-success">
+                                        <fmt:formatNumber value="${invoice.totalAmount}" type="currency" currencySymbol="VND "/>
+                                    </strong>
+                                </div>
+
+                                <div class="payment-item">
+                                    <span>Nội dung CK:</span>
+                                    <strong class="text-primary">INV${invoice.invoiceId}</strong>
+                                </div>
+                                <div class="payment-item">
+                                    <span>Ngân hàng:</span>
+                                    <strong>Techcombank</strong>
+                                </div>
+
+                                <div class="payment-item">
+                                    <span>Số TK:</span>
+                                    <strong>1999992707</strong>
+                                </div>
+
+                                <div class="payment-item">
+                                    <span>Chủ TK:</span>
+                                    <strong>PHAM CONG HUY</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 flex-column">
+                        <button type="button"
+                                class="btn btn-success w-100 py-2 fw-bold"
+                                onclick="confirmCustomerPaid()">
+                            Khách hàng đã thanh toán
+                        </button>
+                        <button type="button"
+                                class="btn btn-vnpay-custom w-100 py-2"
+                                onclick="payWithVnpayGateway()">
+                            Thanh toán qua cổng VNPay <i class="fa-solid fa-chevron-right ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCRIPTS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            function openVietqrModal() {
+                var myModal = new bootstrap.Modal(document.getElementById('vietqrModal'));
+                myModal.show();
+            }
+
+            function confirmCustomerPaid() {
+                // Xác nhận lại để tránh click nhầm
+                const ok = window.confirm("Xác nhận khách hàng đã thanh toán đầy đủ cho hóa đơn này?");
+                if (!ok) {
+                    return;
+                }
+                // Ghi nhận khách đã thanh toán (Cash/manual) => cập nhật status Paid
+                var methodInput = document.getElementById('paymentMethodInput');
+                methodInput.value = 'cash';
+                document.getElementById('paymentForm').submit();
+            }
+
+            function payWithVnpayGateway() {
+                // Chuyển qua luồng VNPay chính thức
+                var methodInput = document.getElementById('paymentMethodInput');
+                methodInput.value = 'vnpay';
+                document.getElementById('paymentForm').submit();
+            }
+        </script>
     </body>
 </html>

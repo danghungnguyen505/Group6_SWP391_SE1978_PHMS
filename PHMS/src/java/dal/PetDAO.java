@@ -105,6 +105,37 @@ public class PetDAO extends DBContext {
         return false;
     }
 
+    /**
+     * Insert pet and return generated pet_id.
+     */
+    public int insertPetReturnId(int ownerId, String name, String species, String history,
+            String breed, double weight, Date birthDate, String gender) {
+        String sql = "INSERT INTO Pet (owner_id, name, species, history_summary, breed, weight, dob, gender) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+            st.setInt(1, ownerId);
+            st.setString(2, name);
+            st.setString(3, species);
+            st.setString(4, history);
+            st.setString(5, breed);
+            st.setDouble(6, weight);
+            st.setDate(7, birthDate);
+            st.setString(8, gender);
+
+            int rows = st.executeUpdate();
+            if (rows > 0) {
+                ResultSet rs = st.getGeneratedKeys();
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error insertPetReturnId: " + e);
+        }
+        return -1;
+    }
+
     // 4. Cập nhật thông tin thú cưng
     public boolean updatePet(Pet p) {
         String sql = "UPDATE Pet SET name = ?, species = ?, history_summary = ?, "

@@ -17,9 +17,10 @@ public class MedicalRecordDAO extends DBContext {
      * Business rules:
      * - appointment must belong to vetId
      * - appointment status must be 'Checked-in'
-     * - after creating record, appointment status becomes 'Completed'
+     * - after creating record, appointment status becomes 'In-Progress'
+     * Returns newly created record_id, or -1 on failure.
      */
-    public boolean createForVet(int apptId, int vetId, String diagnosis, String treatmentPlan) throws SQLException {
+    public int createForVetReturnId(int apptId, int vetId, String diagnosis, String treatmentPlan) throws SQLException {
         String checkSql = "SELECT appt_id FROM Appointment WHERE appt_id = ? AND vet_id = ? AND status = 'Checked-in'";
         String insertSql = "INSERT INTO MedicalRecord (appt_id, diagnosis, treatment_plan) VALUES (?, ?, ?)";
         String updateApptSql = "UPDATE Appointment SET status = 'In-Progress' WHERE appt_id = ? AND vet_id = ? AND status = 'Checked-in'";
@@ -34,19 +35,30 @@ public class MedicalRecordDAO extends DBContext {
                 try (ResultSet rs = chk.executeQuery()) {
                     if (!rs.next()) {
                         connection.rollback();
-                        return false;
+                        return -1;
                     }
                 }
             }
 
-            try (PreparedStatement ins = connection.prepareStatement(insertSql)) {
+            int recordId = -1;
+            try (PreparedStatement ins = connection.prepareStatement(insertSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 ins.setInt(1, apptId);
                 ins.setString(2, diagnosis);
                 ins.setString(3, treatmentPlan);
                 if (ins.executeUpdate() <= 0) {
                     connection.rollback();
-                    return false;
+                    return -1;
                 }
+                try (ResultSet rs = ins.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        recordId = rs.getInt(1);
+                    }
+                }
+            }
+
+            if (recordId <= 0) {
+                connection.rollback();
+                return -1;
             }
 
             try (PreparedStatement up = connection.prepareStatement(updateApptSql)) {
@@ -54,12 +66,12 @@ public class MedicalRecordDAO extends DBContext {
                 up.setInt(2, vetId);
                 if (up.executeUpdate() <= 0) {
                     connection.rollback();
-                    return false;
+                    return -1;
                 }
             }
 
             connection.commit();
-            return true;
+            return recordId;
         } catch (SQLException e) {
             connection.rollback();
             throw e;

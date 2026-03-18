@@ -13,9 +13,14 @@ public class MedicalRecord {
     private Timestamp createdAt;
 
     // Display fields (JOIN)
+    private int petId;
     private Timestamp apptStartTime;
+    private String apptNotes;
     private String petName;
+    private double petWeight;
+    private String petHistorySummary;
     private String ownerName;
+    private String ownerPhone;
     private String vetName;
     private int vetId;
     private int ownerId;
@@ -76,6 +81,14 @@ public class MedicalRecord {
         this.apptStartTime = apptStartTime;
     }
 
+    public String getApptNotes() {
+        return apptNotes;
+    }
+
+    public void setApptNotes(String apptNotes) {
+        this.apptNotes = apptNotes;
+    }
+
     public String getPetName() {
         return petName;
     }
@@ -84,12 +97,44 @@ public class MedicalRecord {
         this.petName = petName;
     }
 
+    public int getPetId() {
+        return petId;
+    }
+
+    public void setPetId(int petId) {
+        this.petId = petId;
+    }
+
+    public double getPetWeight() {
+        return petWeight;
+    }
+
+    public void setPetWeight(double petWeight) {
+        this.petWeight = petWeight;
+    }
+
+    public String getPetHistorySummary() {
+        return petHistorySummary;
+    }
+
+    public void setPetHistorySummary(String petHistorySummary) {
+        this.petHistorySummary = petHistorySummary;
+    }
+
     public String getOwnerName() {
         return ownerName;
     }
 
     public void setOwnerName(String ownerName) {
         this.ownerName = ownerName;
+    }
+
+    public String getOwnerPhone() {
+        return ownerPhone;
+    }
+
+    public void setOwnerPhone(String ownerPhone) {
+        this.ownerPhone = ownerPhone;
     }
 
     public String getVetName() {

@@ -4,6 +4,7 @@
 <%@page import="java.util.*"%>
 <%@ page import="java.time.*, java.time.format.*" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
 
 <!DOCTYPE html>
 <html>
@@ -45,22 +46,44 @@
             </div>
 
             <ul class="menu">
-                <li><a href="${pageContext.request.contextPath}/receptionist/dashboard"><i class="fa-solid fa-table-columns"></i> Dashboard</a></li>
-                <li><a href="${pageContext.request.contextPath}/receptionist/dashboard" class="text-danger"><i class="fa-solid fa-truck-medical"></i> Emergency Triage</a></li>
-                <li><a href="${pageContext.request.contextPath}/receptionist/scheduling"><i class="fa-solid fa-truck-medical"></i> Staff Scheduling</a></li>
-                <li><a href="${pageContext.request.contextPath}/receptionist/appointment"><i class="fa-regular fa-calendar-check"></i> Appointments</a></li>
-                <li><a href="${pageContext.request.contextPath}/receptionist/dashboard"><i class="fa-solid fa-paw"></i> My Pets</a></li>
-                <li><a href="${pageContext.request.contextPath}/receptionist/dashboard"><i class="fa-solid fa-file-medical"></i> Medical Records</a></li>
-
-                <!-- Billing ACTIVE -->
                 <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/dashboard" class="active">
-                        <i class="fa-regular fa-credit-card"></i> Billing
+                    <a href="${pageContext.request.contextPath}/receptionist/dashboard">
+                        <i class="fa-solid fa-table-columns"></i> ${L == 'en' ? 'Dashboard' : 'Bảng điều khiển'}
                     </a>
                 </li>
-
-                <li><a href="${pageContext.request.contextPath}/receptionist/dashboard"><i class="fa-solid fa-gear"></i> Administration</a></li>
+                <li>
+                    <a href="${pageContext.request.contextPath}/receptionist/emergency/queue" class="text-danger">
+                        <i class="fa-solid fa-truck-medical"></i> ${L == 'en' ? 'Emergency Triage' : 'Cấp cứu'}
+                    </a>
+                </li>
+                <li>
+                    <a href="${pageContext.request.contextPath}/receptionist/appointment">
+                        <i class="fa-regular fa-calendar-check"></i> ${L == 'en' ? 'Appointments' : 'Cuộc hẹn'}
+                    </a>
+                </li>
+                <li>
+                    <a href="${pageContext.request.contextPath}/receptionist/invoice/create" class="active">
+                        <i class="fa-regular fa-credit-card"></i> ${L == 'en' ? 'Billing' : 'Thanh toán'}
+                    </a>
+                </li>
             </ul>
+
+            <!-- Language Switcher -->
+            <div style="padding: 12px; margin-top: auto;">
+                <div style="display:flex; background:#f1f5f9; border-radius:8px; padding:3px; gap:2px;">
+                    <a href="${pageContext.request.contextPath}/language?lang=vi"
+                       style="padding:5px 10px; border-radius:6px; font-size:11px; font-weight:700; text-decoration:none; flex:1; text-align:center;
+                              ${L == 'vi' ? 'background:#10b981; color:#fff;' : 'color:#64748b;'}">VI</a>
+                    <a href="${pageContext.request.contextPath}/language?lang=en"
+                       style="padding:5px 10px; border-radius:6px; font-size:11px; font-weight:700; text-decoration:none; flex:1; text-align:center;
+                              ${L == 'en' ? 'background:#10b981; color:#fff;' : 'color:#64748b;'}">EN</a>
+                </div>
+            </div>
+
+            <div class="help-box">
+                <div class="help-text">${L == 'en' ? 'Need help?' : 'Cần hỗ trợ?'}</div>
+                <a href="#" class="btn-contact">${L == 'en' ? 'Contact Support' : 'Liên hệ hỗ trợ'}</a>
+            </div>
         </nav>
 
         <!-- RIGHT CONTENT -->

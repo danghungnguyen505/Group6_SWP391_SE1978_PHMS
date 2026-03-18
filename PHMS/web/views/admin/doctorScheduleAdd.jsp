@@ -412,9 +412,35 @@
 
                 <div class="form-group">
                     <label class="form-label">Chọn Slot Làm Việc *</label>
-                    <p class="info-text">Khung giờ từ 09:00 AM đến 05:30 PM, mỗi slot 30 phút. Có thể chọn nhiều slot trong 1 lần.</p>
+                    <p class="info-text">Chọn buổi làm việc (Sáng: 09:00 - 12:00, Chiều: 14:00 - 17:00).</p>
 
-                    <div class="slot-toolbar">
+                    <div class="shift-selector" style="display: flex; gap: 20px; margin-top: 15px;">
+                        <div class="shift-option" style="flex: 1;">
+                            <input type="checkbox" id="shiftMorning" class="shift-checkbox" style="display:none;">
+                            <label for="shiftMorning" class="shift-label" style="display:block; padding: 20px; border: 2px solid #edf2f7; border-radius: 12px; text-align: center; cursor: pointer; font-weight: 700; color: #64748b; transition: 0.2s;">
+                                <i class="fa-solid fa-sun" style="font-size: 24px; color: #fbbf24; margin-bottom: 10px; display: block;"></i>
+                                Buổi Sáng<br>
+                                <span style="font-size: 11px; font-weight: 500;">09:00 AM - 12:00 PM</span>
+                            </label>
+                        </div>
+                        <div class="shift-option" style="flex: 1;">
+                            <input type="checkbox" id="shiftAfternoon" class="shift-checkbox" style="display:none;">
+                            <label for="shiftAfternoon" class="shift-label" style="display:block; padding: 20px; border: 2px solid #edf2f7; border-radius: 12px; text-align: center; cursor: pointer; font-weight: 700; color: #64748b; transition: 0.2s;">
+                                <i class="fa-solid fa-cloud-moon" style="font-size: 24px; color: #818cf8; margin-bottom: 10px; display: block;"></i>
+                                Buổi Chiều<br>
+                                <span style="font-size: 11px; font-weight: 500;">02:00 PM - 05:00 PM</span>
+                            </label>
+                        </div>
+                    </div>
+                    <style>
+                        .shift-checkbox:checked + .shift-label {
+                            border-color: var(--primary-green) !important;
+                            background: #f0fff4 !important;
+                            color: var(--primary-green) !important;
+                        }
+                    </style>
+
+                    <div class="slot-toolbar" style="display:none;">
                         <div class="slot-actions">
                             <button type="button" class="btn-mini" id="btnSelectAll">Chọn tất cả</button>
                             <button type="button" class="btn-mini" id="btnClearAll">Bỏ chọn</button>
@@ -422,10 +448,10 @@
                         <div class="info-text" id="slotCounter" style="margin-top:0;">Đã chọn: 0 slot</div>
                     </div>
 
-                    <div class="slot-grid" id="slotGrid">
+                    <div class="slot-grid" id="slotGrid" style="display:none;">
                         <c:forEach var="slot" items="${timeSlots}" varStatus="st">
                             <div class="slot-item">
-                                <input type="checkbox" name="slots" value="${slot}" id="slot_${st.index}">
+                                <input type="checkbox" name="slots" value="${slot}" id="slot_${st.index}" class="hidden-slot-cb" data-time="${slot}">
                                 <label for="slot_${st.index}">${slot}</label>
                             </div>
                         </c:forEach>
@@ -520,33 +546,29 @@
 
         // Slot selection helpers
         const slotGrid = document.getElementById('slotGrid');
-        const slotCounter = document.getElementById('slotCounter');
-        const btnSelectAll = document.getElementById('btnSelectAll');
-        const btnClearAll = document.getElementById('btnClearAll');
+        const hiddenSlots = document.querySelectorAll('.hidden-slot-cb');
+        
+        document.getElementById('shiftMorning').addEventListener('change', function() {
+            const isChecked = this.checked;
+            hiddenSlots.forEach(cb => {
+                const timeStr = cb.getAttribute('data-time');
+                // Morning slots are 09:xx AM, 10:xx AM, 11:xx AM
+                if (timeStr.includes('AM') && !timeStr.startsWith('12')) {
+                    cb.checked = isChecked;
+                }
+            });
+        });
 
-        function updateSlotCounter() {
-            const checked = document.querySelectorAll('input[name="slots"]:checked').length;
-            if (slotCounter) slotCounter.textContent = 'Đã chọn: ' + checked + ' slot';
-        }
-
-        if (btnSelectAll) {
-            btnSelectAll.addEventListener('click', () => {
-                document.querySelectorAll('input[name="slots"]').forEach(cb => cb.checked = true);
-                updateSlotCounter();
+        document.getElementById('shiftAfternoon').addEventListener('change', function() {
+            const isChecked = this.checked;
+            hiddenSlots.forEach(cb => {
+                const timeStr = cb.getAttribute('data-time');
+                // Afternoon slots are 02:xx PM, 03:xx PM, 04:xx PM
+                if (timeStr.includes('PM') && !timeStr.startsWith('12') && !timeStr.startsWith('01')) {
+                    cb.checked = isChecked;
+                }
             });
-        }
-        if (btnClearAll) {
-            btnClearAll.addEventListener('click', () => {
-                document.querySelectorAll('input[name="slots"]').forEach(cb => cb.checked = false);
-                updateSlotCounter();
-            });
-        }
-        if (slotGrid) {
-            slotGrid.addEventListener('change', (e) => {
-                if (e.target && e.target.name === 'slots') updateSlotCounter();
-            });
-        }
-        updateSlotCounter();
+        });
 
         // Validate at least one slot selected
         const scheduleForm = document.getElementById('scheduleForm');

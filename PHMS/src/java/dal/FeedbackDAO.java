@@ -21,7 +21,7 @@ public class FeedbackDAO extends DBContext {
         String checkSql = "SELECT a.appt_id FROM Appointment a " +
                          "JOIN Pet p ON a.pet_id = p.pet_id " +
                          "WHERE a.appt_id = ? AND p.owner_id = ? AND a.status = 'Completed'";
-        String insertSql = "INSERT INTO Feedback (appt_id, rating, comment) VALUES (?, ?, ?)";
+        String insertSql = "INSERT INTO Feedback (appt_id, rating, comment, status) VALUES (?, ?, ?, 'New')";
         
         try {
             // Check authorization and status
@@ -60,24 +60,32 @@ public class FeedbackDAO extends DBContext {
     }
     
     /**
-     * Get feedback list for admin/manager (all feedbacks with pagination).
+     * Get feedback list for admin/manager with optional rating and status filters.
      */
-    public List<Feedback> getAllFeedbacks(int page, int pageSize) {
+    public List<Feedback> getAllFeedbacks(int page, int pageSize, String ratingFilter, String statusFilter) {
         List<Feedback> list = new ArrayList<>();
         int offset = (page - 1) * pageSize;
-        String sql = "SELECT f.feedback_id, f.appt_id, f.rating, f.comment, " +
+        String baseSql = "SELECT f.feedback_id, f.appt_id, f.rating, f.comment, f.status, " +
                      "u.full_name AS customer_name, p.name AS pet_name, " +
                      "FORMAT(a.start_time, 'dd/MM/yyyy HH:mm') AS appt_date " +
                      "FROM Feedback f " +
                      "JOIN Appointment a ON f.appt_id = a.appt_id " +
                      "JOIN Pet p ON a.pet_id = p.pet_id " +
                      "JOIN PetOwner po ON p.owner_id = po.user_id " +
-                     "JOIN Users u ON po.user_id = u.user_id " +
-                     "ORDER BY f.feedback_id DESC " +
-                     "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+                     "JOIN Users u ON po.user_id = u.user_id ";
+
+        String where = buildWhereClause(ratingFilter, statusFilter);
+        String sql = baseSql + where + " ORDER BY f.feedback_id DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
-            st.setInt(1, offset);
-            st.setInt(2, pageSize);
+            int idx = 1;
+            if (ratingFilter != null && !"all".equals(ratingFilter) && !ratingFilter.isEmpty()) {
+                st.setInt(idx++, getRatingValue(ratingFilter));
+            }
+            if (statusFilter != null && !"all".equals(statusFilter) && !statusFilter.isEmpty()) {
+                st.setString(idx++, statusFilter);
+            }
+            st.setInt(idx++, offset);
+            st.setInt(idx++, pageSize);
             try (ResultSet rs = st.executeQuery()) {
                 while (rs.next()) {
                     Feedback f = mapFeedback(rs);
@@ -89,21 +97,93 @@ public class FeedbackDAO extends DBContext {
         }
         return list;
     }
-    
+
+    public List<Feedback> getAllFeedbacks(int page, int pageSize, String ratingFilter) {
+        return getAllFeedbacks(page, pageSize, ratingFilter, null);
+    }
+
+    public List<Feedback> getAllFeedbacks(int page, int pageSize) {
+        return getAllFeedbacks(page, pageSize, null, null);
+    }
+
     /**
-     * Get total count of feedbacks.
+     * Get total count of feedbacks with optional filters.
      */
-    public int getTotalFeedbacks() {
-        String sql = "SELECT COUNT(*) AS total FROM Feedback";
-        try (PreparedStatement st = connection.prepareStatement(sql);
-             ResultSet rs = st.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt("total");
+    public int getTotalFeedbacks(String ratingFilter, String statusFilter) {
+        String sql = "SELECT COUNT(*) AS total FROM Feedback f " + buildWhereClause(ratingFilter, statusFilter);
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            int idx = 1;
+            if (ratingFilter != null && !"all".equals(ratingFilter) && !ratingFilter.isEmpty()) {
+                st.setInt(idx++, getRatingValue(ratingFilter));
+            }
+            if (statusFilter != null && !"all".equals(statusFilter) && !statusFilter.isEmpty()) {
+                st.setString(idx++, statusFilter);
+            }
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("total");
+                }
             }
         } catch (SQLException e) {
             System.out.println("Error getTotalFeedbacks: " + e.getMessage());
         }
         return 0;
+    }
+
+    public int getTotalFeedbacks(String ratingFilter) {
+        return getTotalFeedbacks(ratingFilter, null);
+    }
+
+    public int getTotalFeedbacks() {
+        return getTotalFeedbacks(null, null);
+    }
+
+    private String buildWhereClause(String ratingFilter, String statusFilter) {
+        StringBuilder sb = new StringBuilder();
+        boolean hasRating = ratingFilter != null && !"all".equals(ratingFilter) && !ratingFilter.isEmpty();
+        boolean hasStatus = statusFilter != null && !"all".equals(statusFilter) && !statusFilter.isEmpty();
+
+        if (hasRating || hasStatus) {
+            sb.append("WHERE ");
+            if (hasRating) {
+                if ("below3".equals(ratingFilter)) {
+                    sb.append("f.rating <= 3");
+                } else {
+                    sb.append("f.rating = ?");
+                }
+            }
+            if (hasRating && hasStatus) {
+                sb.append(" AND ");
+            }
+            if (hasStatus) {
+                sb.append("f.status = ?");
+            }
+            sb.append(" ");
+        }
+        return sb.toString();
+    }
+
+    private int getRatingValue(String ratingFilter) {
+        switch (ratingFilter) {
+            case "5": return 5;
+            case "4": return 4;
+            default: return 0;
+        }
+    }
+
+    /**
+     * Update feedback status.
+     */
+    public boolean updateFeedbackStatus(int feedbackId, String newStatus) {
+        String sql = "UPDATE Feedback SET status = ? WHERE feedback_id = ?";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setString(1, newStatus);
+            st.setInt(2, feedbackId);
+            return st.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Error updateFeedbackStatus: " + e.getMessage());
+            return false;
+        }
     }
     
     /**
@@ -173,9 +253,28 @@ public class FeedbackDAO extends DBContext {
         f.setApptId(rs.getInt("appt_id"));
         f.setRating(rs.getInt("rating"));
         f.setComment(rs.getString("comment"));
+        f.setStatus(rs.getString("status"));
         f.setCustomerName(rs.getString("customer_name"));
         f.setPetName(rs.getString("pet_name"));
         f.setApptDate(rs.getString("appt_date"));
         return f;
+    }
+
+    /**
+     * Check if an appointment already has feedback.
+     */
+    public boolean hasFeedback(int apptId) {
+        String sql = "SELECT COUNT(*) FROM Feedback WHERE appt_id = ?";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, apptId);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error hasFeedback: " + e.getMessage());
+        }
+        return false;
     }
 }

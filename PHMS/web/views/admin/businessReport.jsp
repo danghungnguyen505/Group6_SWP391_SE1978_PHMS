@@ -215,9 +215,15 @@
                 <div class="chart-placeholder">
                     <c:choose>
                         <c:when test="${not empty monthlyRevenue}">
+                            <c:set var="maxRev" value="1" />
+                            <c:forEach var="m" items="${monthlyRevenue}">
+                                <c:if test="${m.revenue > maxRev}"><c:set var="maxRev" value="${m.revenue}" /></c:if>
+                            </c:forEach>
                             <c:forEach var="month" items="${monthlyRevenue}">
                                 <div class="month-col">
-                                    <span class="month-label">Tháng ${month.month}</span>
+                                    <span class="month-value" style="font-size:11px; font-weight:700; color:#0f172a;"><fmt:formatNumber value="${month.revenue}" pattern="#,###"/>₫</span>
+                                    <div style="width:30px; background:linear-gradient(to top, #10b981, #34d399); border-radius:4px 4px 0 0; height: ${month.revenue > 0 ? (month.revenue / maxRev) * 120 : 4}px;"></div>
+                                    <span class="month-label">Tháng ${fn:substring(month.month, 5, 7)}</span>
                                 </div>
                             </c:forEach>
                         </c:when>
@@ -241,7 +247,18 @@
                     </div>
                     <div>
                         <p class="rev-total-label" style="text-align: right;">Tăng trưởng</p>
-                        <div class="growth-badge">+18.4%</div>
+                        <div class="growth-badge">
+                            <c:choose>
+                                <c:when test="${not empty revenueGrowth}">
+                                    <c:set var="growth" value="${revenueGrowth.growthPercentage}" />
+                                    <c:choose>
+                                        <c:when test="${growth >= 0}">+<fmt:formatNumber value="${growth}" pattern="#.0"/>%</c:when>
+                                        <c:otherwise><fmt:formatNumber value="${growth}" pattern="#.0"/>%</c:otherwise>
+                                    </c:choose>
+                                </c:when>
+                                <c:otherwise>0%</c:otherwise>
+                            </c:choose>
+                        </div>
                     </div>
                 </div>
             </section>

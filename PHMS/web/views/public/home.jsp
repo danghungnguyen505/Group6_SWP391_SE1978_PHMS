@@ -1,17 +1,20 @@
-<%-- 
+<%--
     Document   : home
     Created on : Jan 22, 2026, 1:18:21 AM
     Author     : Nguyen Dang Hung
 --%>
 
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%-- Load all translations --%>
+<%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="${L}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VetCare Pro - Chăm sóc Thú cưng Chuyên nghiệp</title>
+    <title>VetCare Pro - ${L == 'en' ? 'Professional Pet Care' : 'Chăm sóc Thú cưng Chuyên nghiệp'}</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css">
@@ -30,77 +33,72 @@
             <span class="logo-text">VetCare Pro</span>
         </div>
         <div class="nav-links">
-            <a href="#">Trang chủ</a>
-            <a href="#services">Dịch vụ</a>
-            <a href="#doctors">Bác sĩ</a>
-            <a href="#testimonials">Về chúng tôi</a>
-            <!-- Link Dashboard dành cho từng role (Tùy chọn) -->
+            <a href="#">${t_home}</a>
+            <a href="#services">${t_services}</a>
+            <a href="#doctors">${t_doctors}</a>
+            <a href="#testimonials">${t_about}</a>
             <c:if test="${not empty sessionScope.account}">
                 <c:choose>
                     <c:when test="${sessionScope.account.role == 'PetOwner'}">
-                        <a href="${pageContext.request.contextPath}/petOwner/menuPetOwner">Đặt lịch</a>
+                        <a href="${pageContext.request.contextPath}/petOwner/menuPetOwner">${t_booking}</a>
                     </c:when>
                     <c:when test="${sessionScope.account.role == 'Veterinarian'}">
-                        <a href="${pageContext.request.contextPath}/doctor/schedule">Lịch làm việc</a>
+                        <a href="${pageContext.request.contextPath}/doctor/schedule">${t_schedule}</a>
                     </c:when>
                     <c:when test="${sessionScope.account.role == 'ClinicManager'}">
-                        <a href="${pageContext.request.contextPath}/admin/dashboard">Quản trị</a>
+                        <a href="${pageContext.request.contextPath}/admin/dashboard">${t_admin}</a>
                     </c:when>
                 </c:choose>
-            </c:if> 
+            </c:if>
         </div>
-        <div>
-            <!-- LOGIC HIỂN THỊ NÚT ĐĂNG NHẬP / USER PROFILE -->
-            <c:choose>
-                <%-- TRƯỜNG HỢP 1: CHƯA ĐĂNG NHẬP --%>
-                <c:when test="${empty sessionScope.account}">
-                    <a href="${pageContext.request.contextPath}/login" class="btn btn-dark">
-                        Đăng nhập
-                    </a>
-                    <a href="${pageContext.request.contextPath}/register" class="btn btn-outline" style="margin-left: 10px; color: black; border-color: black;">
-                        Đăng ký
-                    </a>
-                </c:when>
+        <div style="display:inline-flex; align-items:center; gap:10px;">
+            <!-- Language Switcher -->
+            <div style="display:inline-flex; align-items:center; background:#f1f5f9; border-radius:20px; padding:3px; gap:2px;">
+                <a href="${pageContext.request.contextPath}/language?lang=vi"
+                   style="padding:5px 12px; border-radius:16px; font-size:12px; font-weight:700; text-decoration:none; transition:0.2s;
+                          ${L == 'vi' ? 'background:#0f172a; color:#fff;' : 'color:#64748b;'}">
+                    VI
+                </a>
+                <a href="${pageContext.request.contextPath}/language?lang=en"
+                   style="padding:5px 12px; border-radius:16px; font-size:12px; font-weight:700; text-decoration:none; transition:0.2s;
+                          ${L == 'en' ? 'background:#0f172a; color:#fff;' : 'color:#64748b;'}">
+                    EN
+                </a>
+            </div>
 
-                <%-- TRƯỜNG HỢP 2: ĐÃ ĐĂNG NHẬP --%>
+            <c:choose>
+                <c:when test="${empty sessionScope.account}">
+                    <a href="${pageContext.request.contextPath}/login" class="btn btn-dark">${t_login}</a>
+                    <a href="${pageContext.request.contextPath}/register" class="btn btn-outline" style="color: black; border-color: black;">${t_register}</a>
+                </c:when>
                 <c:otherwise>
-                    <div style="display: inline-flex; align-items: center; gap: 10px;">
-                        <span class="btn btn-dark">
-                           <i class="fa-solid fa-user" style="color: greenyellow;padding-right: 10px"></i> 
-                              <a href="${pageContext.request.contextPath}/profile">${sessionScope.account.fullName}</a>
-                        </span>
-                        
-                        <!-- Nút Logout -->
-                        <a href="${pageContext.request.contextPath}/logout" class="btn btn-dark" style="background-color: #ef4444; border-color: #ef4444;">
-                            Đăng xuất
-                        </a>
-                    </div>
+                    <span class="btn btn-dark">
+                        <i class="fa-solid fa-user" style="color: greenyellow; padding-right: 8px;"></i>
+                        <a href="${pageContext.request.contextPath}/profile" style="color:inherit; text-decoration:none;">${sessionScope.account.fullName}</a>
+                    </span>
+                    <a href="${pageContext.request.contextPath}/logout" class="btn btn-dark" style="background-color: #ef4444; border-color: #ef4444;">${t_logout}</a>
                 </c:otherwise>
             </c:choose>
         </div>
     </nav>
 
     <section class="hero">
-        <img src="https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&w=1200&q=80" 
+        <img src="https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&w=1200&q=80"
              class="hero-image" alt="Clinic Interior">
         <div class="container hero-content">
-            <span class="hero-badge">PHMS - HỆ THỐNG QUẢN LÝ Y TẾ</span>
-            <h1>Chăm sóc Toàn diện <br/> <span>Cho Thú cưng.</span></h1>
-            <p>Sử dụng công nghệ hiện đại và lòng tận tâm để bảo vệ sức khỏe cho người bạn nhỏ của bạn.</p>
+            <span class="hero-badge">${t_hero_badge}</span>
+            <h1>${t_hero_title} <br/> <span>${t_hero_highlight}</span></h1>
+            <p>${t_hero_subtitle}</p>
             <div class="hero-actions">
-                
-                <!-- SỬA LINK NÚT "ĐẶT LỊCH NGAY" -->
                 <c:choose>
                     <c:when test="${not empty sessionScope.account and sessionScope.account.role == 'PetOwner'}">
-                        <a href="${pageContext.request.contextPath}/petOwner/menuPetOwner" class="btn btn-primary">Đặt lịch ngay</a>
+                        <a href="${pageContext.request.contextPath}/petOwner/menuPetOwner" class="btn btn-primary">${t_book_now}</a>
                     </c:when>
                     <c:otherwise>
-                        <!-- Nếu chưa login hoặc không phải PetOwner thì trỏ về Login -->
-                        <a href="${pageContext.request.contextPath}/login" class="btn btn-primary">Đặt lịch ngay</a>
+                        <a href="${pageContext.request.contextPath}/login" class="btn btn-primary">${t_book_now}</a>
                     </c:otherwise>
                 </c:choose>
-
-                <button class="btn btn-outline">Tìm hiểu thêm</button>
+                <button class="btn btn-outline">${t_learn_more}</button>
             </div>
         </div>
     </section>
@@ -108,10 +106,9 @@
     <section id="services" class="section-padding">
         <div class="container">
             <div class="text-center mb-10">
-                <h2 class="section-title">Dịch vụ Chuyên môn</h2>
+                <h2 class="section-title">${t_services_title}</h2>
                 <div class="section-divider"></div>
             </div>
-            
             <div class="services-grid">
                 <c:forEach var="service" items="${topServices}">
                     <div class="card card-hover service-card">
@@ -122,7 +119,7 @@
                         </div>
                         <h3 class="mb-4 service-title">${service.name}</h3>
                         <p class="mb-8 service-description">${service.description}</p>
-                        <p class="service-price-tag">Từ $${service.basePrice}</p>
+                        <p class="service-price-tag">${t_from} ${service.basePrice} VND</p>
                     </div>
                 </c:forEach>
             </div>
@@ -132,33 +129,30 @@
     <section id="doctors" class="section-padding bg-muted">
         <div class="container">
             <div class="text-center mb-10">
-                <h2 class="section-title">Đội ngũ Chuyên gia</h2>
+                <h2 class="section-title">${t_doctors_title}</h2>
                 <div class="section-divider"></div>
-                <p class="section-subtitle">Các bác sĩ giàu kinh nghiệm, tận tâm với mọi loài vật nuôi.</p>
+                <p class="section-subtitle">${t_doctors_subtitle}</p>
             </div>
-            
             <div class="doctors-grid">
                 <c:forEach var="doctor" items="${topDoctors}">
                     <div class="doctor-card card-hover">
                         <img src="${doctor.image}" alt="${doctor.fullName}" class="doctor-avatar">
                         <h3 class="doctor-name">${doctor.fullName}</h3>
                         <p class="doctor-spec">${doctor.specialization}</p>
-                        
-                        <button class="btn-profile">Xem hồ sơ</button>
+                        <button class="btn-profile">${t_view_profile}</button>
                     </div>
                 </c:forEach>
             </div>
         </div>
     </section>
-    
+
     <section id="testimonials" class="section-padding">
         <div class="container">
             <div class="text-center mb-10">
-                <h2 class="section-title">Ý kiến Khách hàng</h2>
+                <h2 class="section-title">${t_testimonials_title}</h2>
                 <div class="section-divider"></div>
-                <p class="section-subtitle">Những câu chuyện thật từ cộng đồng yêu thú cưng của chúng tôi.</p>
+                <p class="section-subtitle">${t_testimonials_subtitle}</p>
             </div>
-
             <div class="testimonials-grid">
                 <c:forEach var="t" items="${feedbacks}">
                     <div class="testimonial-card">
@@ -189,20 +183,20 @@
         <div class="container footer-grid">
             <div class="footer-brand">
                 <h3>VetCare Pro</h3>
-                <p>Nâng tầm tiêu chuẩn chăm sóc sức khỏe thú cưng tại Việt Nam bằng công nghệ và sự tận tâm.</p>
+                <p>${L == 'en' ? 'Elevating pet healthcare standards with technology and dedication.' : 'Nâng tầm tiêu chuẩn chăm sóc sức khỏe thú cưng tại Việt Nam bằng công nghệ và sự tận tâm.'}</p>
             </div>
             <div>
-                <h4 class="footer-title">Liên kết</h4>
+                <h4 class="footer-title">${t_links}</h4>
                 <ul class="footer-list">
-                    <li><a href="#">Dịch vụ cấp cứu</a></li>
-                    <li><a href="#">Nhà thuốc thú y</a></li>
-                    <li><a href="#">Chăm sóc Spa</a></li>
+                    <li><a href="#">${t_emergency}</a></li>
+                    <li><a href="#">${t_pharmacy}</a></li>
+                    <li><a href="#">${t_spa}</a></li>
                 </ul>
             </div>
             <div>
-                <h4 class="footer-title">Liên hệ</h4>
+                <h4 class="footer-title">${t_contact}</h4>
                 <ul class="footer-list">
-                    <li>123 Đường Thú Cưng, TP. Hà Nội</li>
+                    <li>123 ${L == 'en' ? 'Pet Street, Hanoi' : 'Đường Thú Cưng, TP. Hà Nội'}</li>
                     <li>+84 (123) 456-789</li>
                     <li>contact@vetcarepro.vn</li>
                 </ul>
@@ -212,24 +206,11 @@
             <p>&copy; 2026 PHMS_DB Management System. All rights reserved.</p>
         </div>
     </footer>
-    <script>
-        //Hiện thông báo khi đặt lịch thành công
-        window.onload = function() {
-            <% 
-                // Lấy thông báo từ Session
-                String msg = (String) session.getAttribute("toastMessage");
-                if(msg != null) {
-                    String[] parts = msg.split("\\|");
-                    String text = parts.length > 1 ? parts[1] : msg;
-            %>
-                // Hiển thị thông báo
-                alert("<%= text %>");
-            <% 
-                // Xóa ngay để F5 không hiện lại
-                session.removeAttribute("toastMessage");
-                } 
-            %>
-        };
-    </script>
+    <c:if test="${not empty sessionScope.toastMessage}">
+        <c:set var="toastParts" value="${fn:split(sessionScope.toastMessage, '|')}" />
+        <c:set var="toastText" value="${fn:length(toastParts) > 1 ? toastParts[1] : sessionScope.toastMessage}" />
+        <script>window.onload = function() { alert("${toastText}"); };</script>
+        <c:remove var="toastMessage" scope="session" />
+    </c:if>
 </body>
 </html>
