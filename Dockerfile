@@ -6,20 +6,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends ant wget
 
 WORKDIR /app
 
-# Tải thư viện CopyLibs (Sửa lỗi 404 và CopyLibs của NetBeans)
-RUN wget https://repo1.maven.org/maven2/org/netbeans/external/org-netbeans-modules-java-j2seproject-copylibstask/RELEASE110/org-netbeans-modules-java-j2seproject-copylibstask-RELEASE110.jar -O /app/copylibstask.jar
+# TẢI THƯ VIỆN COPYLIBS (Sửa lỗi 404: Chuyển từ folder 'external' sang 'api')
+RUN wget https://repo1.maven.org/maven2/org/netbeans/api/org-netbeans-modules-java-j2seproject-copylibstask/RELEASE126/org-netbeans-modules-java-j2seproject-copylibstask-RELEASE126.jar -O /app/copylibstask.jar
 
 # Copy toàn bộ code vào
 COPY . .
 
-# Tự động tải servlet-api nếu dự án thiếu (tránh lỗi compile)
+# Tự động tải servlet-api (Để biên dịch code Servlet không bị lỗi)
 RUN mkdir -p PHMS/lib && \
     wget https://repo1.maven.org/maven2/javax/servlet/javax.servlet-api/3.1.0/javax.servlet-api-3.1.0.jar -O PHMS/lib/servlet-api.jar
 
-# Giới hạn RAM cho Ant (Gói Free Render chỉ có 512MB)
+# Giới hạn RAM cho Ant (Tránh Render bị crash 512MB)
 ENV ANT_OPTS="-Xmx256m"
 
-# Chạy lệnh build của Ant
+# Chạy lệnh build của Ant với CopyLibs vừa tải
 RUN cd PHMS && ant -f build.xml dist -Dlibs.CopyLibs.classpath=/app/copylibstask.jar
 
 # --- Giai đoạn 2: Chạy bằng Tomcat ---
