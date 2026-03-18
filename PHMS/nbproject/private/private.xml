@@ -3,10 +3,20 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/GitHub/Group6_SWP391_SE1978_PHMS/PHMS/web/views/auth/forgot-password.jsp</file>
+            <file>file:/D:/GitHub/Group6_SWP391_SE1978_PHMS/PHMS/web/views/petOwner/menuPetOwner.jsp</file>
+            <file>file:/D:/GitHub/Group6_SWP391_SE1978_PHMS/PHMS/src/java/controller/petOwner/MyPetController.java</file>
+            <file>file:/D:/GitHub/Group6_SWP391_SE1978_PHMS/PHMS/src/java/controller/petOwner/UpdatePetController.java</file>
             <file>file:/D:/GitHub/Group6_SWP391_SE1978_PHMS/PHMS/web/views/admin/dashboard.jsp</file>
+            <file>file:/D:/GitHub/Group6_SWP391_SE1978_PHMS/PHMS/src/java/controller/ai/AIChatController.java</file>
+            <file>file:/D:/GitHub/Group6_SWP391_SE1978_PHMS/PHMS/web/views/receptionist/emergencyCreate.jsp</file>
+            <file>file:/D:/GitHub/Group6_SWP391_SE1978_PHMS/PHMS/web/views/receptionist/emergencyQueue.jsp</file>
+            <file>file:/D:/GitHub/Group6_SWP391_SE1978_PHMS/PHMS/src/java/controller/receptionist/EmergencyCreateController.java</file>
+            <file>file:/D:/GitHub/Group6_SWP391_SE1978_PHMS/PHMS/web/views/auth/forgot-password.jsp</file>
             <file>file:/D:/GitHub/Group6_SWP391_SE1978_PHMS/PHMS/web/views/public/home.jsp</file>
+            <file>file:/D:/GitHub/Group6_SWP391_SE1978_PHMS/PHMS/src/java/dal/PetDAO.java</file>
+            <file>file:/D:/GitHub/Group6_SWP391_SE1978_PHMS/PHMS/web/views/veterinarian/medicalRecordDetail.jsp</file>
             <file>file:/D:/GitHub/Group6_SWP391_SE1978_PHMS/PHMS/src/java/controller/auth/ForgotPasswordController.java</file>
+            <file>file:/D:/GitHub/Group6_SWP391_SE1978_PHMS/PHMS/src/java/controller/petOwner/OwnerMedicalRecordDetailController.java</file>
         </group>
     </open-files>
 </project-private>
