@@ -285,7 +285,7 @@
                     <div class="stat-icon orange"><i class="fa-solid fa-file-medical"></i></div>
                     <div>
                         <div class="stat-value">${completedEMR}</div>
-                        <div class="stat-label">Submitted Today</div>
+                        <div class="stat-label">In Progress</div>
                     </div>
                 </div>
             </div>
@@ -343,21 +343,16 @@
                                     </td>
                                     <td>
                                         <div class="action-cell" style="justify-content:center;">
-                                            <a class="btn-edit"
-                                               href="${pageContext.request.contextPath}/veterinarian/emr/queue/edit?apptId=${a.apptId}">
-                                                <i class="fa-solid fa-pen-to-square"></i> Edit EMR
-                                            </a>
                                             <c:if test="${a.status == 'Checked-in'}">
                                                 <a class="btn-submit"
                                                    href="${pageContext.request.contextPath}/veterinarian/emr/submit?apptId=${a.apptId}">
-                                                    <i class="fa-solid fa-paper-plane"></i> Submit
+                                                    <i class="fa-solid fa-file-circle-plus"></i> Create EMR
                                                 </a>
                                             </c:if>
                                             <c:if test="${a.status == 'In-Progress'}">
                                                 <a class="btn-complete"
-                                                   href="${pageContext.request.contextPath}/veterinarian/emr/complete?apptId=${a.apptId}"
-                                                   onclick="return confirm('Mark this appointment as Completed?');">
-                                                    <i class="fa-solid fa-check-circle"></i> Complete
+                                                   href="${pageContext.request.contextPath}/veterinarian/emr/submit?apptId=${a.apptId}">
+                                                    <i class="fa-solid fa-stethoscope"></i> Open EMR Detail
                                                 </a>
                                             </c:if>
                                         </div>

@@ -28,6 +28,8 @@ public class LabRequestCancelController extends HttpServlet {
         }
 
         String idStr = request.getParameter("id");
+        String recordIdStr = request.getParameter("recordId");
+        boolean fromDetail = "detail".equalsIgnoreCase(request.getParameter("source"));
         if (idStr == null || idStr.trim().isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/veterinarian/lab/requests");
             return;
@@ -47,7 +49,11 @@ public class LabRequestCancelController extends HttpServlet {
         } else {
             session.setAttribute("toastMessage", "error|Cannot cancel request (not found / access denied / already completed).");
         }
-        response.sendRedirect(request.getContextPath() + "/veterinarian/lab/requests");
+        if (fromDetail && util.ValidationUtils.isIntegerInRange(recordIdStr, 1, Integer.MAX_VALUE)) {
+            response.sendRedirect(request.getContextPath() + "/veterinarian/emr/detail?id=" + recordIdStr);
+        } else {
+            response.sendRedirect(request.getContextPath() + "/veterinarian/lab/requests");
+        }
     }
 }
 

@@ -750,6 +750,84 @@ public class AppointmentDAO extends DBContext {
     }
 
     /**
+     * Search emergency appointments for vet by keyword (pet name, owner name).
+     */
+    public List<model.Appointment> searchEmergencyAppointmentsForVet(int vetId, String keyword, String status) {
+        List<model.Appointment> list = new ArrayList<>();
+        String sql = "SELECT a.appt_id, a.start_time, a.status, a.type, a.notes, "
+                + "p.name AS pet_name, u_owner.full_name AS owner_name "
+                + "FROM Appointment a "
+                + "JOIN Pet p ON a.pet_id = p.pet_id "
+                + "JOIN Users u_owner ON p.owner_id = u_owner.user_id "
+                + "WHERE a.type = 'Urgent' "
+                + "AND a.vet_id = ? "
+                + "AND (p.name LIKE ? OR u_owner.full_name LIKE ?) "
+                + (status != null ? "AND a.status = ? " : "AND a.status IN ('Pending','Confirmed','Checked-in','In-Progress','Completed') ")
+                + "ORDER BY a.start_time ASC";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            String like = "%" + keyword + "%";
+            st.setInt(1, vetId);
+            st.setString(2, like);
+            st.setString(3, like);
+            if (status != null) st.setString(4, status);
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    model.Appointment a = new model.Appointment();
+                    a.setApptId(rs.getInt("appt_id"));
+                    a.setStartTime(rs.getTimestamp("start_time"));
+                    a.setStatus(rs.getString("status"));
+                    a.setType(rs.getString("type"));
+                    a.setNotes(rs.getString("notes"));
+                    a.setPetName(rs.getString("pet_name"));
+                    a.setOwnerName(rs.getString("owner_name"));
+                    a.setVetId(vetId);
+                    list.add(a);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error searchEmergencyAppointmentsForVet: " + e.getMessage());
+        }
+        return list;
+    }
+
+    /**
+     * Filter emergency appointments by status for vet.
+     */
+    public List<model.Appointment> filterEmergencyAppointmentsByStatusForVet(int vetId, String status) {
+        List<model.Appointment> list = new ArrayList<>();
+        String sql = "SELECT a.appt_id, a.start_time, a.status, a.type, a.notes, "
+                + "p.name AS pet_name, u_owner.full_name AS owner_name "
+                + "FROM Appointment a "
+                + "JOIN Pet p ON a.pet_id = p.pet_id "
+                + "JOIN Users u_owner ON p.owner_id = u_owner.user_id "
+                + "WHERE a.type = 'Urgent' "
+                + "AND a.vet_id = ? "
+                + "AND a.status = ? "
+                + "ORDER BY a.start_time ASC";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, vetId);
+            st.setString(2, status);
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    model.Appointment a = new model.Appointment();
+                    a.setApptId(rs.getInt("appt_id"));
+                    a.setStartTime(rs.getTimestamp("start_time"));
+                    a.setStatus(rs.getString("status"));
+                    a.setType(rs.getString("type"));
+                    a.setNotes(rs.getString("notes"));
+                    a.setPetName(rs.getString("pet_name"));
+                    a.setOwnerName(rs.getString("owner_name"));
+                    a.setVetId(vetId);
+                    list.add(a);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error filterEmergencyAppointmentsByStatusForVet: " + e.getMessage());
+        }
+        return list;
+    }
+
+    /**
      * Veterinarian "Agree" an emergency appointment.
      * Move status to In-Progress only if it belongs to the vet and is still
      * in a startable state.
@@ -760,7 +838,7 @@ public class AppointmentDAO extends DBContext {
                 + "WHERE appt_id = ? "
                 + "AND vet_id = ? "
                 + "AND type = 'Urgent' "
-                + "AND status IN ('Confirmed','Checked-in')";
+                + "AND status IN ('Pending','Confirmed','Checked-in')";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, apptId);
             st.setInt(2, vetId);
@@ -771,11 +849,20 @@ public class AppointmentDAO extends DBContext {
         }
     }
 
-    //Mark appointment as Completed for the assigned vet only when In-Progress.
-    //Danh dau cuoc hen da Completed
+    //Mark appointment as Completed for the assigned vet only when In-Progress
+    //and there is no pending lab request (Requested/In Progress).
     public boolean completeForVet(int apptId, int vetId) {
-        String sql = "UPDATE Appointment SET status = 'Completed' "
-                + "WHERE appt_id = ? AND vet_id = ? AND status = 'In-Progress'";
+        String sql = "UPDATE a SET a.status = 'Completed' "
+                + "FROM Appointment a "
+                + "WHERE a.appt_id = ? AND a.vet_id = ? AND a.status = 'In-Progress' "
+                + "AND NOT EXISTS ( "
+                + "    SELECT 1 "
+                + "    FROM MedicalRecord mr "
+                + "    JOIN LabTest lt ON lt.record_id = mr.record_id "
+                + "    WHERE mr.appt_id = a.appt_id "
+                + "    AND UPPER(LTRIM(RTRIM(lt.status))) IN ('REQUESTED', 'IN PROGRESS', 'IN-PROGRESS') "
+                + "    AND NULLIF(LTRIM(RTRIM(REPLACE(REPLACE(REPLACE(COALESCE(lt.result_data, ''), CHAR(13), ''), CHAR(10), ''), CHAR(9), ''))), '') IS NULL "
+                + ")";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, apptId);
             st.setInt(2, vetId);

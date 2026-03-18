@@ -119,6 +119,8 @@ public class InvoiceCreateController extends HttpServlet {
 
         // Simple invoice number & date preview
         java.time.LocalDate today = java.time.LocalDate.now();
+        java.time.LocalTime now = java.time.LocalTime.now();
+        java.time.format.DateTimeFormatter timeFormatter = java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss");
         String invoiceNumber = String.format("INV-%d-%03d", today.getYear(), apptId);
 
         request.setAttribute("appt", appt);
@@ -129,6 +131,9 @@ public class InvoiceCreateController extends HttpServlet {
         request.setAttribute("grandTotal", grandTotal);
         request.setAttribute("invoiceNumber", invoiceNumber);
         request.setAttribute("invoiceDate", today.toString());
+        request.setAttribute("invoiceTime", now.format(timeFormatter));
+        request.setAttribute("invoiceDateTime", today + " " + now.format(timeFormatter));
+        request.setAttribute("staffName", account.getFullName() != null ? account.getFullName() : account.getUsername());
         request.getRequestDispatcher("/views/receptionist/invoiceCreate.jsp").forward(request, response);
     }
 

@@ -37,14 +37,13 @@ public class EmergencyAgreeController extends HttpServlet {
             AppointmentDAO apptDAO = new AppointmentDAO();
             boolean ok = apptDAO.agreeEmergencyAppointmentForVet(apptId, account.getUserId());
             if (ok) {
-                // Chuyển thẳng sang màn Examine (tạo EMR) cho cuộc hẹn này
-                response.sendRedirect(request.getContextPath() + "/veterinarian/emr/create?apptId=" + apptId);
-                return;
+                session.setAttribute("toastMessage", "success|Emergency case accepted.");
+            } else {
+                session.setAttribute("toastMessage", "error|Cannot accept. Appointment may not be valid or not assigned to you.");
             }
         }
 
-        // Nếu có lỗi, quay lại EMR Queue
-        response.sendRedirect(request.getContextPath() + "/veterinarian/emr/queue");
+        response.sendRedirect(request.getContextPath() + "/veterinarian/emergency/queue");
     }
 }
 

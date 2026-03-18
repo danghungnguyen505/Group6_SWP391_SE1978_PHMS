@@ -101,6 +101,47 @@ public class PrescriptionDAO extends DBContext {
         }
         return list;
     }
+
+    /**
+     * List prescription history for one pet (exclude current record).
+     */
+    public List<Prescription> listHistoryForPet(int petId, int excludeRecordId) {
+        List<Prescription> list = new ArrayList<>();
+        String sql = "SELECT p.pres_id, p.record_id, p.medicine_id, p.quantity, p.dosage, "
+                + "m.name AS medicine_name, m.unit AS medicine_unit, m.price AS medicine_price, "
+                + "mr.created_at AS record_created_at, "
+                + "u_vet.full_name AS vet_name "
+                + "FROM Prescription p "
+                + "JOIN Medicine m ON p.medicine_id = m.medicine_id "
+                + "JOIN MedicalRecord mr ON p.record_id = mr.record_id "
+                + "JOIN Appointment a ON mr.appt_id = a.appt_id "
+                + "JOIN Users u_vet ON a.vet_id = u_vet.user_id "
+                + "WHERE a.pet_id = ? AND p.record_id <> ? "
+                + "ORDER BY mr.created_at DESC, p.pres_id DESC";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, petId);
+            st.setInt(2, excludeRecordId);
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    Prescription p = new Prescription();
+                    p.setPresId(rs.getInt("pres_id"));
+                    p.setRecordId(rs.getInt("record_id"));
+                    p.setMedicineId(rs.getInt("medicine_id"));
+                    p.setQuantity(rs.getInt("quantity"));
+                    p.setDosage(rs.getString("dosage"));
+                    p.setMedicineName(rs.getString("medicine_name"));
+                    p.setMedicineUnit(rs.getString("medicine_unit"));
+                    p.setMedicinePrice(rs.getDouble("medicine_price"));
+                    p.setRecordCreatedAt(rs.getTimestamp("record_created_at"));
+                    p.setVetName(rs.getString("vet_name"));
+                    list.add(p);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error listHistoryForPet: " + e.getMessage());
+        }
+        return list;
+    }
     
     /**
      * Get all prescriptions for a medical record (for owner).

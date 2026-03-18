@@ -33,7 +33,43 @@ public class LabRequestListController extends HttpServlet {
         }
 
         LabTestDAO dao = new LabTestDAO();
-        List<LabTest> all = dao.listForVet(account.getUserId());
+
+        String filter = request.getParameter("filter");
+        if (filter == null) filter = "all";
+
+        String search = request.getParameter("search");
+        if (search != null && search.trim().isEmpty()) {
+            search = null;
+        }
+
+        String dbStatus;
+        switch (filter) {
+            case "requested":
+                dbStatus = "Requested";
+                break;
+            case "inprogress":
+                dbStatus = "In Progress";
+                break;
+            case "completed":
+                dbStatus = "Completed";
+                break;
+            case "cancelled":
+                dbStatus = "Cancelled";
+                break;
+            default:
+                filter = "all";
+                dbStatus = null;
+                break;
+        }
+
+        List<LabTest> all;
+        if (search != null && !search.trim().isEmpty()) {
+            all = dao.searchForVet(account.getUserId(), search.trim(), dbStatus);
+        } else if ("all".equals(filter)) {
+            all = dao.listForVet(account.getUserId());
+        } else {
+            all = dao.listByStatusForVet(account.getUserId(), dbStatus);
+        }
 
         int page = 1;
         String pageStr = request.getParameter("page");
@@ -51,6 +87,8 @@ public class LabRequestListController extends HttpServlet {
         request.setAttribute("tests", list);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
+        request.setAttribute("filter", filter);
+        request.setAttribute("search", search != null ? search : "");
         request.getRequestDispatcher("/views/veterinarian/labRequestList.jsp").forward(request, response);
     }
 }

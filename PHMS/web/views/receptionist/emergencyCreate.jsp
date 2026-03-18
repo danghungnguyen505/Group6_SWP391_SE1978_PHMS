@@ -5,488 +5,489 @@
 <!DOCTYPE html>
 
 <html lang="vi">
-<head>
-<meta charset="UTF-8">
+    <head>
+        <meta charset="UTF-8">
 
-<title>
-${L == 'en' ? 'Create Emergency' : 'Tạo cấp cứu'} - Lễ tân
-</title>
+        <title>
+            ${L == 'en' ? 'Create Emergency' : 'Tạo cấp cứu'} - Lễ tân
+        </title>
 
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-<link rel="stylesheet"
-href="${pageContext.request.contextPath}/assets/css/pages/receptionistDashboard.css">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+        <link rel="stylesheet"
+              href="${pageContext.request.contextPath}/assets/css/pages/receptionistDashboard.css">
 
-<style>
+        <style>
 
-.form-grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:16px;
-margin-bottom:16px;
-}
+            .form-grid{
+                display:grid;
+                grid-template-columns:1fr 1fr;
+                gap:16px;
+                margin-bottom:16px;
+            }
 
-.form-group{
-display:flex;
-flex-direction:column;
-gap:6px;
-}
+            .form-group{
+                display:flex;
+                flex-direction:column;
+                gap:6px;
+            }
 
-.form-group label{
-font-weight:600;
-font-size:14px;
-}
+            .form-group label{
+                font-weight:600;
+                font-size:14px;
+            }
 
-.form-group input,
-.form-group select,
-.form-group textarea{
+            .form-group input,
+            .form-group select,
+            .form-group textarea{
 
-padding:10px;
-border:1px solid #d1d5db;
-border-radius:6px;
-font-size:14px;
+                padding:10px;
+                border:1px solid #d1d5db;
+                border-radius:6px;
+                font-size:14px;
 
-}
+            }
 
-.form-group small{
-font-size:12px;
-color:#6b7280;
-}
+            .form-group small{
+                font-size:12px;
+                color:#6b7280;
+            }
 
-.btn{
-padding:10px 16px;
-border-radius:6px;
-border:none;
-cursor:pointer;
-font-weight:600;
-}
+            .btn{
+                padding:10px 16px;
+                border-radius:6px;
+                border:none;
+                cursor:pointer;
+                font-weight:600;
+            }
 
-.btn-search{
-background:#2563eb;
-color:white;
-}
+            .btn-search{
+                background:#2563eb;
+                color:white;
+            }
 
-.btn-create{
-background:#dc2626;
-color:white;
-}
+            .btn-create{
+                background:#dc2626;
+                color:white;
+            }
 
-.btn-cancel{
-background:#e5e7eb;
-color:#111827;
-text-decoration:none;
-}
+            .btn-cancel{
+                background:#e5e7eb;
+                color:#111827;
+                text-decoration:none;
+            }
 
-.form-actions{
-display:flex;
-gap:12px;
-margin-top:20px;
-}
+            .form-actions{
+                display:flex;
+                gap:12px;
+                margin-top:20px;
+            }
 
-.owner-info{
-background:#f8fafc;
-padding:12px;
-border-radius:8px;
-margin-bottom:16px;
-}
+            .owner-info{
+                background:#f8fafc;
+                padding:12px;
+                border-radius:8px;
+                margin-bottom:16px;
+            }
 
-.warning-box{
-background:#fff7ed;
-border:1px solid #fed7aa;
-padding:12px;
-border-radius:8px;
-color:#9a3412;
-margin-bottom:16px;
-}
+            .warning-box{
+                background:#fff7ed;
+                border:1px solid #fed7aa;
+                padding:12px;
+                border-radius:8px;
+                color:#9a3412;
+                margin-bottom:16px;
+            }
 
-.alert-danger{
-background:#fee2e2;
-color:#991b1b;
-padding:12px;
-border-radius:8px;
-margin-bottom:16px;
-}
+            .alert-danger{
+                background:#fee2e2;
+                color:#991b1b;
+                padding:12px;
+                border-radius:8px;
+                margin-bottom:16px;
+            }
 
-</style>
+        </style>
 
-</head>
+    </head>
 
-<body>
+    <body>
 
-    <nav class="sidebar">
-        <div class="brand">
-            <i class="fa-solid fa-plus-square"></i> VetCare Pro
-        </div>
-
-        <ul class="menu">
-            <li>
-                <a href="${pageContext.request.contextPath}/receptionist/dashboard">
-                    <i class="fa-solid fa-table-columns"></i> ${L == 'en' ? 'Dashboard' : 'Bảng điều khiển'}
-                </a>
-            </li>
-            <li>
-                <a href="${pageContext.request.contextPath}/receptionist/emergency/queue" class="active text-danger">
-                    <i class="fa-solid fa-truck-medical"></i> ${L == 'en' ? 'Emergency Triage' : 'Cấp cứu'}
-                </a>
-            </li>
-            <li>
-                <a href="${pageContext.request.contextPath}/receptionist/appointment">
-                    <i class="fa-regular fa-calendar-check"></i> ${L == 'en' ? 'Appointments' : 'Cuộc hẹn'}
-                </a>
-            </li>
-            <li>
-                <a href="${pageContext.request.contextPath}/receptionist/invoice/create">
-                    <i class="fa-regular fa-credit-card"></i> ${L == 'en' ? 'Billing' : 'Thanh toán'}
-                </a>
-            </li>
-        </ul>
-
-        <!-- Language Switcher -->
-        <div style="padding: 12px; margin-top: auto;">
-            <div style="display:flex; background:#f1f5f9; border-radius:8px; padding:3px; gap:2px;">
-                <a href="${pageContext.request.contextPath}/language?lang=vi"
-                   style="padding:5px 10px; border-radius:6px; font-size:11px; font-weight:700; text-decoration:none; flex:1; text-align:center;
-                          ${L == 'vi' ? 'background:#10b981; color:#fff;' : 'color:#64748b;'}">VI</a>
-                <a href="${pageContext.request.contextPath}/language?lang=en"
-                   style="padding:5px 10px; border-radius:6px; font-size:11px; font-weight:700; text-decoration:none; flex:1; text-align:center;
-                          ${L == 'en' ? 'background:#10b981; color:#fff;' : 'color:#64748b;'}">EN</a>
+        <nav class="sidebar">
+            <div class="brand">
+                <i class="fa-solid fa-plus-square"></i> VetCare Pro
             </div>
-        </div>
 
-        <div class="help-box">
-            <div class="help-text">${L == 'en' ? 'Need help?' : 'Cần hỗ trợ?'}</div>
-            <a href="#" class="btn-contact">${L == 'en' ? 'Contact Support' : 'Liên hệ hỗ trợ'}</a>
-        </div>
-    </nav>
+            <ul class="menu">
+                <li>
+                    <a href="${pageContext.request.contextPath}/receptionist/dashboard">
+                        <i class="fa-solid fa-table-columns"></i> ${L == 'en' ? 'Dashboard' : 'Bảng điều khiển'}
+                    </a>
+                </li>
+                <li>
+                    <a href="${pageContext.request.contextPath}/receptionist/emergency/queue" class="active text-danger">
+                        <i class="fa-solid fa-truck-medical"></i> ${L == 'en' ? 'Emergency Triage' : 'Cấp cứu'}
+                    </a>
+                </li>
+                <li>
+                    <a href="${pageContext.request.contextPath}/receptionist/appointment">
+                        <i class="fa-regular fa-calendar-check"></i> ${L == 'en' ? 'Appointments' : 'Cuộc hẹn'}
+                    </a>
+                </li>
+                <li>
+                    <a href="${pageContext.request.contextPath}/receptionist/invoice/create">
+                        <i class="fa-regular fa-credit-card"></i> ${L == 'en' ? 'Billing' : 'Thanh toán'}
+                    </a>
+                </li>
+            </ul>
 
-<main class="main-content">
+            <!-- Language Switcher -->
+            <div style="padding: 12px; margin-top: auto;">
+                <div style="display:flex; background:#f1f5f9; border-radius:8px; padding:3px; gap:2px;">
+                    <a href="${pageContext.request.contextPath}/language?lang=vi"
+                       style="padding:5px 10px; border-radius:6px; font-size:11px; font-weight:700; text-decoration:none; flex:1; text-align:center;
+                       ${L == 'vi' ? 'background:#10b981; color:#fff;' : 'color:#64748b;'}">VI</a>
+                    <a href="${pageContext.request.contextPath}/language?lang=en"
+                       style="padding:5px 10px; border-radius:6px; font-size:11px; font-weight:700; text-decoration:none; flex:1; text-align:center;
+                       ${L == 'en' ? 'background:#10b981; color:#fff;' : 'color:#64748b;'}">EN</a>
+                </div>
+            </div>
 
-<div class="top-bar">
+            <div class="help-box">
+                <div class="help-text">${L == 'en' ? 'Need help?' : 'Cần hỗ trợ?'}</div>
+                <a href="#" class="btn-contact">${L == 'en' ? 'Contact Support' : 'Liên hệ hỗ trợ'}</a>
+            </div>
+        </nav>
 
-<div class="page-header">
+        <main class="main-content">
 
-<h2>Tạo cuộc hẹn cấp cứu</h2>
+            <div class="top-bar">
 
-<p>
-Khi chủ thú cưng mang pet đến phòng khám trong tình trạng nguy kịch
-</p>
+                <div class="page-header">
 
-</div>
+                    <h2>Tạo cuộc hẹn cấp cứu</h2>
 
-<a href="${pageContext.request.contextPath}/logout"
-class="btn-signout">
-Sign Out </a>
+                    <p>
+                        Khi chủ thú cưng mang pet đến phòng khám trong tình trạng nguy kịch
+                    </p>
 
-</div>
+                </div>
 
-<div class="card">
+                <a href="${pageContext.request.contextPath}/logout"
+                   class="btn-signout">
+                    Sign Out </a>
 
-<c:if test="${not empty error}">
+            </div>
 
-<div class="alert-danger">
-<i class="fa-solid fa-exclamation-circle"></i>
-${error}
-</div>
-</c:if>
+            <div class="card">
 
-<form method="post"
-action="${pageContext.request.contextPath}/receptionist/emergency/create">
+                <c:if test="${not empty error}">
 
-<!-- EMAIL + OWNER -->
+                    <div class="alert-danger">
+                        <i class="fa-solid fa-exclamation-circle"></i>
+                        ${error}
+                    </div>
+                </c:if>
 
-<div class="form-grid">
+                <form method="post"
+                      action="${pageContext.request.contextPath}/receptionist/emergency/create">
 
-<div class="form-group">
+                    <!-- EMAIL + OWNER -->
 
-<label>Email chủ pet *</label>
+                    <div class="form-grid">
 
-<div style="display:flex;gap:8px;">
+                        <div class="form-group">
 
-<input type="email"
-name="email"
-id="email"
-value="${email}"
-required
-placeholder="owner@gmail.com"
-style="flex:1;">
+                            <label>Email chủ pet *</label>
 
-<button type="button"
-class="btn btn-search"
-onclick="lookupOwnerByEmail()">
+                            <div style="display:flex;gap:8px;">
 
-<i class="fa-solid fa-magnifying-glass"></i>
-Tra cứu
+                                <input type="email"
+                                       name="email"
+                                       id="email"
+                                       value="${email}"
+                                       required
+                                       placeholder="owner@gmail.com"
+                                       style="flex:1;">
 
-</button>
+                                <button type="button"
+                                        class="btn btn-search"
+                                        onclick="lookupOwnerByEmail()">
 
-</div>
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                    Tra cứu
 
-<small>Nhập email rồi bấm Tra cứu để tải chủ & thú cưng</small>
+                                </button>
 
-</div>
+                            </div>
 
-<div class="form-group">
+                            <small>Nhập email rồi bấm Tra cứu để tải chủ & thú cưng</small>
 
-<label>Chủ pet *</label>
+                        </div>
 
-<input type="text"
-name="ownerFullName"
-id="ownerFullName"
-value="${not empty owner ? owner.fullName : ''}"
-${not empty owner ? 'readonly' : ''}
-${ownerNotFound == true ? 'required' : ''}
-maxlength="100"
-placeholder="Tên chủ thú cưng">
+                        <div class="form-group">
 
-<small>
+                            <label>Chủ pet *</label>
 
-<c:choose>
+                            <input type="text"
+                                   name="ownerFullName"
+                                   id="ownerFullName"
+                                   value="${not empty owner ? owner.fullName : ''}"
+                                   ${not empty owner ? 'readonly' : ''}
+                                   ${ownerNotFound == true ? 'required' : ''}
+                                   maxlength="100"
+                                   placeholder="Tên chủ thú cưng">
 
-<c:when test="${not empty owner}">
-Đã tìm thấy tài khoản theo email
-</c:when>
+                            <small>
 
-<c:otherwise>
-Chưa có tài khoản thì nhập tên
-</c:otherwise>
+                                <c:choose>
 
-</c:choose>
+                                    <c:when test="${not empty owner}">
+                                        Đã tìm thấy tài khoản theo email
+                                    </c:when>
 
-</small>
+                                    <c:otherwise>
+                                        Chưa có tài khoản thì nhập tên
+                                    </c:otherwise>
 
-</div>
+                                </c:choose>
 
-</div>
+                            </small>
 
-<!-- OWNER INFO -->
+                        </div>
 
-<c:if test="${not empty owner}">
+                    </div>
 
-<div class="owner-info">
+                    <!-- OWNER INFO -->
 
-<b>Chủ pet:</b> ${owner.fullName}
-| <b>Email:</b> ${owner.email}
+                    <c:if test="${not empty owner}">
 
-<input type="hidden"
-name="ownerId"
-value="${owner.userId}">
+                        <div class="owner-info">
 
-</div>
+                            <b>Chủ pet:</b> ${owner.fullName}
+                            | <b>Email:</b> ${owner.email}
 
-<div class="form-group">
+                            <input type="hidden"
+                                   name="ownerId"
+                                   value="${owner.userId}">
 
-<label>Chọn thú cưng *</label>
+                        </div>
 
-<select name="petId" required>
+                        <div class="form-group">
 
-<option value="">-- Chọn thú cưng --</option>
+                            <label>Chọn thú cưng *</label>
 
-<c:forEach var="pet" items="${pets}">
+                            <select name="petId" required>
 
-<option value="${pet.id}">
-${pet.name} (${pet.species})
-</option>
-</c:forEach>
+                                <option value="">-- Chọn thú cưng --</option>
 
-</select>
+                                <c:forEach var="pet" items="${pets}">
 
-</div>
+                                    <option value="${pet.id}">
+                                        ${pet.name} (${pet.species})
+                                    </option>
+                                </c:forEach>
 
-</c:if>
+                            </select>
 
-<!-- OWNER NOT FOUND -->
+                        </div>
 
-<c:if test="${ownerNotFound == true}">
+                    </c:if>
 
-<div class="warning-box">
+                    <!-- OWNER NOT FOUND -->
 
-<i class="fa-solid fa-circle-info"></i>
+                    <c:if test="${ownerNotFound == true}">
 
-Chưa có tài khoản với email này.
-Vui lòng nhập thông tin để hệ thống tự tạo.
+                        <div class="warning-box">
 
-</div>
+                            <i class="fa-solid fa-circle-info"></i>
 
-<div class="form-grid">
+                            Chưa có tài khoản với email này.
+                            Vui lòng nhập thông tin để hệ thống tự tạo.
 
-<div class="form-group">
-<label>Tên thú cưng *</label>
-<input type="text" name="petNameNew" required>
-</div>
+                        </div>
 
-<div class="form-group">
-<label>Species *</label>
-<input type="text" name="speciesNew" required>
-</div>
+                        <div class="form-grid">
 
-<div class="form-group">
-<label>Breed *</label>
-<input type="text" name="breedNew" required>
-</div>
+                            <div class="form-group">
+                                <label>Tên thú cưng *</label>
+                                <input type="text" name="petNameNew" required>
+                            </div>
 
-<div class="form-group">
-<label>Giới tính *</label>
-<select name="genderNew" required>
-<option value="">-- Chọn --</option>
-<option value="Male">Male</option>
-<option value="Female">Female</option>
-</select>
-</div>
+                            <div class="form-group">
+                                <label>Species *</label>
+                                <input type="text" name="speciesNew" required>
+                            </div>
 
-<div class="form-group">
-<label>Ngày sinh *</label>
-<input type="date" name="birthDateNew" required>
-</div>
+                            <div class="form-group">
+                                <label>Breed *</label>
+                                <input type="text" name="breedNew" required>
+                            </div>
 
-<div class="form-group">
-<label>Cân nặng (kg) *</label>
-<input type="number" name="weightNew" step="0.1" min="0.1" required>
-</div>
+                            <div class="form-group">
+                                <label>Giới tính *</label>
+                                <select name="genderNew" required>
+                                    <option value="">-- Chọn --</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
 
-</div>
+                            <div class="form-group">
+                                <label>Ngày sinh *</label>
+                                <input type="date" name="birthDateNew" required>
+                            </div>
 
-</c:if>
+                            <div class="form-group">
+                                <label>Cân nặng (kg) *</label>
+                                <input type="number" name="weightNew" step="0.1" min="0.1" required>
+                            </div>
 
-<!-- VET -->
+                        </div>
 
-<div class="form-group">
+                    </c:if>
 
-<label>Chọn bác sĩ cấp cứu *</label>
+                    <!-- VET -->
 
-<select name="vetId" required>
+                    <div class="form-group">
 
-<option value="">-- Chọn bác sĩ --</option>
+                        <label>Chọn bác sĩ cấp cứu *</label>
 
-<c:forEach var="vet" items="${veterinarians}">
+                        <select name="vetId" required>
 
-<option value="${vet.userId}">
-${vet.fullName}
-- ${vetStatusMap[vet.userId]}
+                            <option value="">-- Chọn bác sĩ --</option>
 
-<c:if test="${not empty vetShiftMap[vet.userId]}">
-(${vetShiftMap[vet.userId]})
-</c:if>
+                            <c:forEach var="vet" items="${veterinarians}">
 
-</option>
+                                <option value="${vet.userId}">
+                                    ${vet.fullName}
+                                    - ${vetStatusMap[vet.userId]}
 
-</c:forEach>
+                                    <c:if test="${not empty vetShiftMap[vet.userId]}">
+                                        (${vetShiftMap[vet.userId]})
+                                    </c:if>
 
-</select>
+                                </option>
 
-</div>
+                            </c:forEach>
 
-<!-- PRIORITY -->
+                        </select>
 
-<div class="form-group">
+                    </div>
 
-<label>Mức độ ưu tiên *</label>
+                    <!-- PRIORITY -->
 
-<select name="conditionLevel"
-id="conditionLevel"
-required>
+                    <div class="form-group">
 
-<option value="">-- Chọn mức độ --</option>
+                        <label>Mức độ ưu tiên *</label>
 
-<option value="Critical"
-style="background:#fee2e2;color:#991b1b;">
-Critical - Nguy kịch
-</option>
+                        <select name="conditionLevel"
+                                id="conditionLevel"
+                                required>
 
-<option value="High"
-style="background:#fed7aa;color:#9a3412;">
-High - Cao
-</option>
+                            <option value="">-- Chọn mức độ --</option>
 
-<option value="Medium"
-style="background:#fef3c7;color:#92400e;">
-Medium - Trung bình
-</option>
+                            <option value="Critical"
+                                    style="background:#fee2e2;color:#991b1b;">
+                                Critical - Nguy kịch
+                            </option>
 
-<option value="Low"
-style="background:#d1fae5;color:#065f46;">
-Low - Thấp
-</option>
+                            <option value="High"
+                                    style="background:#fed7aa;color:#9a3412;">
+                                High - Cao
+                            </option>
 
-</select>
+                            <option value="Medium"
+                                    style="background:#fef3c7;color:#92400e;">
+                                Medium - Trung bình
+                            </option>
 
-</div>
+                            <option value="Low"
+                                    style="background:#d1fae5;color:#065f46;">
+                                Low - Thấp
+                            </option>
 
-<!-- SYMPTOMS -->
+                        </select>
 
-<div class="form-group">
+                    </div>
 
-<label>Triệu chứng ban đầu *</label>
+                    <!-- SYMPTOMS -->
 
-<textarea name="initialSymptoms"
-rows="4"
-maxlength="2000"
-required></textarea>
+                    <div class="form-group">
 
-</div>
+                        <label>Triệu chứng ban đầu *</label>
 
-<div class="form-group">
+                        <textarea name="initialSymptoms"
+                                  rows="4"
+                                  maxlength="2000"
+                                  required></textarea>
 
-<label>Ghi chú</label>
+                    </div>
 
-<textarea name="notes"
-rows="3"
-maxlength="1000"></textarea>
+                    <div class="form-group">
 
-</div>
+                        <label>Ghi chú</label>
 
-<!-- ACTION -->
+                        <textarea name="notes"
+                                  rows="3"
+                                  maxlength="1000"></textarea>
 
-<div class="form-actions">
+                    </div>
 
-<a class="btn btn-cancel"
-href="${pageContext.request.contextPath}/receptionist/emergency/queue">
-Hủy </a>
+                    <!-- ACTION -->
 
-<button type="submit"
-class="btn btn-create">
+                    <div class="form-actions">
 
-<i class="fa-solid fa-plus-circle"></i>
-Tạo cuộc hẹn cấp cứu
+                        <a class="btn btn-cancel"
+                           href="${pageContext.request.contextPath}/receptionist/emergency/queue">
+                            Hủy </a>
 
-</button>
+                        <button type="submit"
+                                class="btn btn-create">
 
-</div>
+                            <i class="fa-solid fa-plus-circle"></i>
+                            Tạo cuộc hẹn cấp cứu
 
-</form>
+                        </button>
 
-</div>
+                    </div>
 
-</main>
+                </form>
 
-<script>
+            </div>
 
-function lookupOwnerByEmail(){
+        </main>
 
-const email=document.getElementById("email").value.trim();
+        <script>
 
-if(!email) return;
+            function lookupOwnerByEmail() {
 
-window.location.href=
-"${pageContext.request.contextPath}/receptionist/emergency/create?email="
-+encodeURIComponent(email);
+                const email = document.getElementById("email").value.trim();
 
-}
+                if (!email)
+                    return;
 
-const levelSelect=document.getElementById("conditionLevel");
+                window.location.href =
+                        "${pageContext.request.contextPath}/receptionist/emergency/create?email="
+                        + encodeURIComponent(email);
 
-levelSelect?.addEventListener("change",function(){
+            }
 
-const colors={
-Critical:"#fee2e2",
-High:"#fed7aa",
-Medium:"#fef3c7",
-Low:"#d1fae5"
-};
+            const levelSelect = document.getElementById("conditionLevel");
 
-this.style.background=colors[this.value]||"white";
+            levelSelect?.addEventListener("change", function () {
 
-});
+                const colors = {
+                    Critical: "#fee2e2",
+                    High: "#fed7aa",
+                    Medium: "#fef3c7",
+                    Low: "#d1fae5"
+                };
 
-</script>
+                this.style.background = colors[this.value] || "white";
 
-</body>
+            });
+
+        </script>
+
+    </body>
 </html>

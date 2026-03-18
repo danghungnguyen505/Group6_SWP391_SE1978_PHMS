@@ -105,9 +105,26 @@ public class MyPetController extends HttpServlet {
                 selectedPet = allPets.get(0);
             }
 
+            // Fetch Medical Records for selectedPet
+            if (selectedPet != null) {
+                dal.MedicalRecordDAO mrDAO = new dal.MedicalRecordDAO();
+                dal.PrescriptionDAO presDAO = new dal.PrescriptionDAO();
+                java.util.List<model.MedicalRecord> medicalRecords = mrDAO.listForOwner(account.getUserId(), selectedPet.getId());
+                
+                java.util.Map<Integer, java.util.List<model.Prescription>> recordPrescriptions = new java.util.HashMap<>();
+                for (model.MedicalRecord mr : medicalRecords) {
+                    java.util.List<model.Prescription> pres = presDAO.getByRecordIdForOwner(mr.getRecordId(), account.getUserId());
+                    recordPrescriptions.put(mr.getRecordId(), pres);
+                }
+                
+                request.setAttribute("medicalRecords", medicalRecords);
+                request.setAttribute("recordPrescriptions", recordPrescriptions);
+            }
+
             // 6. Set attributes để JSP dùng
             request.setAttribute("pets", petsOnPage);       // List hiển thị bên trái (theo trang)
             request.setAttribute("selectedPet", selectedPet); // Object hiển thị chi tiết bên phải (View/Edit)
+            request.setAttribute("allPets", petDAO.getPetsByOwnerId(account.getUserId())); // List đầy đủ cho dropdown chuyển đổi thú cưng
 
             request.setAttribute("search", search);         // Giữ lại từ khóa search trong ô input
             request.setAttribute("currentPage", currentPage);

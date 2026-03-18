@@ -1,6 +1,5 @@
 package controller.veterinarian;
 
-import dal.AppointmentDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -11,7 +10,8 @@ import java.io.IOException;
 import model.User;
 
 /**
- * Trang edit cuộc hẹn trong EMR Queue (hiện thông tin + sửa notes).
+ * Legacy queue edit route.
+ * Current flow: all veterinarian actions must be done in EMR detail page.
  */
 @WebServlet(name = "EmrQueueEditNotesController", urlPatterns = {"/veterinarian/emr/queue/edit"})
 public class EmrQueueEditNotesController extends HttpServlet {
@@ -35,15 +35,8 @@ public class EmrQueueEditNotesController extends HttpServlet {
             return;
         }
 
-        AppointmentDAO dao = new AppointmentDAO();
-        model.Appointment appt = dao.getAppointmentById(apptId);
-        if (appt == null || appt.getVetId() != account.getUserId()) {
-            response.sendRedirect(request.getContextPath() + "/veterinarian/emr/queue");
-            return;
-        }
-
-        request.setAttribute("appt", appt);
-        request.getRequestDispatcher("/views/veterinarian/emrQueueEdit.jsp").forward(request, response);
+        session.setAttribute("toastMessage", "success|Please continue in EMR Detail page.");
+        response.sendRedirect(request.getContextPath() + "/veterinarian/emr/submit?apptId=" + apptId);
     }
 
     @Override
@@ -57,8 +50,6 @@ public class EmrQueueEditNotesController extends HttpServlet {
         }
 
         String apptIdRaw = request.getParameter("apptId");
-        String notes = request.getParameter("notes");
-
         int apptId;
         try {
             apptId = Integer.parseInt(apptIdRaw);
@@ -67,10 +58,7 @@ public class EmrQueueEditNotesController extends HttpServlet {
             return;
         }
 
-        AppointmentDAO dao = new AppointmentDAO();
-        dao.updateAppointmentNotes(apptId, notes != null ? notes.trim() : null);
-
-        response.sendRedirect(request.getContextPath() + "/veterinarian/emr/queue");
+        session.setAttribute("toastMessage", "error|Editing from queue is disabled. Please use EMR Detail page.");
+        response.sendRedirect(request.getContextPath() + "/veterinarian/emr/submit?apptId=" + apptId);
     }
 }
-

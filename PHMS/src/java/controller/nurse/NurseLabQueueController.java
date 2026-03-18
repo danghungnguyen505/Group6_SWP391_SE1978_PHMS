@@ -33,7 +33,40 @@ public class NurseLabQueueController extends HttpServlet {
         }
 
         LabTestDAO dao = new LabTestDAO();
-        List<LabTest> all = dao.listQueueForNurse();
+
+        String filter = request.getParameter("filter");
+        if (filter == null) filter = "requested";
+
+        String search = request.getParameter("search");
+        if (search != null && search.trim().isEmpty()) {
+            search = null;
+        }
+
+        String dbStatus;
+        switch (filter) {
+            case "all":
+                dbStatus = null;
+                break;
+            case "inprogress":
+                dbStatus = "In Progress";
+                break;
+            case "completed":
+                dbStatus = "Completed";
+                break;
+            default:
+                filter = "requested";
+                dbStatus = "Requested";
+                break;
+        }
+
+        List<LabTest> all;
+        if (search != null && !search.trim().isEmpty()) {
+            all = dao.searchForNurse(search.trim(), dbStatus);
+        } else if ("all".equals(filter)) {
+            all = dao.listAllForNurse();
+        } else {
+            all = dao.listByStatusForNurse(dbStatus);
+        }
 
         int page = 1;
         String pageStr = request.getParameter("page");
@@ -51,6 +84,8 @@ public class NurseLabQueueController extends HttpServlet {
         request.setAttribute("tests", list);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
+        request.setAttribute("filter", filter != null ? filter : "requested");
+        request.setAttribute("search", search != null ? search : "");
         request.getRequestDispatcher("/views/nurse/labQueue.jsp").forward(request, response);
     }
 }

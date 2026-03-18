@@ -202,16 +202,26 @@
                                                 </c:choose>
                                             </td>
                                             <td style="text-align:center;">
-                                                <div style="display:flex; gap:6px; justify-content:center;">
-                                                    <a class="btn-action btn-emr"
-                                                       href="${pageContext.request.contextPath}/veterinarian/emr/queue/edit?apptId=${a.apptId}">
-                                                        <i class="fa-solid fa-pen-to-square"></i> EMR
-                                                    </a>
-                                                    <a class="btn-action btn-treat"
-                                                       href="${pageContext.request.contextPath}/veterinarian/emr/submit?apptId=${a.apptId}">
-                                                        <i class="fa-solid fa-paper-plane"></i> Submit
-                                                    </a>
-                                                </div>
+                                                <c:choose>
+                                                    <c:when test="${a.status == 'Checked-in'}">
+                                                        <a class="btn-action btn-emr"
+                                                           href="${pageContext.request.contextPath}/veterinarian/emr/submit?apptId=${a.apptId}">
+                                                            <i class="fa-solid fa-file-circle-plus"></i> Create EMR
+                                                        </a>
+                                                    </c:when>
+                                                    <c:when test="${a.status == 'In-Progress'}">
+                                                        <a class="btn-action btn-treat"
+                                                           href="${pageContext.request.contextPath}/veterinarian/emr/submit?apptId=${a.apptId}">
+                                                            <i class="fa-solid fa-stethoscope"></i> Open EMR Detail
+                                                        </a>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <a class="btn-action btn-emr"
+                                                           href="${pageContext.request.contextPath}/veterinarian/emr/queue">
+                                                            <i class="fa-solid fa-eye"></i> View Queue
+                                                        </a>
+                                                    </c:otherwise>
+                                                </c:choose>
                                             </td>
                                         </tr>
                                     </c:forEach>
@@ -297,7 +307,7 @@
                                 </div>
                                 <i class="fa-solid fa-chevron-right" style="margin-left:auto; color:#cbd5e0;"></i>
                             </a>
-                            <a href="${pageContext.request.contextPath}/veterinarian/medical-records" class="quick-btn">
+                            <a href="${pageContext.request.contextPath}/veterinarian/emr/records" class="quick-btn">
                                 <div class="quick-btn-icon" style="background:#dbeafe; color:#2563eb;">
                                     <i class="fa-solid fa-file-medical"></i>
                                 </div>
@@ -307,7 +317,7 @@
                                 </div>
                                 <i class="fa-solid fa-chevron-right" style="margin-left:auto; color:#cbd5e0;"></i>
                             </a>
-                            <a href="${pageContext.request.contextPath}/doctor/schedule" class="quick-btn">
+                            <a href="${pageContext.request.contextPath}/veterinarian/scheduling" class="quick-btn">
                                 <div class="quick-btn-icon" style="background:#fef3c7; color:#d97706;">
                                     <i class="fa-solid fa-calendar-alt"></i>
                                 </div>
@@ -317,7 +327,7 @@
                                 </div>
                                 <i class="fa-solid fa-chevron-right" style="margin-left:auto; color:#cbd5e0;"></i>
                             </a>
-                            <a href="${pageContext.request.contextPath}/hrm/leave/create" class="quick-btn">
+                            <a href="${pageContext.request.contextPath}/veterinarian/scheduling" class="quick-btn">
                                 <div class="quick-btn-icon" style="background:#ede9fe; color:#7c3aed;">
                                     <i class="fa-solid fa-umbrella-beach"></i>
                                 </div>

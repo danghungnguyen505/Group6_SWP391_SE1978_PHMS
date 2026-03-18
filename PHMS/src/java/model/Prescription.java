@@ -1,5 +1,7 @@
 package model;
 
+import java.sql.Timestamp;
+
 /**
  * Prescription entity mapped to table Prescription.
  */
@@ -16,6 +18,8 @@ public class Prescription {
     private double medicinePrice;
     private String petName;
     private String ownerName;
+    private Timestamp recordCreatedAt;
+    private String vetName;
     
     public Prescription() {
     }
@@ -106,5 +110,21 @@ public class Prescription {
     
     public void setOwnerName(String ownerName) {
         this.ownerName = ownerName;
+    }
+
+    public Timestamp getRecordCreatedAt() {
+        return recordCreatedAt;
+    }
+
+    public void setRecordCreatedAt(Timestamp recordCreatedAt) {
+        this.recordCreatedAt = recordCreatedAt;
+    }
+
+    public String getVetName() {
+        return vetName;
+    }
+
+    public void setVetName(String vetName) {
+        this.vetName = vetName;
     }
 }

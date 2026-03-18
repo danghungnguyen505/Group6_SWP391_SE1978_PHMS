@@ -59,10 +59,19 @@ public class InvoiceDetailController extends HttpServlet {
         List<InvoiceDetail> details = invoiceDAO.getDetailsByInvoice(invoiceId);
         List<Payment> payments = paymentDAO.getPaymentsByInvoice(invoiceId);
 
+        // Pass staff name and date/time for printing
+        String staffName = account.getFullName() != null ? account.getFullName() : account.getUsername();
+        java.time.LocalDate today = java.time.LocalDate.now();
+        java.time.LocalTime now = java.time.LocalTime.now();
+        java.time.format.DateTimeFormatter timeFormatter = java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss");
+
         request.setAttribute("invoice", inv);
         request.setAttribute("appt", appt);
         request.setAttribute("details", details);
         request.setAttribute("payments", payments);
+        request.setAttribute("staffName", staffName);
+        request.setAttribute("invoiceDate", today.toString());
+        request.setAttribute("invoiceTime", now.format(timeFormatter));
         request.getRequestDispatcher("/views/receptionist/invoiceDetail.jsp").forward(request, response);
     }
 }
