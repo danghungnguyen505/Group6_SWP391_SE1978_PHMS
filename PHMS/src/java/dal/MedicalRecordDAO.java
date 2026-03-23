@@ -85,9 +85,9 @@ public class MedicalRecordDAO extends DBContext {
      */
     public MedicalRecord getByIdForVet(int recordId, int vetId) {
         String sql = "SELECT mr.record_id, mr.appt_id, mr.diagnosis, mr.treatment_plan, mr.created_at, "
-                + "a.start_time AS appt_start_time, a.vet_id, a.status AS appt_status, "
-                + "p.owner_id, p.name AS pet_name, "
-                + "u_owner.full_name AS owner_name, "
+                + "a.start_time AS appt_start_time, a.notes AS appt_notes, a.vet_id, a.status AS appt_status, "
+                + "p.pet_id, p.owner_id, p.name AS pet_name, p.weight AS pet_weight, p.history_summary AS pet_history_summary, "
+                + "u_owner.full_name AS owner_name, u_owner.phone AS owner_phone, "
                 + "u_vet.full_name AS vet_name "
                 + "FROM MedicalRecord mr "
                 + "JOIN Appointment a ON mr.appt_id = a.appt_id "
@@ -114,9 +114,9 @@ public class MedicalRecordDAO extends DBContext {
      */
     public MedicalRecord getByIdForOwner(int recordId, int ownerId) {
         String sql = "SELECT mr.record_id, mr.appt_id, mr.diagnosis, mr.treatment_plan, mr.created_at, "
-                + "a.start_time AS appt_start_time, a.vet_id, a.status AS appt_status, "
-                + "p.owner_id, p.name AS pet_name, "
-                + "u_owner.full_name AS owner_name, "
+                + "a.start_time AS appt_start_time, a.notes AS appt_notes, a.vet_id, a.status AS appt_status, "
+                + "p.pet_id, p.owner_id, p.name AS pet_name, p.weight AS pet_weight, p.history_summary AS pet_history_summary, "
+                + "u_owner.full_name AS owner_name, u_owner.phone AS owner_phone, "
                 + "u_vet.full_name AS vet_name "
                 + "FROM MedicalRecord mr "
                 + "JOIN Appointment a ON mr.appt_id = a.appt_id "
@@ -144,9 +144,9 @@ public class MedicalRecordDAO extends DBContext {
     public List<MedicalRecord> listForVet(int vetId) {
         List<MedicalRecord> list = new ArrayList<>();
         String sql = "SELECT mr.record_id, mr.appt_id, mr.diagnosis, mr.treatment_plan, mr.created_at, "
-                + "a.start_time AS appt_start_time, a.vet_id, a.status AS appt_status, "
-                + "p.owner_id, p.name AS pet_name, "
-                + "u_owner.full_name AS owner_name, "
+                + "a.start_time AS appt_start_time, a.notes AS appt_notes, a.vet_id, a.status AS appt_status, "
+                + "p.pet_id, p.owner_id, p.name AS pet_name, p.weight AS pet_weight, p.history_summary AS pet_history_summary, "
+                + "u_owner.full_name AS owner_name, u_owner.phone AS owner_phone, "
                 + "u_vet.full_name AS vet_name "
                 + "FROM MedicalRecord mr "
                 + "JOIN Appointment a ON mr.appt_id = a.appt_id "
@@ -174,9 +174,9 @@ public class MedicalRecordDAO extends DBContext {
     public List<MedicalRecord> listForOwner(int ownerId, Integer petId) {
         List<MedicalRecord> list = new ArrayList<>();
         String sql = "SELECT mr.record_id, mr.appt_id, mr.diagnosis, mr.treatment_plan, mr.created_at, "
-                + "a.start_time AS appt_start_time, a.vet_id, a.status AS appt_status, "
-                + "p.owner_id, p.name AS pet_name, "
-                + "u_owner.full_name AS owner_name, "
+                + "a.start_time AS appt_start_time, a.notes AS appt_notes, a.vet_id, a.status AS appt_status, "
+                + "p.pet_id, p.owner_id, p.name AS pet_name, p.weight AS pet_weight, p.history_summary AS pet_history_summary, "
+                + "u_owner.full_name AS owner_name, u_owner.phone AS owner_phone, "
                 + "u_vet.full_name AS vet_name "
                 + "FROM MedicalRecord mr "
                 + "JOIN Appointment a ON mr.appt_id = a.appt_id "
@@ -200,6 +200,61 @@ public class MedicalRecordDAO extends DBContext {
             System.out.println("Error listForOwner: " + e.getMessage());
         }
         return list;
+    }
+
+    /**
+     * List previous medical records of a pet for quick history view.
+     * Excludes the current record.
+     */
+    public List<MedicalRecord> listHistoryForPet(int petId, int excludeRecordId) {
+        List<MedicalRecord> list = new ArrayList<>();
+        String sql = "SELECT mr.record_id, mr.appt_id, mr.diagnosis, mr.treatment_plan, mr.created_at, "
+                + "a.start_time AS appt_start_time, a.notes AS appt_notes, a.vet_id, a.status AS appt_status, "
+                + "p.pet_id, p.owner_id, p.name AS pet_name, p.weight AS pet_weight, p.history_summary AS pet_history_summary, "
+                + "u_owner.full_name AS owner_name, u_owner.phone AS owner_phone, "
+                + "u_vet.full_name AS vet_name "
+                + "FROM MedicalRecord mr "
+                + "JOIN Appointment a ON mr.appt_id = a.appt_id "
+                + "JOIN Pet p ON a.pet_id = p.pet_id "
+                + "JOIN Users u_owner ON p.owner_id = u_owner.user_id "
+                + "JOIN Users u_vet ON a.vet_id = u_vet.user_id "
+                + "WHERE p.pet_id = ? AND mr.record_id <> ? "
+                + "ORDER BY mr.created_at DESC";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, petId);
+            st.setInt(2, excludeRecordId);
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRecord(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error listHistoryForPet: " + e.getMessage());
+        }
+        return list;
+    }
+
+    /**
+     * Get record id by appointment for current vet.
+     */
+    public Integer getRecordIdByApptForVet(int apptId, int vetId) {
+        String sql = "SELECT TOP 1 mr.record_id "
+                + "FROM MedicalRecord mr "
+                + "JOIN Appointment a ON mr.appt_id = a.appt_id "
+                + "WHERE mr.appt_id = ? AND a.vet_id = ? "
+                + "ORDER BY mr.record_id DESC";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, apptId);
+            st.setInt(2, vetId);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("record_id");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getRecordIdByApptForVet: " + e.getMessage());
+        }
+        return null;
     }
 
     /**
@@ -251,8 +306,13 @@ public class MedicalRecordDAO extends DBContext {
         mr.setTreatmentPlan(rs.getString("treatment_plan"));
         mr.setCreatedAt(rs.getTimestamp("created_at"));
         mr.setApptStartTime(rs.getTimestamp("appt_start_time"));
+        mr.setApptNotes(rs.getString("appt_notes"));
+        mr.setPetId(rs.getInt("pet_id"));
         mr.setPetName(rs.getString("pet_name"));
+        mr.setPetWeight(rs.getDouble("pet_weight"));
+        mr.setPetHistorySummary(rs.getString("pet_history_summary"));
         mr.setOwnerName(rs.getString("owner_name"));
+        mr.setOwnerPhone(rs.getString("owner_phone"));
         mr.setVetName(rs.getString("vet_name"));
         mr.setVetId(rs.getInt("vet_id"));
         mr.setOwnerId(rs.getInt("owner_id"));
@@ -260,4 +320,3 @@ public class MedicalRecordDAO extends DBContext {
         return mr;
     }
 }
-

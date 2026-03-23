@@ -71,6 +71,7 @@ public class MedicalRecordUpdateController extends HttpServlet {
         String idStr = request.getParameter("recordId");
         String diagnosis = util.ValidationUtils.sanitize(request.getParameter("diagnosis"));
         String treatmentPlan = util.ValidationUtils.sanitize(request.getParameter("treatmentPlan"));
+        boolean fromDetail = "detail".equalsIgnoreCase(request.getParameter("source"));
 
         if (!util.ValidationUtils.isNotEmpty(idStr) || !util.ValidationUtils.isIntegerInRange(idStr, 1, Integer.MAX_VALUE)) {
             session.setAttribute("toastMessage", "error|Invalid record ID.");
@@ -80,6 +81,11 @@ public class MedicalRecordUpdateController extends HttpServlet {
         int recordId = Integer.parseInt(idStr);
 
         if (!util.ValidationUtils.isNotEmpty(diagnosis) || diagnosis.length() > 4000) {
+            if (fromDetail) {
+                session.setAttribute("toastMessage", "error|Diagnosis is required and must be <= 4000 characters.");
+                response.sendRedirect(request.getContextPath() + "/veterinarian/emr/detail?id=" + recordId);
+                return;
+            }
             request.setAttribute("error", "Diagnosis is required and must be <= 4000 characters.");
             request.setAttribute("recordId", recordId);
             request.setAttribute("diagnosis", diagnosis);
@@ -88,6 +94,11 @@ public class MedicalRecordUpdateController extends HttpServlet {
             return;
         }
         if (!util.ValidationUtils.isNotEmpty(treatmentPlan) || treatmentPlan.length() > 4000) {
+            if (fromDetail) {
+                session.setAttribute("toastMessage", "error|Doctor note is required and must be <= 4000 characters.");
+                response.sendRedirect(request.getContextPath() + "/veterinarian/emr/detail?id=" + recordId);
+                return;
+            }
             request.setAttribute("error", "Treatment plan is required and must be <= 4000 characters.");
             request.setAttribute("recordId", recordId);
             request.setAttribute("diagnosis", diagnosis);
@@ -109,6 +120,11 @@ public class MedicalRecordUpdateController extends HttpServlet {
             session.setAttribute("toastMessage", "success|Medical record updated.");
             response.sendRedirect(request.getContextPath() + "/veterinarian/emr/detail?id=" + recordId);
         } else {
+            if (fromDetail) {
+                session.setAttribute("toastMessage", "error|Cannot save record. Please try again.");
+                response.sendRedirect(request.getContextPath() + "/veterinarian/emr/detail?id=" + recordId);
+                return;
+            }
             request.setAttribute("error", "Cannot update record (not found or access denied).");
             request.setAttribute("recordId", recordId);
             request.setAttribute("diagnosis", diagnosis);

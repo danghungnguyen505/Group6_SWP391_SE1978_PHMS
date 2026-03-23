@@ -62,7 +62,7 @@
             <div class="top-bar">
                 <div class="page-header">
                     <h2>Create Prescription</h2>
-                    <p>Prescribe medicines for medical record #${record.recordId}</p>
+                    <p>Prescribe medicines for medical record</p>
                 </div>
                 <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
             </div>
@@ -73,7 +73,7 @@
                 </div>
                 <c:if test="${not empty record}">
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <div><b>Record ID:</b> #${record.recordId}</div>
+                        <span style="display:none;">${record.recordId}</span>
                         <div><b>Pet:</b> ${record.petName}</div>
                         <div><b>Owner:</b> ${record.ownerName}</div>
                         <div><b>Date:</b> <fmt:formatDate value="${record.createdAt}" pattern="dd/MM/yyyy HH:mm"/></div>
@@ -88,14 +88,16 @@
                         <table style="width:100%; margin-top:10px;">
                             <thead>
                                 <tr style="background:#f3f4f6;">
+                                    <th style="padding:8px; text-align:left;">STT</th>
                                     <th style="padding:8px; text-align:left;">Medicine</th>
                                     <th style="padding:8px; text-align:left;">Quantity</th>
                                     <th style="padding:8px; text-align:left;">Dosage</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <c:forEach var="pres" items="${existingPrescriptions}">
+                                <c:forEach var="pres" items="${existingPrescriptions}" varStatus="st">
                                     <tr>
+                                        <td style="padding:8px;">${st.index + 1}<span style="display:none;">${pres.presId}</span></td>
                                         <td style="padding:8px;">${pres.medicineName}</td>
                                         <td style="padding:8px;">${pres.quantity} ${pres.medicineUnit}</td>
                                         <td style="padding:8px;">${pres.dosage}</td>
@@ -206,10 +208,11 @@
                 const items = document.querySelectorAll('.prescription-item');
                 if (items.length === 0) {
                     e.preventDefault();
-                    alert('Vui lòng thêm ít nhất một loại thuốc.');
+                    alert('Please add at least one medicine.');
                     return;
                 }
             });
         </script>
     </body>
 </html>
+

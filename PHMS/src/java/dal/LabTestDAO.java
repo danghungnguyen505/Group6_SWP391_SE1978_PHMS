@@ -446,6 +446,87 @@ public class LabTestDAO extends DBContext {
         return null;
     }
 
+    /**
+     * List lab tests for one record (vet-owned record only).
+     */
+    public List<LabTest> listByRecordForVet(int recordId, int vetId) {
+        List<LabTest> list = new ArrayList<>();
+        String sql = "SELECT lt.test_id, lt.record_id, lt.nurse_id, lt.test_type, lt.request_notes, lt.result_data, lt.status, "
+                + "mr.created_at AS record_created_at, mr.appt_id, "
+                + "a.start_time AS appt_start_time, a.vet_id, "
+                + "p.owner_id, p.name AS pet_name, "
+                + "u_owner.full_name AS owner_name, "
+                + "u_vet.full_name AS vet_name "
+                + "FROM LabTest lt "
+                + "JOIN MedicalRecord mr ON lt.record_id = mr.record_id "
+                + "JOIN Appointment a ON mr.appt_id = a.appt_id "
+                + "JOIN Pet p ON a.pet_id = p.pet_id "
+                + "JOIN Users u_owner ON p.owner_id = u_owner.user_id "
+                + "JOIN Users u_vet ON a.vet_id = u_vet.user_id "
+                + "WHERE lt.record_id = ? AND a.vet_id = ? "
+                + "ORDER BY lt.test_id DESC";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, recordId);
+            st.setInt(2, vetId);
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    list.add(map(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error listByRecordForVet: " + e.getMessage());
+        }
+        return list;
+    }
+
+    /**
+     * List available lab test types from ServiceList for dropdown selection.
+     * Source of truth: ServiceList.type = 'LabTest' and active services only.
+     */
+    public List<String> listDistinctTestTypes() {
+        List<String> types = new ArrayList<>();
+        String sql = "SELECT DISTINCT LTRIM(RTRIM(name)) AS test_type "
+                + "FROM ServiceList "
+                + "WHERE is_active = 1 "
+                + "  AND UPPER(LTRIM(RTRIM(COALESCE([type], '')))) = 'LABTEST' "
+                + "  AND NULLIF(LTRIM(RTRIM(name)), '') IS NOT NULL "
+                + "ORDER BY LTRIM(RTRIM(name)) ASC";
+        try (PreparedStatement st = connection.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+            while (rs.next()) {
+                types.add(rs.getString("test_type"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error listDistinctTestTypes: " + e.getMessage());
+        }
+        return types;
+    }
+
+    /**
+     * Complete examination is blocked when any lab request is still pending.
+     */
+    public boolean hasPendingByRecordForVet(int recordId, int vetId) {
+        String sql = "SELECT COUNT(*) AS cnt "
+                + "FROM LabTest lt "
+                + "JOIN MedicalRecord mr ON lt.record_id = mr.record_id "
+                + "JOIN Appointment a ON mr.appt_id = a.appt_id "
+                + "WHERE lt.record_id = ? AND a.vet_id = ? "
+                + "AND UPPER(LTRIM(RTRIM(lt.status))) IN ('REQUESTED', 'IN PROGRESS', 'IN-PROGRESS') "
+                + "AND NULLIF(LTRIM(RTRIM(REPLACE(REPLACE(REPLACE(COALESCE(lt.result_data, ''), CHAR(13), ''), CHAR(10), ''), CHAR(9), ''))), '') IS NULL";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, recordId);
+            st.setInt(2, vetId);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("cnt") > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error hasPendingByRecordForVet: " + e.getMessage());
+        }
+        return false;
+    }
+
     private LabTest map(ResultSet rs) throws SQLException {
         LabTest lt = new LabTest();
         lt.setTestId(rs.getInt("test_id"));

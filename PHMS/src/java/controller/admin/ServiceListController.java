@@ -75,6 +75,7 @@ public class ServiceListController extends HttpServlet {
 
         String search = request.getParameter("search");
         String statusFilter = request.getParameter("status"); // active / inactive
+        String typeFilter = request.getParameter("type"); // Basic / Emergency / LabTest
 
         List<Service> filteredServices = new java.util.ArrayList<>();
         for (Service s : allServices) {
@@ -84,7 +85,8 @@ public class ServiceListController extends HttpServlet {
                 String lower = search.trim().toLowerCase();
                 String name = s.getName() != null ? s.getName().toLowerCase() : "";
                 String desc = s.getDescription() != null ? s.getDescription().toLowerCase() : "";
-                match = name.contains(lower) || desc.contains(lower);
+                String type = s.getType() != null ? s.getType().toLowerCase() : "";
+                match = name.contains(lower) || desc.contains(lower) || type.contains(lower);
             }
 
             if (match && statusFilter != null && !statusFilter.trim().isEmpty()) {
@@ -94,6 +96,11 @@ public class ServiceListController extends HttpServlet {
                 } else if ("inactive".equalsIgnoreCase(statusFilter)) {
                     match = !active;
                 }
+            }
+
+            if (match && typeFilter != null && !typeFilter.trim().isEmpty()) {
+                String serviceType = s.getType() != null ? s.getType() : "";
+                match = serviceType.equalsIgnoreCase(typeFilter.trim());
             }
 
             if (match) {
@@ -125,6 +132,7 @@ public class ServiceListController extends HttpServlet {
         request.setAttribute("pageSize", PAGE_SIZE);
         request.setAttribute("searchKeyword", search);
         request.setAttribute("statusFilter", statusFilter);
+        request.setAttribute("typeFilter", typeFilter);
         
         request.getRequestDispatcher("/views/admin/serviceManagement.jsp").forward(request, response);
     } 
@@ -154,18 +162,20 @@ public class ServiceListController extends HttpServlet {
         try {
             if ("add".equals(action)) {
                 String name = request.getParameter("name");
+                String serviceType = normalizeServiceType(request.getParameter("serviceType"));
                 double price = Double.parseDouble(request.getParameter("price"));
                 String desc = request.getParameter("description");
 
-                dao.addService(new Service(0, name, price, desc, true, currentAdminId));
+                dao.addService(new Service(0, name, serviceType, price, desc, true, currentAdminId));
 
             } else if ("edit".equals(action)) {
                 int id = Integer.parseInt(request.getParameter("serviceId"));
                 String name = request.getParameter("name");
+                String serviceType = normalizeServiceType(request.getParameter("serviceType"));
                 double price = Double.parseDouble(request.getParameter("price"));
                 String desc = request.getParameter("description");
 
-                dao.updateService(new Service(id, name, price, desc, true, currentAdminId));
+                dao.updateService(new Service(id, name, serviceType, price, desc, true, currentAdminId));
 
             } else if ("toggle".equals(action)) {
                 int id = Integer.parseInt(request.getParameter("id"));
@@ -177,6 +187,20 @@ public class ServiceListController extends HttpServlet {
         }
 
         response.sendRedirect("services");
+    }
+
+    private String normalizeServiceType(String rawType) {
+        if (rawType == null) {
+            return "Basic";
+        }
+        String t = rawType.trim();
+        if ("Emergency".equalsIgnoreCase(t)) {
+            return "Emergency";
+        }
+        if ("LabTest".equalsIgnoreCase(t)) {
+            return "LabTest";
+        }
+        return "Basic";
     }
 
     /** 

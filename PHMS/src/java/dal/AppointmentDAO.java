@@ -849,11 +849,20 @@ public class AppointmentDAO extends DBContext {
         }
     }
 
-    //Mark appointment as Completed for the assigned vet only when In-Progress.
-    //Danh dau cuoc hen da Completed
+    //Mark appointment as Completed for the assigned vet only when In-Progress
+    //and there is no pending lab request (Requested/In Progress).
     public boolean completeForVet(int apptId, int vetId) {
-        String sql = "UPDATE Appointment SET status = 'Completed' "
-                + "WHERE appt_id = ? AND vet_id = ? AND status = 'In-Progress'";
+        String sql = "UPDATE a SET a.status = 'Completed' "
+                + "FROM Appointment a "
+                + "WHERE a.appt_id = ? AND a.vet_id = ? AND a.status = 'In-Progress' "
+                + "AND NOT EXISTS ( "
+                + "    SELECT 1 "
+                + "    FROM MedicalRecord mr "
+                + "    JOIN LabTest lt ON lt.record_id = mr.record_id "
+                + "    WHERE mr.appt_id = a.appt_id "
+                + "    AND UPPER(LTRIM(RTRIM(lt.status))) IN ('REQUESTED', 'IN PROGRESS', 'IN-PROGRESS') "
+                + "    AND NULLIF(LTRIM(RTRIM(REPLACE(REPLACE(REPLACE(COALESCE(lt.result_data, ''), CHAR(13), ''), CHAR(10), ''), CHAR(9), ''))), '') IS NULL "
+                + ")";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, apptId);
             st.setInt(2, vetId);

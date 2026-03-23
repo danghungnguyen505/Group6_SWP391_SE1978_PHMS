@@ -202,16 +202,26 @@
                                                 </c:choose>
                                             </td>
                                             <td style="text-align:center;">
-                                                <div style="display:flex; gap:6px; justify-content:center;">
-                                                    <a class="btn-action btn-emr"
-                                                       href="${pageContext.request.contextPath}/veterinarian/emr/queue/edit?apptId=${a.apptId}">
-                                                        <i class="fa-solid fa-pen-to-square"></i> EMR
-                                                    </a>
-                                                    <a class="btn-action btn-treat"
-                                                       href="${pageContext.request.contextPath}/veterinarian/emr/submit?apptId=${a.apptId}">
-                                                        <i class="fa-solid fa-paper-plane"></i> Submit
-                                                    </a>
-                                                </div>
+                                                <c:choose>
+                                                    <c:when test="${a.status == 'Checked-in'}">
+                                                        <a class="btn-action btn-emr"
+                                                           href="${pageContext.request.contextPath}/veterinarian/emr/submit?apptId=${a.apptId}">
+                                                            <i class="fa-solid fa-file-circle-plus"></i> Create EMR
+                                                        </a>
+                                                    </c:when>
+                                                    <c:when test="${a.status == 'In-Progress'}">
+                                                        <a class="btn-action btn-treat"
+                                                           href="${pageContext.request.contextPath}/veterinarian/emr/submit?apptId=${a.apptId}">
+                                                            <i class="fa-solid fa-stethoscope"></i> Open EMR Detail
+                                                        </a>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <a class="btn-action btn-emr"
+                                                           href="${pageContext.request.contextPath}/veterinarian/emr/queue">
+                                                            <i class="fa-solid fa-eye"></i> View Queue
+                                                        </a>
+                                                    </c:otherwise>
+                                                </c:choose>
                                             </td>
                                         </tr>
                                     </c:forEach>

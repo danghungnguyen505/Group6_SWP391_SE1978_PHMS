@@ -1,6 +1,6 @@
 package controller.veterinarian;
 
-import dal.AppointmentDAO;
+import dal.MedicalRecordDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -33,13 +33,14 @@ public class EmrCompleteController extends HttpServlet {
             return;
         }
 
-        AppointmentDAO dao = new AppointmentDAO();
-        boolean ok = dao.completeForVet(apptId, account.getUserId());
-        if (ok) {
-            session.setAttribute("toastMessage", "success|Appointment marked as Completed.");
+        MedicalRecordDAO recordDAO = new MedicalRecordDAO();
+        Integer recordId = recordDAO.getRecordIdByApptForVet(apptId, account.getUserId());
+        if (recordId != null) {
+            session.setAttribute("toastMessage", "error|Please complete examination inside EMR Detail page.");
+            response.sendRedirect(request.getContextPath() + "/veterinarian/emr/detail?id=" + recordId);
         } else {
-            session.setAttribute("toastMessage", "error|Cannot complete. Appointment may not be In-Progress or not assigned to you.");
+            session.setAttribute("toastMessage", "error|Medical record not found. Please create/open EMR from queue.");
+            response.sendRedirect(request.getContextPath() + "/veterinarian/emr/queue");
         }
-        response.sendRedirect(request.getContextPath() + "/veterinarian/emr/queue");
     }
 }

@@ -55,6 +55,8 @@ public class LabRequestCreateController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/veterinarian/lab/requests");
             return;
         }
+        LabTestDAO labTestDAO = new LabTestDAO();
+        request.setAttribute("labTestTypes", labTestDAO.listDistinctTestTypes());
         request.setAttribute("record", mr);
         request.getRequestDispatcher("/views/veterinarian/labRequestCreate.jsp").forward(request, response);
     }
@@ -64,6 +66,7 @@ public class LabRequestCreateController extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         User account = (User) session.getAttribute("account");
+        boolean fromDetail = "detail".equalsIgnoreCase(request.getParameter("source"));
         if (account == null || !"Veterinarian".equalsIgnoreCase(account.getRole())) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
@@ -75,24 +78,42 @@ public class LabRequestCreateController extends HttpServlet {
 
         if (!util.ValidationUtils.isNotEmpty(recordIdStr) || !util.ValidationUtils.isIntegerInRange(recordIdStr, 1, Integer.MAX_VALUE)) {
             session.setAttribute("toastMessage", "error|Invalid record ID.");
-            response.sendRedirect(request.getContextPath() + "/veterinarian/emr/records");
+            if (fromDetail) {
+                response.sendRedirect(request.getContextPath() + "/veterinarian/emr/records");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/veterinarian/emr/records");
+            }
             return;
         }
         int recordId = Integer.parseInt(recordIdStr);
 
         if (!util.ValidationUtils.isNotEmpty(testType) || testType.length() > 100) {
+            if (fromDetail) {
+                session.setAttribute("toastMessage", "error|Test type is required and must be <= 100 characters.");
+                response.sendRedirect(request.getContextPath() + "/veterinarian/emr/detail?id=" + recordId);
+                return;
+            }
             request.setAttribute("error", "Test type is required and must be <= 100 characters.");
             request.setAttribute("recordId", recordId);
             request.setAttribute("testType", testType);
             request.setAttribute("requestNotes", requestNotes);
+            LabTestDAO labTestDAO = new LabTestDAO();
+            request.setAttribute("labTestTypes", labTestDAO.listDistinctTestTypes());
             request.getRequestDispatcher("/views/veterinarian/labRequestCreate.jsp").forward(request, response);
             return;
         }
         if (requestNotes != null && requestNotes.length() > 4000) {
+            if (fromDetail) {
+                session.setAttribute("toastMessage", "error|Lab request note must be <= 4000 characters.");
+                response.sendRedirect(request.getContextPath() + "/veterinarian/emr/detail?id=" + recordId);
+                return;
+            }
             request.setAttribute("error", "Request notes must be <= 4000 characters.");
             request.setAttribute("recordId", recordId);
             request.setAttribute("testType", testType);
             request.setAttribute("requestNotes", requestNotes);
+            LabTestDAO labTestDAO = new LabTestDAO();
+            request.setAttribute("labTestTypes", labTestDAO.listDistinctTestTypes());
             request.getRequestDispatcher("/views/veterinarian/labRequestCreate.jsp").forward(request, response);
             return;
         }
@@ -100,24 +121,43 @@ public class LabRequestCreateController extends HttpServlet {
         MedicalRecord mr = mrDao.getByIdForVet(recordId, account.getUserId());
         if (mr == null) {
             session.setAttribute("toastMessage", "error|Record not found or access denied.");
-            response.sendRedirect(request.getContextPath() + "/veterinarian/emr/records");
+            if (fromDetail) {
+                response.sendRedirect(request.getContextPath() + "/veterinarian/emr/detail?id=" + recordId);
+            } else {
+                response.sendRedirect(request.getContextPath() + "/veterinarian/emr/records");
+            }
             return;
         }
         if ("Completed".equalsIgnoreCase(mr.getApptStatus())) {
             session.setAttribute("toastMessage", "error|Appointment already completed. Cannot request lab test.");
-            response.sendRedirect(request.getContextPath() + "/veterinarian/lab/requests");
+            if (fromDetail) {
+                response.sendRedirect(request.getContextPath() + "/veterinarian/emr/detail?id=" + recordId);
+            } else {
+                response.sendRedirect(request.getContextPath() + "/veterinarian/lab/requests");
+            }
             return;
         }
         LabTestDAO dao = new LabTestDAO();
         boolean ok = dao.createForVet(recordId, account.getUserId(), testType, requestNotes);
         if (ok) {
             session.setAttribute("toastMessage", "success|Lab request created.");
-            response.sendRedirect(request.getContextPath() + "/veterinarian/lab/requests");
+            if (fromDetail) {
+                response.sendRedirect(request.getContextPath() + "/veterinarian/emr/detail?id=" + recordId);
+            } else {
+                response.sendRedirect(request.getContextPath() + "/veterinarian/lab/requests");
+            }
         } else {
+            if (fromDetail) {
+                session.setAttribute("toastMessage", "error|Cannot create lab request.");
+                response.sendRedirect(request.getContextPath() + "/veterinarian/emr/detail?id=" + recordId);
+                return;
+            }
             request.setAttribute("error", "Cannot create lab request (record not found or access denied).");
             request.setAttribute("recordId", recordId);
             request.setAttribute("testType", testType);
             request.setAttribute("requestNotes", requestNotes);
+            LabTestDAO labTestDAO = new LabTestDAO();
+            request.setAttribute("labTestTypes", labTestDAO.listDistinctTestTypes());
             request.getRequestDispatcher("/views/veterinarian/labRequestCreate.jsp").forward(request, response);
         }
     }

@@ -217,17 +217,26 @@
             <form action="add-service" method="post">
                 <div class="form-group">
                     <label class="form-label">Service Name</label>
-                    <input type="text" name="name" class="form-input" required placeholder="e.g. General Check-up">
+                    <input type="text" name="name" class="form-input" required placeholder="e.g. General Check-up" value="${name}">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Service Type</label>
+                    <select name="serviceType" class="form-input" required>
+                        <option value="Basic" ${serviceType == 'Basic' || empty serviceType ? 'selected' : ''}>Cơ bản</option>
+                        <option value="Emergency" ${serviceType == 'Emergency' ? 'selected' : ''}>Cấp cứu</option>
+                        <option value="LabTest" ${serviceType == 'LabTest' ? 'selected' : ''}>Lab test</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Base Price (VND)</label>
-                    <input type="number" name="price" class="form-input" required placeholder="e.g. 500000">
+                    <input type="number" name="price" class="form-input" required placeholder="e.g. 500000" value="${price}">
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Detailed Description</label>
-                    <textarea name="description" class="form-input" placeholder="Describe what the service includes..."></textarea>
+                    <textarea name="description" class="form-input" placeholder="Describe what the service includes...">${description}</textarea>
                 </div>
 
                 <div class="form-group">

@@ -5,7 +5,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import model.Invoice;
 import model.InvoiceDetail;
 import model.Medicine;
@@ -186,9 +188,8 @@ public class InvoiceDAO extends DBContext {
 
     /**
      * Tự động tạo hóa đơn cho một cuộc hẹn dựa trên: - Dịch vụ chính từ
-     * Appointment.type -> ServiceList.name - Thuốc từ các Prescription thuộc
-     * các MedicalRecord của cuộc hẹn đó Lễ tân không cần chọn tay từng dịch
-     * vụ/thuốc.
+     * Appointment.type -> ServiceList.name - LabTest.test_type -> ServiceList
+     * (map by name/like). Medicine is intentionally excluded from invoice.
      */
     public Integer autoCreateInvoiceForAppointment(int apptId, int recepId) throws SQLException {
         // Không tạo trùng hóa đơn cho cùng 1 cuộc hẹn
@@ -230,6 +231,17 @@ public class InvoiceDAO extends DBContext {
                     hasMainService = true;
                 }
             }
+            if (!hasMainService) {
+                Service emergencyFallback = serviceDAO.getFirstActiveServiceByType("Emergency");
+                if (emergencyFallback != null) {
+                    InvoiceDetail serviceDetail = new InvoiceDetail();
+                    serviceDetail.setServiceId(emergencyFallback.getServiceId());
+                    serviceDetail.setItemType("Service");
+                    serviceDetail.setQuantity(1);
+                    autoDetails.add(serviceDetail);
+                    hasMainService = true;
+                }
+            }
         }
 
         // 2b. For non-emergency or if triage lookup failed, try matching by appointment type name
@@ -261,30 +273,10 @@ public class InvoiceDAO extends DBContext {
             }
         }
 
-        // 3. Thêm thuốc từ Prescription của cuộc hẹn (tính tiền thuốc)
-        String medSql = "SELECT p.medicine_id, SUM(p.quantity) AS total_qty "
-                + "FROM Prescription p "
-                + "JOIN MedicalRecord mr ON p.record_id = mr.record_id "
-                + "WHERE mr.appt_id = ? "
-                + "GROUP BY p.medicine_id";
-        try (PreparedStatement st = connection.prepareStatement(medSql)) {
-            st.setInt(1, apptId);
-            try (ResultSet rs = st.executeQuery()) {
-                while (rs.next()) {
-                    int medicineId = rs.getInt("medicine_id");
-                    int qty = rs.getInt("total_qty");
-                    if (qty <= 0) {
-                        continue;
-                    }
-                    InvoiceDetail medDetail = new InvoiceDetail();
-                    medDetail.setMedicineId(medicineId);
-                    medDetail.setItemType("Medicine");
-                    medDetail.setQuantity(qty);
-                    autoDetails.add(medDetail);
-                }
-            }
-        } catch (SQLException e) {
-            System.out.println("Error autoCreateInvoiceForAppointment - load medicines: " + e.getMessage());
+        // 3. Add lab-test service lines (medicine is not billed in invoice flow)
+        List<InvoiceDetail> labServiceDetails = getLabServiceDetailsForAppointment(apptId);
+        for (InvoiceDetail labDetail : labServiceDetails) {
+            addOrMergeServiceDetail(autoDetails, labDetail.getServiceId(), labDetail.getQuantity());
         }
 
         // Nếu không có bất kỳ dịch vụ nào thì không tạo hóa đơn
@@ -294,6 +286,82 @@ public class InvoiceDAO extends DBContext {
 
         // Tái sử dụng logic transaction đã có
         return createInvoiceForAppointment(apptId, recepId, autoDetails);
+    }
+
+    /**
+     * Build service details from lab tests of an appointment.
+     * Mapping rule: test_type -> active service (exact name first, then LIKE).
+     * Cancelled tests are excluded.
+     */
+    public List<InvoiceDetail> getLabServiceDetailsForAppointment(int apptId) {
+        List<InvoiceDetail> result = new ArrayList<>();
+        String sql = "SELECT LTRIM(RTRIM(lt.test_type)) AS test_type, COUNT(*) AS qty "
+                + "FROM LabTest lt "
+                + "JOIN MedicalRecord mr ON lt.record_id = mr.record_id "
+                + "WHERE mr.appt_id = ? "
+                + "  AND NULLIF(LTRIM(RTRIM(lt.test_type)), '') IS NOT NULL "
+                + "  AND UPPER(LTRIM(RTRIM(COALESCE(lt.status, '')))) <> 'CANCELLED' "
+                + "GROUP BY LTRIM(RTRIM(lt.test_type))";
+
+        ServiceDAO serviceDAO = new ServiceDAO();
+        Map<Integer, InvoiceDetail> merged = new LinkedHashMap<>();
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, apptId);
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    String testType = rs.getString("test_type");
+                    int qty = rs.getInt("qty");
+                    if (qty <= 0 || testType == null) {
+                        continue;
+                    }
+
+                    Service svc = serviceDAO.getActiveServiceByName(testType);
+                    if (svc == null) {
+                        svc = serviceDAO.getActiveServiceByNameLike(testType);
+                    }
+                    if (svc == null) {
+                        continue;
+                    }
+
+                    InvoiceDetail existing = merged.get(svc.getServiceId());
+                    if (existing == null) {
+                        InvoiceDetail d = new InvoiceDetail();
+                        d.setServiceId(svc.getServiceId());
+                        d.setServiceName(svc.getName());
+                        d.setItemType("Service");
+                        d.setQuantity(qty);
+                        d.setUnitPrice(svc.getBasePrice());
+                        merged.put(svc.getServiceId(), d);
+                    } else {
+                        existing.setQuantity(existing.getQuantity() + qty);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getLabServiceDetailsForAppointment: " + e.getMessage());
+        }
+
+        result.addAll(merged.values());
+        return result;
+    }
+
+    private void addOrMergeServiceDetail(List<InvoiceDetail> details, Integer serviceId, int qtyToAdd) {
+        if (details == null || serviceId == null || qtyToAdd <= 0) {
+            return;
+        }
+        for (InvoiceDetail d : details) {
+            if ("Service".equalsIgnoreCase(d.getItemType())
+                    && d.getServiceId() != null
+                    && d.getServiceId().intValue() == serviceId.intValue()) {
+                d.setQuantity(d.getQuantity() + qtyToAdd);
+                return;
+            }
+        }
+        InvoiceDetail newDetail = new InvoiceDetail();
+        newDetail.setServiceId(serviceId);
+        newDetail.setItemType("Service");
+        newDetail.setQuantity(qtyToAdd);
+        details.add(newDetail);
     }
 
     public Invoice getInvoiceByAppointment(int apptId) {
@@ -414,6 +482,9 @@ public class InvoiceDAO extends DBContext {
             TriageRecord triage = triageDAO.getByAppointment(apptId);
             if (triage != null && triage.getConditionLevel() != null) {
                 mainService = serviceDAO.getServiceByTriageLevel(triage.getConditionLevel());
+            }
+            if (mainService == null) {
+                mainService = serviceDAO.getFirstActiveServiceByType("Emergency");
             }
         }
         if (mainService == null) {

@@ -494,13 +494,13 @@
                                     <tr><td colspan="4" class="text-center text-muted">No billable service found.</td></tr>
                                 </c:otherwise>
                             </c:choose>
-                            <c:if test="${not empty prescriptions}">
-                                <c:forEach var="p" items="${prescriptions}">
+                            <c:if test="${not empty labServices}">
+                                <c:forEach var="lab" items="${labServices}">
                                     <tr>
-                                        <td><c:out value="${p.medicineName}"/></td>
-                                        <td class="text-center"><c:out value="${p.quantity}"/></td>
-                                        <td class="text-right"><fmt:formatNumber value="${p.medicinePrice}" type="currency" currencySymbol="VND "/></td>
-                                        <td class="text-right fw-bold"><fmt:formatNumber value="${p.quantity * p.medicinePrice}" type="currency" currencySymbol="VND "/></td>
+                                        <td><c:out value="${lab.serviceName}"/></td>
+                                        <td class="text-center"><c:out value="${lab.quantity}"/></td>
+                                        <td class="text-right"><fmt:formatNumber value="${lab.unitPrice}" type="currency" currencySymbol="VND "/></td>
+                                        <td class="text-right fw-bold"><fmt:formatNumber value="${lab.quantity * lab.unitPrice}" type="currency" currencySymbol="VND "/></td>
                                     </tr>
                                 </c:forEach>
                             </c:if>

@@ -2,7 +2,6 @@ package controller.receptionist;
 
 import dal.AppointmentDAO;
 import dal.InvoiceDAO;
-import dal.PrescriptionDAO;
 import dal.ServiceDAO;
 import dal.TriageRecordDAO;
 import model.TriageRecord;
@@ -14,11 +13,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import model.Appointment;
+import model.InvoiceDetail;
 import model.User;
 
 /**
@@ -74,6 +71,9 @@ public class InvoiceCreateController extends HttpServlet {
             if (triage != null && triage.getConditionLevel() != null) {
                 mainService = serviceDAO.getServiceByTriageLevel(triage.getConditionLevel());
             }
+            if (mainService == null) {
+                mainService = serviceDAO.getFirstActiveServiceByType("Emergency");
+            }
         }
 
         // For non-emergency or if triage lookup failed, try matching by appointment type name
@@ -87,35 +87,22 @@ public class InvoiceCreateController extends HttpServlet {
             mainService = serviceDAO.getFirstActiveService();
         }
 
-        // Load prescription medicines for this appointment (for billing preview)
-        PrescriptionDAO presDAO = new PrescriptionDAO();
-        List<model.Prescription> rawPrescriptions = presDAO.getByApptId(apptId);
-
-        // Aggregate by medicine to show one line per medicine
-        Map<Integer, model.Prescription> agg = new LinkedHashMap<>();
-        for (model.Prescription p : rawPrescriptions) {
-            int medId = p.getMedicineId();
-            if (!agg.containsKey(medId)) {
-                agg.put(medId, p);
-            } else {
-                model.Prescription ex = agg.get(medId);
-                ex.setQuantity(ex.getQuantity() + p.getQuantity());
-            }
-        }
-        List<model.Prescription> prescriptions = new ArrayList<>(agg.values());
+        // Load lab-test based services for this appointment (medicine is NOT billed in invoice)
+        List<InvoiceDetail> labServices = invoiceDAO.getLabServiceDetailsForAppointment(apptId);
 
         Double subtotal = null;
         Double tax = null;
         Double grandTotal = null;
+        double s = 0;
         if (mainService != null) {
-            double s = mainService.getBasePrice();
-            for (model.Prescription p : prescriptions) {
-                s += p.getQuantity() * p.getMedicinePrice();
-            }
-            subtotal = s;
-            tax = subtotal * 0.08; // 8% tax
-            grandTotal = subtotal + tax;
+            s += mainService.getBasePrice();
         }
+        for (InvoiceDetail lab : labServices) {
+            s += lab.getQuantity() * lab.getUnitPrice();
+        }
+        subtotal = s;
+        tax = subtotal * 0.08; // 8% tax
+        grandTotal = subtotal + tax;
 
         // Simple invoice number & date preview
         java.time.LocalDate today = java.time.LocalDate.now();
@@ -125,7 +112,7 @@ public class InvoiceCreateController extends HttpServlet {
 
         request.setAttribute("appt", appt);
         request.setAttribute("mainService", mainService);
-        request.setAttribute("prescriptions", prescriptions);
+        request.setAttribute("labServices", labServices);
         request.setAttribute("subtotal", subtotal);
         request.setAttribute("tax", tax);
         request.setAttribute("grandTotal", grandTotal);
@@ -158,10 +145,10 @@ public class InvoiceCreateController extends HttpServlet {
 
         InvoiceDAO invoiceDAO = new InvoiceDAO();
         try {
-            // Tự động sinh chi tiết hóa đơn từ dữ liệu khám (Appointment + Prescription)
+            // Tự động sinh chi tiết hóa đơn từ dữ liệu khám (dịch vụ chính + dịch vụ xét nghiệm)
             Integer invoiceId = invoiceDAO.autoCreateInvoiceForAppointment(apptId, account.getUserId());
             if (invoiceId == null) {
-                session.setAttribute("toastMessage", "error|Không thể tự động tạo hóa đơn (chưa có dịch vụ/thuốc hoặc đã tồn tại hóa đơn).");
+                session.setAttribute("toastMessage", "error|Không thể tự động tạo hóa đơn (chưa có dịch vụ phù hợp hoặc đã tồn tại hóa đơn).");
                 response.sendRedirect(request.getContextPath() + "/receptionist/invoice/create?apptId=" + apptId);
                 return;
             }
@@ -177,4 +164,3 @@ public class InvoiceCreateController extends HttpServlet {
         }
     }
 }
-
