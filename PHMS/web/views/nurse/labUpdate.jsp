@@ -94,16 +94,20 @@
                     <c:if test="${not empty test.resultData}">
                         <div style="margin-top:16px; padding:12px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px;">
                             <b><i class="fa-solid fa-file-medical"></i> Result:</b>
-                            <c:choose>
-                                <c:when test="${fn:startsWith(test.resultData, '/uploads/lab/')}">
-                                    <a href="${pageContext.request.contextPath}${test.resultData}" target="_blank" class="btn btn-approve" style="text-decoration:none; margin-left:8px;">
-                                        <i class="fa-solid fa-download"></i> View File
-                                    </a>
-                                </c:when>
-                                <c:otherwise>
-                                    <p style="margin-top:8px; white-space:pre-wrap;">${test.resultData}</p>
-                                </c:otherwise>
-                            </c:choose>
+                            <c:if test="${not empty existingFilePath}">
+                                <a href="${pageContext.request.contextPath}${existingFilePath}" target="_blank" class="btn btn-approve" style="text-decoration:none; margin-left:8px;">
+                                    <i class="fa-regular fa-image"></i> View Image
+                                </a>
+                                <c:if test="${fn:endsWith(fn:toLowerCase(existingFilePath), '.jpg') || fn:endsWith(fn:toLowerCase(existingFilePath), '.jpeg') || fn:endsWith(fn:toLowerCase(existingFilePath), '.png')}">
+                                    <div style="margin-top:10px;">
+                                        <img src="${pageContext.request.contextPath}${existingFilePath}" alt="Lab Result Image"
+                                             style="max-width:320px; width:100%; border:1px solid #d1d5db; border-radius:10px;">
+                                    </div>
+                                </c:if>
+                            </c:if>
+                            <c:if test="${not empty existingResultText}">
+                                <p style="margin-top:8px; white-space:pre-wrap;">${existingResultText}</p>
+                            </c:if>
                         </div>
                     </c:if>
                 </c:if>
@@ -123,7 +127,18 @@
                     <div style="margin-top: 10px;">
                         <label><b>Result Text</b> (optional)</label>
                         <textarea name="resultText" rows="4" style="width:100%;" maxlength="4000"
-                                  placeholder="Enter result text..." ${canUpdate == false ? 'readonly' : ''}><c:if test="${not empty test.resultData && !fn:startsWith(test.resultData, '/uploads/')}">${test.resultData}</c:if></textarea>
+                                  placeholder="Enter result text..." ${canUpdate == false ? 'readonly' : ''}>${existingResultText}</textarea>
+                    </div>
+
+                    <div style="margin-top: 10px;">
+                        <label><b>Upload Result Image</b> (optional)</label>
+                        <input id="resultFileInput" type="file" name="resultFile" accept=".jpg,.jpeg,.png,image/*" style="width:100%;" ${canUpdate == false ? 'disabled' : ''}>
+                        <small style="color:#64748b;">Allowed: JPG, JPEG, PNG. Max size: 10MB.</small>
+                        <div id="selectedImagePreviewWrap" style="display:none; margin-top:10px;">
+                            <div style="font-weight:600; margin-bottom:6px; color:#334155;">Preview before save:</div>
+                            <img id="selectedImagePreview" alt="Selected image preview"
+                                 style="max-width:320px; width:100%; border:1px solid #d1d5db; border-radius:10px;">
+                        </div>
                     </div>
 
                     <div style="display:flex; gap:10px; margin-top: 12px;">
@@ -138,6 +153,36 @@
                 </form>
             </div>
         </main>
+        <script>
+            (function () {
+                var input = document.getElementById('resultFileInput');
+                var previewWrap = document.getElementById('selectedImagePreviewWrap');
+                var previewImg = document.getElementById('selectedImagePreview');
+                if (!input || !previewWrap || !previewImg) {
+                    return;
+                }
+
+                input.addEventListener('change', function () {
+                    var file = input.files && input.files[0] ? input.files[0] : null;
+                    if (!file) {
+                        previewWrap.style.display = 'none';
+                        previewImg.removeAttribute('src');
+                        return;
+                    }
+                    if (!file.type || file.type.indexOf('image/') !== 0) {
+                        previewWrap.style.display = 'none';
+                        previewImg.removeAttribute('src');
+                        return;
+                    }
+                    var objectUrl = URL.createObjectURL(file);
+                    previewImg.src = objectUrl;
+                    previewWrap.style.display = 'block';
+                    previewImg.onload = function () {
+                        URL.revokeObjectURL(objectUrl);
+                    };
+                });
+            })();
+        </script>
     </body>
 </html>
 

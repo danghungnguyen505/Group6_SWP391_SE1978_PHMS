@@ -117,6 +117,15 @@
                 </div>
 
                 <div class="form-group">
+                    <label class="form-label">Service Type</label>
+                    <select name="serviceType" class="form-input" required>
+                        <option value="Basic" ${s.type == 'Basic' ? 'selected' : ''}>Cơ bản</option>
+                        <option value="Emergency" ${s.type == 'Emergency' ? 'selected' : ''}>Cấp cứu</option>
+                        <option value="LabTest" ${s.type == 'LabTest' ? 'selected' : ''}>Lab test</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label class="form-label">Base Price (VND)</label>
                     <input type="number" name="price" class="form-input" value="${s.basePrice}" required>
                 </div>

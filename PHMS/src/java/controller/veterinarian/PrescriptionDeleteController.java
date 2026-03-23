@@ -29,6 +29,7 @@ public class PrescriptionDeleteController extends HttpServlet {
         
         String presIdStr = request.getParameter("presId");
         String recordIdStr = request.getParameter("recordId");
+        boolean fromDetail = "detail".equalsIgnoreCase(request.getParameter("source"));
         
         if (!util.ValidationUtils.isNotEmpty(presIdStr)
                 || !util.ValidationUtils.isIntegerInRange(presIdStr, 1, Integer.MAX_VALUE)) {
@@ -49,7 +50,11 @@ public class PrescriptionDeleteController extends HttpServlet {
         }
         
         if (recordIdStr != null && util.ValidationUtils.isIntegerInRange(recordIdStr, 1, Integer.MAX_VALUE)) {
-            response.sendRedirect(request.getContextPath() + "/veterinarian/prescription/list?recordId=" + recordIdStr);
+            if (fromDetail) {
+                response.sendRedirect(request.getContextPath() + "/veterinarian/emr/detail?id=" + recordIdStr);
+            } else {
+                response.sendRedirect(request.getContextPath() + "/veterinarian/prescription/list?recordId=" + recordIdStr);
+            }
         } else {
             response.sendRedirect(request.getContextPath() + "/veterinarian/emr/records");
         }

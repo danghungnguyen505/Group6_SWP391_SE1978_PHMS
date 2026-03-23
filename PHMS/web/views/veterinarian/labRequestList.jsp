@@ -84,7 +84,7 @@
                             <tr>
                                 <th style="display:none;">ID</th>
                                 <th>STT</th>
-                                <th>Record</th>
+                                <th style="display:none;">Record</th>
                                 <th>Pet</th>
                                 <th>Type</th>
                                 <th>Status</th>
@@ -97,17 +97,34 @@
                                 <tr>
                                     <td style="display:none;">${t.testId}</td>
                                     <td>${(currentPage - 1) * 10 + status.index + 1}</td>
-                                    <td>#${t.recordId}</td>
+                                    <td style="display:none;">${t.recordId}</td>
                                     <td class="col-pet">${t.petName}</td>
                                     <td class="col-service">${t.testType}</td>
                                     <td>${t.status}</td>
                                     <td>
-                                        <c:if test="${empty t.requestNotes}">
-                                            <span style="color:#999; font-style:italic;">Pending</span>
-                                        </c:if>
-                                        <c:if test="${not empty t.requestNotes}">
-                                            ${t.requestNotes}
-                                        </c:if>
+                                        <c:choose>
+                                            <c:when test="${not empty labResultImageMap[t.testId] || not empty labResultTextMap[t.testId]}">
+                                                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                                                    <c:if test="${not empty labResultImageMap[t.testId]}">
+                                                        <button type="button" class="btn btn-approve"
+                                                                onclick="openImageModal('${pageContext.request.contextPath}${labResultImageMap[t.testId]}', 'Lab Result Image')">
+                                                            <i class="fa-regular fa-image"></i> View Image
+                                                        </button>
+                                                    </c:if>
+                                                    <c:if test="${not empty labResultTextMap[t.testId]}">
+                                                        <button type="button" class="btn btn-reject"
+                                                                style="background:#e5e7eb; color:#111827;"
+                                                                onclick="openNoteModal('lab-note-${t.testId}', 'Lab Result Note')">
+                                                            <i class="fa-regular fa-eye"></i> View Note
+                                                        </button>
+                                                        <textarea id="lab-note-${t.testId}" style="display:none;">${labResultTextMap[t.testId]}</textarea>
+                                                    </c:if>
+                                                </div>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span style="color:#999; font-style:italic;">Pending</span>
+                                            </c:otherwise>
+                                        </c:choose>
                                     </td>
                                     <td style="text-align:center;">
                                         <c:if test="${t.status != 'Completed' && t.status != 'Cancelled'}">
@@ -153,6 +170,74 @@
                 </c:if>
             </div>
         </main>
+
+        <div id="noteModal" style="display:none; position:fixed; z-index:2000; left:0; top:0; width:100%; height:100%; background:rgba(2,6,23,0.4);">
+            <div style="background:#fff; max-width:760px; margin:7% auto; border-radius:14px; overflow:hidden; box-shadow:0 20px 60px rgba(15,23,42,0.3);">
+                <div style="padding:13px 16px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
+                    <div id="noteModalTitle" style="font-size:14px; font-weight:800; color:#1e293b;">Note</div>
+                    <span style="font-size:22px; color:#64748b; cursor:pointer; line-height:1;" onclick="closeNoteModal()">&times;</span>
+                </div>
+                <div style="padding:16px; max-height:440px; overflow-y:auto;">
+                    <div id="noteContent" style="white-space:pre-wrap; color:#334155; font-size:14px; line-height:1.5;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="imageModal" style="display:none; position:fixed; z-index:2100; left:0; top:0; width:100%; height:100%; background:rgba(2,6,23,0.65);">
+            <div style="position:relative; max-width:960px; margin:4% auto; background:#fff; border-radius:14px; overflow:hidden; box-shadow:0 20px 60px rgba(15,23,42,0.35);">
+                <div style="padding:13px 16px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
+                    <div id="imageModalTitle" style="font-size:14px; font-weight:800; color:#1e293b;">Image</div>
+                    <span style="font-size:22px; color:#64748b; cursor:pointer; line-height:1;" onclick="closeImageModal()">&times;</span>
+                </div>
+                <div style="padding:16px; text-align:center; background:#f8fafc;">
+                    <img id="imageModalContent" alt="Lab result image"
+                         style="max-width:100%; max-height:75vh; border:1px solid #d1d5db; border-radius:10px;">
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function openNoteModal(sourceId, title) {
+                var source = document.getElementById(sourceId);
+                var content = document.getElementById('noteContent');
+                var modal = document.getElementById('noteModal');
+                var modalTitle = document.getElementById('noteModalTitle');
+                content.textContent = source ? source.value : '';
+                modalTitle.textContent = title || 'Note';
+                modal.style.display = 'block';
+            }
+
+            function closeNoteModal() {
+                document.getElementById('noteModal').style.display = 'none';
+            }
+
+            function openImageModal(imageUrl, title) {
+                var modal = document.getElementById('imageModal');
+                var image = document.getElementById('imageModalContent');
+                var modalTitle = document.getElementById('imageModalTitle');
+                image.src = imageUrl || '';
+                modalTitle.textContent = title || 'Image';
+                modal.style.display = 'block';
+            }
+
+            function closeImageModal() {
+                var modal = document.getElementById('imageModal');
+                var image = document.getElementById('imageModalContent');
+                modal.style.display = 'none';
+                image.removeAttribute('src');
+            }
+
+            window.onclick = function (event) {
+                var noteModal = document.getElementById('noteModal');
+                var imageModal = document.getElementById('imageModal');
+                if (event.target === noteModal) {
+                    closeNoteModal();
+                }
+                if (event.target === imageModal) {
+                    closeImageModal();
+                }
+            };
+        </script>
     </body>
 </html>
 

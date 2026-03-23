@@ -11,8 +11,8 @@ import java.io.IOException;
 import model.User;
 
 /**
- * Quick submit from EMR Queue:
- * Auto-create a medical record with placeholder fields and redirect to list.
+ * Quick create from EMR Queue / Dashboard:
+ * Auto-create a medical record with placeholder fields and redirect to detail.
  */
 @WebServlet(name = "MedicalRecordQuickSubmitController", urlPatterns = {"/veterinarian/emr/submit"})
 public class MedicalRecordQuickSubmitController extends HttpServlet {
@@ -42,12 +42,19 @@ public class MedicalRecordQuickSubmitController extends HttpServlet {
 
         try {
             MedicalRecordDAO dao = new MedicalRecordDAO();
+            Integer existingRecordId = dao.getRecordIdByApptForVet(apptId, account.getUserId());
+            if (existingRecordId != null) {
+                session.setAttribute("toastMessage", "success|Opened existing medical record.");
+                response.sendRedirect(request.getContextPath() + "/veterinarian/emr/detail?id=" + existingRecordId);
+                return;
+            }
+
             int recordId = dao.createForVetReturnId(apptId, account.getUserId(), DEFAULT_DIAGNOSIS, DEFAULT_TREATMENT_PLAN);
             if (recordId > 0) {
-                session.setAttribute("toastMessage", "success|Medical record submitted.");
-                response.sendRedirect(request.getContextPath() + "/veterinarian/emr/records");
+                session.setAttribute("toastMessage", "success|Medical record created. Appointment moved to In-Progress.");
+                response.sendRedirect(request.getContextPath() + "/veterinarian/emr/detail?id=" + recordId);
             } else {
-                session.setAttribute("toastMessage", "error|Cannot submit medical record. Appointment may not be Checked-in or not assigned to you.");
+                session.setAttribute("toastMessage", "error|Cannot create medical record. Appointment may not be Checked-in or not assigned to you.");
                 response.sendRedirect(request.getContextPath() + "/veterinarian/emr/queue");
             }
         } catch (Exception e) {
