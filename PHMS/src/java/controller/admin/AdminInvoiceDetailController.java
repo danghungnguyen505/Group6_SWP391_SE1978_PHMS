@@ -1,4 +1,4 @@
-package controller.receptionist;
+package controller.admin;
 
 import dal.AppointmentDAO;
 import dal.InvoiceDAO;
@@ -18,34 +18,26 @@ import model.Payment;
 import model.User;
 
 /**
- * Receptionist view invoice detail.
- * SRP: Read invoice & details only.
+ * Admin view invoice detail (read-only).
  */
-@WebServlet(name = "InvoiceDetailController", urlPatterns = {"/receptionist/invoice/detail"})
-public class InvoiceDetailController extends HttpServlet {
+@WebServlet(name = "AdminInvoiceDetailController", urlPatterns = {"/admin/invoice/detail"})
+public class AdminInvoiceDetailController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         User account = (User) session.getAttribute("account");
-        if (account == null
-                || (!"Receptionist".equalsIgnoreCase(account.getRole())
-                && !"Admin".equalsIgnoreCase(account.getRole())
+        if (account == null || (!"Admin".equalsIgnoreCase(account.getRole())
                 && !"ClinicManager".equalsIgnoreCase(account.getRole()))) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
-        boolean isReceptionist = "Receptionist".equalsIgnoreCase(account.getRole());
-        String fallbackUrl = isReceptionist
-                ? request.getContextPath() + "/receptionist/dashboard"
-                : request.getContextPath() + "/admin/reports";
-
         String invoiceIdStr = request.getParameter("invoiceId");
         if (!util.ValidationUtils.isNotEmpty(invoiceIdStr)
                 || !util.ValidationUtils.isIntegerInRange(invoiceIdStr, 1, Integer.MAX_VALUE)) {
-            response.sendRedirect(fallbackUrl);
+            response.sendRedirect(request.getContextPath() + "/admin/reports");
             return;
         }
         int invoiceId = Integer.parseInt(invoiceIdStr);
@@ -56,31 +48,20 @@ public class InvoiceDetailController extends HttpServlet {
 
         Invoice inv = invoiceDAO.getInvoiceById(invoiceId);
         if (inv == null) {
-            session.setAttribute("toastMessage", "error|Không tìm thấy hóa đơn.");
-            response.sendRedirect(fallbackUrl);
+            session.setAttribute("toastMessage", "error|Khong tim thay hoa don.");
+            response.sendRedirect(request.getContextPath() + "/admin/reports");
             return;
         }
 
-        // Lấy thông tin appointment để hiển thị owner, pet, vet
         Appointment appt = appointmentDAO.getAppointmentById(inv.getApptId());
-
         List<InvoiceDetail> details = invoiceDAO.getDetailsByInvoice(invoiceId);
         List<Payment> payments = paymentDAO.getPaymentsByInvoice(invoiceId);
-
-        // Pass staff name and date/time for printing
-        String staffName = account.getFullName() != null ? account.getFullName() : account.getUsername();
-        java.time.LocalDate today = java.time.LocalDate.now();
-        java.time.LocalTime now = java.time.LocalTime.now();
-        java.time.format.DateTimeFormatter timeFormatter = java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss");
 
         request.setAttribute("invoice", inv);
         request.setAttribute("appt", appt);
         request.setAttribute("details", details);
         request.setAttribute("payments", payments);
-        request.setAttribute("staffName", staffName);
-        request.setAttribute("invoiceDate", today.toString());
-        request.setAttribute("invoiceTime", now.format(timeFormatter));
-        request.getRequestDispatcher("/views/receptionist/invoiceDetail.jsp").forward(request, response);
+        request.getRequestDispatcher("/views/admin/invoiceDetail.jsp").forward(request, response);
     }
 }
 

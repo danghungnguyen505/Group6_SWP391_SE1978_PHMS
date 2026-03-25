@@ -91,7 +91,6 @@ public class InvoiceCreateController extends HttpServlet {
         List<InvoiceDetail> labServices = invoiceDAO.getLabServiceDetailsForAppointment(apptId);
 
         Double subtotal = null;
-        Double tax = null;
         Double grandTotal = null;
         double s = 0;
         if (mainService != null) {
@@ -101,8 +100,7 @@ public class InvoiceCreateController extends HttpServlet {
             s += lab.getQuantity() * lab.getUnitPrice();
         }
         subtotal = s;
-        tax = subtotal * 0.08; // 8% tax
-        grandTotal = subtotal + tax;
+        grandTotal = subtotal;
 
         // Simple invoice number & date preview
         java.time.LocalDate today = java.time.LocalDate.now();
@@ -114,7 +112,6 @@ public class InvoiceCreateController extends HttpServlet {
         request.setAttribute("mainService", mainService);
         request.setAttribute("labServices", labServices);
         request.setAttribute("subtotal", subtotal);
-        request.setAttribute("tax", tax);
         request.setAttribute("grandTotal", grandTotal);
         request.setAttribute("invoiceNumber", invoiceNumber);
         request.setAttribute("invoiceDate", today.toString());

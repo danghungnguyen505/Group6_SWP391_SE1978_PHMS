@@ -62,7 +62,7 @@ public class BookingController extends HttpServlet {
         }
         // 1.2. Load danh sách dịch vụ đang hoạt động (Service Type)
         ServiceDAO serviceDAO = new ServiceDAO();
-        List<Service> services = serviceDAO.getAllActiveServices();
+        List<Service> services = serviceDAO.getAllActiveServicesByType("Basic");
         request.setAttribute("services", services);
         // 2. Xử lý logic lọc Bác sĩ theo Ngày
         String dateStr = request.getParameter("selectedDate");

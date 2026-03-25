@@ -509,7 +509,6 @@
 
                     <div class="totals-section">
                         <div class="total-row"><span>Subtotal</span><span class="amount"><fmt:formatNumber value="${subtotal != null ? subtotal : 0}" type="currency" currencySymbol="VND "/></span></div>
-                        <div class="total-row"><span>Tax (8%)</span><span class="amount"><fmt:formatNumber value="${tax != null ? tax : 0}" type="currency" currencySymbol="VND "/></span></div>
                         <div class="total-row grand-total"><span>Grand Total</span><span class="amount-green"><fmt:formatNumber value="${grandTotal != null ? grandTotal : 0}" type="currency" currencySymbol="VND "/></span></div>
                     </div>
                 </div>

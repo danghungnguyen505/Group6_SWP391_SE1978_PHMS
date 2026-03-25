@@ -476,7 +476,7 @@
                         <div class="info-group">
                             <label>TOTAL AMOUNT</label>
                             <div class="info-value">
-                                <fmt:formatNumber value="${invoice.totalAmount * 1.08}" type="currency" currencySymbol="VND "/>
+                                <fmt:formatNumber value="${invoice.totalAmount}" type="currency" currencySymbol="VND "/>
                             </div>
                         </div>
                     </div>
@@ -514,11 +514,10 @@
 
                     <div class="totals-section">
                         <div class="total-row"><span>Subtotal</span><span class="amount"><fmt:formatNumber value="${invoice.totalAmount}" type="currency" currencySymbol="VND "/></span></div>
-                        <div class="total-row"><span>Tax (8%)</span><span class="amount"><fmt:formatNumber value="${invoice.totalAmount * 0.08}" type="currency" currencySymbol="VND "/></span></div>
                         <div class="total-row grand-total">
                             <span>Grand Total</span>
                             <span class="amount-green">
-                                <fmt:formatNumber value="${invoice.totalAmount * 1.08}" type="currency" currencySymbol="VND "/>
+                                <fmt:formatNumber value="${invoice.totalAmount}" type="currency" currencySymbol="VND "/>
                             </span>
                         </div>
                     </div>
@@ -565,7 +564,7 @@
 
                                 <button type="button" class="btn-pay" onclick="openVietqrModal()">
                                     Pay
-                                    <fmt:formatNumber value="${invoice.totalAmount * 1.08}" type="currency" currencySymbol="VND "/>
+                                    <fmt:formatNumber value="${invoice.totalAmount}" type="currency" currencySymbol="VND "/>
                                 </button>
                             </form>
 
@@ -623,7 +622,7 @@
                         <!-- LEFT QR -->
                         <div class="qr-section">
                             <div class="qr-wrapper">
-                                <img src="https://img.vietqr.io/image/techcombank-1999992707-compact.png?amount=${invoice.totalAmount * 1.08}&addInfo=INV${invoice.invoiceId}&accountName=PHAM CONG HUY"
+                                <img src="https://img.vietqr.io/image/techcombank-1999992707-compact.png?amount=${invoice.totalAmount}&addInfo=INV${invoice.invoiceId}&accountName=PHAM CONG HUY"
                                      alt="QR">
                             </div>
                             <div class="qr-note">Quét mã QR để thanh toán</div>
@@ -651,7 +650,7 @@
                             <div class="payment-item">
                                 <span>Số tiền</span>
                                 <strong class="amount-highlight">
-                                    <fmt:formatNumber value="${invoice.totalAmount * 1.08}" type="currency" currencySymbol="VND "/>
+                                    <fmt:formatNumber value="${invoice.totalAmount}" type="currency" currencySymbol="VND "/>
                                 </strong>
                             </div>
 
