@@ -49,6 +49,45 @@ public class ServiceDAO extends DBContext {
         return services;
     }
 
+    public List<Service> getAllActiveServicesByType(String type) {
+        List<Service> services = new ArrayList<>();
+        if (type == null || type.trim().isEmpty()) {
+            return services;
+        }
+
+        boolean withType = hasTypeColumn();
+        if (!withType) {
+            if ("basic".equalsIgnoreCase(type.trim())) {
+                return getAllActiveServices();
+            }
+            return services;
+        }
+
+        String sql = "SELECT service_id, name, [type], base_price, description, is_active "
+                + "FROM ServiceList "
+                + "WHERE is_active = 1 "
+                + "  AND UPPER(LTRIM(RTRIM(COALESCE([type], '')))) = UPPER(?) "
+                + "ORDER BY service_id DESC";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setString(1, type.trim());
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    Service service = new Service();
+                    service.setServiceId(rs.getInt("service_id"));
+                    service.setName(rs.getString("name"));
+                    service.setType(rs.getString("type"));
+                    service.setBasePrice(rs.getDouble("base_price"));
+                    service.setDescription(rs.getString("description"));
+                    service.setActive(rs.getBoolean("is_active"));
+                    services.add(service);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getAllActiveServicesByType: " + e.getMessage());
+        }
+        return services;
+    }
+
     public List<Service> getAllServices() {
         List<Service> list = new ArrayList<>();
         boolean withType = hasTypeColumn();
@@ -179,6 +218,44 @@ public class ServiceDAO extends DBContext {
             }
         } catch (SQLException e) {
             System.out.println("Error getActiveServiceByName: " + e.getMessage());
+        }
+        return null;
+    }
+
+    public Service getActiveServiceByNameAndType(String name, String type) {
+        if (name == null || name.trim().isEmpty() || type == null || type.trim().isEmpty()) {
+            return null;
+        }
+        boolean withType = hasTypeColumn();
+        String sql = withType
+                ? "SELECT service_id, name, [type], base_price, description, is_active, managed_by "
+                + "FROM ServiceList "
+                + "WHERE name = ? AND is_active = 1 "
+                + "  AND UPPER(LTRIM(RTRIM(COALESCE([type], '')))) = UPPER(?)"
+                : "SELECT service_id, name, base_price, description, is_active, managed_by "
+                + "FROM ServiceList WHERE name = ? AND is_active = 1";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, name.trim());
+            if (withType) {
+                ps.setString(2, type.trim());
+            } else if (!"basic".equalsIgnoreCase(type.trim())) {
+                return null;
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new Service(
+                            rs.getInt("service_id"),
+                            rs.getString("name"),
+                            withType ? rs.getString("type") : "Basic",
+                            rs.getDouble("base_price"),
+                            rs.getString("description"),
+                            rs.getBoolean("is_active"),
+                            rs.getInt("managed_by")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getActiveServiceByNameAndType: " + e.getMessage());
         }
         return null;
     }

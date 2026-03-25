@@ -84,7 +84,15 @@ public class AuthorizationFilter implements Filter {
                 return;
             }
         } else if (path.startsWith("/receptionist/")) {
-            if (!"Receptionist".equalsIgnoreCase(role)) {
+            // Allow Admin/ClinicManager to view invoice detail page only.
+            if (path.startsWith("/receptionist/invoice/detail")) {
+                if (!"Receptionist".equalsIgnoreCase(role)
+                        && !"Admin".equalsIgnoreCase(role)
+                        && !"ClinicManager".equalsIgnoreCase(role)) {
+                    httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied. Receptionist role required.");
+                    return;
+                }
+            } else if (!"Receptionist".equalsIgnoreCase(role)) {
                 httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied. Receptionist role required.");
                 return;
             }

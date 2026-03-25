@@ -6,6 +6,7 @@ package controller.appointment;
 
 import dal.AppointmentDAO;
 import dal.ScheduleVeterianrianDAO;
+import dal.ServiceDAO;
 import dal.UserDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -75,6 +76,12 @@ public class SaveAppointmentController extends HttpServlet {
             // Validate service type
             if (!util.ValidationUtils.isNotEmpty(serviceType)) {
                 request.setAttribute("error", "Vui lòng chọn loại dịch vụ!");
+                response.sendRedirect(request.getContextPath() + "/booking");
+                return;
+            }
+            ServiceDAO serviceDAO = new ServiceDAO();
+            if (serviceDAO.getActiveServiceByNameAndType(serviceType, "Basic") == null) {
+                session.setAttribute("toastMessage", "error|Pet owner chỉ được đặt lịch dịch vụ Basic.");
                 response.sendRedirect(request.getContextPath() + "/booking");
                 return;
             }
