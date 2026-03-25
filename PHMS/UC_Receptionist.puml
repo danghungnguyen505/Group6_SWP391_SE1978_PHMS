@@ -1,0 +1,22 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Receptionist" as RC
+
+rectangle "PHMS - Receptionist" {
+
+  RC -- (View Dashboard)
+  RC -- (Manage Appointments\n Confirm / Cancel / Reschedule)
+  RC -- (Request Appointment\n Walk-in)
+  RC -- (Manage Emergency Queue\n Create / Triage)
+  RC -- (Create Invoice)
+  RC -- (View Invoice Detail)
+  RC -- (Create Payment)
+  RC -- (View Staff Scheduling)
+
+  (Create Invoice) ..> (Create Payment) : <<include>>
+  (View Invoice Detail) ..> (Create Invoice) : <<extend>>
+}
+
+@enduml

@@ -18,6 +18,19 @@ import util.PasswordUtil;
  */
 public class UserDAO extends DBContext {
 
+    private boolean hasVeterinarianTypeColumn() {
+        String sql = "SELECT COL_LENGTH('Veterinarian', 'type') AS col_len";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getObject("col_len") != null;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error hasVeterinarianTypeColumn: " + e.getMessage());
+        }
+        return false;
+    }
+
     /**
      * Check login credentials with BCrypt password verification
      * Supports both BCrypt hashed passwords and plain text (for backward compatibility)
@@ -348,12 +361,15 @@ public class UserDAO extends DBContext {
         }
         return null;
     }
-    //List Veterinarians để hiện danh sách làm việc
+    //List Veterinarians Ä‘á»ƒ hiá»‡n danh sÃ¡ch lÃ m viá»‡c
     public List<User> getAllVeterinarians() {
         List<User> list = new ArrayList<>();
-        // Join bảng Users và Veterinarian để chỉ lấy những ai là Bác sĩ
-        String sql = "SELECT u.user_id, u.full_name FROM Users u " +
-                     "JOIN Veterinarian v ON u.user_id = v.emp_id";
+        boolean withType = hasVeterinarianTypeColumn();
+        String sql = withType
+                ? "SELECT u.user_id, u.full_name, v.[type] AS vet_type FROM Users u "
+                + "JOIN Veterinarian v ON u.user_id = v.emp_id"
+                : "SELECT u.user_id, u.full_name FROM Users u "
+                + "JOIN Veterinarian v ON u.user_id = v.emp_id";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             ResultSet rs = st.executeQuery();
@@ -361,6 +377,7 @@ public class UserDAO extends DBContext {
                 User u = new User();
                 u.setUserId(rs.getInt("user_id"));
                 u.setFullName(rs.getString("full_name"));
+                u.setVetType(withType ? rs.getString("vet_type") : "Normal");
                 list.add(u);
             }
         } catch (SQLException e) {
@@ -368,7 +385,55 @@ public class UserDAO extends DBContext {
         }
         return list;
     }
-    
+
+    public boolean isBookableVeterinarianForOwner(int vetId) {
+        boolean withType = hasVeterinarianTypeColumn();
+        String sql = withType
+                ? "SELECT TOP 1 1 FROM Users u "
+                + "JOIN Veterinarian v ON u.user_id = v.emp_id "
+                + "WHERE u.user_id = ? AND u.role = 'Veterinarian' "
+                + "AND ISNULL(u.is_active, 1) = 1 "
+                + "AND UPPER(ISNULL(v.[type], 'Normal')) = 'NORMAL'"
+                : "SELECT TOP 1 1 FROM Users u "
+                + "JOIN Veterinarian v ON u.user_id = v.emp_id "
+                + "WHERE u.user_id = ? AND u.role = 'Veterinarian' "
+                + "AND ISNULL(u.is_active, 1) = 1";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, vetId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            System.out.println("Error isBookableVeterinarianForOwner: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public List<User> getEmergencyVeterinarians() {
+        List<User> list = new ArrayList<>();
+        boolean withType = hasVeterinarianTypeColumn();
+        String sql = withType
+                ? "SELECT u.user_id, u.full_name, v.[type] AS vet_type "
+                + "FROM Users u "
+                + "JOIN Veterinarian v ON u.user_id = v.emp_id "
+                + "WHERE UPPER(ISNULL(v.[type], 'Normal')) = 'EMERGENCY'"
+                : "SELECT u.user_id, u.full_name FROM Users u "
+                + "JOIN Veterinarian v ON u.user_id = v.emp_id";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                User u = new User();
+                u.setUserId(rs.getInt("user_id"));
+                u.setFullName(rs.getString("full_name"));
+                u.setVetType(withType ? rs.getString("vet_type") : "Emergency");
+                list.add(u);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getEmergencyVeterinarians: " + e.getMessage());
+        }
+        return list;
+    }
+
     /**
      * Get owner (PetOwner) by pet ID.
      */
@@ -398,3 +463,4 @@ public class UserDAO extends DBContext {
         return null;
     }
 }
+

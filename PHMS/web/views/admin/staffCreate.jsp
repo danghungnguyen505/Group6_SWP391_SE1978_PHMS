@@ -172,6 +172,13 @@
                     <label class="form-label">License Number (Veterinarian only)</label>
                     <input type="text" name="licenseNumber" value="${licenseNumber}" class="form-input" placeholder="LIC-XXXXX">
                 </div>
+                <div id="vetTypeGroup" class="form-group" style="margin-top: 20px;">
+                    <label class="form-label">Veterinarian Type</label>
+                    <select name="vetType" class="form-input">
+                        <option value="Normal" ${vetType == 'Normal' || empty vetType ? 'selected' : ''}>Normal</option>
+                        <option value="Emergency" ${vetType == 'Emergency' ? 'selected' : ''}>Emergency</option>
+                    </select>
+                </div>
 
                 <div class="form-actions">
                     <button type="submit" class="btn-submit">Confirm & Register</button>
@@ -186,13 +193,16 @@
             const role = document.getElementById('roleSelect').value;
             const specGroup = document.getElementById('specializationGroup');
             const licenseGroup = document.getElementById('licenseGroup');
+            const vetTypeGroup = document.getElementById('vetTypeGroup');
             
             if (role === 'Veterinarian') {
                 specGroup.style.display = 'block';
                 licenseGroup.style.display = 'block';
+                vetTypeGroup.style.display = 'block';
             } else {
                 specGroup.style.display = 'none';
                 licenseGroup.style.display = 'none';
+                vetTypeGroup.style.display = 'none';
             }
         }
         toggleVetFields();

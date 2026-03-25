@@ -15,6 +15,19 @@ import util.PasswordUtil;
  */
 public class StaffAccountDAO extends DBContext {
 
+    private boolean hasVeterinarianTypeColumn() {
+        String sql = "SELECT COL_LENGTH('Veterinarian', 'type') AS col_len";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getObject("col_len") != null;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error hasVeterinarianTypeColumn: " + e.getMessage());
+        }
+        return false;
+    }
+
     /**
      * Get all staff accounts (excluding PetOwner) with pagination.
      * Supports optional filters: keyword (username/full_name/phone/code), role, status.
@@ -156,9 +169,17 @@ public class StaffAccountDAO extends DBContext {
      * Get staff account detail by ID.
      */
     public User getStaffAccountById(int userId) {
-        String sql = "SELECT u.*, e.employee_code, e.department, e.salary_base "
+        boolean withType = hasVeterinarianTypeColumn();
+        String sql = withType
+                ? "SELECT u.*, e.employee_code, e.department, e.salary_base, v.license_number, v.specialization, v.[type] AS vet_type "
                 + "FROM Users u "
                 + "LEFT JOIN Employee e ON u.user_id = e.user_id "
+                + "LEFT JOIN Veterinarian v ON u.user_id = v.emp_id "
+                + "WHERE u.user_id = ? AND u.role IN ('Veterinarian', 'Nurse', 'Receptionist', 'ClinicManager', 'Admin')"
+                : "SELECT u.*, e.employee_code, e.department, e.salary_base, v.license_number, v.specialization "
+                + "FROM Users u "
+                + "LEFT JOIN Employee e ON u.user_id = e.user_id "
+                + "LEFT JOIN Veterinarian v ON u.user_id = v.emp_id "
                 + "WHERE u.user_id = ? AND u.role IN ('Veterinarian', 'Nurse', 'Receptionist', 'ClinicManager', 'Admin')";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, userId);
@@ -174,6 +195,9 @@ public class StaffAccountDAO extends DBContext {
                     user.setAddress(rs.getString("employee_code") + "|"
                             + rs.getString("department") + "|"
                             + (rs.getDouble("salary_base") != 0 ? String.valueOf(rs.getDouble("salary_base")) : ""));
+                    user.setVetType(withType ? rs.getString("vet_type") : "Normal");
+                    user.setSpecialization(rs.getString("specialization"));
+                    user.setLicenseNumber(rs.getString("license_number"));
                     return user;
                 }
             }
@@ -190,7 +214,7 @@ public class StaffAccountDAO extends DBContext {
      */
     public boolean createStaffAccount(String username, String password, String fullName, String phone,
             String role, String employeeCode, String department, Double salaryBase,
-            String specialization, String licenseNumber) throws SQLException {
+            String specialization, String licenseNumber, String vetType) throws SQLException {
         if (!isValidStaffRole(role)) {
             return false;
         }
@@ -244,6 +268,9 @@ public class StaffAccountDAO extends DBContext {
                     if ("Veterinarian".equalsIgnoreCase(role)) {
                         ps.setString(2, licenseNumber != null ? licenseNumber : "");
                         ps.setString(3, specialization != null ? specialization : "");
+                        if (hasVeterinarianTypeColumn()) {
+                            ps.setString(4, vetType != null ? vetType : "Normal");
+                        }
                     }
                     if (ps.executeUpdate() <= 0) {
                         connection.rollback();
@@ -267,7 +294,7 @@ public class StaffAccountDAO extends DBContext {
      */
     public boolean updateStaffAccount(int userId, String fullName, String phone, String role,
             String employeeCode, String department, Double salaryBase,
-            String specialization, String licenseNumber) throws SQLException {
+            String specialization, String licenseNumber, String vetType) throws SQLException {
         if (!isValidStaffRole(role)) {
             return false;
         }
@@ -317,15 +344,25 @@ public class StaffAccountDAO extends DBContext {
                     try (PreparedStatement ps = connection.prepareStatement(sqlRoleSpecific)) {
                         ps.setString(1, licenseNumber != null ? licenseNumber : "");
                         ps.setString(2, specialization != null ? specialization : "");
-                        ps.setInt(3, userId);
+                        if (hasVeterinarianTypeColumn()) {
+                            ps.setString(3, vetType != null ? vetType : "Normal");
+                            ps.setInt(4, userId);
+                        } else {
+                            ps.setInt(3, userId);
+                        }
                         ps.executeUpdate();
                     }
                 } else {
-                    String insertSql = "INSERT INTO Veterinarian (emp_id, license_number, specialization) VALUES (?, ?, ?)";
+                    String insertSql = hasVeterinarianTypeColumn()
+                            ? "INSERT INTO Veterinarian (emp_id, license_number, specialization, [type]) VALUES (?, ?, ?, ?)"
+                            : "INSERT INTO Veterinarian (emp_id, license_number, specialization) VALUES (?, ?, ?)";
                     try (PreparedStatement ps = connection.prepareStatement(insertSql)) {
                         ps.setInt(1, userId);
                         ps.setString(2, licenseNumber != null ? licenseNumber : "");
                         ps.setString(3, specialization != null ? specialization : "");
+                        if (hasVeterinarianTypeColumn()) {
+                            ps.setString(4, vetType != null ? vetType : "Normal");
+                        }
                         ps.executeUpdate();
                     }
                 }
@@ -473,6 +510,9 @@ public class StaffAccountDAO extends DBContext {
 
     private String getRoleSpecificInsertSQL(String role) {
         if ("Veterinarian".equalsIgnoreCase(role)) {
+            if (hasVeterinarianTypeColumn()) {
+                return "INSERT INTO Veterinarian (emp_id, license_number, specialization, [type]) VALUES (?, ?, ?, ?)";
+            }
             return "INSERT INTO Veterinarian (emp_id, license_number, specialization) VALUES (?, ?, ?)";
         }
         // Other roles don't need additional inserts based on schema
@@ -481,6 +521,9 @@ public class StaffAccountDAO extends DBContext {
 
     private String getRoleSpecificUpdateSQL(String role) {
         if ("Veterinarian".equalsIgnoreCase(role)) {
+            if (hasVeterinarianTypeColumn()) {
+                return "UPDATE Veterinarian SET license_number = ?, specialization = ?, [type] = ? WHERE emp_id = ?";
+            }
             return "UPDATE Veterinarian SET license_number = ?, specialization = ? WHERE emp_id = ?";
         }
         return null;

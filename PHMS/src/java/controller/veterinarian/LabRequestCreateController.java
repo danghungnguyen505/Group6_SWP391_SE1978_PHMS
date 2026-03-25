@@ -55,6 +55,8 @@ public class LabRequestCreateController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/veterinarian/lab/requests");
             return;
         }
+        LabTestDAO labTestDAO = new LabTestDAO();
+        request.setAttribute("labTestTypes", labTestDAO.listDistinctTestTypes());
         request.setAttribute("record", mr);
         request.getRequestDispatcher("/views/veterinarian/labRequestCreate.jsp").forward(request, response);
     }
@@ -95,6 +97,8 @@ public class LabRequestCreateController extends HttpServlet {
             request.setAttribute("recordId", recordId);
             request.setAttribute("testType", testType);
             request.setAttribute("requestNotes", requestNotes);
+            LabTestDAO labTestDAO = new LabTestDAO();
+            request.setAttribute("labTestTypes", labTestDAO.listDistinctTestTypes());
             request.getRequestDispatcher("/views/veterinarian/labRequestCreate.jsp").forward(request, response);
             return;
         }
@@ -108,6 +112,8 @@ public class LabRequestCreateController extends HttpServlet {
             request.setAttribute("recordId", recordId);
             request.setAttribute("testType", testType);
             request.setAttribute("requestNotes", requestNotes);
+            LabTestDAO labTestDAO = new LabTestDAO();
+            request.setAttribute("labTestTypes", labTestDAO.listDistinctTestTypes());
             request.getRequestDispatcher("/views/veterinarian/labRequestCreate.jsp").forward(request, response);
             return;
         }
@@ -150,6 +156,8 @@ public class LabRequestCreateController extends HttpServlet {
             request.setAttribute("recordId", recordId);
             request.setAttribute("testType", testType);
             request.setAttribute("requestNotes", requestNotes);
+            LabTestDAO labTestDAO = new LabTestDAO();
+            request.setAttribute("labTestTypes", labTestDAO.listDistinctTestTypes());
             request.getRequestDispatcher("/views/veterinarian/labRequestCreate.jsp").forward(request, response);
         }
     }

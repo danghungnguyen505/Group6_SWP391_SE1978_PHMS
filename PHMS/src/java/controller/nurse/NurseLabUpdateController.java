@@ -27,6 +27,55 @@ import model.User;
 )
 public class NurseLabUpdateController extends HttpServlet {
 
+    private String extractLabFilePath(String resultData) {
+        if (resultData == null) {
+            return null;
+        }
+        String trimmed = resultData.trim();
+        if (!trimmed.startsWith("/uploads/lab/")) {
+            return null;
+        }
+        int lineBreakIdx = trimmed.indexOf('\n');
+        if (lineBreakIdx < 0) {
+            return trimmed;
+        }
+        return trimmed.substring(0, lineBreakIdx).trim();
+    }
+
+    private String extractLabResultText(String resultData) {
+        if (resultData == null) {
+            return "";
+        }
+        String normalized = resultData.replace("\r", "");
+        if (!normalized.trim().startsWith("/uploads/lab/")) {
+            return normalized.trim();
+        }
+        int lineBreakIdx = normalized.indexOf('\n');
+        if (lineBreakIdx < 0) {
+            return "";
+        }
+        String remain = normalized.substring(lineBreakIdx + 1).trim();
+        return remain;
+    }
+
+    private String composeResultData(String filePath, String resultText) {
+        String text = resultText == null ? "" : resultText.trim();
+        if (filePath != null && !filePath.trim().isEmpty()) {
+            if (text.isEmpty()) {
+                return filePath.trim();
+            }
+            return filePath.trim() + "\n\n" + text;
+        }
+        return text;
+    }
+
+    private String sanitizeFileName(String fileName) {
+        if (fileName == null) {
+            return "upload";
+        }
+        return fileName.replaceAll("[^a-zA-Z0-9._-]", "_");
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -60,8 +109,12 @@ public class NurseLabUpdateController extends HttpServlet {
 
         // Check if test can be updated (not Completed or Cancelled)
         boolean canUpdate = dao.canUpdate(testId);
+        String existingFilePath = extractLabFilePath(lt.getResultData());
+        String existingResultText = extractLabResultText(lt.getResultData());
         request.setAttribute("test", lt);
         request.setAttribute("canUpdate", canUpdate);
+        request.setAttribute("existingFilePath", existingFilePath);
+        request.setAttribute("existingResultText", existingResultText);
         request.getRequestDispatcher("/views/nurse/labUpdate.jsp").forward(request, response);
     }
 
@@ -116,7 +169,9 @@ public class NurseLabUpdateController extends HttpServlet {
             return;
         }
 
-        String resultDataToStore = resultText;
+        LabTest currentTest = daoCheck.getByIdForNurse(testId);
+        String existingFilePath = currentTest != null ? extractLabFilePath(currentTest.getResultData()) : null;
+        String resultDataToStore;
 
         // Optional file upload
         Part filePart = null;
@@ -128,9 +183,12 @@ public class NurseLabUpdateController extends HttpServlet {
         if (filePart != null && filePart.getSize() > 0) {
             String submittedFileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
             String lower = submittedFileName.toLowerCase();
-            boolean allowed = lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png") || lower.endsWith(".dcm");
+            String contentType = filePart.getContentType() != null ? filePart.getContentType().toLowerCase() : "";
+            boolean allowedExtension = lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png");
+            boolean allowedMime = contentType.startsWith("image/");
+            boolean allowed = allowedExtension && allowedMime;
             if (!allowed) {
-                session.setAttribute("toastMessage", "error|Invalid file type. Allowed: JPG/PNG/DICOM(.dcm)");
+                session.setAttribute("toastMessage", "error|Invalid image type. Allowed: JPG, JPEG, PNG.");
                 response.sendRedirect(request.getContextPath() + "/nurse/lab/update?id=" + testId);
                 return;
             }
@@ -139,12 +197,14 @@ public class NurseLabUpdateController extends HttpServlet {
             File dir = new File(uploadDir);
             if (!dir.exists()) dir.mkdirs();
 
-            String storedName = "lab_" + testId + "_" + System.currentTimeMillis() + "_" + submittedFileName;
+            String safeFileName = sanitizeFileName(submittedFileName);
+            String storedName = "lab_" + testId + "_" + System.currentTimeMillis() + "_" + safeFileName;
             File out = new File(dir, storedName);
             filePart.write(out.getAbsolutePath());
 
-            // Store relative path in result_data
-            resultDataToStore = "/uploads/lab/" + storedName + (resultText != null && !resultText.isEmpty() ? ("\n\n" + resultText) : "");
+            resultDataToStore = composeResultData("/uploads/lab/" + storedName, resultText);
+        } else {
+            resultDataToStore = composeResultData(existingFilePath, resultText);
         }
 
         LabTestDAO dao = new LabTestDAO();

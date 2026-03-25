@@ -397,6 +397,15 @@
                                 <input type="text" name="licenseNumber" value="${licenseNumber}" class="form-input">
                             </div>
                         </div>
+                        <div id="vetTypeGroup">
+                            <div class="form-group" style="margin-top: 20px;">
+                                <label class="form-label">Veterinarian Type</label>
+                                <select name="vetType" class="form-input">
+                                    <option value="Normal" ${vetType == 'Normal' || empty vetType ? 'selected' : ''}>Normal</option>
+                                    <option value="Emergency" ${vetType == 'Emergency' ? 'selected' : ''}>Emergency</option>
+                                </select>
+                            </div>
+                        </div>
 
                         <div class="form-actions">
                             <button type="submit" class="btn-submit">Update Changes</button>
@@ -412,13 +421,16 @@
                 const role = document.getElementById('roleSelect').value;
                 const specGroup = document.getElementById('specializationGroup');
                 const licenseGroup = document.getElementById('licenseGroup');
+                const vetTypeGroup = document.getElementById('vetTypeGroup');
 
                 if (role === 'Veterinarian') {
                     specGroup.style.display = 'block';
                     licenseGroup.style.display = 'block';
+                    vetTypeGroup.style.display = 'block';
                 } else {
                     specGroup.style.display = 'none';
                     licenseGroup.style.display = 'none';
+                    vetTypeGroup.style.display = 'none';
                 }
             }
             // Khởi chạy khi load trang

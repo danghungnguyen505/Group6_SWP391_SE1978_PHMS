@@ -1,0 +1,30 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Hospital Manager" as AD
+
+rectangle "PHMS - Hospital Manager" {
+
+  AD -- (View Dashboard)
+  AD -- (Manage Staff Accounts\n Create / Update / Delete / Lock)
+  AD -- (Manage Services\n Add / Edit / Toggle Status)
+  AD -- (View Service List)
+  AD -- (Manage Medicines\n Add / Update / Delete)
+  AD -- (View Medicine List)
+  AD -- (Manage Doctor Schedule\n Add / Delete)
+  AD -- (View Doctor Schedule List)
+  AD -- (View Business Report)
+  AD -- (View Feedback List)
+  AD -- (Manage Leave Requests\n Approve / Reject)
+  AD -- (View Leave Pending List)
+  AD -- (Send Notifications)
+  AD -- (Auto-Cancel Pending Payments)
+
+  (Manage Services\n Add / Edit / Toggle Status) ..> (View Service List) : <<include>>
+  (Manage Medicines\n Add / Update / Delete) ..> (View Medicine List) : <<include>>
+  (Manage Doctor Schedule\n Add / Delete) ..> (View Doctor Schedule List) : <<include>>
+  (Manage Leave Requests\n Approve / Reject) ..> (View Leave Pending List) : <<include>>
+}
+
+@enduml

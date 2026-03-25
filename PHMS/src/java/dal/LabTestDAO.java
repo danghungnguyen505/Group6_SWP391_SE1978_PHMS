@@ -480,14 +480,17 @@ public class LabTestDAO extends DBContext {
     }
 
     /**
-     * List distinct test types from database for dropdown selection.
+     * List available lab test types from ServiceList for dropdown selection.
+     * Source of truth: ServiceList.type = 'LabTest' and active services only.
      */
     public List<String> listDistinctTestTypes() {
         List<String> types = new ArrayList<>();
-        String sql = "SELECT DISTINCT test_type "
-                + "FROM LabTest "
-                + "WHERE test_type IS NOT NULL AND LTRIM(RTRIM(test_type)) <> '' "
-                + "ORDER BY test_type ASC";
+        String sql = "SELECT DISTINCT LTRIM(RTRIM(name)) AS test_type "
+                + "FROM ServiceList "
+                + "WHERE is_active = 1 "
+                + "  AND UPPER(LTRIM(RTRIM(COALESCE([type], '')))) = 'LABTEST' "
+                + "  AND NULLIF(LTRIM(RTRIM(name)), '') IS NOT NULL "
+                + "ORDER BY LTRIM(RTRIM(name)) ASC";
         try (PreparedStatement st = connection.prepareStatement(sql);
              ResultSet rs = st.executeQuery()) {
             while (rs.next()) {

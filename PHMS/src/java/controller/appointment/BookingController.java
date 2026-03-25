@@ -70,7 +70,7 @@ public class BookingController extends HttpServlet {
         List<Schedule> listSchedules;
         if (dateStr != null && !dateStr.isEmpty()) {
             Date date = Date.valueOf(dateStr); // SQL Date
-            List<Schedule> rawList = scheduleDAO.getSchedulesByDate(date);
+            List<Schedule> rawList = scheduleDAO.getSchedulesByDateForBooking(date);
             // Gộp lịch trùng và loại bỏ bác sĩ đã có đơn nghỉ trong ngày đó
             Map<Integer, Schedule> uniqueMap = new LinkedHashMap<>();
             for (Schedule s : rawList) {
@@ -100,7 +100,7 @@ public class BookingController extends HttpServlet {
                 int vetId = Integer.parseInt(vetIdStr);
                 Date date = Date.valueOf(dateStr);
                 // 1. Lấy dữ liệu từ DB
-                List<String> shifts = scheduleDAO.getShiftsByVetAndDate(vetId, date);
+                List<String> shifts = scheduleDAO.getShiftsByVetAndDateForBooking(vetId, date);
                 AppointmentDAO apptDAO = new AppointmentDAO();
                 List<String> bookedTimes = apptDAO.getBookedSlots(vetId, dateStr);
                 SimpleDateFormat sdfCheck = new SimpleDateFormat("HH:mm");       // 24h để so sánh

@@ -582,11 +582,11 @@
         <jsp:include page="nav/navVeterinarian.jsp" />
 
         <main class="main-content">
-            <div class="top-bar">
-                <div class="page-header">
-                    <h2><i class="fa-solid fa-file-medical" style="color:#10b981; margin-right:8px;"></i>Medical Record Detail</h2>
-                    <p>Record #${record.recordId}</p>
-                </div>
+                <div class="top-bar">
+                    <div class="page-header">
+                        <h2><i class="fa-solid fa-file-medical" style="color:#10b981; margin-right:8px;"></i>Medical Record Detail</h2>
+                    <p>Medical record information</p>
+                    </div>
                 <a href="${pageContext.request.contextPath}/logout" class="btn-signout">
                     <i class="fa-solid fa-right-from-bracket"></i> Sign Out
                 </a>
@@ -653,7 +653,8 @@
                                     <div class="info-item">
                                         <div class="info-label">Appointment</div>
                                         <div class="info-value">
-                                            #${record.apptId}
+                                            <span style="display:none;">${record.apptId}</span>
+                                            Appointment
                                             <span style="color:#64748b; font-weight:500;">
                                                 (<fmt:formatDate value="${record.apptStartTime}" pattern="dd/MM/yyyy HH:mm"/>)
                                             </span>
@@ -693,7 +694,7 @@
                                     <table class="custom-table">
                                         <thead>
                                             <tr>
-                                                <th>Test ID</th>
+                                                <th>STT</th>
                                                 <th>Test Type</th>
                                                 <th>Status</th>
                                                 <th>Request Note</th>
@@ -707,15 +708,15 @@
                                                     <td colspan="6" class="no-note">No lab request.</td>
                                                 </tr>
                                             </c:if>
-                                            <c:forEach items="${labTests}" var="t">
+                                            <c:forEach items="${labTests}" var="t" varStatus="st">
                                                 <tr>
-                                                    <td>#${t.testId}</td>
+                                                    <td>${st.index + 1}<span style="display:none;">${t.testId}</span></td>
                                                     <td>${t.testType}</td>
                                                     <td>${t.status}</td>
                                                     <td>
                                                         <c:choose>
                                                             <c:when test="${not empty t.requestNotes}">
-                                                                <button type="button" class="btn-view" onclick="openNoteModal('lab-request-${t.testId}', 'Lab Request Note #${t.testId}')">
+                                                                <button type="button" class="btn-view" onclick="openNoteModal('lab-request-${t.testId}', 'Lab Request Note')">
                                                                     <i class="fa-regular fa-eye"></i> View
                                                                 </button>
                                                                 <textarea id="lab-request-${t.testId}" style="display:none;">${t.requestNotes}</textarea>
@@ -727,11 +728,21 @@
                                                     </td>
                                                     <td>
                                                         <c:choose>
-                                                            <c:when test="${not empty t.resultData}">
-                                                                <button type="button" class="btn-view" onclick="openNoteModal('lab-note-${t.testId}', 'Lab Test Note #${t.testId}')">
-                                                                    <i class="fa-regular fa-eye"></i> View
-                                                                </button>
-                                                                <textarea id="lab-note-${t.testId}" style="display:none;">${t.resultData}</textarea>
+                                                            <c:when test="${not empty labResultImageMap[t.testId] || not empty labResultTextMap[t.testId]}">
+                                                                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                                                                    <c:if test="${not empty labResultImageMap[t.testId]}">
+                                                                        <button type="button" class="btn-view"
+                                                                                onclick="openImageModal('${pageContext.request.contextPath}${labResultImageMap[t.testId]}', 'Lab Result Image')">
+                                                                            <i class="fa-regular fa-image"></i> View Image
+                                                                        </button>
+                                                                    </c:if>
+                                                                    <c:if test="${not empty labResultTextMap[t.testId]}">
+                                                                        <button type="button" class="btn-view" onclick="openNoteModal('lab-note-${t.testId}', 'Lab Test Note')">
+                                                                            <i class="fa-regular fa-eye"></i> View Note
+                                                                        </button>
+                                                                        <textarea id="lab-note-${t.testId}" style="display:none;">${labResultTextMap[t.testId]}</textarea>
+                                                                    </c:if>
+                                                                </div>
                                                             </c:when>
                                                             <c:otherwise>
                                                                 <span class="no-note">No</span>
@@ -771,7 +782,7 @@
                                     <table class="custom-table">
                                         <thead>
                                             <tr>
-                                                <th>Record</th>
+                                                <th>STT</th>
                                                 <th>Date</th>
                                                 <th>Vet</th>
                                                 <th>Note</th>
@@ -783,15 +794,15 @@
                                                     <td colspan="4" class="no-note">No previous medical history.</td>
                                                 </tr>
                                             </c:if>
-                                            <c:forEach items="${petHistory}" var="h">
+                                            <c:forEach items="${petHistory}" var="h" varStatus="st">
                                                 <tr>
-                                                    <td>#${h.recordId}</td>
+                                                    <td>${(historyCurrentPage - 1) * 3 + st.index + 1}<span style="display:none;">${h.recordId}</span></td>
                                                     <td><fmt:formatDate value="${h.createdAt}" pattern="dd/MM/yyyy HH:mm"/></td>
                                                     <td>${h.vetName}</td>
                                                     <td>
                                                         <c:choose>
                                                             <c:when test="${not empty h.diagnosis || not empty h.treatmentPlan}">
-                                                                <button type="button" class="btn-view" onclick="openNoteModal('history-note-${h.recordId}', 'History Note #${h.recordId}')">
+                                                                <button type="button" class="btn-view" onclick="openNoteModal('history-note-${h.recordId}', 'History Note')">
                                                                     <i class="fa-regular fa-eye"></i> View
                                                                 </button>
                                                                 <textarea id="history-note-${h.recordId}" style="display:none;">Diagnosis: ${h.diagnosis}
@@ -1114,6 +1125,19 @@ Doctor Note: ${h.treatmentPlan}</textarea>
             </div>
         </div>
 
+        <div id="imageModal" class="note-modal" style="z-index:2100; background:rgba(2, 6, 23, 0.65);">
+            <div class="note-modal-content" style="max-width:960px; margin:4% auto;">
+                <div class="note-modal-header">
+                    <div id="imageModalTitle" class="note-modal-title">Image</div>
+                    <span class="note-close" onclick="closeImageModal()">&times;</span>
+                </div>
+                <div class="note-modal-body" style="text-align:center; background:#f8fafc;">
+                    <img id="imageModalContent" alt="Lab result image"
+                         style="max-width:100%; max-height:75vh; border:1px solid #d1d5db; border-radius:10px;">
+                </div>
+            </div>
+        </div>
+
         <script>
             function openNoteModal(sourceId, title) {
                 var source = document.getElementById(sourceId);
@@ -1127,6 +1151,22 @@ Doctor Note: ${h.treatmentPlan}</textarea>
 
             function closeNoteModal() {
                 document.getElementById('noteModal').style.display = 'none';
+            }
+
+            function openImageModal(imageUrl, title) {
+                var modal = document.getElementById('imageModal');
+                var image = document.getElementById('imageModalContent');
+                var modalTitle = document.getElementById('imageModalTitle');
+                image.src = imageUrl || '';
+                modalTitle.textContent = title || 'Image';
+                modal.style.display = 'block';
+            }
+
+            function closeImageModal() {
+                var modal = document.getElementById('imageModal');
+                var image = document.getElementById('imageModalContent');
+                modal.style.display = 'none';
+                image.removeAttribute('src');
             }
 
             function updatePrescriptionItemLabels() {
@@ -1175,11 +1215,16 @@ Doctor Note: ${h.treatmentPlan}</textarea>
             });
 
             window.onclick = function (event) {
-                var modal = document.getElementById('noteModal');
-                if (event.target === modal) {
+                var noteModal = document.getElementById('noteModal');
+                var imageModal = document.getElementById('imageModal');
+                if (event.target === noteModal) {
                     closeNoteModal();
+                }
+                if (event.target === imageModal) {
+                    closeImageModal();
                 }
             };
         </script>
     </body>
 </html>
+

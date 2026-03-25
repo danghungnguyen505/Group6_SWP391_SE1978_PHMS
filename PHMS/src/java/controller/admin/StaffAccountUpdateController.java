@@ -13,11 +13,10 @@ import model.User;
 
 /**
  * Admin updates staff account.
- * SRP: Update staff account only.
  */
 @WebServlet(name = "StaffAccountUpdateController", urlPatterns = {"/admin/staff/update"})
 public class StaffAccountUpdateController extends HttpServlet {
-    
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -29,7 +28,6 @@ public class StaffAccountUpdateController extends HttpServlet {
             return;
         }
 
-        // Lấy ID từ query param (truy cập từ danh sách) hoặc từ attribute (trường hợp doPost gọi lại doGet khi có lỗi)
         String idStr = request.getParameter("id");
         if (idStr == null || idStr.isEmpty()) {
             Object userIdAttr = request.getAttribute("userId");
@@ -39,22 +37,21 @@ public class StaffAccountUpdateController extends HttpServlet {
         }
 
         if (!util.ValidationUtils.isIntegerInRange(idStr, 1, Integer.MAX_VALUE)) {
-            session.setAttribute("toastMessage", "error|Staff ID không hợp lệ.");
+            session.setAttribute("toastMessage", "error|Staff ID khong hop le.");
             response.sendRedirect(request.getContextPath() + "/admin/staff/list");
             return;
         }
-        
+
         int id = Integer.parseInt(idStr);
         StaffAccountDAO staffDAO = new StaffAccountDAO();
         User staff = staffDAO.getStaffAccountById(id);
-        
+
         if (staff == null) {
-            session.setAttribute("toastMessage", "error|Không tìm thấy tài khoản nhân viên.");
+            session.setAttribute("toastMessage", "error|Khong tim thay tai khoan nhan vien.");
             response.sendRedirect(request.getContextPath() + "/admin/staff/list");
             return;
         }
-        
-        // Parse employee info from address field
+
         if (staff.getAddress() != null && staff.getAddress().contains("|")) {
             String[] parts = staff.getAddress().split("\\|");
             if (parts.length >= 3) {
@@ -63,11 +60,14 @@ public class StaffAccountUpdateController extends HttpServlet {
                 request.setAttribute("salaryBase", parts[2]);
             }
         }
-        
+
         request.setAttribute("staff", staff);
+        request.setAttribute("vetType", staff.getVetType() != null ? staff.getVetType() : "Normal");
+        request.setAttribute("specialization", staff.getSpecialization());
+        request.setAttribute("licenseNumber", staff.getLicenseNumber());
         request.getRequestDispatcher("/views/admin/staffUpdate.jsp").forward(request, response);
     }
-    
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -78,7 +78,7 @@ public class StaffAccountUpdateController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-        
+
         String idStr = request.getParameter("userId");
         String fullName = util.ValidationUtils.sanitize(request.getParameter("fullName"));
         String phone = util.ValidationUtils.sanitize(request.getParameter("phone"));
@@ -88,90 +88,100 @@ public class StaffAccountUpdateController extends HttpServlet {
         String salaryStr = request.getParameter("salaryBase");
         String specialization = util.ValidationUtils.sanitize(request.getParameter("specialization"));
         String licenseNumber = util.ValidationUtils.sanitize(request.getParameter("licenseNumber"));
-        
+        String vetType = util.ValidationUtils.sanitize(request.getParameter("vetType"));
+
         if (!util.ValidationUtils.isIntegerInRange(idStr, 1, Integer.MAX_VALUE)) {
-            session.setAttribute("toastMessage", "error|Staff ID không hợp lệ.");
+            session.setAttribute("toastMessage", "error|Staff ID khong hop le.");
             response.sendRedirect(request.getContextPath() + "/admin/staff/list");
             return;
         }
-        
+
         int userId = Integer.parseInt(idStr);
-        
-        // Validation (similar to create)
+
         if (!util.ValidationUtils.isNotEmpty(fullName) || !util.ValidationUtils.isLengthValid(fullName, 2, 100)) {
-            request.setAttribute("error", "Họ tên phải có từ 2 đến 100 ký tự!");
+            request.setAttribute("error", "Ho ten phai co tu 2 den 100 ky tu!");
             request.setAttribute("userId", idStr);
             doGet(request, response);
             return;
         }
-        
+
         if (!util.ValidationUtils.isNotEmpty(phone) || !util.ValidationUtils.isValidPhone(phone)) {
-            request.setAttribute("error", "Số điện thoại không hợp lệ!");
+            request.setAttribute("error", "So dien thoai khong hop le!");
             request.setAttribute("userId", idStr);
             doGet(request, response);
             return;
         }
-        
-        // Phone must be unique across users (excluding current staff)
+
         dal.UserDAO userDAO = new dal.UserDAO();
         if (userDAO.checkPhoneExistsForOther(userId, phone)) {
-            request.setAttribute("error", "Số điện thoại này đã được sử dụng!");
+            request.setAttribute("error", "So dien thoai nay da duoc su dung!");
             request.setAttribute("userId", idStr);
             doGet(request, response);
             return;
         }
-        
+
         if (!isValidStaffRole(role)) {
-            request.setAttribute("error", "Vai trò không hợp lệ!");
+            request.setAttribute("error", "Vai tro khong hop le!");
             request.setAttribute("userId", idStr);
             doGet(request, response);
             return;
         }
-        
+
+        if ("Veterinarian".equalsIgnoreCase(role)) {
+            if (!"Normal".equalsIgnoreCase(vetType) && !"Emergency".equalsIgnoreCase(vetType)) {
+                request.setAttribute("error", "Loai bac si khong hop le!");
+                request.setAttribute("userId", idStr);
+                doGet(request, response);
+                return;
+            }
+        } else {
+            vetType = "Normal";
+        }
+
         Double salaryBase = null;
         if (util.ValidationUtils.isNotEmpty(salaryStr)) {
             if (!util.ValidationUtils.isPositiveNumber(salaryStr)) {
-                request.setAttribute("error", "Lương cơ bản phải là số dương!");
+                request.setAttribute("error", "Luong co ban phai la so duong!");
                 request.setAttribute("userId", idStr);
                 doGet(request, response);
                 return;
             }
             salaryBase = Double.parseDouble(salaryStr);
         }
-        
+
         StaffAccountDAO staffDAO = new StaffAccountDAO();
 
-        // Không cho phép thay đổi role của chính tài khoản đang đăng nhập (dù có chỉnh sửa HTML ở phía client)
         if (userId == account.getUserId()) {
             User currentStaff = staffDAO.getStaffAccountById(userId);
             if (currentStaff != null && currentStaff.getRole() != null) {
                 role = currentStaff.getRole();
             }
         }
+
         try {
             boolean ok = staffDAO.updateStaffAccount(userId, fullName, phone, role,
-                    employeeCode, department, salaryBase, specialization, licenseNumber);
+                    employeeCode, department, salaryBase, specialization, licenseNumber, vetType);
             if (ok) {
-                session.setAttribute("toastMessage", "success|Cập nhật tài khoản nhân viên thành công!");
+                session.setAttribute("toastMessage", "success|Cap nhat tai khoan nhan vien thanh cong!");
                 response.sendRedirect(request.getContextPath() + "/admin/staff/list");
             } else {
-                request.setAttribute("error", "Không thể cập nhật tài khoản. Vui lòng thử lại.");
+                request.setAttribute("error", "Khong the cap nhat tai khoan. Vui long thu lai.");
                 request.setAttribute("userId", idStr);
                 doGet(request, response);
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            request.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
+            request.setAttribute("error", "Loi he thong: " + e.getMessage());
             request.setAttribute("userId", idStr);
             doGet(request, response);
         }
     }
-    
+
     private boolean isValidStaffRole(String role) {
-        return "Veterinarian".equalsIgnoreCase(role) ||
-               "Nurse".equalsIgnoreCase(role) ||
-               "Receptionist".equalsIgnoreCase(role) ||
-               "ClinicManager".equalsIgnoreCase(role) ||
-               "Admin".equalsIgnoreCase(role);
+        return "Veterinarian".equalsIgnoreCase(role)
+                || "Nurse".equalsIgnoreCase(role)
+                || "Receptionist".equalsIgnoreCase(role)
+                || "ClinicManager".equalsIgnoreCase(role)
+                || "Admin".equalsIgnoreCase(role);
     }
 }

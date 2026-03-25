@@ -18,6 +18,19 @@ import java.sql.Date;
 
 public class ScheduleVeterianrianDAO extends DBContext {
 
+    private boolean hasVeterinarianTypeColumn() {
+        String sql = "SELECT COL_LENGTH('Veterinarian', 'type') AS col_len";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getObject("col_len") != null;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error hasVeterinarianTypeColumn: " + e.getMessage());
+        }
+        return false;
+    }
+
     /**
      * Get minimal schedule info by schedule_id (emp_id, work_date, shift_time).
      * Returns null if not found.
@@ -98,6 +111,39 @@ public class ScheduleVeterianrianDAO extends DBContext {
         return list;
     }
 
+    public List<Schedule> getAvailableSchedulesForBooking() {
+        List<Schedule> list = new ArrayList<>();
+        boolean withType = hasVeterinarianTypeColumn();
+        String sql = withType
+                ? "SELECT s.schedule_id, s.emp_id, u.full_name, s.work_date, s.shift_time "
+                + "FROM Schedule s "
+                + "JOIN Users u ON s.emp_id = u.user_id "
+                + "JOIN Veterinarian v ON s.emp_id = v.emp_id "
+                + "WHERE s.work_date >= CAST(GETDATE() AS DATE) "
+                + "AND ISNULL(u.is_active, 1) = 1 "
+                + "AND UPPER(ISNULL(v.[type], 'Normal')) = 'NORMAL'"
+                : "SELECT s.schedule_id, s.emp_id, u.full_name, s.work_date, s.shift_time "
+                + "FROM Schedule s "
+                + "JOIN Users u ON s.emp_id = u.user_id "
+                + "WHERE s.work_date >= CAST(GETDATE() AS DATE) "
+                + "AND ISNULL(u.is_active, 1) = 1";
+        try (PreparedStatement st = connection.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+            while (rs.next()) {
+                Schedule s = new Schedule();
+                s.setScheduleId(rs.getInt("schedule_id"));
+                s.setEmpId(rs.getInt("emp_id"));
+                s.setVetName(rs.getString("full_name"));
+                s.setWorkDate(rs.getDate("work_date"));
+                s.setShiftTime(rs.getString("shift_time"));
+                list.add(s);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getAvailableSchedulesForBooking: " + e.getMessage());
+        }
+        return list;
+    }
+
     /**
      * Get leave request status for a specific employee and date, if any.
      * Returns one of Pending/Approved/Rejected (or other DB value), or null if no leave.
@@ -145,6 +191,43 @@ public class ScheduleVeterianrianDAO extends DBContext {
         return list;
     }
 
+    public List<Schedule> getSchedulesByDateForBooking(Date date) {
+        List<Schedule> list = new ArrayList<>();
+        boolean withType = hasVeterinarianTypeColumn();
+        String sql = withType
+                ? "SELECT s.schedule_id, s.emp_id, u.full_name, s.work_date, s.shift_time "
+                + "FROM Schedule s "
+                + "JOIN Users u ON s.emp_id = u.user_id "
+                + "JOIN Veterinarian v ON s.emp_id = v.emp_id "
+                + "WHERE s.work_date = ? "
+                + "AND ISNULL(u.is_active, 1) = 1 "
+                + "AND UPPER(ISNULL(v.[type], 'Normal')) = 'NORMAL' "
+                + "ORDER BY u.full_name ASC, s.shift_time ASC"
+                : "SELECT s.schedule_id, s.emp_id, u.full_name, s.work_date, s.shift_time "
+                + "FROM Schedule s "
+                + "JOIN Users u ON s.emp_id = u.user_id "
+                + "WHERE s.work_date = ? "
+                + "AND ISNULL(u.is_active, 1) = 1 "
+                + "ORDER BY u.full_name ASC, s.shift_time ASC";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setDate(1, date);
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    Schedule s = new Schedule();
+                    s.setScheduleId(rs.getInt("schedule_id"));
+                    s.setEmpId(rs.getInt("emp_id"));
+                    s.setVetName(rs.getString("full_name"));
+                    s.setWorkDate(rs.getDate("work_date"));
+                    s.setShiftTime(rs.getString("shift_time"));
+                    list.add(s);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getSchedulesByDateForBooking: " + e.getMessage());
+        }
+        return list;
+    }
+
     public List<String> getShiftsByVetAndDate(int vetId, Date date) {
         List<String> list = new ArrayList<>();
         // Lấy cột shift_time (ví dụ: "09:00 AM - 11:30 AM")
@@ -160,6 +243,34 @@ public class ScheduleVeterianrianDAO extends DBContext {
             }
         } catch (SQLException e) {
             System.out.println("Error getShiftsByVetAndDate: " + e);
+        }
+        return list;
+    }
+
+    public List<String> getShiftsByVetAndDateForBooking(int vetId, Date date) {
+        List<String> list = new ArrayList<>();
+        boolean withType = hasVeterinarianTypeColumn();
+        String sql = withType
+                ? "SELECT s.shift_time FROM Schedule s "
+                + "JOIN Users u ON s.emp_id = u.user_id "
+                + "JOIN Veterinarian v ON s.emp_id = v.emp_id "
+                + "WHERE s.emp_id = ? AND s.work_date = ? "
+                + "AND ISNULL(u.is_active, 1) = 1 "
+                + "AND UPPER(ISNULL(v.[type], 'Normal')) = 'NORMAL'"
+                : "SELECT s.shift_time FROM Schedule s "
+                + "JOIN Users u ON s.emp_id = u.user_id "
+                + "WHERE s.emp_id = ? AND s.work_date = ? "
+                + "AND ISNULL(u.is_active, 1) = 1";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, vetId);
+            st.setDate(2, date);
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    list.add(rs.getString("shift_time"));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getShiftsByVetAndDateForBooking: " + e.getMessage());
         }
         return list;
     }

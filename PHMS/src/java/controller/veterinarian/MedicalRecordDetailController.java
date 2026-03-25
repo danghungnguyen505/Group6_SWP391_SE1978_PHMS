@@ -12,7 +12,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import model.LabTest;
 import model.MedicalRecord;
 import model.Medicine;
@@ -28,6 +30,39 @@ import util.PaginationUtils;
 public class MedicalRecordDetailController extends HttpServlet {
 
     private static final int HISTORY_PAGE_SIZE = 3;
+
+    private String extractLabImagePath(String resultData) {
+        if (resultData == null) {
+            return null;
+        }
+        String normalized = resultData.replace("\r", "").trim();
+        if (!normalized.startsWith("/uploads/lab/")) {
+            return null;
+        }
+        int lineBreakIdx = normalized.indexOf('\n');
+        String path = lineBreakIdx >= 0 ? normalized.substring(0, lineBreakIdx).trim() : normalized;
+        String lower = path.toLowerCase();
+        if (lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png")) {
+            return path;
+        }
+        return null;
+    }
+
+    private String extractLabResultText(String resultData) {
+        if (resultData == null) {
+            return "";
+        }
+        String normalized = resultData.replace("\r", "");
+        String trimmed = normalized.trim();
+        if (!trimmed.startsWith("/uploads/lab/")) {
+            return trimmed;
+        }
+        int lineBreakIdx = normalized.indexOf('\n');
+        if (lineBreakIdx < 0) {
+            return "";
+        }
+        return normalized.substring(lineBreakIdx + 1).trim();
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -82,6 +117,8 @@ public class MedicalRecordDetailController extends HttpServlet {
         List<MedicalRecord> petHistory = PaginationUtils.getPage(allPetHistory, historyPage, HISTORY_PAGE_SIZE);
 
         List<LabTest> labTests = labDao.listByRecordForVet(recordId, account.getUserId());
+        Map<Integer, String> labResultImageMap = new HashMap<>();
+        Map<Integer, String> labResultTextMap = new HashMap<>();
         boolean hasPendingLabTests = false;
         if (labTests != null) {
             for (LabTest t : labTests) {
@@ -95,6 +132,12 @@ public class MedicalRecordDetailController extends HttpServlet {
                     hasPendingLabTests = true;
                     break;
                 }
+            }
+            for (LabTest t : labTests) {
+                String imagePath = extractLabImagePath(t.getResultData());
+                String resultText = extractLabResultText(t.getResultData());
+                labResultImageMap.put(t.getTestId(), imagePath);
+                labResultTextMap.put(t.getTestId(), resultText);
             }
         }
 
@@ -110,6 +153,8 @@ public class MedicalRecordDetailController extends HttpServlet {
         request.setAttribute("historyTotalPages", historyTotalPages);
         request.setAttribute("labTestTypes", labTestTypes);
         request.setAttribute("labTests", labTests);
+        request.setAttribute("labResultImageMap", labResultImageMap);
+        request.setAttribute("labResultTextMap", labResultTextMap);
         request.setAttribute("hasPendingLabTests", hasPendingLabTests);
         request.setAttribute("prescriptions", prescriptions);
         request.setAttribute("medicines", medicines);

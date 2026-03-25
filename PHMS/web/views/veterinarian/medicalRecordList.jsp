@@ -503,7 +503,7 @@
                         <table class="records-table">
                             <thead>
                                 <tr>
-                                    <th>Record</th>
+                                    <th>STT</th>
                                     <th>Created At</th>
                                     <th>Appointment</th>
                                     <th>Owner &amp; Pet</th>
@@ -512,16 +512,18 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <c:forEach items="${records}" var="r">
+                                <c:forEach items="${records}" var="r" varStatus="st">
                                     <tr>
                                         <td>
-                                            <div class="record-id">#${r.recordId}</div>
+                                            <div class="record-id">${(currentPage - 1) * 10 + st.index + 1}</div>
+                                            <span style="display:none;">${r.recordId}</span>
                                         </td>
                                         <td>
                                             <fmt:formatDate value="${r.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
                                         </td>
                                         <td>
-                                            <div>#${r.apptId}</div>
+                                            <span style="display:none;">${r.apptId}</span>
+                                            <div>Appointment</div>
                                             <div class="sub-text">
                                                 <fmt:formatDate value="${r.apptStartTime}" pattern="dd/MM/yyyy HH:mm"/>
                                             </div>
@@ -606,3 +608,4 @@
         </main>
     </body>
 </html>
+

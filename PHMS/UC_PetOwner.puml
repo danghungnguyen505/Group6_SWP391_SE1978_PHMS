@@ -1,0 +1,30 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Pet Owner" as PO
+actor "VNPay (External)" as VNPay
+
+rectangle "PHMS - Pet Owner" {
+
+  PO -- (Register / Login)
+  PO -- (Manage Profile)
+  PO -- (Manage Pets\n Add / Update / Delete)
+  PO -- (Book Appointment)
+  PO -- (View My Appointments\n Cancel / Reschedule)
+  PO -- (Make Payment VNPay)
+  PO -- (View Medical Records)
+  PO -- (View Medical Record Detail)
+  PO -- (Submit Feedback)
+  PO -- (Emergency SOS)
+  PO -- (AI Chat)
+  PO -- (View Billing)
+  PO -- (View Dashboard)
+
+  (Book Appointment) ..> (Make Payment VNPay) : <<include>>
+  (View My Appointments\n Cancel / Reschedule) ..> (View Medical Records) : <<include>>
+  (View Medical Records) ..> (View Medical Record Detail) : <<include>>
+  (Make Payment VNPay) -- VNPay
+}
+
+@enduml

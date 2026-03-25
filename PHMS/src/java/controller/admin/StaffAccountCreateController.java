@@ -13,11 +13,10 @@ import model.User;
 
 /**
  * Admin creates new staff account.
- * SRP: Create staff account only.
  */
 @WebServlet(name = "StaffAccountCreateController", urlPatterns = {"/admin/staff/create"})
 public class StaffAccountCreateController extends HttpServlet {
-    
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -28,10 +27,10 @@ public class StaffAccountCreateController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-        
+
         request.getRequestDispatcher("/views/admin/staffCreate.jsp").forward(request, response);
     }
-    
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -42,7 +41,7 @@ public class StaffAccountCreateController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-        
+
         String username = util.ValidationUtils.sanitize(request.getParameter("username"));
         String password = request.getParameter("password");
         String fullName = util.ValidationUtils.sanitize(request.getParameter("fullName"));
@@ -53,108 +52,119 @@ public class StaffAccountCreateController extends HttpServlet {
         String salaryStr = request.getParameter("salaryBase");
         String specialization = util.ValidationUtils.sanitize(request.getParameter("specialization"));
         String licenseNumber = util.ValidationUtils.sanitize(request.getParameter("licenseNumber"));
-        
-        // Validation
+        String vetType = util.ValidationUtils.sanitize(request.getParameter("vetType"));
+
         if (!util.ValidationUtils.isNotEmpty(username) || !util.ValidationUtils.isValidUsername(username)) {
-            request.setAttribute("error", "Tên đăng nhập không hợp lệ!");
-            repopulateForm(request, username, password, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber);
+            request.setAttribute("error", "Ten dang nhap khong hop le!");
+            repopulateForm(request, username, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber, vetType);
             doGet(request, response);
             return;
         }
-        
+
         dal.UserDAO userDAO = new dal.UserDAO();
         if (userDAO.checkUsernameExists(username)) {
-            request.setAttribute("error", "Tên đăng nhập đã tồn tại!");
-            repopulateForm(request, username, password, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber);
+            request.setAttribute("error", "Ten dang nhap da ton tai!");
+            repopulateForm(request, username, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber, vetType);
             doGet(request, response);
             return;
         }
-        
+
         if (!util.ValidationUtils.isNotEmpty(password) || !util.ValidationUtils.isValidPassword(password)) {
-            request.setAttribute("error", "Mật khẩu phải có ít nhất 6 ký tự!");
-            repopulateForm(request, username, password, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber);
+            request.setAttribute("error", "Mat khau phai co it nhat 6 ky tu!");
+            repopulateForm(request, username, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber, vetType);
             doGet(request, response);
             return;
         }
-        
+
         if (!util.ValidationUtils.isNotEmpty(fullName) || !util.ValidationUtils.isLengthValid(fullName, 2, 100)) {
-            request.setAttribute("error", "Họ tên phải có từ 2 đến 100 ký tự!");
-            repopulateForm(request, username, password, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber);
+            request.setAttribute("error", "Ho ten phai co tu 2 den 100 ky tu!");
+            repopulateForm(request, username, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber, vetType);
             doGet(request, response);
             return;
         }
-        
+
         if (!util.ValidationUtils.isNotEmpty(phone) || !util.ValidationUtils.isValidPhone(phone)) {
-            request.setAttribute("error", "Số điện thoại không hợp lệ!");
-            repopulateForm(request, username, password, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber);
+            request.setAttribute("error", "So dien thoai khong hop le!");
+            repopulateForm(request, username, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber, vetType);
             doGet(request, response);
             return;
         }
-        
-        // Phone must be unique across all users
+
         if (userDAO.checkPhoneExists(phone)) {
-            request.setAttribute("error", "Số điện thoại này đã được sử dụng!");
-            repopulateForm(request, username, password, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber);
+            request.setAttribute("error", "So dien thoai nay da duoc su dung!");
+            repopulateForm(request, username, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber, vetType);
             doGet(request, response);
             return;
         }
-        
+
         if (!isValidStaffRole(role)) {
-            request.setAttribute("error", "Vai trò không hợp lệ!");
-            repopulateForm(request, username, password, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber);
+            request.setAttribute("error", "Vai tro khong hop le!");
+            repopulateForm(request, username, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber, vetType);
             doGet(request, response);
             return;
         }
-        
+
         if (!util.ValidationUtils.isNotEmpty(employeeCode) || !util.ValidationUtils.isLengthValid(employeeCode, 1, 20)) {
-            request.setAttribute("error", "Mã nhân viên phải có từ 1 đến 20 ký tự!");
-            repopulateForm(request, username, password, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber);
+            request.setAttribute("error", "Ma nhan vien phai co tu 1 den 20 ky tu!");
+            repopulateForm(request, username, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber, vetType);
             doGet(request, response);
             return;
         }
-        
+
+        if ("Veterinarian".equalsIgnoreCase(role)) {
+            if (!"Normal".equalsIgnoreCase(vetType) && !"Emergency".equalsIgnoreCase(vetType)) {
+                request.setAttribute("error", "Loai bac si khong hop le!");
+                repopulateForm(request, username, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber, vetType);
+                doGet(request, response);
+                return;
+            }
+        } else {
+            vetType = "Normal";
+        }
+
         Double salaryBase = null;
         if (util.ValidationUtils.isNotEmpty(salaryStr)) {
             if (!util.ValidationUtils.isPositiveNumber(salaryStr)) {
-                request.setAttribute("error", "Lương cơ bản phải là số dương!");
-                repopulateForm(request, username, password, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber);
+                request.setAttribute("error", "Luong co ban phai la so duong!");
+                repopulateForm(request, username, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber, vetType);
                 doGet(request, response);
                 return;
             }
             salaryBase = Double.parseDouble(salaryStr);
         }
-        
+
         StaffAccountDAO staffDAO = new StaffAccountDAO();
         try {
             boolean ok = staffDAO.createStaffAccount(username, password, fullName, phone, role,
-                    employeeCode, department, salaryBase, specialization, licenseNumber);
+                    employeeCode, department, salaryBase, specialization, licenseNumber, vetType);
             if (ok) {
-                session.setAttribute("toastMessage", "success|Tạo tài khoản nhân viên thành công!");
+                session.setAttribute("toastMessage", "success|Tao tai khoan nhan vien thanh cong!");
                 response.sendRedirect(request.getContextPath() + "/admin/staff/list");
             } else {
-                request.setAttribute("error", "Không thể tạo tài khoản. Vui lòng thử lại.");
-                repopulateForm(request, username, password, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber);
+                request.setAttribute("error", "Khong the tao tai khoan. Vui long thu lai.");
+                repopulateForm(request, username, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber, vetType);
                 doGet(request, response);
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            request.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
-            repopulateForm(request, username, password, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber);
+            request.setAttribute("error", "Loi he thong: " + e.getMessage());
+            repopulateForm(request, username, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber, vetType);
             doGet(request, response);
         }
     }
-    
+
     private boolean isValidStaffRole(String role) {
-        return "Veterinarian".equalsIgnoreCase(role) ||
-               "Nurse".equalsIgnoreCase(role) ||
-               "Receptionist".equalsIgnoreCase(role) ||
-               "ClinicManager".equalsIgnoreCase(role) ||
-               "Admin".equalsIgnoreCase(role);
+        return "Veterinarian".equalsIgnoreCase(role)
+                || "Nurse".equalsIgnoreCase(role)
+                || "Receptionist".equalsIgnoreCase(role)
+                || "ClinicManager".equalsIgnoreCase(role)
+                || "Admin".equalsIgnoreCase(role);
     }
-    
-    private void repopulateForm(HttpServletRequest request, String username, String password,
-                               String fullName, String phone, String role, String employeeCode,
-                               String department, String salaryStr, String specialization, String licenseNumber) {
+
+    private void repopulateForm(HttpServletRequest request, String username,
+            String fullName, String phone, String role, String employeeCode,
+            String department, String salaryStr, String specialization,
+            String licenseNumber, String vetType) {
         request.setAttribute("username", username);
         request.setAttribute("fullName", fullName);
         request.setAttribute("phone", phone);
@@ -164,5 +174,6 @@ public class StaffAccountCreateController extends HttpServlet {
         request.setAttribute("salaryBase", salaryStr);
         request.setAttribute("specialization", specialization);
         request.setAttribute("licenseNumber", licenseNumber);
+        request.setAttribute("vetType", vetType);
     }
 }

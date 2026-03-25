@@ -11,6 +11,7 @@ package model;
 public class Service {
     private int serviceId;
     private String name;
+    private String type;
     private double basePrice;
     private String description;
     private boolean isActive;
@@ -22,6 +23,17 @@ public class Service {
     public Service(int serviceId, String name, double basePrice, String description, boolean isActive, int manageBy) {
         this.serviceId = serviceId;
         this.name = name;
+        this.type = "Basic";
+        this.basePrice = basePrice;
+        this.description = description;
+        this.isActive = isActive;
+        this.manageBy = manageBy;
+    }
+
+    public Service(int serviceId, String name, String type, double basePrice, String description, boolean isActive, int manageBy) {
+        this.serviceId = serviceId;
+        this.name = name;
+        this.type = type;
         this.basePrice = basePrice;
         this.description = description;
         this.isActive = isActive;
@@ -42,6 +54,14 @@ public class Service {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public double getBasePrice() {

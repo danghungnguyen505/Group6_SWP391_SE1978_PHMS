@@ -46,15 +46,13 @@ public class EmergencyCreateController extends HttpServlet {
             return null;
         }
 
-        // 24h formats
-        try {
-            if (t.length() == 5) { // HH:mm
-                return LocalTime.parse(t, DateTimeFormatter.ofPattern("HH:mm"));
+        // 24h formats (allow both 1-digit and 2-digit hour)
+        String[] patterns24h = new String[]{"H:mm", "HH:mm", "H:mm:ss", "HH:mm:ss"};
+        for (String p : patterns24h) {
+            try {
+                return LocalTime.parse(t, DateTimeFormatter.ofPattern(p));
+            } catch (DateTimeParseException ignore) {
             }
-            if (t.length() == 8) { // HH:mm:ss
-                return LocalTime.parse(t, DateTimeFormatter.ofPattern("HH:mm:ss"));
-            }
-        } catch (DateTimeParseException ignore) {
         }
 
         // 12h formats with AM/PM
@@ -101,7 +99,7 @@ public class EmergencyCreateController extends HttpServlet {
         }
         
         UserDAO userDAO = new UserDAO();
-        List<User> vetsAll = userDAO.getAllVeterinarians();
+        List<User> vetsAll = userDAO.getEmergencyVeterinarians();
 
         // Determine which vets are currently in-shift and busy/available
         Map<Integer, String> vetStatusMap = new HashMap<>();
@@ -126,6 +124,10 @@ public class EmergencyCreateController extends HttpServlet {
             boolean inShiftNow = false;
             String shiftLabel = "Đang làm việc";
             List<StaffScheduleVeterinarian> ss = schedulesByVet.get(v.getUserId());
+            if (ss == null || ss.isEmpty()) {
+                // Only allow vets who actually have schedule today.
+                continue;
+            }
             if (ss != null && !ss.isEmpty()) {
                 for (StaffScheduleVeterinarian sch : ss) {
                     Time[] times = parseShiftTimeToSqlTimes(sch.getShiftTime());
@@ -143,8 +145,6 @@ public class EmergencyCreateController extends HttpServlet {
                         if ("Đang làm việc".equals(shiftLabel)) {
                             shiftLabel = start.toString().substring(0, 5) + "-" + end.toString().substring(0, 5);
                         }
-                    } else if (sch.getShiftTime() != null && !"Đang làm việc".equals(shiftLabel)) {
-                        shiftLabel = sch.getShiftTime();
                     } else if (sch.getShiftTime() != null) {
                         shiftLabel = sch.getShiftTime();
                     }
@@ -154,18 +154,16 @@ public class EmergencyCreateController extends HttpServlet {
             String statusLabel;
             int priority;
             if (!inShiftNow) {
-                statusLabel = "Đang trống lịch";
-                priority = 2;
-            } else {
-                boolean busy = apptDAO.isVetBusyNow(v.getUserId());
-                if (busy) {
-                    statusLabel = "Bận";
-                    priority = 1;
-                } else {
-                    statusLabel = "Trống";
-                    priority = 0;
-                }
+                // Emergency selection only shows doctors in current shift.
+                continue;
             }
+            boolean busy = apptDAO.isVetBusyNow(v.getUserId());
+            if (busy) {
+                // Only show currently free doctors.
+                continue;
+            }
+            statusLabel = "Trong ca hien tai";
+            priority = 0;
             vetStatusMap.put(v.getUserId(), statusLabel);
             vetShiftMap.put(v.getUserId(), shiftLabel);
             vetPriorityMap.put(v.getUserId(), priority);
@@ -179,6 +177,9 @@ public class EmergencyCreateController extends HttpServlet {
         request.setAttribute("veterinarians", vetsSorted);
         request.setAttribute("vetStatusMap", vetStatusMap);
         request.setAttribute("vetShiftMap", vetShiftMap);
+        if (vetsSorted.isEmpty()) {
+            request.setAttribute("error", "Khong co bac si nao dang trong ca hien tai.");
+        }
 
         // Lookup pet owner by email (if provided)
         String email = util.ValidationUtils.sanitize(request.getParameter("email"));
@@ -362,6 +363,42 @@ public class EmergencyCreateController extends HttpServlet {
         }
         
         int vetId = Integer.parseInt(vetIdStr);
+
+                // Safety check: selected vet must be in current shift and currently free.
+        StaffScheduleVeterinarianDAO scheduleDAO2 = new StaffScheduleVeterinarianDAO();
+        java.sql.Date today2 = java.sql.Date.valueOf(LocalDate.now());
+        List<StaffScheduleVeterinarian> todaySchedules2 = scheduleDAO2.getSchedulesByDateRange(today2, today2);
+
+        boolean inShiftNow2 = false;
+        LocalTime now2 = LocalTime.now();
+        for (StaffScheduleVeterinarian s : todaySchedules2) {
+            if (s.getEmpId() != vetId) {
+                continue;
+            }
+            Time[] times = parseShiftTimeToSqlTimes(s.getShiftTime());
+            if (times == null) {
+                continue;
+            }
+            LocalTime start = times[0].toLocalTime();
+            LocalTime end = times[1].toLocalTime();
+            if (!now2.isBefore(start) && now2.isBefore(end)) {
+                inShiftNow2 = true;
+                break;
+            }
+        }
+
+        if (!inShiftNow2) {
+            request.setAttribute("error", "Bac si duoc chon khong trong ca hien tai.");
+            doGet(request, response);
+            return;
+        }
+
+        AppointmentDAO apptDAOForCheck = new AppointmentDAO();
+        if (apptDAOForCheck.isVetBusyNow(vetId)) {
+            request.setAttribute("error", "Bac si duoc chon dang ban, vui long chon bac si khac.");
+            doGet(request, response);
+            return;
+        }
         
         // Verify pet belongs to owner (existing-owner flow and after auto-create)
         PetDAO petDAO = new PetDAO();
