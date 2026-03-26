@@ -1,0 +1,244 @@
+<%--
+    Document   : myAppointment
+    Created on : Jan 31, 2026
+    Author     : zoxy4
+--%>
+
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${t_my_appts} - VetCare Pro</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link href="${pageContext.request.contextPath}/assets/css/pages/menuPetOwner.css" rel="stylesheet" type="text/css"/>
+        <link href="${pageContext.request.contextPath}/assets/css/pages/myAppointment.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+
+        <!-- Sidebar Navigation -->
+        <jsp:include page="nav/navPetOwner.jsp" />
+
+        <main class="main-content">
+            <header class="top-bar">
+                <a href="${pageContext.request.contextPath}/logout" class="btn btn-dark" style="background-color: #ef4444; border-color: #ef4444;">
+                    ${t_logout}
+                </a>
+            </header>
+
+            <div class="page-header">
+                <div class="page-title">
+                    <h1>${t_my_appts}</h1>
+                    <p>${t_my_appts_sub}</p>
+                </div>
+                <a href="${pageContext.request.contextPath}/home" class="btn btn-outline-secondary" style="text-decoration: none;">
+                    <i class="fa-solid fa-arrow-left me-2"></i> ${t_back_home}
+                </a>
+            </div>
+
+            <div class="section-header">
+                <i class="fa-regular fa-clock text-primary"></i> ${t_upcoming}
+            </div>
+
+            <c:if test="${empty upcomingList}">
+                <div class="empty-state">
+                    ${t_no_upcoming}
+                </div>
+            </c:if>
+
+            <c:if test="${not empty upcomingList}">
+                <table class="table-custom">
+                    <thead>
+                        <tr>
+                            <th>#ID</th>
+                            <th>${t_date_time}</th>
+                            <th>${t_pet}</th>
+                            <th>${t_service}</th>
+                            <th>${t_doctor}</th>
+                            <th>${t_status}</th>
+                            <th>${t_notes_col}</th>
+                            <th>${t_actions}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach items="${upcomingList}" var="u">
+                            <tr>
+                                <td><b>#${u.apptId}</b></td>
+                                <td>
+                                    <i class="fa-regular fa-calendar"></i> <fmt:formatDate value="${u.startTime}" pattern="dd-MM-yyyy HH:mm"/>
+                                </td>
+                                <td>${u.petName}</td>
+                                <td>${u.type}</td>
+                                <td>${u.vetName}</td>
+                                <td>
+                                    <span class="status-badge
+                                          ${u.status == 'Pending' ? 'status-pending' : 'status-confirmed'}">
+                                        ${u.status}
+                                    </span>
+                                </td>
+                                <td>
+                                    <c:if test="${not empty u.notes}">
+                                        <button type="button" class="btn-view-note" data-note="${u.notes}" onclick="openModal(this)">
+                                            <i class="fa-regular fa-eye"></i> ${L == 'en' ? 'View' : 'Xem'}
+                                        </button>
+                                    </c:if>
+                                    <c:if test="${empty u.notes}">
+                                        <span style="color: #9ca3af; font-style: italic; font-size: 0.9em;">${t_no_notes}</span>
+                                    </c:if>
+                                </td>
+                                <td style="text-align: center;">
+                                    <jsp:useBean id="now" class="java.util.Date" />
+                                    <c:set var="currentTime" value="${now.time}" />
+                                    <c:set var="startTimeMs" value="${u.startTime.time}" />
+                                    <c:set var="hoursUntilStart" value="${(startTimeMs - currentTime) / (1000 * 60 * 60)}" />
+                                    <c:set var="isActionAllowed" value="${(u.status == 'Pending' || u.status == 'Confirmed') && hoursUntilStart >= 5}" />
+
+                                    <c:if test="${isActionAllowed}">
+                                        <div class="action-buttons">
+                                            <a href="${pageContext.request.contextPath}/booking?petId=${u.petId}&vetId=${u.vetId}&serviceType=${u.type}&rescheduleId=${u.apptId}&selectedDate=<fmt:formatDate value="${u.startTime}" pattern="yyyy-MM-dd"/>" 
+                                               class="btn-action btn-reschedule" 
+                                               title="Reschedule">
+                                                <i class="fa-regular fa-clock"></i>
+                                            </a>
+                                            <a href="${pageContext.request.contextPath}/appointment-action?id=${u.apptId}&type=cancel" 
+                                               class="btn-action btn-cancel" title="Cancel">
+                                                <i class="fa-solid fa-user-doctor"></i>
+                                            </a>
+                                        </div>
+
+                                        <div style="font-size: 0.75rem; color: #666; margin-top: 5px; text-align: left;">
+                                            ${L == 'en' ? 'You can cancel/reschedule at least 5 hours before. Remaining:' : 'Bạn có thể hủy/đổi lịch trước giờ hẹn ít nhất 5 tiếng. Còn khoảng:'} <fmt:formatNumber value="${hoursUntilStart}" maxFractionDigits="0"/>h
+                                        </div>
+                                    </c:if>
+
+                                    <c:if test="${!isActionAllowed}">
+                                        <div style="color: #9ca3af; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 5px; background: #f3f4f6; padding: 5px; border-radius: 4px;">
+                                            <i class="fa-solid fa-lock"></i> ${t_locked}
+                                        </div>
+                                    </c:if>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                    </tbody>
+                </table>
+            </c:if>
+
+            <div class="section-header" style="margin-top: 40px;">
+                <i class="fa-solid fa-history text-secondary"></i> ${t_history}
+            </div>
+
+            <c:if test="${empty historyList}">
+                <div class="empty-state">
+                    ${t_no_history}
+                </div>
+            </c:if>
+
+            <c:if test="${not empty historyList}">
+                <table class="table-custom">
+                    <thead>
+                        <tr>
+                            <th>#ID</th>
+                            <th>${t_date_time}</th>
+                            <th>${t_pet}</th>
+                            <th>${t_service}</th>
+                            <th>${t_doctor}</th>
+                            <th>${t_status}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach items="${historyList}" var="h">
+                            <tr>
+                                <td>#${h.apptId}</td>
+                                <td style="color: #666;">
+                                    <fmt:formatDate value="${h.startTime}" pattern="dd-MM-yyyy HH:mm"/>
+                                </td>
+                                <td>${h.petName}</td>
+                                <td>${h.type}</td>
+                                <td>${h.vetName}</td>
+                                <td>
+                                    <span class="status-badge ${h.status == 'Completed' ? 'status-completed' : 'status-cancelled'}">
+                                        ${h.status}
+                                    </span>
+                                    <c:if test="${h.status == 'Completed'}">
+                                        <c:choose>
+                                            <c:when test="${feedbackedApptIds.contains(h.apptId)}">
+                                                <span style="display:inline-flex; align-items:center; gap:4px; margin-top:5px; font-size:12px; color:#059669; background:#d1fae5; padding:3px 10px; border-radius:20px; font-weight:600;">
+                                                    <i class="fa-solid fa-check-circle"></i> ${t_reviewed}
+                                                </span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <a href="${pageContext.request.contextPath}/feedback/create?apptId=${h.apptId}"
+                                                   style="display:inline-flex; align-items:center; gap:4px; margin-top:5px; font-size:12px; color:#fff; background:#f59e0b; padding:4px 12px; border-radius:20px; font-weight:600; text-decoration:none; transition:0.2s;"
+                                                   onmouseover="this.style.background='#d97706'" onmouseout="this.style.background='#f59e0b'">
+                                                    <i class="fa-solid fa-star"></i> ${t_feedback}
+                                                </a>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </c:if>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                    </tbody>
+                </table>
+            </c:if>
+            <!--Paging của History-->           
+            <c:if test="${totalPages > 1}">
+                <div class="pagination-container">
+                    <!-- Previous -->
+                    <c:if test="${currentPage > 1}">
+                        <a href="?page=${currentPage - 1}" class="page-link">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+                    </c:if>
+                    <!-- Trang 1 -->
+                    <a href="?page=1" class="page-link ${currentPage == 1 ? 'active' : ''}">1</a>
+                    <!-- Dấu ... bên trái -->
+                    <c:if test="${currentPage > 4}">
+                        <span class="page-dots">...</span>
+                    </c:if>
+                    <!-- Vòng lặp các trang ở giữa (Current - 2 đến Current + 2) -->
+                    <c:forEach begin="2" end="${totalPages - 1}" var="i">
+                        <c:if test="${i >= currentPage - 2 && i <= currentPage + 2}">
+                            <a href="?page=${i}" class="page-link ${currentPage == i ? 'active' : ''}">
+                                ${i}
+                            </a>
+                        </c:if>
+                    </c:forEach>
+                    <!-- Dấu ... bên phải -->
+                    <c:if test="${currentPage < totalPages - 3}">
+                        <span class="page-dots">...</span>
+                    </c:if>
+                    <!-- Trang cuối (nếu tổng trang > 1) -->
+                    <c:if test="${totalPages > 1}">
+                        <a href="?page=${totalPages}" class="page-link ${currentPage == totalPages ? 'active' : ''}">
+                            ${totalPages}
+                        </a>
+                    </c:if>
+                    <!-- Next -->
+                    <c:if test="${currentPage < totalPages}">
+                        <a href="?page=${currentPage + 1}" class="page-link">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                    </c:if>   
+                </c:if> 
+                <!--Click để xem note chi tiết-->
+                <div id="noteModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-btn" onclick="closeModal()"></span>
+                        <h2 class="modal-title">
+                            <i class="fa-solid fa-clipboard-list"></i> ${t_appt_notes_title}
+                        </h2>
+                        <div id="modalNoteContent" class="modal-body">
+                        </div>
+                    </div>
+                </div>
+        </main>
+        <script src="${pageContext.request.contextPath}/assets/js/myAppointment.js"></script>
+    </body>
+</html>
