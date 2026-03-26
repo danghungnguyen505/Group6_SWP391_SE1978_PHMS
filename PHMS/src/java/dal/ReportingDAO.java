@@ -285,4 +285,39 @@ public class ReportingDAO extends DBContext {
 
         return result;
     }
+
+    /**
+     * Get recent invoices for transaction history panel in admin report.
+     */
+    public List<Map<String, Object>> getRecentInvoices(int limit) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        String sql = "SELECT TOP (?) "
+                + "inv.invoice_id, inv.appt_id, inv.total_amount, inv.status, inv.created_at, "
+                + "p.name AS pet_name, u_owner.full_name AS owner_name "
+                + "FROM Invoice inv "
+                + "INNER JOIN Appointment a ON inv.appt_id = a.appt_id "
+                + "INNER JOIN Pet p ON a.pet_id = p.pet_id "
+                + "INNER JOIN Users u_owner ON p.owner_id = u_owner.user_id "
+                + "WHERE inv.status = 'Paid' "
+                + "ORDER BY inv.created_at DESC, inv.invoice_id DESC";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, limit);
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> item = new HashMap<>();
+                    item.put("invoiceId", rs.getInt("invoice_id"));
+                    item.put("appointmentId", rs.getInt("appt_id"));
+                    item.put("totalAmount", rs.getDouble("total_amount"));
+                    item.put("status", rs.getString("status"));
+                    item.put("createdAt", rs.getTimestamp("created_at"));
+                    item.put("petName", rs.getString("pet_name"));
+                    item.put("ownerName", rs.getString("owner_name"));
+                    list.add(item);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getRecentInvoices: " + e.getMessage());
+        }
+        return list;
+    }
 }

@@ -100,13 +100,9 @@
                             <span>Subtotal</span>
                             <span class="amount">$115.50</span>
                         </div>
-                        <div class="total-row">
-                            <span>Tax (8%)</span>
-                            <span class="amount">$9.24</span>
-                        </div>
                         <div class="total-row grand-total">
                             <span>Grand Total</span>
-                            <span class="amount-green">$124.74</span>
+                            <span class="amount-green">$115.50</span>
                         </div>
                     </div>
                 </div>

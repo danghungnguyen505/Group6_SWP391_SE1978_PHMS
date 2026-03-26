@@ -1,6 +1,5 @@
 package controller.admin;
 
-import dal.FeedbackDAO;
 import dal.ReportingDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -121,9 +120,7 @@ public class BusinessReportController extends HttpServlet {
 
         // Growth percentage
         Map<String, Object> revenueGrowth = reportingDAO.getRevenueGrowth(startTimestamp, endTimestamp);
-
-        FeedbackDAO feedbackDAO = new FeedbackDAO();
-        List<model.Feedback> feedbacks = feedbackDAO.getAllFeedbacks(1, 4);
+        List<Map<String, Object>> recentInvoices = reportingDAO.getRecentInvoices(6);
 
         request.setAttribute("startDate", sdf.format(startDate));
         request.setAttribute("endDate", sdf.format(endDate));
@@ -132,7 +129,7 @@ public class BusinessReportController extends HttpServlet {
         request.setAttribute("topServices", topServices);
         request.setAttribute("dailyAppointments", dailyAppointments);
         request.setAttribute("monthlyRevenue", monthlyRevenue);
-        request.setAttribute("feedbacks", feedbacks);
+        request.setAttribute("recentInvoices", recentInvoices);
         request.setAttribute("revenueGrowth", revenueGrowth);
 
         request.getRequestDispatcher("/views/admin/businessReport.jsp").forward(request, response);
