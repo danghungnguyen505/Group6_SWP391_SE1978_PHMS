@@ -1,4 +1,4 @@
-<%--
+﻿<%--
     Document   : home
     Created on : Jan 22, 2026, 1:18:21 AM
     Author     : Nguyen Dang Hung
@@ -72,10 +72,6 @@
                     <a href="${pageContext.request.contextPath}/register" class="btn btn-outline" style="color: black; border-color: black;">${t_register}</a>
                 </c:when>
                 <c:otherwise>
-                    <span class="btn btn-dark">
-                        <i class="fa-solid fa-user" style="color: greenyellow; padding-right: 8px;"></i>
-                        <a href="${pageContext.request.contextPath}/profile" style="color:inherit; text-decoration:none;">${sessionScope.account.fullName}</a>
-                    </span>
                     <a href="${pageContext.request.contextPath}/logout" class="btn btn-dark" style="background-color: #ef4444; border-color: #ef4444;">${t_logout}</a>
                 </c:otherwise>
             </c:choose>
@@ -212,5 +208,11 @@
         <script>window.onload = function() { alert("${toastText}"); };</script>
         <c:remove var="toastMessage" scope="session" />
     </c:if>
+<script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+

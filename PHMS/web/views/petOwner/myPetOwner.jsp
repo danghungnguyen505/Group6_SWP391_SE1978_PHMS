@@ -1,4 +1,4 @@
-<%@page contentType="text/html" pageEncoding="UTF-8" %>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8" %>
     <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
         <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
             <%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
@@ -125,8 +125,7 @@
                                     <!-- Tên & Loài -->
                                     <c:if test="${empty selectedPet}">
                                         <div class="pet-name">${t_no_pets}</div>
-                                        <div class="pet-breed">${L == 'en' ? 'Add a pet or clear search' : 'Thêm thú
-                                            cưng hoặc xóa tìm kiếm'}</div>
+                                        <div class="pet-breed">${L == 'en' ? 'Add a pet or clear search' : 'Thêm thú cưng hoặc xóa tìm kiếm'}</div>
                                     </c:if>
                                     <c:if test="${not empty selectedPet}">
                                         <div class="pet-name">${selectedPet.name}</div>
@@ -410,6 +409,11 @@
                     </main>
 
                     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-                </body>
+                <script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
+</body>
 
                 </html>

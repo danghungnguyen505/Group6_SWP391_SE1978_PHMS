@@ -512,8 +512,11 @@
                         </tbody>
                     </table>
 
+                    <c:set var="invoiceSubtotal" value="${invoice.totalAmount / 1.1}" />
+                    <c:set var="invoiceVat" value="${invoice.totalAmount - invoiceSubtotal}" />
                     <div class="totals-section">
-                        <div class="total-row"><span>Subtotal</span><span class="amount"><fmt:formatNumber value="${invoice.totalAmount}" type="currency" currencySymbol="VND "/></span></div>
+                        <div class="total-row"><span>Subtotal</span><span class="amount"><fmt:formatNumber value="${invoiceSubtotal}" type="currency" currencySymbol="VND "/></span></div>
+                        <div class="total-row"><span>VAT (10%)</span><span class="amount"><fmt:formatNumber value="${invoiceVat}" type="currency" currencySymbol="VND "/></span></div>
                         <div class="total-row grand-total">
                             <span>Grand Total</span>
                             <span class="amount-green">
@@ -711,5 +714,12 @@
                 document.getElementById('paymentForm').submit();
             }
         </script>
-    </body>
+    <script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
+</body>
 </html>
+
+

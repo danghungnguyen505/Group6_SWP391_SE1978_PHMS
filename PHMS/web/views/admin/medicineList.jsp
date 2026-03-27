@@ -1,4 +1,4 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -303,6 +303,27 @@
                 font-weight: 700;
                 font-size: 12px;
             }
+
+            .toast-alert {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 12px 14px;
+                border-radius: 10px;
+                font-weight: 600;
+                font-size: 13px;
+                margin-bottom: 16px;
+            }
+            .toast-alert.success {
+                background: #dcfce7;
+                color: #166534;
+                border: 1px solid #86efac;
+            }
+            .toast-alert.error {
+                background: #fee2e2;
+                color: #991b1b;
+                border: 1px solid #fca5a5;
+            }
         </style>
     </head>
     <body>
@@ -345,6 +366,25 @@
             </div>
 
             <div class="card">
+                <c:if test="${not empty sessionScope.toastMessage}">
+                    <c:set var="toast" value="${sessionScope.toastMessage}" />
+                    <c:choose>
+                        <c:when test="${fn:startsWith(toast, 'success|')}">
+                            <div class="toast-alert success">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span>${fn:substringAfter(toast, 'success|')}</span>
+                            </div>
+                        </c:when>
+                        <c:when test="${fn:startsWith(toast, 'error|')}">
+                            <div class="toast-alert error">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                                <span>${fn:substringAfter(toast, 'error|')}</span>
+                            </div>
+                        </c:when>
+                    </c:choose>
+                    <c:remove var="toastMessage" scope="session" />
+                </c:if>
+
                 <c:choose>
                     <c:when test="${empty medicines || medicines.size() == 0}">
                         <div style="text-align:center; padding:60px; color: #a0aec0;">
@@ -389,7 +429,7 @@
                                                   onsubmit="return confirm('Bạn có chắc muốn xóa thuốc này?');">
                                                 <input type="hidden" name="id" value="${med.medicineId}">
                                                 <button type="submit" class="btn-action btn-reject" title="Delete">
-                                                    <i class="fa-solid fa-circle-stop"></i>
+                                                    <i class="fa-solid fa-trash-can"></i>
                                                 </button>
                                             </form>
                                         </td>
@@ -419,5 +459,10 @@
                 </c:choose>
             </div>
         </main>
-    </body>
+    <script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
+</body>
 </html>

@@ -13,9 +13,9 @@ public class ValidationUtils {
         "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
     );
     
-    // Vietnamese phone number pattern (10 digits, may start with 0 or +84)
+    // Vietnamese phone number pattern: exactly 10 digits, starts with 0
     private static final Pattern PHONE_PATTERN = Pattern.compile(
-        "^(\\+84|0)[0-9]{9,10}$"
+        "^0\\d{9}$"
     );
     
     // Username pattern: alphanumeric, underscore, 3-50 characters

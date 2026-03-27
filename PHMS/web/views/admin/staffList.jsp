@@ -1,4 +1,4 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -139,6 +139,17 @@
                 text-transform: uppercase;
                 box-shadow: 0 4px 15px rgba(80, 180, 152, 0.2);
                 transition: 0.2s;
+            }
+            .btn-signout {
+                padding: 10px 20px;
+                border: 1px solid #e2e8f0;
+                background: white;
+                border-radius: 10px;
+                color: var(--text-main);
+                font-weight: 700;
+                font-size: 12px;
+                text-decoration: none;
+                text-transform: uppercase;
             }
 
             /* --- TABLE CARD --- */
@@ -350,6 +361,7 @@
                         </c:if>
                     </form>
                     <a href="${pageContext.request.contextPath}/admin/staff/create" class="btn-create">Create New</a>
+                    <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
                 </div>
             </div>
 
@@ -507,5 +519,10 @@
                 </c:choose>
             </div>
         </main>
-    </body>
+    <script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
+</body>
 </html>

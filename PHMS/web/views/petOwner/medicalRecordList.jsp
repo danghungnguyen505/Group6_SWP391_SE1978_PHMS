@@ -31,6 +31,17 @@
             </div>
 
             <div class="card" style="padding: 16px;">
+                <c:if test="${param.msg == 'no_invoice'}">
+                    <div class="alert alert-warning" style="margin-bottom:12px;">
+                        ${L == 'en' ? 'No invoice available for this visit yet.' : 'Lần khám này chưa có hóa đơn.'}
+                    </div>
+                </c:if>
+                <c:if test="${param.msg == 'no_permission'}">
+                    <div class="alert alert-danger" style="margin-bottom:12px;">
+                        ${L == 'en' ? 'You do not have permission to view this invoice.' : 'Bạn không có quyền xem hóa đơn này.'}
+                    </div>
+                </c:if>
+
                 <form method="get" action="${pageContext.request.contextPath}/my-medical-records" style="display:flex; gap:10px; align-items:center; margin-bottom: 12px;">
                     <label style="font-weight:600;">${t_filter_pet}</label>
                     <select name="petId" class="form-control" style="max-width: 280px;" onchange="this.form.submit()">
@@ -64,10 +75,29 @@
                                     <td>${r.petName}</td>
                                     <td>${r.vetName}</td>
                                     <td style="text-align:center;">
-                                        <a class="btn-action btn-reschedule" style="text-decoration:none;"
-                                           href="${pageContext.request.contextPath}/my-medical-records/detail?id=${r.recordId}">
-                                            <i class="fa-regular fa-eye"></i>
-                                        </a>
+                                        <div style="display:flex; gap:8px; justify-content:center;">
+                                            <a class="btn-action btn-reschedule" style="text-decoration:none;"
+                                               href="${pageContext.request.contextPath}/my-medical-records/detail?id=${r.recordId}"
+                                               title="${L == 'en' ? 'View medical record' : 'Xem hồ sơ bệnh án'}">
+                                                <i class="fa-regular fa-eye"></i>
+                                            </a>
+                                            <c:choose>
+                                                <c:when test="${not empty invoiceMap[r.apptId]}">
+                                                    <a class="btn-action btn-reschedule" style="text-decoration:none;"
+                                                       href="${pageContext.request.contextPath}/my-invoice/detail?apptId=${r.apptId}"
+                                                       title="${L == 'en' ? 'View invoice' : 'Xem hóa đơn'}">
+                                                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                                                    </a>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <button type="button" class="btn-action btn-reschedule" disabled
+                                                            title="${L == 'en' ? 'Invoice not available yet' : 'Chưa có hóa đơn'}"
+                                                            style="opacity:.5; cursor:not-allowed;">
+                                                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                                                    </button>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>
                                     </td>
                                 </tr>
                             </c:forEach>
@@ -106,5 +136,11 @@
                 </c:if>
             </div>
         </main>
-    </body>
+    <script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
+</body>
 </html>
+

@@ -1,4 +1,4 @@
-<%--
+﻿<%--
     Document   : myAppointment
     Created on : Jan 31, 2026
     Author     : zoxy4
@@ -240,5 +240,10 @@
                 </div>
         </main>
         <script src="${pageContext.request.contextPath}/assets/js/myAppointment.js"></script>
-    </body>
+    <script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
+</body>
 </html>

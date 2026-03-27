@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
 
@@ -220,7 +220,7 @@
 
                             </div>
 
-                            <small>Nhập email rồi bấm Tra cứu để tải chủ & thú cưng</small>
+                            <small>Nhập email rồi bấm Tra cứu để tải chủ và thú cưng</small>
 
                         </div>
 
@@ -489,5 +489,12 @@
 
         </script>
 
-    </body>
+    <script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
+</body>
 </html>
+
+

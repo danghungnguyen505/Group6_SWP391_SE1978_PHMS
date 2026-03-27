@@ -1,6 +1,7 @@
 package controller.petOwner;
 
 import dal.MedicalRecordDAO;
+import dal.InvoiceDAO;
 import dal.PetDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -9,7 +10,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import model.Invoice;
 import model.MedicalRecord;
 import model.Pet;
 import model.User;
@@ -75,8 +79,17 @@ public class OwnerMedicalRecordListController extends HttpServlet {
         int totalPages = PaginationUtils.getTotalPages(all, PAGE_SIZE);
         page = PaginationUtils.getValidPage(page, totalPages);
         List<MedicalRecord> list = PaginationUtils.getPage(all, page, PAGE_SIZE);
+        
+        Map<Integer, Invoice> invoiceMap = new HashMap<>();
+        InvoiceDAO invoiceDAO = new InvoiceDAO();
+        for (MedicalRecord r : list) {
+            if (!invoiceMap.containsKey(r.getApptId())) {
+                invoiceMap.put(r.getApptId(), invoiceDAO.getInvoiceByAppointment(r.getApptId()));
+            }
+        }
 
         request.setAttribute("records", list);
+        request.setAttribute("invoiceMap", invoiceMap);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         request.getRequestDispatcher("/views/petOwner/medicalRecordList.jsp").forward(request, response);

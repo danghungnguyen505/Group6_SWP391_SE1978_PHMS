@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -59,6 +59,9 @@
             }
 
             .page-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
                 margin-bottom: 40px;
             }
             .page-header h1 {
@@ -68,6 +71,17 @@
                 letter-spacing: -0.5px;
             }
             .page-header p { color: var(--text-muted); margin-top: 5px; font-size: 15px; }
+            .btn-signout {
+                padding: 10px 20px;
+                border: 1px solid #e2e8f0;
+                background: white;
+                border-radius: 10px;
+                color: var(--text-main);
+                font-weight: 700;
+                font-size: 12px;
+                text-decoration: none;
+                text-transform: uppercase;
+            }
 
             /* --- TABLE CARD --- */
             .table-container {
@@ -286,8 +300,11 @@
         <!-- Main Content -->
         <main class="main-content">
             <header class="page-header">
-                <h1>Leave Management</h1>
-                <p>Review and manage staff absence requests.</p>
+                <div>
+                    <h1>Leave Management</h1>
+                    <p>Review and manage staff absence requests.</p>
+                </div>
+                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
             </header>
 
             <!-- Filter & Search Bar (Single Row) -->
@@ -386,5 +403,10 @@
                 </c:choose>
             </div>
         </main>
-    </body>
+    <script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
+</body>
 </html>

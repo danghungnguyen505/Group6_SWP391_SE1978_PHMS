@@ -1,4 +1,4 @@
-<%--
+﻿<%--
     Document   : dashboardReceptionist
     Created on : Feb 1, 2026, 10:36:50 PM
     Author     : zoxy4
@@ -374,5 +374,12 @@
                 if (e.target === m) closeModal();
             };
         </script>
-    </body>
+    <script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
+</body>
 </html>
+
+

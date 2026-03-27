@@ -31,7 +31,7 @@
         </li>
         <li class="nav-item">
             <a href="${pageContext.request.contextPath}/my-medical-records"
-               class="nav-link ${pageContext.request.requestURI.contains('/my-medical-records') || pageContext.request.requestURI.contains('medicalRecordList') || pageContext.request.requestURI.contains('medicalRecordDetail') ? 'active' : ''}">
+               class="nav-link ${pageContext.request.requestURI.contains('/my-medical-records') || pageContext.request.requestURI.contains('medicalRecordList') || pageContext.request.requestURI.contains('medicalRecordDetail') || pageContext.request.requestURI.contains('/my-invoice/detail') ? 'active' : ''}">
                 <i class="fa-solid fa-file-medical"></i> ${L == 'en' ? 'Medical Records' : 'Hồ sơ bệnh án'}
             </a>
         </li>

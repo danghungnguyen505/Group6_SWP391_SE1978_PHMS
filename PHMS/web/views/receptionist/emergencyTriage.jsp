@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
 <!DOCTYPE html>
@@ -88,7 +88,7 @@
                         <option value="Critical" ${triage != null && triage.conditionLevel == 'Critical' ? 'selected' : ''}>${L == 'en' ? 'Critical - Critical condition' : 'Critical - Nguy kịch'}</option>
                         <option value="High" ${triage != null && triage.conditionLevel == 'High' ? 'selected' : ''}>${L == 'en' ? 'High - Urgent' : 'High - Khẩn'}</option>
                         <option value="Medium" ${triage != null && triage.conditionLevel == 'Medium' ? 'selected' : ''}>${L == 'en' ? 'Medium - Moderate' : 'Medium - Trung bình'}</option>
-                        <option value="Low" ${triage != null && triage.conditionLevel == 'Low' ? 'selected' : ''}>${L == 'en' ? 'Low - Stable' : 'Low - Ổn định'}</option>
+                        <option value="Low" ${triage != null && triage.conditionLevel == 'Low' ? 'selected' : ''}>${L == 'en' ? 'Low - Stable' : 'Low - ổn định'}</option>
                     </select>
                 </div>
 
@@ -106,5 +106,12 @@
             </form>
         </div>
     </main>
+<script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+
+

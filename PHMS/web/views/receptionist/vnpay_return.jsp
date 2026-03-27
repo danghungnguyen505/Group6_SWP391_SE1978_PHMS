@@ -1,4 +1,4 @@
-<%@page import="java.net.URLEncoder"%>
+﻿<%@page import="java.net.URLEncoder"%>
 <%@page import="java.nio.charset.StandardCharsets"%>
 <%@page import="controller.vnpayCommon.Config"%>
 <%@page import="java.util.*"%>
@@ -157,5 +157,12 @@
             </div>
         </main>
 
-    </body>
+    <script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
+</body>
 </html>
+
+

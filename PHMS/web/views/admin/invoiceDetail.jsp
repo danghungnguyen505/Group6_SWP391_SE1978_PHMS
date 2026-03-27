@@ -203,10 +203,20 @@
                 <c:forEach var="p" items="${payments}">
                     <c:set var="paymentTotal" value="${paymentTotal + p.amount}" />
                 </c:forEach>
+                <c:set var="invoiceSubtotal" value="${invoice.totalAmount / 1.1}" />
+                <c:set var="invoiceVat" value="${invoice.totalAmount - invoiceSubtotal}" />
 
                 <div class="summary">
                     <div class="sum-row">
                         <span>T&#7893;ng ti&#7873;n h&#243;a &#273;&#417;n</span>
+                        <span><fmt:formatNumber value="${invoiceSubtotal}" pattern="#,###"/>&#8363;</span>
+                    </div>
+                    <div class="sum-row">
+                        <span>VAT (10%)</span>
+                        <span><fmt:formatNumber value="${invoiceVat}" pattern="#,###"/>&#8363;</span>
+                    </div>
+                    <div class="sum-row">
+                        <span>T&#7893;ng sau thu&#7871;</span>
                         <span><fmt:formatNumber value="${invoice.totalAmount}" pattern="#,###"/>&#8363;</span>
                     </div>
                     <div class="sum-row total">
@@ -244,5 +254,11 @@
             </aside>
         </div>
     </main>
+<script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+
