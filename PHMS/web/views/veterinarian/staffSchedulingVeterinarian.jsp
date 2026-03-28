@@ -1,4 +1,4 @@
-﻿<%-- 
+<%-- 
     Document   : staffSchedulingVeterinarian
     Created on : Feb 1, 2026, 11:47:01 PM
     Author     : zoxy4
@@ -27,7 +27,6 @@
                     <p>Manage your personal work shifts.</p>
                 </div>
                 <div class="header-actions">
-                    <button class="btn btn-primary"><i class="fa-solid fa-plus"></i> Add Shift</button>
                     <a href="${pageContext.request.contextPath}/logout" class="btn-signout" style="margin-left: 15px;">Sign Out</a>
                 </div>
             </div>
@@ -42,10 +41,6 @@
                         <fmt:formatDate value="${parsedStart}" pattern="MMM dd"/> - <fmt:formatDate value="${parsedEnd}" pattern="MMM dd, yyyy"/>
                     </span>
                     <a href="?date=${currentDate.plusWeeks(1)}" class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></a>
-                </div>
-
-                <div style="font-size: 13px; color: #64748b;">
-                    Currently viewing: <span style="color: #1e293b; font-weight: 700;">${sessionScope.account.fullName}</span>
                 </div>
             </div>
             <div class="schedule-grid">
@@ -63,9 +58,6 @@
                         <c:set var="morningShift" value="${entry.value['morning']}" />
                         <c:if test="${not empty morningShift}">
                             <div class="shift-section morning-section">
-                                <div class="shift-section-header morning">
-                                    <i class="fa-solid fa-sun"></i> Ca Sáng (09:00 - 12:00)
-                                </div>
                                 <c:set var="leaveStatus" value="${leaveMap[entry.key]}" />
                                 <div class="shift-card
                                      ${leaveStatus == 'Pending' ? ' leave-pending' : ''}
@@ -79,6 +71,9 @@
                                         ${morningShift.staffName != null ? morningShift.staffName.charAt(0) : 'U'}
                                     </div>
                                     <div class="shift-info">
+                                        <div class="shift-inline-label morning">
+                                            <i class="fa-solid fa-sun"></i> Ca Sáng
+                                        </div>
                                         <h4>${morningShift.staffName}</h4>
                                         <span class="role-badge vet">VETERINARIAN</span>
                                         <c:if test="${not empty leaveStatus}">
@@ -102,9 +97,6 @@
                         <c:set var="afternoonShift" value="${entry.value['afternoon']}" />
                         <c:if test="${not empty afternoonShift}">
                             <div class="shift-section afternoon-section">
-                                <div class="shift-section-header afternoon">
-                                    <i class="fa-solid fa-cloud-sun"></i> Ca Chiều (14:00 - 17:00)
-                                </div>
                                 <c:set var="leaveStatus" value="${leaveMap[entry.key]}" />
                                 <div class="shift-card
                                      ${leaveStatus == 'Pending' ? ' leave-pending' : ''}
@@ -118,6 +110,9 @@
                                         ${afternoonShift.staffName != null ? afternoonShift.staffName.charAt(0) : 'U'}
                                     </div>
                                     <div class="shift-info">
+                                        <div class="shift-inline-label afternoon">
+                                            <i class="fa-solid fa-cloud-sun"></i> Ca Chiều
+                                        </div>
                                         <h4>${afternoonShift.staffName}</h4>
                                         <span class="role-badge vet">VETERINARIAN</span>
                                         <c:if test="${not empty leaveStatus}">
@@ -142,20 +137,22 @@
             </div>
             <br><br>
         </main>
-        <div class="footer-stats">
-            <div class="stats-group">
-                <div class="stat-item">
-                    <span class="stat-label">Total Shifts</span>
-                    <span class="stat-value">18</span> </div>
-            </div>
-            <div class="warning-box">
-                <i class="fa-solid fa-triangle-exclamation" style="color: #fbbf24;"></i>
-                <div class="warning-text">
-                    <strong style="color:white; font-size:12px;">Staff Warning</strong>
-                    <span>Dr. James Chen is on leave.</span>
+        <c:if test="${sessionScope.account != null && sessionScope.account.role == 'Admin'}">
+            <div class="footer-stats">
+                <div class="stats-group">
+                    <div class="stat-item">
+                        <span class="stat-label">Total Shifts</span>
+                        <span class="stat-value">18</span> </div>
+                </div>
+                <div class="warning-box">
+                    <i class="fa-solid fa-triangle-exclamation" style="color: #fbbf24;"></i>
+                    <div class="warning-text">
+                        <strong style="color:white; font-size:12px;">Staff Warning</strong>
+                        <span>Dr. James Chen is on leave.</span>
+                    </div>
                 </div>
             </div>
-        </div>
+        </c:if>
     <script>
 window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
 window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";

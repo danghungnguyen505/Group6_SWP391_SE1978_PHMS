@@ -107,6 +107,7 @@ public class LabRequestListController extends HttpServlet {
         }
 
         int page = 1;
+        int pageSize = PaginationUtils.normalizePageSize(request.getParameter("size"), PAGE_SIZE);
         String pageStr = request.getParameter("page");
         if (pageStr != null && !pageStr.trim().isEmpty()) {
             try {
@@ -115,9 +116,9 @@ public class LabRequestListController extends HttpServlet {
                 page = 1;
             }
         }
-        int totalPages = PaginationUtils.getTotalPages(all, PAGE_SIZE);
+        int totalPages = PaginationUtils.getTotalPages(all, pageSize);
         page = PaginationUtils.getValidPage(page, totalPages);
-        List<LabTest> list = PaginationUtils.getPage(all, page, PAGE_SIZE);
+        List<LabTest> list = PaginationUtils.getPage(all, page, pageSize);
         Map<Integer, String> labResultImageMap = new HashMap<>();
         Map<Integer, String> labResultTextMap = new HashMap<>();
         for (LabTest t : list) {
@@ -130,6 +131,7 @@ public class LabRequestListController extends HttpServlet {
         request.setAttribute("labResultTextMap", labResultTextMap);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
+        request.setAttribute("pageSize", pageSize);
         request.setAttribute("filter", filter);
         request.setAttribute("search", search != null ? search : "");
         request.getRequestDispatcher("/views/veterinarian/labRequestList.jsp").forward(request, response);

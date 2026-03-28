@@ -64,12 +64,13 @@
                     <input type="text" name="search" placeholder="Search by pet, owner, vet, test type..."
                            value="${search}" style="flex:1; padding:8px 12px; border:1px solid #d1d5db; border-radius:6px;">
                     <input type="hidden" name="filter" value="${filter}">
+                    <input type="hidden" name="size" value="${pageSize}">
                     <button type="submit" class="btn btn-approve" style="text-decoration:none;">
                         <i class="fa-solid fa-search"></i> Search
                     </button>
                     <c:if test="${not empty search}">
                         <a class="btn btn-reject" style="text-decoration:none; background:#e5e7eb;color:#111827;"
-                           href="${pageContext.request.contextPath}/nurse/lab/queue?filter=${filter}">
+                           href="${pageContext.request.contextPath}/nurse/lab/queue?filter=${filter}&size=${pageSize}">
                             <i class="fa-solid fa-times"></i> Clear
                         </a>
                     </c:if>
@@ -79,22 +80,22 @@
                 <div style="display:flex; gap:8px; margin-bottom:16px;">
                     <a class="btn ${filter == 'requested' ? 'btn-approve' : 'btn-reject'}"
                        style="text-decoration:none; ${filter == 'requested' ? '' : 'background:#e5e7eb;color:#111827;'}"
-                       href="${pageContext.request.contextPath}/nurse/lab/queue?filter=requested">
+                       href="${pageContext.request.contextPath}/nurse/lab/queue?filter=requested&size=${pageSize}">
                         <i class="fa-solid fa-clock"></i> Requested
                     </a>
                     <a class="btn ${filter == 'inprogress' ? 'btn-approve' : 'btn-reject'}"
                        style="text-decoration:none; ${filter == 'inprogress' ? '' : 'background:#e5e7eb;color:#111827;'}"
-                       href="${pageContext.request.contextPath}/nurse/lab/queue?filter=inprogress">
+                       href="${pageContext.request.contextPath}/nurse/lab/queue?filter=inprogress&size=${pageSize}">
                         <i class="fa-solid fa-spinner"></i> In Progress
                     </a>
                     <a class="btn ${filter == 'completed' ? 'btn-approve' : 'btn-reject'}"
                        style="text-decoration:none; ${filter == 'completed' ? '' : 'background:#e5e7eb;color:#111827;'}"
-                       href="${pageContext.request.contextPath}/nurse/lab/queue?filter=completed">
+                       href="${pageContext.request.contextPath}/nurse/lab/queue?filter=completed&size=${pageSize}">
                         <i class="fa-solid fa-check-circle"></i> Completed
                     </a>
                     <a class="btn ${filter == 'all' ? 'btn-approve' : 'btn-reject'}"
                        style="text-decoration:none; ${filter == 'all' ? '' : 'background:#e5e7eb;color:#111827;'}"
-                       href="${pageContext.request.contextPath}/nurse/lab/queue?filter=all">
+                       href="${pageContext.request.contextPath}/nurse/lab/queue?filter=all&size=${pageSize}">
                         <i class="fa-solid fa-list"></i> All
                     </a>
                 </div>
@@ -121,7 +122,7 @@
                             <c:forEach items="${tests}" var="t" varStatus="status">
                                 <tr>
                                     <td style="display:none;">${t.testId}</td>
-                                    <td>${(currentPage - 1) * 10 + status.index + 1}</td>
+                                    <td>${(currentPage - 1) * pageSize + status.index + 1}</td>
                                     <td class="col-service">${t.testType}</td>
                                     <td class="col-pet">${t.petName}</td>
                                     <td>${t.ownerName}</td>
@@ -167,23 +168,38 @@
 
                 <c:if test="${totalPages > 1}">
                     <c:set var="filterParam" value="&filter=${filter}" />
+                    <c:set var="sizeParam" value="&size=${pageSize}" />
                     <c:set var="searchParam" value="${not empty search ? '&search='.concat(search) : ''}" />
-                    <div style="display:flex; gap:6px; justify-content:flex-end; margin-top:12px;">
+                    <div style="display:flex; gap:6px; justify-content:space-between; margin-top:12px; align-items:center; flex-wrap:wrap;">
+                        <form method="get" action="${pageContext.request.contextPath}/nurse/lab/queue" style="display:flex; align-items:center; gap:8px;">
+                            <input type="hidden" name="filter" value="${filter}">
+                            <input type="hidden" name="search" value="${search}">
+                            <span style="font-size:12px; color:#64748b; font-weight:700;">Hiển thị</span>
+                            <select name="size" onchange="this.form.submit()" style="padding:6px 10px; border:1px solid #d1d5db; border-radius:8px; font-size:12px;">
+                                <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
+                                <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
+                                <option value="20" ${pageSize == 20 ? 'selected' : ''}>20</option>
+                                <option value="50" ${pageSize == 50 ? 'selected' : ''}>50</option>
+                                <option value="100" ${pageSize == 100 ? 'selected' : ''}>100</option>
+                            </select>
+                        </form>
+                        <div style="display:flex; gap:6px; justify-content:flex-end;">
                         <c:if test="${currentPage > 1}">
-                            <a class="btn btn-approve" style="text-decoration:none;" href="?page=${currentPage - 1}${filterParam}${searchParam}">
+                            <a class="btn btn-approve" style="text-decoration:none;" href="?page=${currentPage - 1}${sizeParam}${filterParam}${searchParam}">
                                 <i class="fa-solid fa-chevron-left"></i>
                             </a>
                         </c:if>
                         <c:forEach begin="1" end="${totalPages}" var="i">
                             <a class="btn ${currentPage == i ? 'btn-approve' : 'btn-reject'}"
                                style="text-decoration:none; ${currentPage == i ? '' : 'background:#e5e7eb;color:#111827;'}"
-                               href="?page=${i}${filterParam}${searchParam}">${i}</a>
+                               href="?page=${i}${sizeParam}${filterParam}${searchParam}">${i}</a>
                         </c:forEach>
                         <c:if test="${currentPage < totalPages}">
-                            <a class="btn btn-approve" style="text-decoration:none;" href="?page=${currentPage + 1}${filterParam}${searchParam}">
+                            <a class="btn btn-approve" style="text-decoration:none;" href="?page=${currentPage + 1}${sizeParam}${filterParam}${searchParam}">
                                 <i class="fa-solid fa-chevron-right"></i>
                             </a>
                         </c:if>
+                        </div>
                     </div>
                 </c:if>
             </div>

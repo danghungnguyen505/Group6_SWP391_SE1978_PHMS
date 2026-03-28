@@ -311,15 +311,16 @@
             <div class="filter-bar" style="margin-bottom: 25px;">
                 <!-- Filter Tabs -->
                 <div class="filter-tabs">
-                    <a href="${pageContext.request.contextPath}/leavePending?status=all&search=${search}" class="filter-tab ${statusFilter == 'all' ? 'active' : ''}">All</a>
-                    <a href="${pageContext.request.contextPath}/leavePending?status=Pending&search=${search}" class="filter-tab ${statusFilter == 'Pending' ? 'active' : ''}">Pending</a>
-                    <a href="${pageContext.request.contextPath}/leavePending?status=Approved&search=${search}" class="filter-tab ${statusFilter == 'Approved' ? 'active' : ''}">Approved</a>
-                    <a href="${pageContext.request.contextPath}/leavePending?status=Rejected&search=${search}" class="filter-tab ${statusFilter == 'Rejected' ? 'active' : ''}">Rejected</a>
+                    <a href="${pageContext.request.contextPath}/leavePending?status=all&search=${search}&size=${pageSize}" class="filter-tab ${statusFilter == 'all' ? 'active' : ''}">All</a>
+                    <a href="${pageContext.request.contextPath}/leavePending?status=Pending&search=${search}&size=${pageSize}" class="filter-tab ${statusFilter == 'Pending' ? 'active' : ''}">Pending</a>
+                    <a href="${pageContext.request.contextPath}/leavePending?status=Approved&search=${search}&size=${pageSize}" class="filter-tab ${statusFilter == 'Approved' ? 'active' : ''}">Approved</a>
+                    <a href="${pageContext.request.contextPath}/leavePending?status=Rejected&search=${search}&size=${pageSize}" class="filter-tab ${statusFilter == 'Rejected' ? 'active' : ''}">Rejected</a>
                 </div>
 
                 <!-- Search -->
                 <form method="get" action="${pageContext.request.contextPath}/leavePending" style="display: flex; gap: 10px; flex: 1; justify-content: flex-end;">
                     <input type="hidden" name="status" value="${statusFilter}">
+                    <input type="hidden" name="size" value="${pageSize}">
                     <div class="search-box" style="flex: 0 1 300px;">
                         <i class="fa-solid fa-search"></i>
                         <input type="text" name="search" value="${search}" placeholder="Search by employee name...">
@@ -353,7 +354,7 @@
                             <tbody>
                                 <c:forEach var="r" items="${requests}" varStatus="st">
                                     <tr>
-                                        <td class="col-id">${st.index + 1}</td>
+                                        <td class="col-id">${(currentPage - 1) * pageSize + st.index + 1}</td>
                                         <td>
                                             <div class="col-emp">${not empty r.empName ? r.empName : r.empId}</div>
                                         </td>
@@ -390,13 +391,27 @@
 
                         <!-- Pagination -->
                         <c:if test="${totalPages > 1}">
-                            <div class="pagination">
+                            <div class="pagination" style="justify-content:space-between; width:100%;">
+                                <form method="get" action="${pageContext.request.contextPath}/leavePending" style="display:flex; gap:8px; align-items:center;">
+                                    <input type="hidden" name="status" value="${statusFilter}">
+                                    <input type="hidden" name="search" value="${search}">
+                                    <label style="font-size:12px; color:#64748b; font-weight:700;">Hiển thị</label>
+                                    <select name="size" class="filter-select" style="min-width:90px; padding:8px 10px;" onchange="this.form.submit()">
+                                        <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
+                                        <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
+                                        <option value="20" ${pageSize == 20 ? 'selected' : ''}>20</option>
+                                        <option value="50" ${pageSize == 50 ? 'selected' : ''}>50</option>
+                                        <option value="100" ${pageSize == 100 ? 'selected' : ''}>100</option>
+                                    </select>
+                                </form>
+                                <div style="display:flex; gap:8px;">
                                 <c:forEach begin="1" end="${totalPages}" var="i">
-                                    <a href="${pageContext.request.contextPath}/leavePending?page=${i}&status=${statusFilter}&search=${search}"
+                                    <a href="${pageContext.request.contextPath}/leavePending?page=${i}&size=${pageSize}&status=${statusFilter}&search=${search}"
                                        class="page-btn ${i == currentPage ? 'active' : ''}">
                                         ${i}
                                     </a>
                                 </c:forEach>
+                                </div>
                             </div>
                         </c:if>
                     </c:otherwise>

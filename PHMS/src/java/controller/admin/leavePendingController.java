@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import model.LeaveRequest;
+import util.PaginationUtils;
 
 /**
  *
@@ -25,7 +26,7 @@ public class leavePendingController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        int recordsPerPage = 10;
+        int recordsPerPage = PaginationUtils.normalizePageSize(request.getParameter("size"), 10);
         int currentPage = 1;
         String pageParam = request.getParameter("page");
         if (pageParam != null && !pageParam.isEmpty()) {
@@ -47,6 +48,7 @@ public class leavePendingController extends HttpServlet {
         request.setAttribute("requests", list);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("currentPage", currentPage);
+        request.setAttribute("pageSize", recordsPerPage);
         request.setAttribute("search", search != null ? search : "");
         request.setAttribute("statusFilter", statusFilter);
 

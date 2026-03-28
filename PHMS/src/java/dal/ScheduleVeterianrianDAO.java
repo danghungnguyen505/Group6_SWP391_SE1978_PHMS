@@ -15,8 +15,32 @@ import java.util.ArrayList;
 import java.util.List;
 import model.Schedule;
 import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Locale;
 
 public class ScheduleVeterianrianDAO extends DBContext {
+
+    private LocalTime parseShiftStartTime(String shiftTime) {
+        if (shiftTime == null) {
+            return null;
+        }
+        String[] parts = shiftTime.split("-");
+        if (parts.length < 1) {
+            return null;
+        }
+        String start = parts[0].trim().toUpperCase(Locale.ENGLISH);
+        String[] patterns = new String[]{"hh:mm a", "h:mm a", "HH:mm", "H:mm"};
+        for (String p : patterns) {
+            try {
+                return LocalTime.parse(start, DateTimeFormatter.ofPattern(p, Locale.ENGLISH));
+            } catch (DateTimeParseException ignore) {
+            }
+        }
+        return null;
+    }
 
     private boolean hasVeterinarianTypeColumn() {
         String sql = "SELECT COL_LENGTH('Veterinarian', 'type') AS col_len";
@@ -337,6 +361,18 @@ public class ScheduleVeterianrianDAO extends DBContext {
      * @return true if inserted successfully, false otherwise
      */
     public boolean insertSchedule(int empId, int managerId, Date workDate, String shiftTime) {
+        if (workDate == null || workDate.before(Date.valueOf(LocalDate.now()))) {
+            return false;
+        }
+        if (workDate.equals(Date.valueOf(LocalDate.now()))) {
+            LocalTime start = parseShiftStartTime(shiftTime);
+            if (start != null && !start.isAfter(LocalTime.now())) {
+                return false;
+            }
+        }
+        if (shiftTime == null || shiftTime.trim().isEmpty()) {
+            return false;
+        }
         // Check if schedule already exists
         String checkSql = "SELECT COUNT(*) FROM Schedule WHERE emp_id = ? AND work_date = ? AND shift_time = ?";
         try (PreparedStatement checkSt = connection.prepareStatement(checkSql)) {

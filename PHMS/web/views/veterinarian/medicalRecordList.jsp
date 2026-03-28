@@ -463,6 +463,7 @@
 
             <div class="filter-card">
                 <form method="get" action="${pageContext.request.contextPath}/veterinarian/emr/records" class="filter-form">
+                    <input type="hidden" name="size" value="${pageSize}">
                     <input type="text"
                            class="filter-input"
                            name="keyword"
@@ -515,7 +516,7 @@
                                 <c:forEach items="${records}" var="r" varStatus="st">
                                     <tr>
                                         <td>
-                                            <div class="record-id">${(currentPage - 1) * 10 + st.index + 1}</div>
+                                            <div class="record-id">${(currentPage - 1) * pageSize + st.index + 1}</div>
                                             <span style="display:none;">${r.recordId}</span>
                                         </td>
                                         <td>
@@ -563,9 +564,23 @@
                 </c:if>
 
                 <c:if test="${totalPages > 1}">
-                    <div class="pagination-bar">
+                    <div class="pagination-bar" style="justify-content:space-between; flex-wrap:wrap; gap:10px;">
+                        <form method="get" action="${pageContext.request.contextPath}/veterinarian/emr/records" style="display:flex; align-items:center; gap:8px;">
+                            <input type="hidden" name="keyword" value="${keyword}" />
+                            <input type="hidden" name="status" value="${statusFilter}" />
+                            <span style="font-size:12px; color:#64748b; font-weight:700;">Hiển thị</span>
+                            <select name="size" onchange="this.form.submit()" style="padding:6px 10px; border:1px solid #d1d5db; border-radius:8px; font-size:12px;">
+                                <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
+                                <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
+                                <option value="20" ${pageSize == 20 ? 'selected' : ''}>20</option>
+                                <option value="50" ${pageSize == 50 ? 'selected' : ''}>50</option>
+                                <option value="100" ${pageSize == 100 ? 'selected' : ''}>100</option>
+                            </select>
+                        </form>
+                        <div style="display:flex; gap:6px; align-items:center;">
                         <c:url var="prevPageUrl" value="/veterinarian/emr/records">
                             <c:param name="page" value="${currentPage - 1}" />
+                            <c:param name="size" value="${pageSize}" />
                             <c:if test="${not empty keyword}">
                                 <c:param name="keyword" value="${keyword}" />
                             </c:if>
@@ -580,6 +595,7 @@
                         <c:forEach begin="1" end="${totalPages}" var="i">
                             <c:url var="pageUrl" value="/veterinarian/emr/records">
                                 <c:param name="page" value="${i}" />
+                                <c:param name="size" value="${pageSize}" />
                                 <c:if test="${not empty keyword}">
                                     <c:param name="keyword" value="${keyword}" />
                                 </c:if>
@@ -592,6 +608,7 @@
 
                         <c:url var="nextPageUrl" value="/veterinarian/emr/records">
                             <c:param name="page" value="${currentPage + 1}" />
+                            <c:param name="size" value="${pageSize}" />
                             <c:if test="${not empty keyword}">
                                 <c:param name="keyword" value="${keyword}" />
                             </c:if>
@@ -602,6 +619,7 @@
                         <a class="page-btn ${currentPage >= totalPages ? 'disabled' : ''}" href="${nextPageUrl}">
                             <i class="fa-solid fa-chevron-right"></i>
                         </a>
+                        </div>
                     </div>
                 </c:if>
             </div>

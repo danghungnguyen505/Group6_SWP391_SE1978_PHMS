@@ -340,6 +340,7 @@
                 </div>
                 <div style="display:flex; gap:15px; align-items:center;">
                     <form action="${pageContext.request.contextPath}/admin/medicine/list" method="get" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                        <input type="hidden" name="size" value="${pageSize}">
                         <input type="text" name="search" placeholder="Search name/unit..." 
                                value="${searchKeyword}" 
                                style="padding:8px 10px; border-radius:8px; border:1px solid #e2e8f0; font-size:13px; min-width:200px;">
@@ -408,7 +409,7 @@
                             <tbody>
                                 <c:forEach var="med" items="${medicines}" varStatus="st">
                                     <tr>
-                                        <td class="col-id">${st.index + 1}</td>
+                                        <td class="col-id">${(currentPage - 1) * pageSize + st.index + 1}</td>
                                         <td class="col-name">${med.name}</td>
                                         <td class="col-unit">"${med.unit}"</td>
                                         <td class="col-price">
@@ -442,8 +443,22 @@
                         <c:if test="${totalPages > 1}">
                             <c:set var="searchParam" value="${not empty searchKeyword ? '&search='.concat(searchKeyword) : ''}" />
                             <c:set var="statusParam" value="${not empty statusFilter ? '&status='.concat(statusFilter) : ''}" />
-                            <c:set var="queryParams" value="${searchParam.concat(statusParam)}" />
-                            <div class="pagination">
+                            <c:set var="sizeParam" value="${'&size='.concat(pageSize)}" />
+                            <c:set var="queryParams" value="${searchParam.concat(statusParam).concat(sizeParam)}" />
+                            <div class="pagination" style="justify-content:space-between; width:100%;">
+                                <form method="get" action="${pageContext.request.contextPath}/admin/medicine/list" style="display:flex; gap:8px; align-items:center;">
+                                    <input type="hidden" name="search" value="${searchKeyword}">
+                                    <input type="hidden" name="status" value="${statusFilter}">
+                                    <label class="page-info">Hiển thị</label>
+                                    <select name="size" style="padding:8px 10px; border-radius:8px; border:1px solid #e2e8f0; font-size:12px;" onchange="this.form.submit()">
+                                        <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
+                                        <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
+                                        <option value="20" ${pageSize == 20 ? 'selected' : ''}>20</option>
+                                        <option value="50" ${pageSize == 50 ? 'selected' : ''}>50</option>
+                                        <option value="100" ${pageSize == 100 ? 'selected' : ''}>100</option>
+                                    </select>
+                                </form>
+                                <div style="display:flex; gap:15px; align-items:center;">
                                 <c:if test="${currentPage > 1}">
                                     <a href="${pageContext.request.contextPath}/admin/medicine/list?page=${currentPage - 1}${queryParams}" class="btn-page">Previous</a>
                                 </c:if>
@@ -453,6 +468,7 @@
                                 <c:if test="${currentPage < totalPages}">
                                     <a href="${pageContext.request.contextPath}/admin/medicine/list?page=${currentPage + 1}${queryParams}" class="btn-page">Next</a>
                                 </c:if>
+                                </div>
                             </div>
                         </c:if>
                     </c:otherwise>

@@ -1,4 +1,4 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="vi">
@@ -159,7 +159,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Work Status</label>
-                        <input type="text" class="form-input" value="Đang làm việc (Active)" readonly style="font-weight: 700;">
+                        <input type="text" class="form-input" value="Äang lÃ m viá»‡c (Active)" readonly style="font-weight: 700;">
                     </div>
                 </div>
 
@@ -207,6 +207,9 @@
         }
         toggleVetFields();
     </script>
+<div class="phms-account-entry" style="position:fixed; top:16px; right:20px; z-index:1200;">
+    <a href="${pageContext.request.contextPath}/logout" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;color:#334155;text-decoration:none;font-size:13px;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.05);">Sign Out</a>
+</div>
 <script>
 window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
 window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";

@@ -1,4 +1,4 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
@@ -154,12 +154,13 @@
                 <h1>${L == 'en' ? 'Submit Feedback' : 'Gửi phản hồi'}</h1>
                 <p>${L == 'en' ? 'Share your experience after this appointment.' : 'Chia sẻ trải nghiệm của bạn sau lịch hẹn này.'}</p>
             </div>
-            <a class="btn-cancel" style="text-decoration:none;display:inline-flex;align-items:center;" href="${pageContext.request.contextPath}/feedback/create">
+            <a class="btn-cancel" style="text-decoration:none;display:inline-flex;align-items:center;" href="${pageContext.request.contextPath}/myAppointment">
                 ${L == 'en' ? 'Back' : 'Quay lại'}
             </a>
         </div>
 
         <div class="feedback-wrap">
+            <c:set var="isReadOnly" value="${not empty existingFeedback and not canEdit}" />
             <c:if test="${not empty appt}">
                 <section class="feedback-card">
                     <div class="section-title">${L == 'en' ? 'Appointment Information' : 'Thông tin lịch hẹn'}</div>
@@ -198,6 +199,9 @@
                 <c:if test="${not empty error}">
                     <div class="alert alert-danger">${error}</div>
                 </c:if>
+                <c:if test="${not empty infoMessage}">
+                    <div class="alert alert-info">${infoMessage}</div>
+                </c:if>
 
                 <c:set var="selectedRating" value="${not empty rating ? rating : param.rating}" />
                 <c:set var="commentText" value="${not empty comment ? comment : param.comment}" />
@@ -208,29 +212,31 @@
                     <div class="form-group">
                         <label class="form-label"><b>${L == 'en' ? 'Rating' : 'Số sao'} *</b></label>
                         <div class="rating-stars">
-                            <button type="button" class="star-btn ${selectedRating == '1' ? 'active' : ''}" onclick="setRating(1)" aria-label="1 star"><i class="fa-solid fa-star"></i></button>
-                            <button type="button" class="star-btn ${selectedRating == '2' ? 'active' : ''}" onclick="setRating(2)" aria-label="2 stars"><i class="fa-solid fa-star"></i></button>
-                            <button type="button" class="star-btn ${selectedRating == '3' ? 'active' : ''}" onclick="setRating(3)" aria-label="3 stars"><i class="fa-solid fa-star"></i></button>
-                            <button type="button" class="star-btn ${selectedRating == '4' ? 'active' : ''}" onclick="setRating(4)" aria-label="4 stars"><i class="fa-solid fa-star"></i></button>
-                            <button type="button" class="star-btn ${selectedRating == '5' ? 'active' : ''}" onclick="setRating(5)" aria-label="5 stars"><i class="fa-solid fa-star"></i></button>
+                            <button type="button" class="star-btn ${selectedRating == '1' ? 'active' : ''}" onclick="setRating(1)" aria-label="1 star" ${isReadOnly ? 'disabled' : ''}><i class="fa-solid fa-star"></i></button>
+                            <button type="button" class="star-btn ${selectedRating == '2' ? 'active' : ''}" onclick="setRating(2)" aria-label="2 stars" ${isReadOnly ? 'disabled' : ''}><i class="fa-solid fa-star"></i></button>
+                            <button type="button" class="star-btn ${selectedRating == '3' ? 'active' : ''}" onclick="setRating(3)" aria-label="3 stars" ${isReadOnly ? 'disabled' : ''}><i class="fa-solid fa-star"></i></button>
+                            <button type="button" class="star-btn ${selectedRating == '4' ? 'active' : ''}" onclick="setRating(4)" aria-label="4 stars" ${isReadOnly ? 'disabled' : ''}><i class="fa-solid fa-star"></i></button>
+                            <button type="button" class="star-btn ${selectedRating == '5' ? 'active' : ''}" onclick="setRating(5)" aria-label="5 stars" ${isReadOnly ? 'disabled' : ''}><i class="fa-solid fa-star"></i></button>
                         </div>
-                        <input type="hidden" name="rating" id="ratingInput" value="${selectedRating}" required>
+                        <input type="hidden" name="rating" id="ratingInput" value="${selectedRating}" ${isReadOnly ? '' : 'required'}>
                         <p id="ratingText"></p>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label"><b>${L == 'en' ? 'Comment' : 'Nhận xét'} *</b></label>
-                        <textarea name="comment" class="feedback-textarea" maxlength="1000" placeholder="${L == 'en' ? 'Please share your experience...' : 'Hãy chia sẻ trải nghiệm của bạn...'}" required>${commentText}</textarea>
+                        <textarea name="comment" class="feedback-textarea" maxlength="1000" placeholder="${L == 'en' ? 'Please share your experience...' : 'Hãy chia sẻ trải nghiệm của bạn...'}" ${isReadOnly ? 'readonly' : 'required'}>${commentText}</textarea>
                         <div class="hint">${L == 'en' ? 'Minimum 5 characters, maximum 1000 characters.' : 'Tối thiểu 5 ký tự, tối đa 1000 ký tự.'}</div>
                     </div>
 
                     <div class="actions">
-                        <a href="${pageContext.request.contextPath}/feedback/create" class="btn-feedback secondary">
+                        <a href="${pageContext.request.contextPath}/myAppointment" class="btn-feedback secondary">
                             ${L == 'en' ? 'Cancel' : 'Hủy'}
                         </a>
-                        <button type="submit" class="btn-feedback primary">
-                            <i class="fa-solid fa-paper-plane"></i> ${L == 'en' ? 'Submit Feedback' : 'Gửi phản hồi'}
-                        </button>
+                        <c:if test="${not isReadOnly}">
+                            <button type="submit" class="btn-feedback primary">
+                                <i class="fa-solid fa-paper-plane"></i> ${L == 'en' ? 'Submit Feedback' : 'Gửi phản hồi'}
+                            </button>
+                        </c:if>
                     </div>
                 </form>
             </section>

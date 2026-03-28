@@ -82,6 +82,7 @@ public class MedicalRecordListController extends HttpServlet {
         }
 
         int page = 1;
+        int pageSize = PaginationUtils.normalizePageSize(request.getParameter("size"), PAGE_SIZE);
         String pageStr = request.getParameter("page");
         if (pageStr != null && !pageStr.trim().isEmpty()) {
             try {
@@ -90,13 +91,14 @@ public class MedicalRecordListController extends HttpServlet {
                 page = 1;
             }
         }
-        int totalPages = PaginationUtils.getTotalPages(filtered, PAGE_SIZE);
+        int totalPages = PaginationUtils.getTotalPages(filtered, pageSize);
         page = PaginationUtils.getValidPage(page, totalPages);
-        List<MedicalRecord> list = PaginationUtils.getPage(filtered, page, PAGE_SIZE);
+        List<MedicalRecord> list = PaginationUtils.getPage(filtered, page, pageSize);
 
         request.setAttribute("records", list);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
+        request.setAttribute("pageSize", pageSize);
         request.setAttribute("totalRecords", totalRecords);
         request.setAttribute("inProgressRecords", inProgressRecords);
         request.setAttribute("completedRecords", completedRecords);

@@ -89,6 +89,7 @@
             <!-- Filter Card -->
             <div class="card" style="margin-bottom: 20px; padding: 15px;">
                 <form method="get" action="${pageContext.request.contextPath}/receptionist/appointment" style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:10px; align-items:end;">
+                    <input type="hidden" name="size" value="${pageSize}">
                     <div>
                         <label style="font-size:12px; color:#64748b; display:block; margin-bottom:4px;">${L == 'en' ? 'Date' : 'Ngày'}</label>
                         <input type="date" name="filterDate" value="${filterDate}" style="width:100%; padding:8px 12px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px;">
@@ -160,7 +161,7 @@
                         <tbody>
                             <c:forEach items="${appointments}" var="a" varStatus="loop">
                                 <tr>
-                                    <td>${loop.index + 1}<input type="hidden" value="${a.apptId}" /></td> 
+                                    <td>${(currentPage - 1) * pageSize + loop.index + 1}<input type="hidden" value="${a.apptId}" /></td> 
                                     <td>${a.ownerName}</td>
                                     <td class="col-pet">${a.petName}</td>
                                     <td class="col-service">${a.type}</td>
@@ -205,24 +206,39 @@
 
                     <!-- Pagination -->
                     <c:if test="${totalPages > 1}">
-                        <div style="display:flex; gap:6px; justify-content:flex-end; margin-top:12px;">
+                        <div style="display:flex; gap:6px; justify-content:space-between; margin-top:12px; align-items:center; flex-wrap:wrap;">
+                            <form method="get" action="${pageContext.request.contextPath}/receptionist/appointment" style="display:flex; align-items:center; gap:8px;">
+                                <input type="hidden" name="filterDate" value="${filterDate}">
+                                <input type="hidden" name="filterStatus" value="${filterStatus}">
+                                <input type="hidden" name="filterVetId" value="${filterVetId}">
+                                <span style="font-size:12px; color:#64748b; font-weight:700;">Hiển thị</span>
+                                <select name="size" onchange="this.form.submit()" style="padding:6px 10px; border:1px solid #d1d5db; border-radius:8px; font-size:12px;">
+                                    <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
+                                    <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
+                                    <option value="20" ${pageSize == 20 ? 'selected' : ''}>20</option>
+                                    <option value="50" ${pageSize == 50 ? 'selected' : ''}>50</option>
+                                    <option value="100" ${pageSize == 100 ? 'selected' : ''}>100</option>
+                                </select>
+                            </form>
+                            <div style="display:flex; gap:6px; justify-content:flex-end;">
                             <c:if test="${currentPage > 1}">
                                 <a class="btn btn-approve" style="text-decoration:none;" 
-                                   href="?page=${currentPage - 1}<c:if test='${not empty filterDate}'>&filterDate=${filterDate}</c:if><c:if test='${not empty filterStatus}'>&filterStatus=${filterStatus}</c:if><c:if test='${not empty filterVetId}'>&filterVetId=${filterVetId}</c:if>">
+                                   href="?page=${currentPage - 1}&size=${pageSize}<c:if test='${not empty filterDate}'>&filterDate=${filterDate}</c:if><c:if test='${not empty filterStatus}'>&filterStatus=${filterStatus}</c:if><c:if test='${not empty filterVetId}'>&filterVetId=${filterVetId}</c:if>">
                                     <i class="fa-solid fa-chevron-left"></i>
                                 </a>
                             </c:if>
                             <c:forEach begin="1" end="${totalPages}" var="i">
                                 <a class="btn ${currentPage == i ? 'btn-approve' : 'btn-reject'}"
                                    style="text-decoration:none; ${currentPage == i ? '' : 'background:#e5e7eb;color:#111827;'}"
-                                   href="?page=${i}<c:if test='${not empty filterDate}'>&filterDate=${filterDate}</c:if><c:if test='${not empty filterStatus}'>&filterStatus=${filterStatus}</c:if><c:if test='${not empty filterVetId}'>&filterVetId=${filterVetId}</c:if>">${i}</a>
+                                   href="?page=${i}&size=${pageSize}<c:if test='${not empty filterDate}'>&filterDate=${filterDate}</c:if><c:if test='${not empty filterStatus}'>&filterStatus=${filterStatus}</c:if><c:if test='${not empty filterVetId}'>&filterVetId=${filterVetId}</c:if>">${i}</a>
                             </c:forEach>
                             <c:if test="${currentPage < totalPages}">
                                 <a class="btn btn-approve" style="text-decoration:none;" 
-                                   href="?page=${currentPage + 1}<c:if test='${not empty filterDate}'>&filterDate=${filterDate}</c:if><c:if test='${not empty filterStatus}'>&filterStatus=${filterStatus}</c:if><c:if test='${not empty filterVetId}'>&filterVetId=${filterVetId}</c:if>">
+                                   href="?page=${currentPage + 1}&size=${pageSize}<c:if test='${not empty filterDate}'>&filterDate=${filterDate}</c:if><c:if test='${not empty filterStatus}'>&filterStatus=${filterStatus}</c:if><c:if test='${not empty filterVetId}'>&filterVetId=${filterVetId}</c:if>">
                                     <i class="fa-solid fa-chevron-right"></i>
                                 </a>
                             </c:if>
+                            </div>
                         </div>
                     </c:if>
                 </c:if>

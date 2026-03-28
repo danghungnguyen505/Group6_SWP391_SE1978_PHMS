@@ -44,6 +44,7 @@
 
                 <form method="get" action="${pageContext.request.contextPath}/my-medical-records" style="display:flex; gap:10px; align-items:center; margin-bottom: 12px;">
                     <label style="font-weight:600;">${t_filter_pet}</label>
+                    <input type="hidden" name="size" value="${pageSize}">
                     <select name="petId" class="form-control" style="max-width: 280px;" onchange="this.form.submit()">
                         <option value="">${t_all}</option>
                         <c:forEach items="${pets}" var="p">
@@ -60,7 +61,7 @@
                     <table class="table-custom">
                         <thead>
                             <tr>
-                                <th>#ID</th>
+                                <th>STT</th>
                                 <th>${t_date}</th>
                                 <th>${t_pet}</th>
                                 <th>${t_doctor}</th>
@@ -68,9 +69,12 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <c:forEach items="${records}" var="r">
+                            <c:forEach items="${records}" var="r" varStatus="st">
                                 <tr>
-                                    <td><b>#${r.recordId}</b></td>
+                                    <td>
+                                        <b><c:out value="${(currentPage - 1) * pageSize + st.count}" /></b>
+                                        <input type="hidden" name="recordId" value="${r.recordId}">
+                                    </td>
                                     <td><fmt:formatDate value="${r.apptStartTime}" pattern="dd-MM-yyyy HH:mm"/></td>
                                     <td>${r.petName}</td>
                                     <td>${r.vetName}</td>
@@ -107,28 +111,39 @@
 
                 <c:if test="${totalPages > 1}">
                     <div class="pagination-container">
+                        <form method="get" action="${pageContext.request.contextPath}/my-medical-records" style="display:flex; align-items:center; gap:8px; margin-right:auto;">
+                            <input type="hidden" name="petId" value="${selectedPetId}">
+                            <span style="font-size:12px; color:#64748b; font-weight:700;">Hiển thị</span>
+                            <select name="size" onchange="this.form.submit()" style="padding:6px 10px; border:1px solid #d1d5db; border-radius:8px; font-size:12px;">
+                                <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
+                                <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
+                                <option value="20" ${pageSize == 20 ? 'selected' : ''}>20</option>
+                                <option value="50" ${pageSize == 50 ? 'selected' : ''}>50</option>
+                                <option value="100" ${pageSize == 100 ? 'selected' : ''}>100</option>
+                            </select>
+                        </form>
                         <c:if test="${currentPage > 1}">
-                            <a href="?page=${currentPage - 1}" class="page-link">
+                            <a href="?page=${currentPage - 1}&size=${pageSize}<c:if test='${not empty selectedPetId}'>&petId=${selectedPetId}</c:if>" class="page-link">
                                 <i class="fa-solid fa-chevron-left"></i>
                             </a>
                         </c:if>
-                        <a href="?page=1" class="page-link ${currentPage == 1 ? 'active' : ''}">1</a>
+                        <a href="?page=1&size=${pageSize}<c:if test='${not empty selectedPetId}'>&petId=${selectedPetId}</c:if>" class="page-link ${currentPage == 1 ? 'active' : ''}">1</a>
                         <c:if test="${currentPage > 4}">
                             <span class="page-dots">...</span>
                         </c:if>
                         <c:forEach begin="2" end="${totalPages - 1}" var="i">
                             <c:if test="${i >= currentPage - 2 && i <= currentPage + 2}">
-                                <a href="?page=${i}" class="page-link ${currentPage == i ? 'active' : ''}">${i}</a>
+                                <a href="?page=${i}&size=${pageSize}<c:if test='${not empty selectedPetId}'>&petId=${selectedPetId}</c:if>" class="page-link ${currentPage == i ? 'active' : ''}">${i}</a>
                             </c:if>
                         </c:forEach>
                         <c:if test="${currentPage < totalPages - 3}">
                             <span class="page-dots">...</span>
                         </c:if>
                         <c:if test="${totalPages > 1}">
-                            <a href="?page=${totalPages}" class="page-link ${currentPage == totalPages ? 'active' : ''}">${totalPages}</a>
+                            <a href="?page=${totalPages}&size=${pageSize}<c:if test='${not empty selectedPetId}'>&petId=${selectedPetId}</c:if>" class="page-link ${currentPage == totalPages ? 'active' : ''}">${totalPages}</a>
                         </c:if>
                         <c:if test="${currentPage < totalPages}">
-                            <a href="?page=${currentPage + 1}" class="page-link">
+                            <a href="?page=${currentPage + 1}&size=${pageSize}<c:if test='${not empty selectedPetId}'>&petId=${selectedPetId}</c:if>" class="page-link">
                                 <i class="fa-solid fa-chevron-right"></i>
                             </a>
                         </c:if>

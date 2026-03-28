@@ -1,4 +1,4 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -153,6 +153,24 @@
             margin-bottom: 30px;
             color: var(--text-main);
         }
+        .panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .panel-head .panel-title {
+            margin-bottom: 0;
+        }
+        .panel-head-link {
+            text-decoration: none;
+            color: #0f766e;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+        }
 
         /* Chart Area */
         .chart-placeholder {
@@ -288,7 +306,10 @@
 
             <!-- Right Panel: Transaction History -->
             <section class="card-panel">
-                <h2 class="panel-title">Lịch sử giao dịch gần đây</h2>
+                <div class="panel-head">
+                    <h2 class="panel-title">Lịch sử giao dịch gần đây</h2>
+                    <a class="panel-head-link" href="${pageContext.request.contextPath}/admin/invoice/list">Xem tất cả</a>
+                </div>
                 
                 <div class="txn-list">
                     <c:choose>
@@ -339,4 +360,3 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
-

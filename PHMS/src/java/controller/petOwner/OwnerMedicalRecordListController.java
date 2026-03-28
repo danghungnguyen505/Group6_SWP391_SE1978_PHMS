@@ -68,6 +68,7 @@ public class OwnerMedicalRecordListController extends HttpServlet {
         List<MedicalRecord> all = dao.listForOwner(account.getUserId(), petId);
 
         int page = 1;
+        int pageSize = PaginationUtils.normalizePageSize(request.getParameter("size"), PAGE_SIZE);
         String pageStr = request.getParameter("page");
         if (pageStr != null && !pageStr.trim().isEmpty()) {
             try {
@@ -76,9 +77,9 @@ public class OwnerMedicalRecordListController extends HttpServlet {
                 page = 1;
             }
         }
-        int totalPages = PaginationUtils.getTotalPages(all, PAGE_SIZE);
+        int totalPages = PaginationUtils.getTotalPages(all, pageSize);
         page = PaginationUtils.getValidPage(page, totalPages);
-        List<MedicalRecord> list = PaginationUtils.getPage(all, page, PAGE_SIZE);
+        List<MedicalRecord> list = PaginationUtils.getPage(all, page, pageSize);
         
         Map<Integer, Invoice> invoiceMap = new HashMap<>();
         InvoiceDAO invoiceDAO = new InvoiceDAO();
@@ -92,6 +93,7 @@ public class OwnerMedicalRecordListController extends HttpServlet {
         request.setAttribute("invoiceMap", invoiceMap);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
+        request.setAttribute("pageSize", pageSize);
         request.getRequestDispatcher("/views/petOwner/medicalRecordList.jsp").forward(request, response);
     }
 }
