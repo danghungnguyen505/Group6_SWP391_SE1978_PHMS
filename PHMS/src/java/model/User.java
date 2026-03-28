@@ -17,6 +17,9 @@ public class User {
     private String phone;
     private String email;
     private String address; 
+    private String vetType;
+    private String specialization;
+    private String licenseNumber;
     
     public User() {
     }
@@ -94,6 +97,30 @@ public class User {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getVetType() {
+        return vetType;
+    }
+
+    public void setVetType(String vetType) {
+        this.vetType = vetType;
+    }
+
+    public String getSpecialization() {
+        return specialization;
+    }
+
+    public void setSpecialization(String specialization) {
+        this.specialization = specialization;
+    }
+
+    public String getLicenseNumber() {
+        return licenseNumber;
+    }
+
+    public void setLicenseNumber(String licenseNumber) {
+        this.licenseNumber = licenseNumber;
     }
     
 }

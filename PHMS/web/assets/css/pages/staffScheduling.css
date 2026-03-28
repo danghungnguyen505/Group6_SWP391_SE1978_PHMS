@@ -231,6 +231,26 @@ body {
     align-items: center;
     gap: 5px;
 }
+.shift-inline-label {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.shift-inline-label.afternoon {
+    color: #1e293b;
+}
+.shift-inline-label.afternoon i {
+    color: #2563eb;
+}
+.shift-inline-label.morning {
+    color: #1e293b;
+}
+.shift-inline-label.morning i {
+    color: #d97706;
+}
 
 /* --- Footer --- */
 .footer-stats {
@@ -299,4 +319,36 @@ body {
     border: 2px dashed #9ca3af !important;
     background-color: #f9fafb !important;
     opacity: 0.85;
+}
+
+/* --- Shift Section Headers (Ca Sáng / Ca Chiều) --- */
+.shift-section {
+    margin-bottom: 10px;
+}
+.shift-section-header {
+    font-size: 13px;
+    font-weight: 700;
+    padding: 2px 0;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1.25;
+}
+.shift-section-header.morning {
+    background: transparent;
+    color: #92400e;
+}
+.shift-section-header.afternoon {
+    background: transparent;
+    color: #1e293b;
+}
+.shift-section-header i {
+    font-size: 13px;
+}
+.shift-section-header.morning i {
+    color: #d97706;
+}
+.shift-section-header.afternoon i {
+    color: #2563eb;
 }

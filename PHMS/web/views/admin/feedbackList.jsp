@@ -1,4 +1,4 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
@@ -148,15 +148,27 @@
                 <p>Monitoring client satisfaction and service quality</p>
             </div>
             <div style="display:flex; align-items:center; gap:20px;">
-                <div class="filter-area">
-                    FILTER: 
-                    <select class="filter-select">
-                        <option>All Ratings</option>
-                        <option>5 Stars</option>
-                        <option>4 Stars</option>
-                        <option>Below 3 Stars</option>
-                    </select>
-                </div>
+                <form id="filterForm" method="get" style="display:flex; align-items:center; gap:10px;">
+                    <input type="hidden" name="size" value="${pageSize}">
+                    <div class="filter-area">
+                        Rating:
+                        <select class="filter-select" name="ratingFilter" onchange="document.getElementById('filterForm').submit()">
+                            <option value="all" ${empty ratingFilter || ratingFilter == 'all' ? 'selected' : ''}>All Ratings</option>
+                            <option value="5" ${ratingFilter == '5' ? 'selected' : ''}>5 Stars</option>
+                            <option value="4" ${ratingFilter == '4' ? 'selected' : ''}>4 Stars</option>
+                            <option value="below3" ${ratingFilter == 'below3' ? 'selected' : ''}>Below 3 Stars</option>
+                        </select>
+                    </div>
+                    <div class="filter-area">
+                        Status:
+                        <select class="filter-select" name="statusFilter" onchange="document.getElementById('filterForm').submit()">
+                            <option value="all" ${empty statusFilter || statusFilter == 'all' ? 'selected' : ''}>All Status</option>
+                            <option value="New" ${statusFilter == 'New' ? 'selected' : ''}>New</option>
+                            <option value="Read" ${statusFilter == 'Read' ? 'selected' : ''}>Read</option>
+                            <option value="Flagged" ${statusFilter == 'Flagged' ? 'selected' : ''}>Flagged</option>
+                        </select>
+                    </div>
+                </form>
                 <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
             </div>
         </div>
@@ -173,6 +185,7 @@
                     <table class="data-table">
                         <thead>
                             <tr>
+                                <th>STT</th>
                                 <th>Client / Pet</th>
                                 <th>Rating</th>
                                 <th>Comment</th>
@@ -182,8 +195,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <c:forEach var="fb" items="${feedbacks}">
+                            <c:forEach var="fb" items="${feedbacks}" varStatus="st">
                                 <tr>
+                                    <td>${(currentPage - 1) * pageSize + st.index + 1}</td>
                                     <td>
                                         <div class="col-client">${fb.customerName}</div>
                                         <div class="col-pet">PET: ${fb.petName}</div>
@@ -197,16 +211,27 @@
                                     <td class="col-comment">"${fb.comment}"</td>
                                     <td class="col-date">${fb.apptDate}</td>
                                     <td>
-                                        <!-- Logic giả lập status: Nếu đánh giá thấp (<=3) thì Flagged, cao thì New -->
                                         <c:choose>
-                                            <c:when test="${fb.rating <= 2}"><span class="status-badge status-flagged">Flagged</span></c:when>
-                                            <c:when test="${fb.rating == 3}"><span class="status-badge status-read">Read</span></c:when>
+                                            <c:when test="${fb.status == 'Flagged'}"><span class="status-badge status-flagged">Flagged</span></c:when>
+                                            <c:when test="${fb.status == 'Read'}"><span class="status-badge status-read">Read</span></c:when>
                                             <c:otherwise><span class="status-badge status-new">New</span></c:otherwise>
                                         </c:choose>
                                     </td>
                                     <td style="text-align:right;">
-                                        <button class="btn-action" title="Mark as read"><i class="fa-solid fa-check"></i></button>
-                                        <button class="btn-action" title="Flag review"><i class="fa-solid fa-flag"></i></button>
+                                        <c:if test="${fb.status != 'Read'}">
+                                            <form action="${pageContext.request.contextPath}/admin/feedback/list" method="post" style="display:inline;">
+                                                <input type="hidden" name="feedbackId" value="${fb.feedbackId}">
+                                                <input type="hidden" name="action" value="markRead">
+                                                <button type="submit" class="btn-action" title="Mark as read"><i class="fa-solid fa-check"></i></button>
+                                            </form>
+                                        </c:if>
+                                        <c:if test="${fb.status != 'Flagged'}">
+                                            <form action="${pageContext.request.contextPath}/admin/feedback/list" method="post" style="display:inline;">
+                                                <input type="hidden" name="feedbackId" value="${fb.feedbackId}">
+                                                <input type="hidden" name="action" value="flag">
+                                                <button type="submit" class="btn-action" title="Flag review"><i class="fa-solid fa-flag"></i></button>
+                                            </form>
+                                        </c:if>
                                     </td>
                                 </tr>
                             </c:forEach>
@@ -215,13 +240,25 @@
                     
                     <!-- Pagination -->
                     <c:if test="${totalPages > 1}">
-                        <div class="pagination">
+                        <div class="pagination" style="justify-content:space-between; width:100%;">
+                            <form method="get" style="display:flex; align-items:center; gap:8px;">
+                                <input type="hidden" name="ratingFilter" value="${ratingFilter}">
+                                <input type="hidden" name="statusFilter" value="${statusFilter}">
+                                <label style="font-size:12px; font-weight:700; color:var(--text-muted);">Hiển thị</label>
+                                <select name="size" class="filter-select" style="padding:6px 10px;" onchange="this.form.submit()">
+                                    <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
+                                    <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
+                                    <option value="20" ${pageSize == 20 ? 'selected' : ''}>20</option>
+                                    <option value="50" ${pageSize == 50 ? 'selected' : ''}>50</option>
+                                    <option value="100" ${pageSize == 100 ? 'selected' : ''}>100</option>
+                                </select>
+                            </form>
                             <c:if test="${currentPage > 1}">
-                                <a href="?page=${currentPage - 1}" class="page-link">Previous</a>
+                                <a href="?page=${currentPage - 1}&size=${pageSize}<c:if test='${not empty ratingFilter}'>&ratingFilter=${ratingFilter}</c:if><c:if test='${not empty statusFilter}'>&statusFilter=${statusFilter}</c:if>" class="page-link">Previous</a>
                             </c:if>
                             <span style="font-size:12px; font-weight:700; color:var(--text-muted);">Page ${currentPage} of ${totalPages}</span>
                             <c:if test="${currentPage < totalPages}">
-                                <a href="?page=${currentPage + 1}" class="page-link">Next</a>
+                                <a href="?page=${currentPage + 1}&size=${pageSize}<c:if test='${not empty ratingFilter}'>&ratingFilter=${ratingFilter}</c:if><c:if test='${not empty statusFilter}'>&statusFilter=${statusFilter}</c:if>" class="page-link">Next</a>
                             </c:if>
                         </div>
                     </c:if>
@@ -229,5 +266,10 @@
             </c:choose>
         </div>
     </main>
+<script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>

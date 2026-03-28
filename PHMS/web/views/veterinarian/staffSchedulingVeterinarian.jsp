@@ -27,7 +27,6 @@
                     <p>Manage your personal work shifts.</p>
                 </div>
                 <div class="header-actions">
-                    <button class="btn btn-primary"><i class="fa-solid fa-plus"></i> Add Shift</button>
                     <a href="${pageContext.request.contextPath}/logout" class="btn-signout" style="margin-left: 15px;">Sign Out</a>
                 </div>
             </div>
@@ -43,10 +42,6 @@
                     </span>
                     <a href="?date=${currentDate.plusWeeks(1)}" class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></a>
                 </div>
-
-                <div style="font-size: 13px; color: #64748b;">
-                    Currently viewing: <span style="color: #1e293b; font-weight: 700;">${sessionScope.account.fullName}</span>
-                </div>
             </div>
             <div class="schedule-grid">
                 <jsp:useBean id="now" class="java.util.Date" />
@@ -58,85 +53,110 @@
                             <span class="day-name"><fmt:formatDate value="${colDate}" pattern="EEEE"/></span>
                             <span class="day-num"><fmt:formatDate value="${colDate}" pattern="dd"/></span>
                         </div>
-                        <c:forEach var="shift" items="${entry.value}">
-                            <c:set var="leaveStatus" value="${leaveMap[entry.key]}" />
-                            <c:set var="shiftTypeLabel">
-                                <c:choose>
-                                    <c:when test="${not empty shift.startTime && shift.startTime.toString().startsWith('08')}">morning</c:when>
-                                    <c:when test="${not empty shift.startTime && shift.startTime.toString().startsWith('14')}">afternoon</c:when>
-                                    <c:otherwise>custom</c:otherwise>
-                                </c:choose>
-                            </c:set>
-                            <div class="shift-card
-                                 ${leaveStatus == 'Pending' ? ' leave-pending' : ''}
-                                 ${leaveStatus == 'Approved' ? ' leave-approved' : ''}
-                                 ${leaveStatus == 'Rejected' ? ' leave-rejected' : ''}
-                                 ${empty leaveStatus ? ' clickable' : ' non-clickable'}"
-                                 <c:if test="${empty leaveStatus}">
-                                     onclick="window.location.href = '${pageContext.request.contextPath}/requestLeaveVeterinarian?date=${entry.key}&shiftType=${shiftTypeLabel}'"
-                                 </c:if>>
-                                <div class="avatar-circle">
-                                    ${shift.staffName != null ? shift.staffName.charAt(0) : 'U'}
-                                </div>
-                                <div class="shift-info">
-                                    <h4>${shift.staffName}</h4>
-                                    <span class="role-badge vet">VETERINARIAN</span>
-                                    <c:if test="${not empty leaveStatus}">
-                                        <div style="font-size: 11px; font-weight: bold; margin-top: 5px;
-                                             color:
-                                             ${leaveStatus == 'Pending' ? '#d97706' :
-                                               leaveStatus == 'Approved' ? '#dc2626' : '#6b7280'};">
-                                            [Leave: ${leaveStatus}]
+
+                        <%-- Ca Sáng --%>
+                        <c:set var="morningShift" value="${entry.value['morning']}" />
+                        <c:if test="${not empty morningShift}">
+                            <div class="shift-section morning-section">
+                                <c:set var="leaveStatus" value="${leaveMap[entry.key]}" />
+                                <div class="shift-card
+                                     ${leaveStatus == 'Pending' ? ' leave-pending' : ''}
+                                     ${leaveStatus == 'Approved' ? ' leave-approved' : ''}
+                                     ${leaveStatus == 'Rejected' ? ' leave-rejected' : ''}
+                                     ${empty leaveStatus ? ' clickable' : ' non-clickable'}"
+                                     <c:if test="${empty leaveStatus}">
+                                         onclick="window.location.href = '${pageContext.request.contextPath}/requestLeaveVeterinarian?date=${entry.key}&shiftType=morning'"
+                                     </c:if>>
+                                    <div class="avatar-circle">
+                                        ${morningShift.staffName != null ? morningShift.staffName.charAt(0) : 'U'}
+                                    </div>
+                                    <div class="shift-info">
+                                        <div class="shift-inline-label morning">
+                                            <i class="fa-solid fa-sun"></i> Ca Sáng
                                         </div>
-                                    </c:if>
-                                    <div class="time">
-                                        <i class="fa-regular fa-clock"></i> 
-                                        <c:choose>
-                                            <c:when test="${not empty shift.startTime && shift.startTime.toString().startsWith('08')}">
-                                                <span>Morning (08:00 - 12:00)</span>
-                                            </c:when>
-                                            <c:when test="${not empty shift.startTime && shift.startTime.toString().startsWith('14')}">
-                                                <span>Afternoon (14:00 - 17:00)</span>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <c:choose>
-                                                    <c:when test="${not empty shift.shiftTime}">
-                                                        <span>${shift.shiftTime}</span>
-                                                    </c:when>
-                                                    <c:when test="${not empty shift.startTime && not empty shift.endTime}">
-                                                        <span><fmt:formatDate value="${shift.startTime}" pattern="HH:mm"/> - <fmt:formatDate value="${shift.endTime}" pattern="HH:mm"/></span>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <span>(No shift time)</span>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </c:otherwise>
-                                        </c:choose>
+                                        <h4>${morningShift.staffName}</h4>
+                                        <span class="role-badge vet">VETERINARIAN</span>
+                                        <c:if test="${not empty leaveStatus}">
+                                            <div style="font-size: 11px; font-weight: bold; margin-top: 5px;
+                                                 color:
+                                                 ${leaveStatus == 'Pending' ? '#d97706' :
+                                                   leaveStatus == 'Approved' ? '#dc2626' : '#6b7280'};">
+                                                [Leave: ${leaveStatus}]
+                                            </div>
+                                        </c:if>
+                                        <div class="time">
+                                            <i class="fa-regular fa-clock"></i>
+                                            <span>09:00 - 12:00</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </c:forEach>
-                        <button class="add-another-btn" onclick="openAddShiftModal('${entry.key}')">
-                            <i class="fa-solid fa-plus"></i> Add Another
-                        </button>
+                        </c:if>
+
+                        <%-- Ca Chiều --%>
+                        <c:set var="afternoonShift" value="${entry.value['afternoon']}" />
+                        <c:if test="${not empty afternoonShift}">
+                            <div class="shift-section afternoon-section">
+                                <c:set var="leaveStatus" value="${leaveMap[entry.key]}" />
+                                <div class="shift-card
+                                     ${leaveStatus == 'Pending' ? ' leave-pending' : ''}
+                                     ${leaveStatus == 'Approved' ? ' leave-approved' : ''}
+                                     ${leaveStatus == 'Rejected' ? ' leave-rejected' : ''}
+                                     ${empty leaveStatus ? ' clickable' : ' non-clickable'}"
+                                     <c:if test="${empty leaveStatus}">
+                                         onclick="window.location.href = '${pageContext.request.contextPath}/requestLeaveVeterinarian?date=${entry.key}&shiftType=afternoon'"
+                                     </c:if>>
+                                    <div class="avatar-circle">
+                                        ${afternoonShift.staffName != null ? afternoonShift.staffName.charAt(0) : 'U'}
+                                    </div>
+                                    <div class="shift-info">
+                                        <div class="shift-inline-label afternoon">
+                                            <i class="fa-solid fa-cloud-sun"></i> Ca Chiều
+                                        </div>
+                                        <h4>${afternoonShift.staffName}</h4>
+                                        <span class="role-badge vet">VETERINARIAN</span>
+                                        <c:if test="${not empty leaveStatus}">
+                                            <div style="font-size: 11px; font-weight: bold; margin-top: 5px;
+                                                 color:
+                                                 ${leaveStatus == 'Pending' ? '#d97706' :
+                                                   leaveStatus == 'Approved' ? '#dc2626' : '#6b7280'};">
+                                                [Leave: ${leaveStatus}]
+                                            </div>
+                                        </c:if>
+                                        <div class="time">
+                                            <i class="fa-regular fa-clock"></i>
+                                            <span>14:00 - 17:00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </c:if>
+
                     </div>
                 </c:forEach>
             </div>
             <br><br>
         </main>
-        <div class="footer-stats">
-            <div class="stats-group">
-                <div class="stat-item">
-                    <span class="stat-label">Total Shifts</span>
-                    <span class="stat-value">18</span> </div>
-            </div>
-            <div class="warning-box">
-                <i class="fa-solid fa-triangle-exclamation" style="color: #fbbf24;"></i>
-                <div class="warning-text">
-                    <strong style="color:white; font-size:12px;">Staff Warning</strong>
-                    <span>Dr. James Chen is on leave.</span>
+        <c:if test="${sessionScope.account != null && sessionScope.account.role == 'Admin'}">
+            <div class="footer-stats">
+                <div class="stats-group">
+                    <div class="stat-item">
+                        <span class="stat-label">Total Shifts</span>
+                        <span class="stat-value">18</span> </div>
+                </div>
+                <div class="warning-box">
+                    <i class="fa-solid fa-triangle-exclamation" style="color: #fbbf24;"></i>
+                    <div class="warning-text">
+                        <strong style="color:white; font-size:12px;">Staff Warning</strong>
+                        <span>Dr. James Chen is on leave.</span>
+                    </div>
                 </div>
             </div>
-        </div>
-    </body>
+        </c:if>
+    <script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
+</body>
 </html>

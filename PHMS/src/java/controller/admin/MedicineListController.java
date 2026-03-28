@@ -65,6 +65,7 @@ public class MedicineListController extends HttpServlet {
         }
         
         int page = 1;
+        int pageSize = PaginationUtils.normalizePageSize(request.getParameter("size"), PAGE_SIZE);
         String pageStr = request.getParameter("page");
         if (pageStr != null && !pageStr.trim().isEmpty()) {
             try {
@@ -75,15 +76,15 @@ public class MedicineListController extends HttpServlet {
             }
         }
         
-        int totalPages = PaginationUtils.getTotalPages(filteredMedicines, PAGE_SIZE);
+        int totalPages = PaginationUtils.getTotalPages(filteredMedicines, pageSize);
         page = PaginationUtils.getValidPage(page, totalPages);
-        List<Medicine> medicines = PaginationUtils.getPage(filteredMedicines, page, PAGE_SIZE);
+        List<Medicine> medicines = PaginationUtils.getPage(filteredMedicines, page, pageSize);
         
         request.setAttribute("medicines", medicines);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("totalMedicines", filteredMedicines.size());
-        request.setAttribute("pageSize", PAGE_SIZE);
+        request.setAttribute("pageSize", pageSize);
         request.setAttribute("searchKeyword", search);
         request.setAttribute("statusFilter", statusFilter);
         

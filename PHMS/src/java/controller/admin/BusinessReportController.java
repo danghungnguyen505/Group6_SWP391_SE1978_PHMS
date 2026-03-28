@@ -17,13 +17,9 @@ import java.util.List;
 import java.util.Map;
 import model.User;
 
-/**
- * Admin views business reports.
- * SRP: Read reports only.
- */
 @WebServlet(name = "BusinessReportController", urlPatterns = {"/admin/reports"})
 public class BusinessReportController extends HttpServlet {
-    
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -34,55 +30,98 @@ public class BusinessReportController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-        
-        // Get date range parameters
-        String startDateStr = request.getParameter("startDate");
-        String endDateStr = request.getParameter("endDate");
-        
-        // Default to last 30 days if not provided
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Calendar cal = Calendar.getInstance();
         Date endDate = cal.getTime();
-        cal.add(Calendar.DAY_OF_MONTH, -30);
-        Date startDate = cal.getTime();
-        
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        
-        if (util.ValidationUtils.isNotEmpty(startDateStr)) {
-            try {
-                startDate = sdf.parse(startDateStr);
-            } catch (ParseException e) {
-                // Use default
+        Date startDate;
+
+        String filter = request.getParameter("filter");
+        String startDateStr = request.getParameter("startDate");
+        String endDateStr = request.getParameter("endDate");
+
+        if (filter != null) {
+            cal = Calendar.getInstance();
+            switch (filter) {
+                case "today":
+                    startDate = cal.getTime();
+                    endDate = cal.getTime();
+                    break;
+                case "week":
+                    cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
+                    startDate = cal.getTime();
+                    cal = Calendar.getInstance();
+                    endDate = cal.getTime();
+                    break;
+                case "month":
+                    cal.set(Calendar.DAY_OF_MONTH, 1);
+                    startDate = cal.getTime();
+                    cal = Calendar.getInstance();
+                    endDate = cal.getTime();
+                    break;
+                case "quarter":
+                    int month = cal.get(Calendar.MONTH);
+                    int quarterStart = (month / 3) * 3;
+                    cal.set(Calendar.MONTH, quarterStart);
+                    cal.set(Calendar.DAY_OF_MONTH, 1);
+                    startDate = cal.getTime();
+                    cal = Calendar.getInstance();
+                    endDate = cal.getTime();
+                    break;
+                case "year":
+                    cal.set(Calendar.DAY_OF_YEAR, 1);
+                    startDate = cal.getTime();
+                    cal = Calendar.getInstance();
+                    endDate = cal.getTime();
+                    break;
+                default:
+                    cal.add(Calendar.DAY_OF_MONTH, -30);
+                    startDate = cal.getTime();
             }
-        }
-        
-        if (util.ValidationUtils.isNotEmpty(endDateStr)) {
-            try {
-                endDate = sdf.parse(endDateStr);
-            } catch (ParseException e) {
-                // Use default
+        } else if (util.ValidationUtils.isNotEmpty(startDateStr) || util.ValidationUtils.isNotEmpty(endDateStr)) {
+            cal.add(Calendar.DAY_OF_MONTH, -30);
+            startDate = cal.getTime();
+            cal = Calendar.getInstance();
+            endDate = cal.getTime();
+            if (util.ValidationUtils.isNotEmpty(startDateStr)) {
+                try { startDate = sdf.parse(startDateStr); } catch (ParseException e) { /* use default */ }
             }
+            if (util.ValidationUtils.isNotEmpty(endDateStr)) {
+                try { endDate = sdf.parse(endDateStr); } catch (ParseException e) { /* use default */ }
+            }
+        } else {
+            // Default: this month
+            cal.set(Calendar.DAY_OF_MONTH, 1);
+            startDate = cal.getTime();
+            cal = Calendar.getInstance();
+            endDate = cal.getTime();
         }
-        
+
         Timestamp startTimestamp = new Timestamp(startDate.getTime());
         Timestamp endTimestamp = new Timestamp(endDate.getTime());
-        
+
         ReportingDAO reportingDAO = new ReportingDAO();
-        
-        // Get revenue report
         Map<String, Object> revenueReport = reportingDAO.getRevenueReport(startTimestamp, endTimestamp);
-        
-        // Get appointment statistics
         Map<String, Integer> appointmentStats = reportingDAO.getAppointmentStats(startTimestamp, endTimestamp);
-        
-        // Get top services
-        List<Map<String, Object>> topServices = reportingDAO.getTopServicesByRevenue(startTimestamp, endTimestamp, 10);
-        
-        // Get daily appointment count
+        List<Map<String, Object>> topServices = reportingDAO.getTopServicesByRevenue(startTimestamp, endTimestamp, 5);
         List<Map<String, Object>> dailyAppointments = reportingDAO.getDailyAppointmentCount(startTimestamp, endTimestamp);
-        
-        // Get monthly revenue
-        List<Map<String, Object>> monthlyRevenue = reportingDAO.getMonthlyRevenue(startTimestamp, endTimestamp);
-        
+
+        // Always get last 6 months for chart
+        Calendar cal6 = Calendar.getInstance();
+        cal6.add(Calendar.MONTH, -5);
+        cal6.set(Calendar.DAY_OF_MONTH, 1);
+        cal6.set(Calendar.HOUR_OF_DAY, 0);
+        cal6.set(Calendar.MINUTE, 0);
+        cal6.set(Calendar.SECOND, 0);
+        cal6.set(Calendar.MILLISECOND, 0);
+        Timestamp chartStart = new Timestamp(cal6.getTime().getTime());
+        Timestamp chartEnd = new Timestamp(System.currentTimeMillis());
+        List<Map<String, Object>> monthlyRevenue = reportingDAO.getMonthlyRevenue(chartStart, chartEnd);
+
+        // Growth percentage
+        Map<String, Object> revenueGrowth = reportingDAO.getRevenueGrowth(startTimestamp, endTimestamp);
+        List<Map<String, Object>> recentInvoices = reportingDAO.getRecentInvoices(6);
+
         request.setAttribute("startDate", sdf.format(startDate));
         request.setAttribute("endDate", sdf.format(endDate));
         request.setAttribute("revenueReport", revenueReport);
@@ -90,7 +129,9 @@ public class BusinessReportController extends HttpServlet {
         request.setAttribute("topServices", topServices);
         request.setAttribute("dailyAppointments", dailyAppointments);
         request.setAttribute("monthlyRevenue", monthlyRevenue);
-        
+        request.setAttribute("recentInvoices", recentInvoices);
+        request.setAttribute("revenueGrowth", revenueGrowth);
+
         request.getRequestDispatcher("/views/admin/businessReport.jsp").forward(request, response);
     }
 }

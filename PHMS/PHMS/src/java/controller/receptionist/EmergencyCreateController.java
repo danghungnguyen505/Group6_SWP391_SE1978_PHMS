@@ -39,14 +39,24 @@ public class EmergencyCreateController extends HttpServlet {
         List<User> veterinarians = userDAO.getAllVeterinarians();
         request.setAttribute("veterinarians", veterinarians);
         
-        // Get owner ID from parameter (if provided)
-        String ownerIdStr = request.getParameter("ownerId");
-        if (util.ValidationUtils.isNotEmpty(ownerIdStr) && util.ValidationUtils.isIntegerInRange(ownerIdStr, 1, Integer.MAX_VALUE)) {
-            int ownerId = Integer.parseInt(ownerIdStr);
-            PetDAO petDAO = new PetDAO();
-            List<Pet> pets = petDAO.getPetsByOwnerId(ownerId);
-            request.setAttribute("pets", pets);
-            request.setAttribute("ownerId", ownerId);
+        // Lookup pet owner by email (if provided)
+        String email = util.ValidationUtils.sanitize(request.getParameter("email"));
+        if (util.ValidationUtils.isNotEmpty(email)) {
+            String cleanedEmail = email.trim().toLowerCase(java.util.Locale.ENGLISH);
+            request.setAttribute("email", cleanedEmail);
+            if (!util.ValidationUtils.isValidEmail(cleanedEmail)) {
+                request.setAttribute("error", "Email không hợp lệ.");
+            } else {
+                User owner = userDAO.getPetOwnerByEmail(cleanedEmail);
+                request.setAttribute("owner", owner);
+                if (owner != null) {
+                    PetDAO petDAO = new PetDAO();
+                    List<Pet> pets = petDAO.getPetsByOwnerId(owner.getUserId());
+                    request.setAttribute("pets", pets);
+                } else {
+                    request.setAttribute("ownerNotFound", true);
+                }
+            }
         }
         
         request.getRequestDispatcher("/views/receptionist/emergencyCreate.jsp").forward(request, response);
@@ -63,23 +73,122 @@ public class EmergencyCreateController extends HttpServlet {
         }
         
         String ownerIdStr = request.getParameter("ownerId");
+        String email = util.ValidationUtils.sanitize(request.getParameter("email"));
+        String ownerFullName = util.ValidationUtils.sanitize(request.getParameter("ownerFullName"));
         String petIdStr = request.getParameter("petId");
         String vetIdStr = request.getParameter("vetId");
         String conditionLevel = util.ValidationUtils.sanitize(request.getParameter("conditionLevel"));
         String initialSymptoms = util.ValidationUtils.sanitize(request.getParameter("initialSymptoms"));
         String notes = util.ValidationUtils.sanitize(request.getParameter("notes"));
-        
-        // Validation
-        if (!util.ValidationUtils.isNotEmpty(ownerIdStr) || !util.ValidationUtils.isIntegerInRange(ownerIdStr, 1, Integer.MAX_VALUE)) {
-            request.setAttribute("error", "Vui lòng nhập ID chủ thú cưng hợp lệ.");
-            doGet(request, response);
-            return;
-        }
-        
-        if (!util.ValidationUtils.isNotEmpty(petIdStr) || !util.ValidationUtils.isIntegerInRange(petIdStr, 1, Integer.MAX_VALUE)) {
-            request.setAttribute("error", "Vui lòng chọn thú cưng.");
-            doGet(request, response);
-            return;
+
+        // New-pet info (when owner doesn't exist)
+        String petNameNew = util.ValidationUtils.sanitize(request.getParameter("petNameNew"));
+        String speciesNew = util.ValidationUtils.sanitize(request.getParameter("speciesNew"));
+        String breedNew = util.ValidationUtils.sanitize(request.getParameter("breedNew"));
+        String genderNew = util.ValidationUtils.sanitize(request.getParameter("genderNew"));
+        String birthDateNewStr = util.ValidationUtils.sanitize(request.getParameter("birthDateNew"));
+        String weightNewStr = util.ValidationUtils.sanitize(request.getParameter("weightNew"));
+        String historyNew = util.ValidationUtils.sanitize(request.getParameter("historyNew"));
+
+        // Validate owner: either existing ownerId + petId, or auto-create by email + new pet info
+        Integer ownerId = null;
+        Integer petId = null;
+
+        if (util.ValidationUtils.isNotEmpty(ownerIdStr) && util.ValidationUtils.isIntegerInRange(ownerIdStr, 1, Integer.MAX_VALUE)) {
+            ownerId = Integer.parseInt(ownerIdStr);
+            if (!util.ValidationUtils.isNotEmpty(petIdStr) || !util.ValidationUtils.isIntegerInRange(petIdStr, 1, Integer.MAX_VALUE)) {
+                request.setAttribute("error", "Vui lòng chọn thú cưng.");
+                doGet(request, response);
+                return;
+            }
+            petId = Integer.parseInt(petIdStr);
+        } else {
+            String cleanedEmail = email.trim().toLowerCase(java.util.Locale.ENGLISH);
+            request.setAttribute("email", cleanedEmail);
+            if (!util.ValidationUtils.isValidEmail(cleanedEmail)) {
+                request.setAttribute("error", "Vui lòng nhập email hợp lệ.");
+                doGet(request, response);
+                return;
+            }
+            if (!util.ValidationUtils.isNotEmpty(ownerFullName) || !util.ValidationUtils.isLengthValid(ownerFullName, 2, 100)) {
+                request.setAttribute("error", "Vui lòng nhập tên chủ thú cưng (2-100 ký tự).");
+                doGet(request, response);
+                return;
+            }
+
+            if (!util.ValidationUtils.isNotEmpty(petNameNew) || !util.ValidationUtils.isLengthValid(petNameNew, 1, 50)) {
+                request.setAttribute("error", "Vui lòng nhập tên thú cưng (1-50 ký tự).");
+                doGet(request, response);
+                return;
+            }
+            if (!util.ValidationUtils.isNotEmpty(speciesNew) || !util.ValidationUtils.isLengthValid(speciesNew, 1, 50)) {
+                request.setAttribute("error", "Vui lòng nhập species (1-50 ký tự).");
+                doGet(request, response);
+                return;
+            }
+            if (!util.ValidationUtils.isNotEmpty(breedNew) || !util.ValidationUtils.isLengthValid(breedNew, 1, 100)) {
+                request.setAttribute("error", "Vui lòng nhập breed (1-100 ký tự).");
+                doGet(request, response);
+                return;
+            }
+            if (!("Male".equalsIgnoreCase(genderNew) || "Female".equalsIgnoreCase(genderNew))) {
+                request.setAttribute("error", "Vui lòng chọn giới tính (Male/Female).");
+                doGet(request, response);
+                return;
+            }
+            if (!util.ValidationUtils.isNotEmpty(birthDateNewStr)) {
+                request.setAttribute("error", "Vui lòng chọn ngày sinh.");
+                doGet(request, response);
+                return;
+            }
+            java.sql.Date birthDateNew;
+            try {
+                birthDateNew = java.sql.Date.valueOf(birthDateNewStr);
+            } catch (IllegalArgumentException ex) {
+                request.setAttribute("error", "Ngày sinh không hợp lệ.");
+                doGet(request, response);
+                return;
+            }
+            if (!util.ValidationUtils.isPositiveNumber(weightNewStr)) {
+                request.setAttribute("error", "Vui lòng nhập cân nặng hợp lệ (>0).");
+                doGet(request, response);
+                return;
+            }
+            double weightNew = Double.parseDouble(weightNewStr);
+            if (!util.ValidationUtils.isLengthValid(historyNew, 0, 2000)) {
+                request.setAttribute("error", "Bệnh sử tối đa 2000 ký tự.");
+                doGet(request, response);
+                return;
+            }
+
+            UserDAO userDAO = new UserDAO();
+            User existingOwner = userDAO.getPetOwnerByEmail(cleanedEmail);
+            if (existingOwner != null) {
+                request.setAttribute("error", "Email đã có tài khoản. Vui lòng chọn thú cưng từ danh sách.");
+                response.sendRedirect(request.getContextPath() + "/receptionist/emergency/create?email=" + cleanedEmail);
+                return;
+            }
+
+            String username = cleanedEmail;
+            String password = cleanedEmail;
+            int newOwnerId = userDAO.insertPetOwnerReturnId(username, password, ownerFullName, cleanedEmail, "", "");
+            if (newOwnerId <= 0) {
+                request.setAttribute("error", "Không thể tạo tài khoản chủ thú cưng tự động. Vui lòng thử lại.");
+                doGet(request, response);
+                return;
+            }
+
+            PetDAO petDAO = new PetDAO();
+            int newPetId = petDAO.insertPetReturnId(newOwnerId, petNameNew, speciesNew, historyNew, breedNew, weightNew, birthDateNew, genderNew);
+            if (newPetId <= 0) {
+                request.setAttribute("error", "Đã tạo tài khoản nhưng không thể tạo hồ sơ thú cưng. Vui lòng thử lại.");
+                doGet(request, response);
+                return;
+            }
+
+            ownerId = newOwnerId;
+            petId = newPetId;
+            session.setAttribute("toastMessage", "success|Đã tạo tài khoản. Tên đăng nhập: " + username + " | Mật khẩu: " + password);
         }
         
         if (!util.ValidationUtils.isNotEmpty(vetIdStr) || !util.ValidationUtils.isIntegerInRange(vetIdStr, 1, Integer.MAX_VALUE)) {
@@ -105,8 +214,6 @@ public class EmergencyCreateController extends HttpServlet {
             return;
         }
         
-        int ownerId = Integer.parseInt(ownerIdStr);
-        int petId = Integer.parseInt(petIdStr);
         int vetId = Integer.parseInt(vetIdStr);
         
         // Verify pet belongs to owner

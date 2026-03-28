@@ -18,6 +18,7 @@
                 <th>Pet Owner</th>
                 <th>Receptionist</th>
                 <th>Veterinarian</th>
+                <th>Veterinarian</th>
                 <th>Nurse</th>
                 <th>Admin</th>
             </tr>

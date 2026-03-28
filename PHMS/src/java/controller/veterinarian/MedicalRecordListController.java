@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.io.IOException;
 import java.util.List;
 import model.MedicalRecord;
@@ -35,7 +36,53 @@ public class MedicalRecordListController extends HttpServlet {
         MedicalRecordDAO dao = new MedicalRecordDAO();
         List<MedicalRecord> all = dao.listForVet(account.getUserId());
 
+        int totalRecords = all != null ? all.size() : 0;
+        int inProgressRecords = 0;
+        int completedRecords = 0;
+        if (all != null) {
+            for (MedicalRecord r : all) {
+                if ("In-Progress".equalsIgnoreCase(r.getApptStatus())) {
+                    inProgressRecords++;
+                } else if ("Completed".equalsIgnoreCase(r.getApptStatus())) {
+                    completedRecords++;
+                }
+            }
+        }
+
+        String keyword = request.getParameter("keyword");
+        if (keyword == null) {
+            keyword = "";
+        }
+        keyword = keyword.trim();
+
+        String statusFilter = request.getParameter("status");
+        if (statusFilter == null || statusFilter.trim().isEmpty()) {
+            statusFilter = "All";
+        } else {
+            statusFilter = statusFilter.trim();
+        }
+
+        List<MedicalRecord> filtered = new ArrayList<>();
+        String keywordLower = keyword.toLowerCase();
+        if (all != null) {
+            for (MedicalRecord r : all) {
+                boolean matchesStatus = "All".equalsIgnoreCase(statusFilter)
+                        || statusFilter.equalsIgnoreCase(r.getApptStatus());
+
+                boolean matchesKeyword = keywordLower.isEmpty()
+                        || String.valueOf(r.getRecordId()).contains(keywordLower)
+                        || String.valueOf(r.getApptId()).contains(keywordLower)
+                        || (r.getOwnerName() != null && r.getOwnerName().toLowerCase().contains(keywordLower))
+                        || (r.getPetName() != null && r.getPetName().toLowerCase().contains(keywordLower));
+
+                if (matchesStatus && matchesKeyword) {
+                    filtered.add(r);
+                }
+            }
+        }
+
         int page = 1;
+        int pageSize = PaginationUtils.normalizePageSize(request.getParameter("size"), PAGE_SIZE);
         String pageStr = request.getParameter("page");
         if (pageStr != null && !pageStr.trim().isEmpty()) {
             try {
@@ -44,13 +91,20 @@ public class MedicalRecordListController extends HttpServlet {
                 page = 1;
             }
         }
-        int totalPages = PaginationUtils.getTotalPages(all, PAGE_SIZE);
+        int totalPages = PaginationUtils.getTotalPages(filtered, pageSize);
         page = PaginationUtils.getValidPage(page, totalPages);
-        List<MedicalRecord> list = PaginationUtils.getPage(all, page, PAGE_SIZE);
+        List<MedicalRecord> list = PaginationUtils.getPage(filtered, page, pageSize);
 
         request.setAttribute("records", list);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
+        request.setAttribute("pageSize", pageSize);
+        request.setAttribute("totalRecords", totalRecords);
+        request.setAttribute("inProgressRecords", inProgressRecords);
+        request.setAttribute("completedRecords", completedRecords);
+        request.setAttribute("filteredCount", filtered.size());
+        request.setAttribute("keyword", keyword);
+        request.setAttribute("statusFilter", statusFilter);
         request.getRequestDispatcher("/views/veterinarian/medicalRecordList.jsp").forward(request, response);
     }
 }

@@ -19,10 +19,26 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/pages/change-password.css">
 </head>
 <body>
+    <c:set var="backUrl" value="${pageContext.request.contextPath}/home" />
+    <c:choose>
+        <c:when test="${sessionScope.account.role == 'ClinicManager' || sessionScope.account.role == 'Admin'}">
+            <c:set var="backUrl" value="${pageContext.request.contextPath}/admin/dashboard" />
+        </c:when>
+        <c:when test="${sessionScope.account.role == 'Veterinarian'}">
+            <c:set var="backUrl" value="${pageContext.request.contextPath}/veterinarian/dashboard" />
+        </c:when>
+        <c:when test="${sessionScope.account.role == 'Receptionist'}">
+            <c:set var="backUrl" value="${pageContext.request.contextPath}/receptionist/dashboard" />
+        </c:when>
+        <c:when test="${sessionScope.account.role == 'Nurse'}">
+            <c:set var="backUrl" value="${pageContext.request.contextPath}/nurse/lab/queue" />
+        </c:when>
+    </c:choose>
+
     <div class="back-home-floating">
-        <a href="${pageContext.request.contextPath}/home" class="back-home-btn">
+        <a href="${backUrl}" class="back-home-btn">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-            Về Trang chủ
+            Back
         </a>
     </div>
     <div class="change-pass-wrapper">
@@ -137,4 +153,3 @@
     </script>
 </body>
 </html>
-

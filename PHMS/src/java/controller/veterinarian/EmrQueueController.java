@@ -13,10 +13,6 @@ import model.Appointment;
 import model.User;
 import util.PaginationUtils;
 
-/**
- * Veterinarian EMR Queue - list checked-in appointments for today.
- * SRP: Read queue only.
- */
 @WebServlet(name = "EmrQueueController", urlPatterns = {"/veterinarian/emr/queue"})
 public class EmrQueueController extends HttpServlet {
 
@@ -35,7 +31,26 @@ public class EmrQueueController extends HttpServlet {
         AppointmentDAO dao = new AppointmentDAO();
         List<Appointment> all = dao.getTodayCheckedInAppointmentsForVet(account.getUserId());
 
+        // Calculate stats
+        int totalQueueItems = (all != null) ? all.size() : 0;
+        int completedEMR = 0;
+        int pendingEMR = totalQueueItems;
+
+        if (all != null) {
+            for (Appointment a : all) {
+                if ("In-Progress".equalsIgnoreCase(a.getStatus()) || "Completed".equalsIgnoreCase(a.getStatus())) {
+                    completedEMR++;
+                }
+            }
+            pendingEMR = totalQueueItems - completedEMR;
+        }
+
+        request.setAttribute("totalQueueItems", totalQueueItems);
+        request.setAttribute("completedEMR", completedEMR);
+        request.setAttribute("pendingEMR", pendingEMR);
+
         int page = 1;
+        int pageSize = PaginationUtils.normalizePageSize(request.getParameter("size"), PAGE_SIZE);
         String pageStr = request.getParameter("page");
         if (pageStr != null && !pageStr.trim().isEmpty()) {
             try {
@@ -45,14 +60,15 @@ public class EmrQueueController extends HttpServlet {
             }
         }
 
-        int totalPages = PaginationUtils.getTotalPages(all, PAGE_SIZE);
+        int totalPages = PaginationUtils.getTotalPages(all, pageSize);
+        if (totalPages < 1) totalPages = 1;
         page = PaginationUtils.getValidPage(page, totalPages);
-        List<Appointment> list = PaginationUtils.getPage(all, page, PAGE_SIZE);
+        List<Appointment> list = PaginationUtils.getPage(all, page, pageSize);
 
         request.setAttribute("queueList", list);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
+        request.setAttribute("pageSize", pageSize);
         request.getRequestDispatcher("/views/veterinarian/emrQueue.jsp").forward(request, response);
     }
 }
-

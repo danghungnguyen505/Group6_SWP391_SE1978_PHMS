@@ -358,6 +358,21 @@ public class AppointmentDAO extends DBContext {
         }
     }
 
+    /**
+     * Cập nhật ghi chú (notes) cho một cuộc hẹn trong hàng đợi EMR.
+     */
+    public boolean updateAppointmentNotes(int apptId, String notes) {
+        String sql = "UPDATE Appointment SET notes = ? WHERE appt_id = ?";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setString(1, notes);
+            st.setInt(2, apptId);
+            return st.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Error updateAppointmentNotes: " + e.getMessage());
+            return false;
+        }
+    }
+
     //Checkin 1. Hàm lấy danh sách cuộc hẹn TRONG NGÀY HÔM NAY cho lễ tân
     // Bao gồm: Confirmed, Checked-in, No-show, Completed
     public List<model.Appointment> getTodayAppointments() {
@@ -394,7 +409,7 @@ public class AppointmentDAO extends DBContext {
 
     /**
      * Veterinarian queue: appointments for TODAY assigned to this vet that are
-     * Checked-in.
+     * ready for EMR (Checked-in or In-Progress).
      */
     public List<model.Appointment> getTodayCheckedInAppointmentsForVet(int vetId) {
         List<model.Appointment> list = new ArrayList<>();
@@ -404,7 +419,7 @@ public class AppointmentDAO extends DBContext {
                 + "JOIN Users u_owner ON p.owner_id = u_owner.user_id "
                 + "WHERE CAST(a.start_time AS DATE) = CAST(GETDATE() AS DATE) "
                 + "AND a.vet_id = ? "
-                + "AND a.status = 'Checked-in' "
+                + "AND a.status IN ('Checked-in','In-Progress') "
                 + "ORDER BY a.start_time ASC";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, vetId);
@@ -618,7 +633,7 @@ public class AppointmentDAO extends DBContext {
                 + "JOIN Users u_vet ON a.vet_id = u_vet.user_id "
                 + "JOIN Users u_owner ON p.owner_id = u_owner.user_id "
                 + "WHERE a.type = 'Urgent' "
-                + "AND a.status IN ('Pending','Confirmed','Checked-in') "
+                + "AND a.status IN ('Pending','Confirmed','Checked-in','In-Progress') "
                 + "ORDER BY a.start_time ASC";
         try (PreparedStatement st = connection.prepareStatement(sql); ResultSet rs = st.executeQuery()) {
             while (rs.next()) {
@@ -651,7 +666,7 @@ public class AppointmentDAO extends DBContext {
                 + "JOIN Users u_owner ON p.owner_id = u_owner.user_id "
                 + "WHERE a.type = 'Urgent' "
                 + "AND a.vet_id = ? "
-                + "AND a.status IN ('Confirmed','Checked-in') "
+                + "AND a.status IN ('Confirmed','Checked-in','In-Progress') "
                 + "ORDER BY a.start_time ASC";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, vetId);
@@ -673,6 +688,28 @@ public class AppointmentDAO extends DBContext {
             System.out.println("Error getEmergencyAppointmentsForVet: " + e.getMessage());
         }
         return list;
+    }
+
+    /**
+     * Veterinarian "Agree" an emergency appointment.
+     * Move status to In-Progress only if it belongs to the vet and is still
+     * in a startable state.
+     */
+    public boolean agreeEmergencyAppointmentForVet(int apptId, int vetId) {
+        String sql = "UPDATE Appointment "
+                + "SET status = 'In-Progress' "
+                + "WHERE appt_id = ? "
+                + "AND vet_id = ? "
+                + "AND type = 'Urgent' "
+                + "AND status IN ('Confirmed','Checked-in')";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, apptId);
+            st.setInt(2, vetId);
+            return st.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Error agreeEmergencyAppointmentForVet: " + e.getMessage());
+            return false;
+        }
     }
 
     //Mark appointment as Completed for the assigned vet only when In-Progress.

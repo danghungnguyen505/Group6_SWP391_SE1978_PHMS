@@ -1,4 +1,4 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
@@ -49,12 +49,20 @@
 
                     <div style="margin-top: 10px;">
                         <label><b>Test Type</b></label>
-                        <select name="testType" style="width:100%;">
-                            <option value="Blood Test" ${testType == 'Blood Test' ? 'selected' : ''}>Blood Test</option>
-                            <option value="X-Ray" ${testType == 'X-Ray' ? 'selected' : ''}>X-Ray</option>
-                            <option value="Ultrasound" ${testType == 'Ultrasound' ? 'selected' : ''}>Ultrasound</option>
-                            <option value="Other" ${testType == 'Other' ? 'selected' : ''}>Other</option>
-                        </select>
+                        <c:choose>
+                            <c:when test="${not empty labTestTypes}">
+                                <select name="testType" style="width:100%;" required>
+                                    <option value="">-- Select test type --</option>
+                                    <c:forEach items="${labTestTypes}" var="tt">
+                                        <option value="${tt}" ${testType == tt ? 'selected' : ''}>${tt}</option>
+                                    </c:forEach>
+                                </select>
+                            </c:when>
+                            <c:otherwise>
+                                <input type="text" name="testType" style="width:100%;" maxlength="100"
+                                       value="${testType}" placeholder="Enter test type" required>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
 
                     <div style="margin-top: 10px;">
@@ -73,6 +81,12 @@
                 </form>
             </div>
         </main>
-    </body>
+    <script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
+</body>
 </html>
+
 

@@ -18,6 +18,19 @@ import util.PasswordUtil;
  */
 public class UserDAO extends DBContext {
 
+    private boolean hasVeterinarianTypeColumn() {
+        String sql = "SELECT COL_LENGTH('Veterinarian', 'type') AS col_len";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getObject("col_len") != null;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error hasVeterinarianTypeColumn: " + e.getMessage());
+        }
+        return false;
+    }
+
     /**
      * Check login credentials with BCrypt password verification
      * Supports both BCrypt hashed passwords and plain text (for backward compatibility)
@@ -25,7 +38,7 @@ public class UserDAO extends DBContext {
     public User checkLogin(String username, String password) {
         String sql = "SELECT u.*, p.address, p.email FROM Users u " +
                      "LEFT JOIN PetOwner p ON u.user_id = p.user_id " +
-                     "WHERE u.username = ?";
+                     "WHERE u.username = ? AND ISNULL(u.is_active, 1) = 1";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, username);
@@ -60,6 +73,24 @@ public class UserDAO extends DBContext {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * Check whether a username exists but is inactive/locked.
+     */
+    public boolean isLockedUser(String username) {
+        String sql = "SELECT TOP 1 ISNULL(is_active, 1) AS is_active FROM Users WHERE username = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("is_active") == 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error isLockedUser: " + e.getMessage());
+        }
+        return false;
     }
 
     public boolean checkUsernameExists(String username) {
@@ -125,6 +156,100 @@ public class UserDAO extends DBContext {
             System.out.println("Error checkPhoneExistsForOther: " + e.getMessage());
         }
         return false;
+    }
+
+    /**
+     * Get PetOwner account by phone number.
+     */
+    public User getPetOwnerByPhone(String phone) {
+        String sql = "SELECT u.*, po.address, po.email "
+                + "FROM Users u "
+                + "JOIN PetOwner po ON u.user_id = po.user_id "
+                + "WHERE u.phone = ? AND u.role = 'PetOwner'";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, phone);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                User user = new User();
+                user.setUserId(rs.getInt("user_id"));
+                user.setUsername(rs.getString("username"));
+                user.setFullName(rs.getString("full_name"));
+                user.setRole(rs.getString("role"));
+                user.setPhone(rs.getString("phone"));
+                user.setEmail(rs.getString("email"));
+                user.setAddress(rs.getString("address"));
+                return user;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getPetOwnerByPhone: " + e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * Get PetOwner account by email.
+     */
+    public User getPetOwnerByEmail(String email) {
+        String sql = "SELECT u.*, po.address, po.email "
+                + "FROM Users u "
+                + "JOIN PetOwner po ON u.user_id = po.user_id "
+                + "WHERE po.email = ? AND u.role = 'PetOwner'";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                User user = new User();
+                user.setUserId(rs.getInt("user_id"));
+                user.setUsername(rs.getString("username"));
+                user.setFullName(rs.getString("full_name"));
+                user.setRole(rs.getString("role"));
+                user.setPhone(rs.getString("phone"));
+                user.setEmail(rs.getString("email"));
+                user.setAddress(rs.getString("address"));
+                return user;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getPetOwnerByEmail: " + e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * Create a PetOwner account and return new user_id.
+     * Password will be BCrypt-hashed before storing.
+     */
+    public int insertPetOwnerReturnId(String username, String password, String fullName, String email, String phone, String address) {
+        String sqlUser = "INSERT INTO Users (username, password, full_name, phone, role) VALUES (?, ?, ?, ?, 'PetOwner')";
+        String sqlOwner = "INSERT INTO PetOwner (user_id, address, email) VALUES (?, ?, ?)";
+
+        try {
+            String hashedPassword = PasswordUtil.hashPassword(password);
+
+            PreparedStatement ps = connection.prepareStatement(sqlUser, PreparedStatement.RETURN_GENERATED_KEYS);
+            ps.setString(1, username);
+            ps.setString(2, hashedPassword);
+            ps.setString(3, fullName);
+            ps.setString(4, phone);
+            ps.executeUpdate();
+
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                int userId = rs.getInt(1);
+
+                PreparedStatement psOwner = connection.prepareStatement(sqlOwner);
+                psOwner.setInt(1, userId);
+                psOwner.setString(2, address);
+                psOwner.setString(3, email);
+                psOwner.executeUpdate();
+                return userId;
+            }
+        } catch (Exception e) {
+            System.out.println("Error insertPetOwnerReturnId: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return -1;
     }
 
     /**
@@ -254,12 +379,15 @@ public class UserDAO extends DBContext {
         }
         return null;
     }
-    //List Veterinarians để hiện danh sách làm việc
+    //List Veterinarians Ä‘á»ƒ hiá»‡n danh sÃ¡ch lÃ m viá»‡c
     public List<User> getAllVeterinarians() {
         List<User> list = new ArrayList<>();
-        // Join bảng Users và Veterinarian để chỉ lấy những ai là Bác sĩ
-        String sql = "SELECT u.user_id, u.full_name FROM Users u " +
-                     "JOIN Veterinarian v ON u.user_id = v.emp_id";
+        boolean withType = hasVeterinarianTypeColumn();
+        String sql = withType
+                ? "SELECT u.user_id, u.full_name, v.[type] AS vet_type FROM Users u "
+                + "JOIN Veterinarian v ON u.user_id = v.emp_id"
+                : "SELECT u.user_id, u.full_name FROM Users u "
+                + "JOIN Veterinarian v ON u.user_id = v.emp_id";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             ResultSet rs = st.executeQuery();
@@ -267,6 +395,7 @@ public class UserDAO extends DBContext {
                 User u = new User();
                 u.setUserId(rs.getInt("user_id"));
                 u.setFullName(rs.getString("full_name"));
+                u.setVetType(withType ? rs.getString("vet_type") : "Normal");
                 list.add(u);
             }
         } catch (SQLException e) {
@@ -274,7 +403,55 @@ public class UserDAO extends DBContext {
         }
         return list;
     }
-    
+
+    public boolean isBookableVeterinarianForOwner(int vetId) {
+        boolean withType = hasVeterinarianTypeColumn();
+        String sql = withType
+                ? "SELECT TOP 1 1 FROM Users u "
+                + "JOIN Veterinarian v ON u.user_id = v.emp_id "
+                + "WHERE u.user_id = ? AND u.role = 'Veterinarian' "
+                + "AND ISNULL(u.is_active, 1) = 1 "
+                + "AND UPPER(ISNULL(v.[type], 'Normal')) = 'NORMAL'"
+                : "SELECT TOP 1 1 FROM Users u "
+                + "JOIN Veterinarian v ON u.user_id = v.emp_id "
+                + "WHERE u.user_id = ? AND u.role = 'Veterinarian' "
+                + "AND ISNULL(u.is_active, 1) = 1";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, vetId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            System.out.println("Error isBookableVeterinarianForOwner: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public List<User> getEmergencyVeterinarians() {
+        List<User> list = new ArrayList<>();
+        boolean withType = hasVeterinarianTypeColumn();
+        String sql = withType
+                ? "SELECT u.user_id, u.full_name, v.[type] AS vet_type "
+                + "FROM Users u "
+                + "JOIN Veterinarian v ON u.user_id = v.emp_id "
+                + "WHERE UPPER(ISNULL(v.[type], 'Normal')) = 'EMERGENCY'"
+                : "SELECT u.user_id, u.full_name FROM Users u "
+                + "JOIN Veterinarian v ON u.user_id = v.emp_id";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                User u = new User();
+                u.setUserId(rs.getInt("user_id"));
+                u.setFullName(rs.getString("full_name"));
+                u.setVetType(withType ? rs.getString("vet_type") : "Emergency");
+                list.add(u);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getEmergencyVeterinarians: " + e.getMessage());
+        }
+        return list;
+    }
+
     /**
      * Get owner (PetOwner) by pet ID.
      */
@@ -304,3 +481,4 @@ public class UserDAO extends DBContext {
         return null;
     }
 }
+

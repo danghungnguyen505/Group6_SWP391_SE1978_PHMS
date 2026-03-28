@@ -1,6 +1,7 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -33,20 +34,82 @@
                 <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
             </div>
 
+            <!-- Toast Message -->
+            <c:if test="${not empty sessionScope.toastMessage}">
+                <c:set var="toast" value="${sessionScope.toastMessage}" />
+                <c:choose>
+                    <c:when test="${fn:startsWith(toast, 'success|')}">
+                        <div style="background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:12px 16px;border-radius:10px;margin-bottom:16px;font-weight:600;">
+                            <i class="fa-solid fa-check-circle" style="margin-right:8px;"></i>
+                            ${fn:substringAfter(toast, 'success|')}
+                        </div>
+                    </c:when>
+                    <c:when test="${fn:startsWith(toast, 'error|')}">
+                        <div style="background:#fef2f2;border:1px solid #fecaca;color:#991b1b;padding:12px 16px;border-radius:10px;margin-bottom:16px;font-weight:600;">
+                            <i class="fa-solid fa-triangle-exclamation" style="margin-right:8px;"></i>
+                            ${fn:substringAfter(toast, 'error|')}
+                        </div>
+                    </c:when>
+                </c:choose>
+                <c:remove var="toastMessage" scope="session" />
+            </c:if>
+
             <div class="card">
                 <div class="section-title">
-                    <span>Pending / In Progress</span>
+                    <span>Lab Tests</span>
+                </div>
+
+                <!-- Search -->
+                <form method="get" action="${pageContext.request.contextPath}/nurse/lab/queue" style="display:flex; gap:8px; margin-bottom:16px;">
+                    <input type="text" name="search" placeholder="Search by pet, owner, vet, test type..."
+                           value="${search}" style="flex:1; padding:8px 12px; border:1px solid #d1d5db; border-radius:6px;">
+                    <input type="hidden" name="filter" value="${filter}">
+                    <input type="hidden" name="size" value="${pageSize}">
+                    <button type="submit" class="btn btn-approve" style="text-decoration:none;">
+                        <i class="fa-solid fa-search"></i> Search
+                    </button>
+                    <c:if test="${not empty search}">
+                        <a class="btn btn-reject" style="text-decoration:none; background:#e5e7eb;color:#111827;"
+                           href="${pageContext.request.contextPath}/nurse/lab/queue?filter=${filter}&size=${pageSize}">
+                            <i class="fa-solid fa-times"></i> Clear
+                        </a>
+                    </c:if>
+                </form>
+
+                <!-- Filter Tabs -->
+                <div style="display:flex; gap:8px; margin-bottom:16px;">
+                    <a class="btn ${filter == 'requested' ? 'btn-approve' : 'btn-reject'}"
+                       style="text-decoration:none; ${filter == 'requested' ? '' : 'background:#e5e7eb;color:#111827;'}"
+                       href="${pageContext.request.contextPath}/nurse/lab/queue?filter=requested&size=${pageSize}">
+                        <i class="fa-solid fa-clock"></i> Requested
+                    </a>
+                    <a class="btn ${filter == 'inprogress' ? 'btn-approve' : 'btn-reject'}"
+                       style="text-decoration:none; ${filter == 'inprogress' ? '' : 'background:#e5e7eb;color:#111827;'}"
+                       href="${pageContext.request.contextPath}/nurse/lab/queue?filter=inprogress&size=${pageSize}">
+                        <i class="fa-solid fa-spinner"></i> In Progress
+                    </a>
+                    <a class="btn ${filter == 'completed' ? 'btn-approve' : 'btn-reject'}"
+                       style="text-decoration:none; ${filter == 'completed' ? '' : 'background:#e5e7eb;color:#111827;'}"
+                       href="${pageContext.request.contextPath}/nurse/lab/queue?filter=completed&size=${pageSize}">
+                        <i class="fa-solid fa-check-circle"></i> Completed
+                    </a>
+                    <a class="btn ${filter == 'all' ? 'btn-approve' : 'btn-reject'}"
+                       style="text-decoration:none; ${filter == 'all' ? '' : 'background:#e5e7eb;color:#111827;'}"
+                       href="${pageContext.request.contextPath}/nurse/lab/queue?filter=all&size=${pageSize}">
+                        <i class="fa-solid fa-list"></i> All
+                    </a>
                 </div>
 
                 <c:if test="${empty tests}">
-                    <div class="empty-state"><p>No lab tests in queue.</p></div>
+                    <div class="empty-state"><p>No lab tests found.</p></div>
                 </c:if>
 
                 <c:if test="${not empty tests}">
                     <table>
                         <thead>
                             <tr>
-                                <th>ID</th>
+                                <th style="display:none;">ID</th>
+                                <th>STT</th>
                                 <th>Type</th>
                                 <th>Pet</th>
                                 <th>Owner</th>
@@ -56,19 +119,46 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <c:forEach items="${tests}" var="t">
+                            <c:forEach items="${tests}" var="t" varStatus="status">
                                 <tr>
-                                    <td class="col-id">#${t.testId}</td>
+                                    <td style="display:none;">${t.testId}</td>
+                                    <td>${(currentPage - 1) * pageSize + status.index + 1}</td>
                                     <td class="col-service">${t.testType}</td>
                                     <td class="col-pet">${t.petName}</td>
                                     <td>${t.ownerName}</td>
                                     <td>${t.vetName}</td>
-                                    <td>${t.status}</td>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${t.status == 'Requested'}">
+                                                <span style="color:#f59e0b; font-weight:600;">Requested</span>
+                                            </c:when>
+                                            <c:when test="${t.status == 'In Progress'}">
+                                                <span style="color:#3b82f6; font-weight:600;">In Progress</span>
+                                            </c:when>
+                                            <c:when test="${t.status == 'Completed'}">
+                                                <span style="color:#10b981; font-weight:600;">Completed</span>
+                                            </c:when>
+                                            <c:when test="${t.status == 'Cancelled'}">
+                                                <span style="color:#94a3b8; font-weight:600;">Cancelled</span>
+                                            </c:when>
+                                            <c:otherwise>${t.status}</c:otherwise>
+                                        </c:choose>
+                                    </td>
                                     <td style="text-align:center;">
-                                        <a class="btn btn-approve" style="text-decoration:none;"
-                                           href="${pageContext.request.contextPath}/nurse/lab/update?id=${t.testId}">
-                                            Update
-                                        </a>
+                                        <c:choose>
+                                            <c:when test="${t.status == 'Completed' || t.status == 'Cancelled'}">
+                                                <a class="btn btn-reject" style="text-decoration:none; background:#e5e7eb;color:#111827;"
+                                                   href="${pageContext.request.contextPath}/nurse/lab/update?id=${t.testId}">
+                                                    View
+                                                </a>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <a class="btn btn-approve" style="text-decoration:none;"
+                                                   href="${pageContext.request.contextPath}/nurse/lab/update?id=${t.testId}">
+                                                    Update
+                                                </a>
+                                            </c:otherwise>
+                                        </c:choose>
                                     </td>
                                 </tr>
                             </c:forEach>
@@ -77,26 +167,49 @@
                 </c:if>
 
                 <c:if test="${totalPages > 1}">
-                    <div style="display:flex; gap:6px; justify-content:flex-end; margin-top:12px;">
+                    <c:set var="filterParam" value="&filter=${filter}" />
+                    <c:set var="sizeParam" value="&size=${pageSize}" />
+                    <c:set var="searchParam" value="${not empty search ? '&search='.concat(search) : ''}" />
+                    <div style="display:flex; gap:6px; justify-content:space-between; margin-top:12px; align-items:center; flex-wrap:wrap;">
+                        <form method="get" action="${pageContext.request.contextPath}/nurse/lab/queue" style="display:flex; align-items:center; gap:8px;">
+                            <input type="hidden" name="filter" value="${filter}">
+                            <input type="hidden" name="search" value="${search}">
+                            <span style="font-size:12px; color:#64748b; font-weight:700;">Hiển thị</span>
+                            <select name="size" onchange="this.form.submit()" style="padding:6px 10px; border:1px solid #d1d5db; border-radius:8px; font-size:12px;">
+                                <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
+                                <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
+                                <option value="20" ${pageSize == 20 ? 'selected' : ''}>20</option>
+                                <option value="50" ${pageSize == 50 ? 'selected' : ''}>50</option>
+                                <option value="100" ${pageSize == 100 ? 'selected' : ''}>100</option>
+                            </select>
+                        </form>
+                        <div style="display:flex; gap:6px; justify-content:flex-end;">
                         <c:if test="${currentPage > 1}">
-                            <a class="btn btn-approve" style="text-decoration:none;" href="?page=${currentPage - 1}">
+                            <a class="btn btn-approve" style="text-decoration:none;" href="?page=${currentPage - 1}${sizeParam}${filterParam}${searchParam}">
                                 <i class="fa-solid fa-chevron-left"></i>
                             </a>
                         </c:if>
                         <c:forEach begin="1" end="${totalPages}" var="i">
                             <a class="btn ${currentPage == i ? 'btn-approve' : 'btn-reject'}"
                                style="text-decoration:none; ${currentPage == i ? '' : 'background:#e5e7eb;color:#111827;'}"
-                               href="?page=${i}">${i}</a>
+                               href="?page=${i}${sizeParam}${filterParam}${searchParam}">${i}</a>
                         </c:forEach>
                         <c:if test="${currentPage < totalPages}">
-                            <a class="btn btn-approve" style="text-decoration:none;" href="?page=${currentPage + 1}">
+                            <a class="btn btn-approve" style="text-decoration:none;" href="?page=${currentPage + 1}${sizeParam}${filterParam}${searchParam}">
                                 <i class="fa-solid fa-chevron-right"></i>
                             </a>
                         </c:if>
+                        </div>
                     </div>
                 </c:if>
             </div>
         </main>
-    </body>
+    <script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
+</body>
 </html>
+
 

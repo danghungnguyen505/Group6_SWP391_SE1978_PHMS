@@ -159,7 +159,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Work Status</label>
-                        <input type="text" class="form-input" value="Đang làm việc (Active)" readonly style="font-weight: 700;">
+                        <input type="text" class="form-input" value="Äang lÃ m viá»‡c (Active)" readonly style="font-weight: 700;">
                     </div>
                 </div>
 
@@ -171,6 +171,13 @@
                 <div id="licenseGroup" class="form-group" style="margin-top: 20px;">
                     <label class="form-label">License Number (Veterinarian only)</label>
                     <input type="text" name="licenseNumber" value="${licenseNumber}" class="form-input" placeholder="LIC-XXXXX">
+                </div>
+                <div id="vetTypeGroup" class="form-group" style="margin-top: 20px;">
+                    <label class="form-label">Veterinarian Type</label>
+                    <select name="vetType" class="form-input">
+                        <option value="Normal" ${vetType == 'Normal' || empty vetType ? 'selected' : ''}>Normal</option>
+                        <option value="Emergency" ${vetType == 'Emergency' ? 'selected' : ''}>Emergency</option>
+                    </select>
                 </div>
 
                 <div class="form-actions">
@@ -186,16 +193,28 @@
             const role = document.getElementById('roleSelect').value;
             const specGroup = document.getElementById('specializationGroup');
             const licenseGroup = document.getElementById('licenseGroup');
+            const vetTypeGroup = document.getElementById('vetTypeGroup');
             
             if (role === 'Veterinarian') {
                 specGroup.style.display = 'block';
                 licenseGroup.style.display = 'block';
+                vetTypeGroup.style.display = 'block';
             } else {
                 specGroup.style.display = 'none';
                 licenseGroup.style.display = 'none';
+                vetTypeGroup.style.display = 'none';
             }
         }
         toggleVetFields();
     </script>
+<div class="phms-account-entry" style="position:fixed; top:16px; right:20px; z-index:1200;">
+    <a href="${pageContext.request.contextPath}/logout" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;color:#334155;text-decoration:none;font-size:13px;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.05);">Sign Out</a>
+</div>
+<script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+

@@ -1,4 +1,4 @@
-<%-- 
+﻿<%-- 
     Document   : editService
     Created on : Jan 22, 2026, 10:37:59 AM
     Author     : Nguyen Dang Hung
@@ -91,7 +91,7 @@
 
     <jsp:include page="common/navbar.jsp">
     <jsp:param name="activePage" value="services" />
-</jsp:include>
+    </jsp:include>
 
     <!-- Main Content -->
     <main class="main-content">
@@ -117,6 +117,15 @@
                 </div>
 
                 <div class="form-group">
+                    <label class="form-label">Service Type</label>
+                    <select name="serviceType" class="form-input" required>
+                        <option value="Basic" ${s.type == 'Basic' ? 'selected' : ''}>Cơ bản</option>
+                        <option value="Emergency" ${s.type == 'Emergency' ? 'selected' : ''}>Cấp cứu</option>
+                        <option value="LabTest" ${s.type == 'LabTest' ? 'selected' : ''}>Lab test</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label class="form-label">Base Price (VND)</label>
                     <input type="number" name="price" class="form-input" value="${s.basePrice}" required>
                 </div>
@@ -139,5 +148,11 @@
         </div>
     </main>
 
+<script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+

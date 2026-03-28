@@ -80,7 +80,7 @@ public class LoginController extends HttpServlet {
         VerifyRecaptcha vr = new VerifyRecaptcha();
         boolean isCaptchaValid = vr.verify(gRecaptchaResponse);
         if (isCaptchaValid) {
-            request.setAttribute("error", "Vui lòng xác thực bạn không phải là người máy!");
+            request.setAttribute("error", "Vui lÃƒÂ²ng xÃƒÂ¡c thÃ¡Â»Â±c bÃ¡ÂºÂ¡n khÃƒÂ´ng phÃ¡ÂºÂ£i lÃƒÂ  ngÃ†Â°Ã¡Â»Âi mÃƒÂ¡y!");
             request.setAttribute("username", request.getParameter("username"));
             request.getRequestDispatcher("views/auth/login.jsp").forward(request, response);
             return;
@@ -91,7 +91,7 @@ public class LoginController extends HttpServlet {
         String p = request.getParameter("password");
 
         if (u == null || u.trim().isEmpty() || p == null || p.trim().isEmpty()) {
-            request.setAttribute("error", "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!");
+            request.setAttribute("error", "Vui lÃƒÂ²ng nhÃ¡ÂºÂ­p Ã„â€˜Ã¡ÂºÂ§y Ã„â€˜Ã¡Â»Â§ tÃƒÂªn Ã„â€˜Ã„Æ’ng nhÃ¡ÂºÂ­p vÃƒÂ  mÃ¡ÂºÂ­t khÃ¡ÂºÂ©u!");
             request.setAttribute("username", u != null ? u : "");
             request.getRequestDispatcher("views/auth/login.jsp").forward(request, response);
             return;
@@ -101,14 +101,18 @@ public class LoginController extends HttpServlet {
         User account = dao.checkLogin(u, p);
 
         if (account == null) {
-            request.setAttribute("error", "Sai tài khoản hoặc mật khẩu!");
+            if (dao.isLockedUser(u)) {
+                request.setAttribute("error", "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.");
+            } else {
+                request.setAttribute("error", "Sai tài khoản hoặc mật khẩu!");
+            }
             request.setAttribute("username", u);
             request.getRequestDispatcher("views/auth/login.jsp").forward(request, response);
         } else {
             HttpSession session = request.getSession();
             session.setAttribute("account", account);
 
-            String role = account.getRole(); // Lấy từ DB: Admin, Veterinarian, PetOwner...
+            String role = account.getRole(); // LÃ¡ÂºÂ¥y tÃ¡Â»Â« DB: Admin, Veterinarian, PetOwner...
             if ("ClinicManager".equalsIgnoreCase(role) || "Admin".equalsIgnoreCase(role)) {
                 response.sendRedirect("admin/dashboard");
             } else if ("Veterinarian".equalsIgnoreCase(role)) {

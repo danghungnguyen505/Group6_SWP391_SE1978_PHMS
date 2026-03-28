@@ -1,4 +1,4 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -303,6 +303,27 @@
                 font-weight: 700;
                 font-size: 12px;
             }
+
+            .toast-alert {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 12px 14px;
+                border-radius: 10px;
+                font-weight: 600;
+                font-size: 13px;
+                margin-bottom: 16px;
+            }
+            .toast-alert.success {
+                background: #dcfce7;
+                color: #166534;
+                border: 1px solid #86efac;
+            }
+            .toast-alert.error {
+                background: #fee2e2;
+                color: #991b1b;
+                border: 1px solid #fca5a5;
+            }
         </style>
     </head>
     <body>
@@ -319,6 +340,7 @@
                 </div>
                 <div style="display:flex; gap:15px; align-items:center;">
                     <form action="${pageContext.request.contextPath}/admin/medicine/list" method="get" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                        <input type="hidden" name="size" value="${pageSize}">
                         <input type="text" name="search" placeholder="Search name/unit..." 
                                value="${searchKeyword}" 
                                style="padding:8px 10px; border-radius:8px; border:1px solid #e2e8f0; font-size:13px; min-width:200px;">
@@ -345,6 +367,25 @@
             </div>
 
             <div class="card">
+                <c:if test="${not empty sessionScope.toastMessage}">
+                    <c:set var="toast" value="${sessionScope.toastMessage}" />
+                    <c:choose>
+                        <c:when test="${fn:startsWith(toast, 'success|')}">
+                            <div class="toast-alert success">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span>${fn:substringAfter(toast, 'success|')}</span>
+                            </div>
+                        </c:when>
+                        <c:when test="${fn:startsWith(toast, 'error|')}">
+                            <div class="toast-alert error">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                                <span>${fn:substringAfter(toast, 'error|')}</span>
+                            </div>
+                        </c:when>
+                    </c:choose>
+                    <c:remove var="toastMessage" scope="session" />
+                </c:if>
+
                 <c:choose>
                     <c:when test="${empty medicines || medicines.size() == 0}">
                         <div style="text-align:center; padding:60px; color: #a0aec0;">
@@ -357,7 +398,7 @@
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th class="col-id">ID</th>
+                                    <th class="col-id">STT</th>
                                     <th style="width: 25%;">Medicine Name</th>
                                     <th style="width: 20%;">Unit</th>
                                     <th style="width: 15%;">Price</th>
@@ -366,9 +407,9 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <c:forEach var="med" items="${medicines}">
+                                <c:forEach var="med" items="${medicines}" varStatus="st">
                                     <tr>
-                                        <td class="col-id">#${med.medicineId}</td>
+                                        <td class="col-id">${(currentPage - 1) * pageSize + st.index + 1}</td>
                                         <td class="col-name">${med.name}</td>
                                         <td class="col-unit">"${med.unit}"</td>
                                         <td class="col-price">
@@ -389,7 +430,7 @@
                                                   onsubmit="return confirm('Bạn có chắc muốn xóa thuốc này?');">
                                                 <input type="hidden" name="id" value="${med.medicineId}">
                                                 <button type="submit" class="btn-action btn-reject" title="Delete">
-                                                    <i class="fa-solid fa-circle-stop"></i>
+                                                    <i class="fa-solid fa-trash-can"></i>
                                                 </button>
                                             </form>
                                         </td>
@@ -402,8 +443,22 @@
                         <c:if test="${totalPages > 1}">
                             <c:set var="searchParam" value="${not empty searchKeyword ? '&search='.concat(searchKeyword) : ''}" />
                             <c:set var="statusParam" value="${not empty statusFilter ? '&status='.concat(statusFilter) : ''}" />
-                            <c:set var="queryParams" value="${searchParam.concat(statusParam)}" />
-                            <div class="pagination">
+                            <c:set var="sizeParam" value="${'&size='.concat(pageSize)}" />
+                            <c:set var="queryParams" value="${searchParam.concat(statusParam).concat(sizeParam)}" />
+                            <div class="pagination" style="justify-content:space-between; width:100%;">
+                                <form method="get" action="${pageContext.request.contextPath}/admin/medicine/list" style="display:flex; gap:8px; align-items:center;">
+                                    <input type="hidden" name="search" value="${searchKeyword}">
+                                    <input type="hidden" name="status" value="${statusFilter}">
+                                    <label class="page-info">Hiển thị</label>
+                                    <select name="size" style="padding:8px 10px; border-radius:8px; border:1px solid #e2e8f0; font-size:12px;" onchange="this.form.submit()">
+                                        <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
+                                        <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
+                                        <option value="20" ${pageSize == 20 ? 'selected' : ''}>20</option>
+                                        <option value="50" ${pageSize == 50 ? 'selected' : ''}>50</option>
+                                        <option value="100" ${pageSize == 100 ? 'selected' : ''}>100</option>
+                                    </select>
+                                </form>
+                                <div style="display:flex; gap:15px; align-items:center;">
                                 <c:if test="${currentPage > 1}">
                                     <a href="${pageContext.request.contextPath}/admin/medicine/list?page=${currentPage - 1}${queryParams}" class="btn-page">Previous</a>
                                 </c:if>
@@ -413,11 +468,17 @@
                                 <c:if test="${currentPage < totalPages}">
                                     <a href="${pageContext.request.contextPath}/admin/medicine/list?page=${currentPage + 1}${queryParams}" class="btn-page">Next</a>
                                 </c:if>
+                                </div>
                             </div>
                         </c:if>
                     </c:otherwise>
                 </c:choose>
             </div>
         </main>
-    </body>
+    <script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
+</body>
 </html>

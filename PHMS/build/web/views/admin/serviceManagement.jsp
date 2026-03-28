@@ -1,4 +1,4 @@
-<%-- 
+﻿<%-- 
     Document   : serviceManagement
     Created on : Jan 22, 2026, 2:43:16 AM
     Author     : Nguyen Dang Hung
@@ -86,6 +86,17 @@
             box-shadow: 0 4px 15px rgba(80, 180, 152, 0.2);
             transition: 0.2s;
         }
+        .btn-signout {
+            padding: 10px 20px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 10px;
+            color: var(--text-main);
+            font-weight: 700;
+            font-size: 12px;
+            text-decoration: none;
+            text-transform: uppercase;
+        }
 
         /* --- TABLE CARD --- */
         .table-container {
@@ -136,6 +147,9 @@
             text-transform: uppercase;
             display: inline-block;
         }
+        .badge-basic { background: #e2e8f0; color: #334155; }
+        .badge-lab { background: #dbeafe; color: #1d4ed8; }
+        .badge-emergency { background: #fee2e2; color: #b91c1c; }
         .badge-active { background: #dcfce7; color: #15803d; }
         .badge-inactive { background: #fee2e2; color: #b91c1c; opacity: 0.8; }
 
@@ -210,15 +224,23 @@
                         <option value="inactive" ${statusFilter == 'inactive' ? 'selected' : ''}>Inactive</option>
                     </select>
 
+                    <select name="type" style="padding:8px 10px; border-radius:8px; border:1px solid #e2e8f0; font-size:13px;">
+                        <option value="">All types</option>
+                        <option value="Basic" ${typeFilter == 'Basic' ? 'selected' : ''}>Cơ bản</option>
+                        <option value="Emergency" ${typeFilter == 'Emergency' ? 'selected' : ''}>Cấp cứu</option>
+                        <option value="LabTest" ${typeFilter == 'LabTest' ? 'selected' : ''}>Lab test</option>
+                    </select>
+
                     <button type="submit" class="btn-create" style="padding:8px 14px; text-transform:none;">
                         <i class="fa-solid fa-magnifying-glass"></i>
                     </button>
-                    <c:if test="${not empty searchKeyword || not empty statusFilter}">
+                    <c:if test="${not empty searchKeyword || not empty statusFilter || not empty typeFilter}">
                         <a href="services" 
                            style="font-size:12px; color:#a0aec0; text-decoration:none;">Clear</a>
                     </c:if>
                 </form>
                 <a href="add-service" class="btn-create">Create New</a>
+                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
             </div>
         </header>
 
@@ -226,8 +248,9 @@
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th class="col-id">ID</th>
+                        <th class="col-id">STT</th>
                         <th class="col-name">Service Name</th>
+                        <th class="col-status">Type</th>
                         <th class="col-desc">Description</th>
                         <th class="col-price">Base Price (VND)</th>
                         <th class="col-status">Status</th>
@@ -235,10 +258,19 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <c:forEach var="service" items="${services}">
+                    <c:forEach var="service" items="${services}" varStatus="st">
                         <tr>
-                            <td class="col-id">#${service.serviceId}</td>
+                            <td class="col-id">${st.index + 1}</td>
                             <td class="col-name">${service.name}</td>
+                            <td class="col-status">
+                                <span class="badge ${service.type == 'Emergency' ? 'badge-emergency' : (service.type == 'LabTest' ? 'badge-lab' : 'badge-basic')}">
+                                    <c:choose>
+                                        <c:when test="${service.type == 'Emergency'}">Cấp cứu</c:when>
+                                        <c:when test="${service.type == 'LabTest'}">Lab test</c:when>
+                                        <c:otherwise>Cơ bản</c:otherwise>
+                                    </c:choose>
+                                </span>
+                            </td>
                             <td class="col-desc">"${service.description}"</td>
                             <td class="col-price">
                                 <fmt:formatNumber value="${service.basePrice}" pattern="#,###"/>đ
@@ -278,7 +310,8 @@
             <c:if test="${totalPages > 1}">
                 <c:set var="searchParam" value="${not empty searchKeyword ? '&search='.concat(searchKeyword) : ''}" />
                 <c:set var="statusParam" value="${not empty statusFilter ? '&status='.concat(statusFilter) : ''}" />
-                <c:set var="queryParams" value="${searchParam.concat(statusParam)}" />
+                <c:set var="typeParam" value="${not empty typeFilter ? '&type='.concat(typeFilter) : ''}" />
+                <c:set var="queryParams" value="${searchParam.concat(statusParam).concat(typeParam)}" />
                 <div class="pagination">
                     <c:if test="${currentPage > 1}">
                         <a href="services?page=${currentPage - 1}${queryParams}" class="btn-page">Previous</a>
@@ -293,5 +326,11 @@
             </c:if>
         </div>
     </main>
+<script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+

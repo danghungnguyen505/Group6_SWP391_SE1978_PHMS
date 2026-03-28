@@ -1,10 +1,11 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="${L}">
 <head>
     <meta charset="UTF-8">
-    <title>AI Health Guide - VetCare Pro</title>
+    <title>${t_ai_title} - VetCare Pro</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="${pageContext.request.contextPath}/assets/css/pages/menuPetOwner.css" rel="stylesheet" type="text/css"/>
@@ -17,7 +18,7 @@
     <main class="main-content">
         <header class="top-bar">
             <a href="${pageContext.request.contextPath}/logout" class="btn btn-dark" style="background-color: #ef4444; border-color: #ef4444;">
-                Logout
+                ${t_logout}
             </a>
         </header>
 
@@ -25,25 +26,25 @@
             <div class="ai-title-group">
                 <div class="ai-icon"><i class="fa-solid fa-bolt"></i></div>
                 <div>
-                    <h2>AI Pet Health Assistant</h2>
-                    <p>Instant advice for your pets, powered by advanced AI.</p>
+                    <h2>${t_ai_title}</h2>
+                    <p>${t_ai_subtitle}</p>
                 </div>
             </div>
             <div class="ai-status">
                 <span class="status-dot"></span>
                 <c:choose>
                     <c:when test="${not geminiConfigured}">
-                        <span style="color: red;">AI Offline (Config Error)</span>
+                        <span style="color: red;">${t_ai_offline}</span>
                     </c:when>
                     <c:otherwise>
-                        Gemini AI is Online
+                        ${t_ai_online}
                     </c:otherwise>
                 </c:choose>
             </div>
         </div>
 
         <div class="chat-container">
-            
+
             <c:if test="${not empty error}">
                 <div class="alert alert-danger mx-3 mt-3">
                     <i class="fa-solid fa-circle-exclamation"></i> ${error}
@@ -54,13 +55,13 @@
                 <div class="message bot-message">
                     <div class="message-icon"><i class="fa-solid fa-robot"></i></div>
                     <div class="message-content">
-                        Xin chào! Tôi là trợ lý AI VetCare. Tôi có thể giúp gì cho sức khỏe thú cưng của bạn hôm nay?
+                        ${t_ai_greeting}
                     </div>
                 </div>
 
                 <c:if test="${not empty history}">
                     <c:forEach var="log" items="${history}">
-                        
+
                         <div class="message user-message" style="justify-content: flex-end;">
                             <div class="message-content">
                                 ${log.questionRaw}
@@ -81,24 +82,24 @@
                 </c:if>
 
                 <div id="loadingBubble" class="loading-bubble">
-                    <i class="fa-solid fa-spinner fa-spin"></i> AI đang soạn câu trả lời...
+                    <i class="fa-solid fa-spinner fa-spin"></i> ${t_ai_loading}
                 </div>
             </div>
 
             <div class="input-area">
                 <form id="aiChatForm" action="${pageContext.request.contextPath}/aiHealthGuide" method="post" style="width: 100%;">
                     <div class="input-wrapper">
-                        <textarea id="userInput" name="question" 
-                                  placeholder="Hỏi về triệu chứng, chế độ ăn uống..." 
+                        <textarea id="userInput" name="question"
+                                  placeholder="${t_ai_placeholder}"
                                   rows="1" required></textarea>
-                        
+
                         <button type="submit" class="btn-send" id="btnSend" ${!geminiConfigured ? "disabled" : ""}>
                             <i class="fa-solid fa-paper-plane"></i>
                         </button>
                     </div>
                 </form>
                 <div class="disclaimer">
-                    <i class="fa-solid fa-circle-info"></i> LUÔN HỎI BÁC SĨ THÚ Y TRONG TRƯỜNG HỢP KHẨN CẤP
+                    <i class="fa-solid fa-circle-info"></i> ${t_ai_disclaimer}
                 </div>
             </div>
         </div>
@@ -143,5 +144,10 @@
             }
         });
     </script>
+<script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>

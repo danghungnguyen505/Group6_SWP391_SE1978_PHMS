@@ -46,7 +46,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
                 boolean isUpdated = false;
                 // TRƯỜNG HỢP 1: DUYỆT LỊCH (Pending -> Confirmed/Cancelled)
                 if (status.equals("Confirmed") || status.equals("Cancelled")) {
-                    isUpdated = dao.updateAppointmentStatus(apptId, status);
+                    isUpdated = dao.updateAppointmentStatusWithReceptionist(apptId, status, account.getUserId());
                     
                     if (isUpdated) {
                         String msg = status.equals("Confirmed") ? "Đã duyệt cuộc hẹn thành công!" : "Đã từ chối cuộc hẹn!";
@@ -57,8 +57,8 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
                 } 
                 // TRƯỜNG HỢP 2: CHECK-IN / NO-SHOW (Confirmed -> Checked-in/No-show)
                 else if (status.equals("Checked-in") || status.equals("No-show")) {
-                    // Gọi hàm changeAppointmentStatus (Hàm tổng quát mới thêm vào DAO)
-                    isUpdated = dao.changeAppointmentStatus(apptId, status);
+                    // Gọi hàm changeAppointmentStatusByReceptionist để lưu receptionist_id
+                    isUpdated = dao.changeAppointmentStatusByReceptionist(apptId, status, account.getUserId());
                     
                     if (isUpdated) {
                         String msg = status.equals("Checked-in") ? "Check-in thành công!" : "Đã đánh dấu vắng mặt (No-show).";

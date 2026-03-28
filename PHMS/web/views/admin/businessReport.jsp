@@ -153,6 +153,24 @@
             margin-bottom: 30px;
             color: var(--text-main);
         }
+        .panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .panel-head .panel-title {
+            margin-bottom: 0;
+        }
+        .panel-head-link {
+            text-decoration: none;
+            color: #0f766e;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+        }
 
         /* Chart Area */
         .chart-placeholder {
@@ -177,16 +195,39 @@
         .rev-total-val { font-size: 26px; font-weight: 900; color: var(--text-main); }
         .growth-badge { font-size: 18px; font-weight: 800; color: #48bb78; text-align: right; }
 
-        /* Feedback List */
-        .feedback-list { display: flex; flex-direction: column; gap: 25px; }
-        .fb-item { position: relative; padding-bottom: 10px; border-bottom: 1px solid #f8fafc; }
-        .fb-item:last-child { border-bottom: none; }
-        .fb-user { font-weight: 800; font-size: 14px; margin-bottom: 5px; display: flex; gap: 8px; align-items: center; }
-        .fb-user span { font-weight: 500; color: #cbd5e0; font-size: 12px; }
-        .fb-comment { font-size: 13px; color: var(--text-muted); font-style: italic; line-height: 1.6; padding-right: 60px; }
-        
-        .stars { position: absolute; top: 0; right: 0; color: #f6ad55; font-size: 10px; display: flex; gap: 2px; }
-        .star-muted { color: #edf2f7; }
+        /* Transaction List */
+        .txn-list { display: flex; flex-direction: column; gap: 12px; }
+        .txn-item {
+            border: 1px solid #edf2f7;
+            border-radius: 14px;
+            padding: 12px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+        .txn-main { min-width: 0; }
+        .txn-title { font-weight: 800; font-size: 14px; color: #0f172a; margin-bottom: 4px; }
+        .txn-meta { font-size: 12px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .txn-right { text-align: right; }
+        .txn-amount { font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom: 6px; }
+        .txn-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
+        .txn-status {
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .txn-status.paid { background: #dcfce7; color: #166534; }
+        .txn-status.unpaid { background: #fee2e2; color: #991b1b; }
+        .txn-status.other { background: #e2e8f0; color: #334155; }
+        .txn-link {
+            font-size: 12px;
+            text-decoration: none;
+            color: #0f766e;
+            font-weight: 700;
+        }
 
     </style>
 </head>
@@ -215,9 +256,15 @@
                 <div class="chart-placeholder">
                     <c:choose>
                         <c:when test="${not empty monthlyRevenue}">
+                            <c:set var="maxRev" value="1" />
+                            <c:forEach var="m" items="${monthlyRevenue}">
+                                <c:if test="${m.revenue > maxRev}"><c:set var="maxRev" value="${m.revenue}" /></c:if>
+                            </c:forEach>
                             <c:forEach var="month" items="${monthlyRevenue}">
                                 <div class="month-col">
-                                    <span class="month-label">Tháng ${month.month}</span>
+                                    <span class="month-value" style="font-size:11px; font-weight:700; color:#0f172a;"><fmt:formatNumber value="${month.revenue}" pattern="#,###"/>₫</span>
+                                    <div style="width:30px; background:linear-gradient(to top, #10b981, #34d399); border-radius:4px 4px 0 0; height: ${month.revenue > 0 ? (month.revenue / maxRev) * 120 : 4}px;"></div>
+                                    <span class="month-label">Tháng ${fn:substring(month.month, 5, 7)}</span>
                                 </div>
                             </c:forEach>
                         </c:when>
@@ -241,33 +288,64 @@
                     </div>
                     <div>
                         <p class="rev-total-label" style="text-align: right;">Tăng trưởng</p>
-                        <div class="growth-badge">+18.4%</div>
+                        <div class="growth-badge">
+                            <c:choose>
+                                <c:when test="${not empty revenueGrowth}">
+                                    <c:set var="growth" value="${revenueGrowth.growthPercentage}" />
+                                    <c:choose>
+                                        <c:when test="${growth >= 0}">+<fmt:formatNumber value="${growth}" pattern="#.0"/>%</c:when>
+                                        <c:otherwise><fmt:formatNumber value="${growth}" pattern="#.0"/>%</c:otherwise>
+                                    </c:choose>
+                                </c:when>
+                                <c:otherwise>0%</c:otherwise>
+                            </c:choose>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Right Panel: Latest Feedback -->
+            <!-- Right Panel: Transaction History -->
             <section class="card-panel">
-                <h2 class="panel-title">Phản hồi khách hàng mới nhất</h2>
+                <div class="panel-head">
+                    <h2 class="panel-title">Lịch sử giao dịch gần đây</h2>
+                    <a class="panel-head-link" href="${pageContext.request.contextPath}/admin/invoice/list">Xem tất cả</a>
+                </div>
                 
-                <div class="feedback-list">
+                <div class="txn-list">
                     <c:choose>
-                        <c:when test="${not empty feedbacks}">
-                            <c:forEach var="fb" items="${feedbacks}" varStatus="status">
-                                <c:if test="${status.index < 3}">
-                                    <div class="fb-item">
-                                        <div class="fb-user">${fb.customerName} <span>Thú cưng: ${fb.petName}</span></div>
-                                        <div class="fb-comment">"${fb.comment}"</div>
-                                        <div class="stars">
-                                            <c:forEach begin="1" end="${fb.rating}"><i class="fa-solid fa-star"></i></c:forEach>
-                                            <c:forEach begin="${fb.rating + 1}" end="5"><i class="fa-solid fa-star star-muted"></i></c:forEach>
+                        <c:when test="${not empty recentInvoices}">
+                            <c:forEach var="inv" items="${recentInvoices}">
+                                <div class="txn-item">
+                                    <div class="txn-main">
+                                        <div class="txn-title">Hóa đơn #${inv.invoiceId}</div>
+                                        <div class="txn-meta">
+                                            ${inv.ownerName} - Thú cưng: ${inv.petName}
+                                            <span style="margin:0 4px;">|</span>
+                                            <fmt:formatDate value="${inv.createdAt}" pattern="dd/MM/yyyy HH:mm" />
                                         </div>
                                     </div>
-                                </c:if>
+                                    <div class="txn-right">
+                                        <div class="txn-amount"><fmt:formatNumber value="${inv.totalAmount}" pattern="#,###"/>₫</div>
+                                        <div class="txn-actions">
+                                            <c:choose>
+                                                <c:when test="${inv.status eq 'Paid'}">
+                                                    <span class="txn-status paid">Paid</span>
+                                                </c:when>
+                                                <c:when test="${inv.status eq 'Unpaid'}">
+                                                    <span class="txn-status unpaid">Unpaid</span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="txn-status other">${inv.status}</span>
+                                                </c:otherwise>
+                                            </c:choose>
+                                            <a class="txn-link" href="${pageContext.request.contextPath}/admin/invoice/detail?invoiceId=${inv.invoiceId}">Xem</a>
+                                        </div>
+                                    </div>
+                                </div>
                             </c:forEach>
                         </c:when>
                         <c:otherwise>
-                            <p style="text-align:center; color:#cbd5e0; font-size:13px; padding-top:20px;">Chưa có phản hồi nào từ khách hàng.</p>
+                            <p style="text-align:center; color:#cbd5e0; font-size:13px; padding-top:20px;">Chưa có hóa đơn nào để hiển thị.</p>
                         </c:otherwise>
                     </c:choose>
                 </div>
@@ -275,5 +353,10 @@
         </div>
     </main>
 
+<script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>

@@ -13,6 +13,7 @@ public class LeaveRequest {
     private Date endDate;
     private String reason;
     private String status; // Pending, Approved, Rejected
+    private String empName; // Employee full name for display
 
     public LeaveRequest() {
     }
@@ -82,6 +83,14 @@ public class LeaveRequest {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getEmpName() {
+        return empName;
+    }
+
+    public void setEmpName(String empName) {
+        this.empName = empName;
     }
 }
 

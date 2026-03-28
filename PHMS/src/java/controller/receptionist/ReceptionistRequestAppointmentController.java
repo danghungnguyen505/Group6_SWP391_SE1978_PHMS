@@ -45,14 +45,8 @@ public class ReceptionistRequestAppointmentController extends HttpServlet {
         dal.AppointmentDAO dao = new dal.AppointmentDAO();
         List<model.Appointment> allAppointments;
         
-        // Apply filters if provided
-        if (util.ValidationUtils.isNotEmpty(filterDate) || util.ValidationUtils.isNotEmpty(filterStatus) || filterVetId != null) {
-            allAppointments = dao.getAppointmentsWithFilters(filterDate, filterDate, filterStatus, filterVetId);
-        } else {
-            // Default: show pending and confirmed
-            allAppointments = dao.getPendingAppointments();
-            allAppointments.addAll(dao.getConfirmedAppointments());
-        }
+        // Always use filter method (sorts by newest DESC); pass nulls when no filter
+        allAppointments = dao.getAppointmentsWithFilters(filterDate, filterDate, filterStatus, filterVetId);
         
         // Get all veterinarians for filter dropdown
         dal.UserDAO userDAO = new dal.UserDAO();
@@ -61,7 +55,7 @@ public class ReceptionistRequestAppointmentController extends HttpServlet {
         
         // Pagination
         int page = 1;
-        int pageSize = 10;
+        int pageSize = util.PaginationUtils.normalizePageSize(request.getParameter("size"), 10);
         String pageStr = request.getParameter("page");
         if (pageStr != null && !pageStr.trim().isEmpty()) {
             try {
@@ -79,6 +73,7 @@ public class ReceptionistRequestAppointmentController extends HttpServlet {
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("totalItems", allAppointments.size());
+        request.setAttribute("pageSize", pageSize);
         request.setAttribute("filterDate", filterDate);
         request.setAttribute("filterStatus", filterStatus);
         request.setAttribute("filterVetId", filterVetIdStr);

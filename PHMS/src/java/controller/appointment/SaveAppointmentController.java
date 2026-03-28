@@ -6,6 +6,8 @@ package controller.appointment;
 
 import dal.AppointmentDAO;
 import dal.ScheduleVeterianrianDAO;
+import dal.ServiceDAO;
+import dal.UserDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -77,6 +79,12 @@ public class SaveAppointmentController extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/booking");
                 return;
             }
+            ServiceDAO serviceDAO = new ServiceDAO();
+            if (serviceDAO.getActiveServiceByNameAndType(serviceType, "Basic") == null) {
+                session.setAttribute("toastMessage", "error|Pet owner chỉ được đặt lịch dịch vụ Basic.");
+                response.sendRedirect(request.getContextPath() + "/booking");
+                return;
+            }
             
             // Validate date format and future date
             try {
@@ -95,6 +103,12 @@ public class SaveAppointmentController extends HttpServlet {
             
             // Business rule: do not allow booking if vet has leave request on that date
             int vetId = Integer.parseInt(vetIdStr);
+            UserDAO userDAOForBooking = new UserDAO();
+            if (!userDAOForBooking.isBookableVeterinarianForOwner(vetId)) {
+                session.setAttribute("toastMessage", "error|Khong the dat lich voi bac si cap cuu. Vui long chon bac si khac.");
+                response.sendRedirect(request.getContextPath() + "/booking?selectedDate=" + dateStr);
+                return;
+            }
             java.sql.Date sqlDate = java.sql.Date.valueOf(dateStr);
             ScheduleVeterianrianDAO scheduleDao = new ScheduleVeterianrianDAO();
             String leaveStatus = scheduleDao.getLeaveStatusByEmpAndDate(vetId, sqlDate);

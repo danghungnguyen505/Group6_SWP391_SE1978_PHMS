@@ -47,9 +47,21 @@
         /* --- MAIN CONTENT --- */
         .main-content { margin-left: var(--sidebar-width); flex: 1; padding: 40px 60px; }
 
-        .page-header { display: flex; align-items: center; gap: 20px; margin-bottom: 40px; }
+        .page-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 40px; }
+        .header-left { display: flex; align-items: center; gap: 20px; }
         .btn-back { width: 45px; height: 45px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; color: #a0aec0; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid #edf2f7; transition: 0.2s; }
         .btn-back:hover { transform: translateX(-3px); color: var(--text-main); }
+        .btn-logout {
+            padding: 10px 18px;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            border-radius: 10px;
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
 
         .title-area h1 { font-size: 26px; font-weight: 900; text-transform: uppercase; letter-spacing: -0.5px; }
         .title-area p { color: var(--text-muted); margin-top: 4px; font-size: 15px; }
@@ -95,11 +107,14 @@
     <!-- Main Content -->
     <main class="main-content">
         <header class="page-header">
-            <a href="${pageContext.request.contextPath}/admin/medicine/list" class="btn-back"><i class="fa-solid fa-chevron-left"></i></a>
-            <div class="title-area">
-                <h1>Update Medicine Details</h1>
-                <p>Edit pharmaceutical information and manage current stock levels.</p>
+            <div class="header-left">
+                <a href="${pageContext.request.contextPath}/admin/medicine/list" class="btn-back"><i class="fa-solid fa-chevron-left"></i></a>
+                <div class="title-area">
+                    <h1>Update Medicine Details</h1>
+                    <p>Edit pharmaceutical information and manage current stock levels.</p>
+                </div>
             </div>
+            <a class="btn-logout" href="${pageContext.request.contextPath}/logout">&#272;&#259;ng xu&#7845;t</a>
         </header>
 
         <div class="form-container">
@@ -112,7 +127,7 @@
                 <div class="medicine-id-badge">Medicine ID: #${medicine.medicineId}</div>
 
                 <form method="post" action="${pageContext.request.contextPath}/admin/medicine/update">
-                    <!-- Hidden field để gửi ID thuốc -->
+                    <!-- Hidden field Ä‘á»ƒ gá»­i ID thuá»‘c -->
                     <input type="hidden" name="medicineId" value="${medicine.medicineId}">
 
                     <div class="form-group">
@@ -138,7 +153,7 @@
 
                     <div class="form-group">
                         <label class="form-label">Inventory Status</label>
-                        <input type="text" class="form-input" value="${medicine.stockQuantity > 0 ? 'Hoạt động' : 'Hết hàng'}" readonly 
+                        <input type="text" class="form-input" value="${medicine.stockQuantity > 0 ? 'Hoáº¡t Ä‘á»™ng' : 'Háº¿t hÃ ng'}" readonly 
                                style="font-weight: 700; color: ${medicine.stockQuantity > 0 ? '#15803d' : '#b91c1c'}">
                     </div>
 
@@ -151,5 +166,10 @@
         </div>
     </main>
 
+<script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-<%-- 
+﻿<%-- 
     Document   : staffScheduling
     Created on : Jan 25, 2026
     Author     : zoxy4
@@ -7,6 +7,7 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -26,50 +27,41 @@
             <ul class="menu">
                 <li>
                     <a href="${pageContext.request.contextPath}/receptionist/dashboard">
-                        <i class="fa-solid fa-table-columns"></i> Dashboard
+                        <i class="fa-solid fa-table-columns"></i> ${L == 'en' ? 'Dashboard' : 'Bảng điều khiển'}
                     </a>
                 </li>
                 <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/dashboard" class="text-danger">
-                        <i class="fa-solid fa-truck-medical"></i> Emergency Triage
-                    </a>
-                </li>
-                <!-- Active class ở mục Staff Scheduling -->
-                <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/scheduling" class="active">
-                        <i class="fa-regular fa-calendar-alt"></i> Staff Scheduling
+                    <a href="${pageContext.request.contextPath}/receptionist/emergency/queue" class="text-danger">
+                        <i class="fa-solid fa-truck-medical"></i> ${L == 'en' ? 'Emergency Triage' : 'Cấp cứu'}
                     </a>
                 </li>
                 <li>
                     <a href="${pageContext.request.contextPath}/receptionist/appointment">
-                        <i class="fa-regular fa-calendar-check"></i> Appointments
+                        <i class="fa-regular fa-calendar-check"></i> ${L == 'en' ? 'Appointments' : 'Cuộc hẹn'}
                     </a>
                 </li>
                 <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/dashboard">
-                        <i class="fa-solid fa-paw"></i> My Pets
-                    </a>
-                </li>
-                <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/dashboard">
-                        <i class="fa-solid fa-file-medical"></i> Medical Records
-                    </a>
-                </li>
-                <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/dashboard">
-                        <i class="fa-regular fa-credit-card"></i> Billing
-                    </a>
-                </li>
-                <li>
-                    <a href="${pageContext.request.contextPath}/receptionist/dashboard">
-                        <i class="fa-solid fa-gear"></i> Administration
+                    <a href="${pageContext.request.contextPath}/receptionist/invoice/create">
+                        <i class="fa-regular fa-credit-card"></i> ${L == 'en' ? 'Billing' : 'Thanh toán'}
                     </a>
                 </li>
             </ul>
 
+            <!-- Language Switcher -->
+            <div style="padding: 12px; margin-top: auto;">
+                <div style="display:flex; background:#f1f5f9; border-radius:8px; padding:3px; gap:2px;">
+                    <a href="${pageContext.request.contextPath}/language?lang=vi"
+                       style="padding:5px 10px; border-radius:6px; font-size:11px; font-weight:700; text-decoration:none; flex:1; text-align:center;
+                              ${L == 'vi' ? 'background:#10b981; color:#fff;' : 'color:#64748b;'}">VI</a>
+                    <a href="${pageContext.request.contextPath}/language?lang=en"
+                       style="padding:5px 10px; border-radius:6px; font-size:11px; font-weight:700; text-decoration:none; flex:1; text-align:center;
+                              ${L == 'en' ? 'background:#10b981; color:#fff;' : 'color:#64748b;'}">EN</a>
+                </div>
+            </div>
+
             <div class="help-box">
-                <div class="help-text">Need help?</div>
-                <a href="#" class="btn-contact">Contact Support</a>
+                <div class="help-text">${L == 'en' ? 'Need help?' : 'Cần hỗ trợ?'}</div>
+                <a href="#" class="btn-contact">${L == 'en' ? 'Contact Support' : 'Liên hệ hỗ trợ'}</a>
             </div>
         </nav>
 
@@ -287,5 +279,11 @@
             </div>
         </div>
 
-    </body>
+    <script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
+</body>
 </html>
+

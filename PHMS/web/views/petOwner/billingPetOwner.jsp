@@ -1,4 +1,4 @@
-<%-- 
+﻿<%-- 
     Document   : billingPetOwner
     Created on : Feb 3, 2026, 12:14:33 AM
     Author     : zoxy4
@@ -100,13 +100,9 @@
                             <span>Subtotal</span>
                             <span class="amount">$115.50</span>
                         </div>
-                        <div class="total-row">
-                            <span>Tax (8%)</span>
-                            <span class="amount">$9.24</span>
-                        </div>
                         <div class="total-row grand-total">
                             <span>Grand Total</span>
-                            <span class="amount-green">$124.74</span>
+                            <span class="amount-green">$115.50</span>
                         </div>
                     </div>
                 </div>
@@ -166,5 +162,11 @@
             </div> <!-- End Grid -->
         </main>
 
-    </body>
+    <script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
+</body>
 </html>
+

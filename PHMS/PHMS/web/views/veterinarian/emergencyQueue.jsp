@@ -38,7 +38,7 @@
                                         <th>Pet Owner</th>
                                         <th>Time</th>
                                         <th>Level</th>
-                                        <th>Initial symptoms</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -65,10 +65,26 @@
                                                     </c:otherwise>
                                                 </c:choose>
                                             </td>
-                                            <td style="white-space: pre-wrap;">
-                                                <c:if test="${triage != null}">
-                                                    <small>${triage.initialSymptoms}</small>
-                                                </c:if>
+                                            <td>
+                                                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                                                    <c:choose>
+                                                        <c:when test="${a.status eq 'In-Progress'}">
+                                                            <span class="badge" style="background:#0ea5e9;color:#fff;">Agreed</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="badge badge-inactive">${a.status}</span>
+                                                            <form method="post"
+                                                                  action="${pageContext.request.contextPath}/veterinarian/emergency/agree"
+                                                                  style="margin:0;">
+                                                                <input type="hidden" name="apptId" value="${a.apptId}" />
+                                                                <button type="submit" class="btn btn-secondary"
+                                                                        style="padding:6px 10px; line-height:1; border-radius:10px;">
+                                                                    Accept
+                                                                </button>
+                                                            </form>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </div>
                                             </td>
                                         </tr>
                                     </c:forEach>

@@ -1,4 +1,4 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
@@ -18,7 +18,7 @@
             <div class="top-bar">
                 <div class="page-header">
                     <h2>Prescription List</h2>
-                    <p>Medical Record #${record.recordId}</p>
+                    <p>Medical Record</p>
                 </div>
                 <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
             </div>
@@ -29,7 +29,7 @@
                 </div>
                 <c:if test="${not empty record}">
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <div><b>Record ID:</b> #${record.recordId}</div>
+                        <span style="display:none;">${record.recordId}</span>
                         <div><b>Pet:</b> ${record.petName}</div>
                         <div><b>Owner:</b> ${record.ownerName}</div>
                         <div><b>Date:</b> <fmt:formatDate value="${record.createdAt}" pattern="dd/MM/yyyy HH:mm"/></div>
@@ -65,6 +65,7 @@
                         <table style="width:100%; margin-top:15px;">
                             <thead>
                                 <tr style="background:#f3f4f6;">
+                                    <th style="padding:10px; text-align:left;">STT</th>
                                     <th style="padding:10px; text-align:left;">Medicine</th>
                                     <th style="padding:10px; text-align:left;">Quantity</th>
                                     <th style="padding:10px; text-align:left;">Dosage</th>
@@ -73,17 +74,18 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <c:forEach var="pres" items="${prescriptions}">
+                                <c:forEach var="pres" items="${prescriptions}" varStatus="st">
                                     <tr>
+                                        <td style="padding:10px;">${st.index + 1}<span style="display:none;">${pres.presId}</span></td>
                                         <td style="padding:10px;">${pres.medicineName}</td>
                                         <td style="padding:10px;">${pres.quantity} ${pres.medicineUnit}</td>
                                         <td style="padding:10px;">${pres.dosage}</td>
-                                        <td style="padding:10px;"><fmt:formatNumber value="${pres.medicinePrice}" type="currency" currencySymbol="₫"/></td>
+                                        <td style="padding:10px;"><fmt:formatNumber value="${pres.medicinePrice}" type="currency" currencySymbol="VND "/></td>
                                         <td style="padding:10px;">
                                             <c:if test="${record.apptStatus != 'Completed'}">
                                                 <form method="post" action="${pageContext.request.contextPath}/veterinarian/prescription/delete" 
                                                       style="display:inline;" 
-                                                      onsubmit="return confirm('Bạn có chắc muốn xóa thuốc này khỏi đơn?');">
+                                                      onsubmit="return confirm('Delete this medicine from prescription?');">
                                                     <input type="hidden" name="presId" value="${pres.presId}">
                                                     <input type="hidden" name="recordId" value="${record.recordId}">
                                                     <button type="submit" class="btn btn-reject" style="padding:5px 10px;">
@@ -114,5 +116,12 @@
                 </div>
             </div>
         </main>
-    </body>
+    <script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
+</body>
 </html>
+
+
