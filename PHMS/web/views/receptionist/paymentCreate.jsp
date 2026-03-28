@@ -12,7 +12,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Thanh toán hóa đơn - PHMS</title>
+    <title>Thanh toÃ¡n hÃ³a Ä‘Æ¡n - PHMS</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/components.css">
@@ -30,22 +30,22 @@
         <ul class="menu">
             <li>
                 <a href="${pageContext.request.contextPath}/receptionist/dashboard">
-                    <i class="fa-solid fa-table-columns"></i> ${L == 'en' ? 'Dashboard' : 'Bảng điều khiển'}
+                    <i class="fa-solid fa-table-columns"></i> ${L == 'en' ? 'Dashboard' : 'Báº£ng Ä‘iá»u khiá»ƒn'}
                 </a>
             </li>
             <li>
                 <a href="${pageContext.request.contextPath}/receptionist/emergency/queue" class="text-danger">
-                    <i class="fa-solid fa-truck-medical"></i> ${L == 'en' ? 'Emergency Triage' : 'Cấp cứu'}
+                    <i class="fa-solid fa-truck-medical"></i> ${L == 'en' ? 'Emergency Triage' : 'Cáº¥p cá»©u'}
                 </a>
             </li>
             <li>
                 <a href="${pageContext.request.contextPath}/receptionist/appointment">
-                    <i class="fa-regular fa-calendar-check"></i> ${L == 'en' ? 'Appointments' : 'Cuộc hẹn'}
+                    <i class="fa-regular fa-calendar-check"></i> ${L == 'en' ? 'Appointments' : 'Cuá»™c háº¹n'}
                 </a>
             </li>
             <li>
                 <a href="${pageContext.request.contextPath}/receptionist/invoice/create" class="active">
-                    <i class="fa-regular fa-credit-card"></i> ${L == 'en' ? 'Billing' : 'Thanh toán'}
+                    <i class="fa-regular fa-credit-card"></i> ${L == 'en' ? 'Billing' : 'Thanh toÃ¡n'}
                 </a>
             </li>
         </ul>
@@ -63,8 +63,8 @@
         </div>
 
         <div class="help-box">
-            <div class="help-text">${L == 'en' ? 'Need help?' : 'Cần hỗ trợ?'}</div>
-            <a href="#" class="btn-contact">${L == 'en' ? 'Contact Support' : 'Liên hệ hỗ trợ'}</a>
+            <div class="help-text">${L == 'en' ? 'Need help?' : 'Cáº§n há»— trá»£?'}</div>
+            <a href="#" class="btn-contact">${L == 'en' ? 'Contact Support' : 'LiÃªn há»‡ há»— trá»£'}</a>
         </div>
     </nav>
 
@@ -132,5 +132,13 @@
             </div>
         </div>
     </main>
+<div class="phms-account-entry" style="position:fixed; top:16px; right:20px; z-index:1200;">
+    <a href="${pageContext.request.contextPath}/logout" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;color:#334155;text-decoration:none;font-size:13px;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.05);">Sign Out</a>
+</div>
+<script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-<%@page contentType="text/html" pageEncoding="UTF-8" %>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8" %>
     <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
         <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
             <%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
@@ -85,6 +85,7 @@
                                 <c:if test="${not empty search}">
                                     <input type="hidden" name="search" value="${search}">
                                 </c:if>
+                                <input type="hidden" name="size" value="${pageSize}">
                                 <select class="switch-pet-dropdown" name="selectedPetId" onchange="this.form.submit()">
                                     <c:if test="${empty allPets}">
                                         <option value="">${t_no_pets_found}</option>
@@ -125,8 +126,7 @@
                                     <!-- Tên & Loài -->
                                     <c:if test="${empty selectedPet}">
                                         <div class="pet-name">${t_no_pets}</div>
-                                        <div class="pet-breed">${L == 'en' ? 'Add a pet or clear search' : 'Thêm thú
-                                            cưng hoặc xóa tìm kiếm'}</div>
+                                        <div class="pet-breed">${L == 'en' ? 'Add a pet or clear search' : 'Thêm thú cưng hoặc xóa tìm kiếm'}</div>
                                     </c:if>
                                     <c:if test="${not empty selectedPet}">
                                         <div class="pet-name">${selectedPet.name}</div>
@@ -268,27 +268,30 @@
                                             <table class="history-table table table-hover">
                                                 <thead>
                                                     <tr>
-                                                        <th>ID</th>
+                                                        <th>STT</th>
                                                         <th>${L == 'en' ? 'Name' : 'Tên'}</th>
                                                         <th>${t_species}</th>
                                                         <th class="text-end">${t_actions}</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <c:forEach items="${pets}" var="p">
+                                                    <c:forEach items="${pets}" var="p" varStatus="st">
 
                                                         <!-- LOGIC QUAN TRỌNG: Thêm class 'selected-row' nếu ID trùng -->
                                                         <tr
                                                             class="${selectedPet != null && selectedPet.id == p.id ? 'selected-row' : ''}">
 
-                                                            <td>#${p.id}</td>
+                                                            <td>
+                                                                <c:out value="${(currentPage - 1) * pageSize + st.count}" />
+                                                                <input type="hidden" name="petId" value="${p.id}">
+                                                            </td>
                                                             <td class="fw-bold">${p.name}</td>
                                                             <td>${p.species}</td>
 
                                                             <td class="text-end">
                                                                 <!-- Nút View: Khi bấm vào sẽ reload trang với selectedPetId -->
-                                                                <a class="btn btn-sm btn-outline-primary me-1"
-                                                                    href="${pageContext.request.contextPath}/myPetOwner?selectedPetId=${p.id}&page=${currentPage}&search=${search}"
+                                                                    <a class="btn btn-sm btn-outline-primary me-1"
+                                                                    href="${pageContext.request.contextPath}/myPetOwner?selectedPetId=${p.id}&page=${currentPage}&size=${pageSize}&search=${search}"
                                                                     title="View Details">
                                                                     <i class="fa-solid fa-eye"></i>
                                                                 </a>
@@ -308,33 +311,47 @@
 
                                         <!-- Pagination -->
                                         <c:if test="${totalPages > 1}">
-                                            <div class="d-flex justify-content-center mt-3">
-                                                <nav aria-label="Page navigation">
+                                            <div class="d-flex justify-content-between align-items-center w-100 mt-3">
+                                                <form method="get" action="${pageContext.request.contextPath}/myPetOwner" style="display:flex; align-items:center; gap:8px;">
+                                                    <input type="hidden" name="search" value="${search}">
+                                                    <input type="hidden" name="selectedPetId" value="${selectedPet.id}">
+                                                    <span style="font-size:12px; color:#64748b; font-weight:700;">Hiển thị</span>
+                                                    <select name="size" onchange="this.form.submit()" style="padding:6px 10px; border:1px solid #d1d5db; border-radius:8px; font-size:12px;">
+                                                        <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
+                                                        <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
+                                                        <option value="20" ${pageSize == 20 ? 'selected' : ''}>20</option>
+                                                        <option value="50" ${pageSize == 50 ? 'selected' : ''}>50</option>
+                                                        <option value="100" ${pageSize == 100 ? 'selected' : ''}>100</option>
+                                                    </select>
+                                                </form>
+                                                <nav aria-label="Page navigation" class="ms-auto">
                                                     <ul class="pagination pagination-sm">
                                                         <!-- Params cho phân trang để giữ highlight và search -->
                                                         <c:set var="searchParam"
                                                             value="${not empty search ? '&search='.concat(search) : ''}" />
                                                         <c:set var="selectedParam"
                                                             value="${selectedPet != null ? '&selectedPetId='.concat(selectedPet.id) : ''}" />
+                                                        <c:set var="sizeParam"
+                                                            value="${'&size='.concat(pageSize)}" />
 
                                                         <c:if test="${currentPage > 1}">
                                                             <li class="page-item">
                                                                 <a class="page-link"
-                                                                    href="?page=${currentPage - 1}${searchParam}${selectedParam}">Prev</a>
+                                                                    href="?page=${currentPage - 1}${searchParam}${selectedParam}${sizeParam}">Prev</a>
                                                             </li>
                                                         </c:if>
 
                                                         <c:forEach begin="1" end="${totalPages}" var="i">
                                                             <li class="page-item ${currentPage == i ? 'active' : ''}">
                                                                 <a class="page-link"
-                                                                    href="?page=${i}${searchParam}${selectedParam}">${i}</a>
+                                                                    href="?page=${i}${searchParam}${selectedParam}${sizeParam}">${i}</a>
                                                             </li>
                                                         </c:forEach>
 
                                                         <c:if test="${currentPage < totalPages}">
                                                             <li class="page-item">
                                                                 <a class="page-link"
-                                                                    href="?page=${currentPage + 1}${searchParam}${selectedParam}">Next</a>
+                                                                    href="?page=${currentPage + 1}${searchParam}${selectedParam}${sizeParam}">Next</a>
                                                             </li>
                                                         </c:if>
                                                     </ul>
@@ -410,6 +427,11 @@
                     </main>
 
                     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-                </body>
+                <script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
+</body>
 
                 </html>

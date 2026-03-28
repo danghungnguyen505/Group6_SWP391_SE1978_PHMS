@@ -42,6 +42,7 @@ public class FeedbackListController extends HttpServlet {
         }
 
         int totalFeedbacks = feedbackDAO.getTotalFeedbacks(ratingFilter, statusFilter);
+        int pageSize = PaginationUtils.normalizePageSize(request.getParameter("size"), PAGE_SIZE);
 
         int page = 1;
         String pageStr = request.getParameter("page");
@@ -54,16 +55,16 @@ public class FeedbackListController extends HttpServlet {
             }
         }
 
-        int totalPages = (int) Math.ceil((double) totalFeedbacks / PAGE_SIZE);
+        int totalPages = (int) Math.ceil((double) totalFeedbacks / pageSize);
         page = PaginationUtils.getValidPage(page, totalPages);
 
-        List<Feedback> feedbacks = feedbackDAO.getAllFeedbacks(page, PAGE_SIZE, ratingFilter, statusFilter);
+        List<Feedback> feedbacks = feedbackDAO.getAllFeedbacks(page, pageSize, ratingFilter, statusFilter);
 
         request.setAttribute("feedbacks", feedbacks);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("totalFeedbacks", totalFeedbacks);
-        request.setAttribute("pageSize", PAGE_SIZE);
+        request.setAttribute("pageSize", pageSize);
         request.setAttribute("ratingFilter", ratingFilter);
         request.setAttribute("statusFilter", statusFilter);
 

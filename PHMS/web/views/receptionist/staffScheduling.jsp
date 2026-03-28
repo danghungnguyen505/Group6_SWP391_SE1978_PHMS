@@ -1,4 +1,4 @@
-<%-- 
+﻿<%-- 
     Document   : staffScheduling
     Created on : Jan 25, 2026
     Author     : zoxy4
@@ -279,5 +279,11 @@
             </div>
         </div>
 
-    </body>
+    <script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
+</body>
 </html>
+

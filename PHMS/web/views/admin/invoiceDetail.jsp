@@ -1,4 +1,4 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
@@ -91,9 +91,22 @@
         }
 
         .main-content { margin-left: var(--sidebar-width); flex: 1; padding: 36px 48px; width: calc(100% - var(--sidebar-width)); }
-        .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .top-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 12px; }
         .title h1 { font-size: 24px; font-weight: 900; }
+        .back-box {
+            display: inline-flex;
+            margin-top: 10px;
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: #ffffff;
+        }
+        .top-actions { display: flex; align-items: center; gap: 10px; }
         .btn-back {
+            border: none; background: transparent; text-decoration: none; color: var(--text-main);
+            border-radius: 0; font-size: 12px; font-weight: 700; padding: 0;
+        }
+        .btn-logout {
             border: 1px solid #e2e8f0; background: #fff; text-decoration: none; color: var(--text-main);
             border-radius: 10px; font-size: 12px; font-weight: 700; padding: 10px 16px;
         }
@@ -144,8 +157,13 @@
         <header class="top-header">
             <div class="title">
                 <h1>Chi ti&#7871;t h&#243;a &#273;&#417;n #${invoice.invoiceId}</h1>
+                <div class="back-box">
+                    <a class="btn-back" href="${pageContext.request.contextPath}/admin/reports">Quay l&#7841;i b&#225;o c&#225;o</a>
+                </div>
             </div>
-            <a class="btn-back" href="${pageContext.request.contextPath}/admin/reports">Quay l&#7841;i b&#225;o c&#225;o</a>
+            <div class="top-actions">
+                <a class="btn-logout" href="${pageContext.request.contextPath}/logout">&#272;&#259;ng xu&#7845;t</a>
+            </div>
         </header>
 
         <div class="grid">
@@ -203,10 +221,20 @@
                 <c:forEach var="p" items="${payments}">
                     <c:set var="paymentTotal" value="${paymentTotal + p.amount}" />
                 </c:forEach>
+                <c:set var="invoiceSubtotal" value="${invoice.totalAmount / 1.1}" />
+                <c:set var="invoiceVat" value="${invoice.totalAmount - invoiceSubtotal}" />
 
                 <div class="summary">
                     <div class="sum-row">
                         <span>T&#7893;ng ti&#7873;n h&#243;a &#273;&#417;n</span>
+                        <span><fmt:formatNumber value="${invoiceSubtotal}" pattern="#,###"/>&#8363;</span>
+                    </div>
+                    <div class="sum-row">
+                        <span>VAT (10%)</span>
+                        <span><fmt:formatNumber value="${invoiceVat}" pattern="#,###"/>&#8363;</span>
+                    </div>
+                    <div class="sum-row">
+                        <span>T&#7893;ng sau thu&#7871;</span>
                         <span><fmt:formatNumber value="${invoice.totalAmount}" pattern="#,###"/>&#8363;</span>
                     </div>
                     <div class="sum-row total">
@@ -244,5 +272,11 @@
             </aside>
         </div>
     </main>
+<script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+

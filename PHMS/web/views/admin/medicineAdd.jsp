@@ -234,7 +234,7 @@
 
                 <div class="form-group">
                     <label class="form-label">Inventory Status</label>
-                    <input type="text" class="form-input" value="Hoạt động" readonly style="font-weight: 700;">
+                    <input type="text" class="form-input" value="Hoáº¡t Ä‘á»™ng" readonly style="font-weight: 700;">
                 </div>
 
                 <div class="form-actions">
@@ -244,5 +244,13 @@
             </form>
         </div>
     </main>
+<div class="phms-account-entry" style="position:fixed; top:16px; right:20px; z-index:1200;">
+    <a href="${pageContext.request.contextPath}/logout" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;color:#334155;text-decoration:none;font-size:13px;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.05);">Sign Out</a>
+</div>
+<script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>

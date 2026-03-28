@@ -1,6 +1,7 @@
 package controller.veterinarian;
 
 import dal.AppointmentDAO;
+import dal.MedicalRecordDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -12,6 +13,9 @@ import model.User;
 
 @WebServlet(name = "EmergencyAgreeController", urlPatterns = {"/veterinarian/emergency/agree"})
 public class EmergencyAgreeController extends HttpServlet {
+
+    private static final String DEFAULT_DIAGNOSIS = "Pending diagnosis.";
+    private static final String DEFAULT_TREATMENT_PLAN = "Pending treatment plan.";
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -34,12 +38,36 @@ public class EmergencyAgreeController extends HttpServlet {
         }
 
         if (apptId > 0) {
-            AppointmentDAO apptDAO = new AppointmentDAO();
-            boolean ok = apptDAO.agreeEmergencyAppointmentForVet(apptId, account.getUserId());
-            if (ok) {
-                session.setAttribute("toastMessage", "success|Emergency case accepted.");
-            } else {
-                session.setAttribute("toastMessage", "error|Cannot accept. Appointment may not be valid or not assigned to you.");
+            try {
+                MedicalRecordDAO mrDAO = new MedicalRecordDAO();
+                int recordId = mrDAO.createOrGetForVetByAppointment(
+                        apptId,
+                        account.getUserId(),
+                        DEFAULT_DIAGNOSIS,
+                        DEFAULT_TREATMENT_PLAN
+                );
+                // Backward compatibility: allow old Pending/Confirmed emergencies
+                // to be accepted first, then create/open EMR.
+                if (recordId <= 0) {
+                    AppointmentDAO apptDAO = new AppointmentDAO();
+                    boolean accepted = apptDAO.agreeEmergencyAppointmentForVet(apptId, account.getUserId());
+                    if (accepted) {
+                        recordId = mrDAO.createOrGetForVetByAppointment(
+                                apptId,
+                                account.getUserId(),
+                                DEFAULT_DIAGNOSIS,
+                                DEFAULT_TREATMENT_PLAN
+                        );
+                    }
+                }
+                if (recordId > 0) {
+                    session.setAttribute("toastMessage", "success|Emergency case accepted. Medical record is ready.");
+                    response.sendRedirect(request.getContextPath() + "/veterinarian/emr/detail?id=" + recordId);
+                    return;
+                }
+                session.setAttribute("toastMessage", "error|Cannot accept. Appointment may not be eligible or not assigned to you.");
+            } catch (Exception e) {
+                session.setAttribute("toastMessage", "error|System error: " + e.getMessage());
             }
         }
 

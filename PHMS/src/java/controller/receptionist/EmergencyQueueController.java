@@ -43,6 +43,7 @@ public class EmergencyQueueController extends HttpServlet {
 
         // Xử lý phân trang
         int page = 1;
+        int pageSize = PaginationUtils.normalizePageSize(request.getParameter("size"), PAGE_SIZE);
         String pageStr = request.getParameter("page");
         if (pageStr != null && !pageStr.trim().isEmpty()) {
             try {
@@ -51,9 +52,9 @@ public class EmergencyQueueController extends HttpServlet {
                 page = 1;
             }
         }
-        int totalPages = PaginationUtils.getTotalPages(all, PAGE_SIZE);
+        int totalPages = PaginationUtils.getTotalPages(all, pageSize);
         page = PaginationUtils.getValidPage(page, totalPages);
-        List<Appointment> list = PaginationUtils.getPage(all, page, PAGE_SIZE);
+        List<Appointment> list = PaginationUtils.getPage(all, page, pageSize);
 
         // Map apptId -> TriageRecord (if any)
         TriageRecordDAO triageDAO = new TriageRecordDAO();
@@ -80,6 +81,7 @@ public class EmergencyQueueController extends HttpServlet {
         request.setAttribute("invoiceMap", invoiceMap);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
+        request.setAttribute("pageSize", pageSize);
         request.getRequestDispatcher("/views/receptionist/emergencyQueue.jsp").forward(request, response);
     }
 }

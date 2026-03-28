@@ -69,6 +69,7 @@ public class NurseLabQueueController extends HttpServlet {
         }
 
         int page = 1;
+        int pageSize = PaginationUtils.normalizePageSize(request.getParameter("size"), PAGE_SIZE);
         String pageStr = request.getParameter("page");
         if (pageStr != null && !pageStr.trim().isEmpty()) {
             try {
@@ -77,13 +78,14 @@ public class NurseLabQueueController extends HttpServlet {
                 page = 1;
             }
         }
-        int totalPages = PaginationUtils.getTotalPages(all, PAGE_SIZE);
+        int totalPages = PaginationUtils.getTotalPages(all, pageSize);
         page = PaginationUtils.getValidPage(page, totalPages);
-        List<LabTest> list = PaginationUtils.getPage(all, page, PAGE_SIZE);
+        List<LabTest> list = PaginationUtils.getPage(all, page, pageSize);
 
         request.setAttribute("tests", list);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
+        request.setAttribute("pageSize", pageSize);
         request.setAttribute("filter", filter != null ? filter : "requested");
         request.setAttribute("search", search != null ? search : "");
         request.getRequestDispatcher("/views/nurse/labQueue.jsp").forward(request, response);

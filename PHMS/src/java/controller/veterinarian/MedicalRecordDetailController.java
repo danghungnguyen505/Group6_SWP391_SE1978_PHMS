@@ -104,6 +104,7 @@ public class MedicalRecordDetailController extends HttpServlet {
 
         List<MedicalRecord> allPetHistory = dao.listHistoryForPet(mr.getPetId(), mr.getRecordId());
         int historyPage = 1;
+        int historyPageSize = PaginationUtils.normalizePageSize(request.getParameter("historySize"), HISTORY_PAGE_SIZE);
         String historyPageStr = request.getParameter("historyPage");
         if (historyPageStr != null && !historyPageStr.trim().isEmpty()) {
             try {
@@ -112,9 +113,9 @@ public class MedicalRecordDetailController extends HttpServlet {
                 historyPage = 1;
             }
         }
-        int historyTotalPages = PaginationUtils.getTotalPages(allPetHistory, HISTORY_PAGE_SIZE);
+        int historyTotalPages = PaginationUtils.getTotalPages(allPetHistory, historyPageSize);
         historyPage = PaginationUtils.getValidPage(historyPage, historyTotalPages > 0 ? historyTotalPages : 1);
-        List<MedicalRecord> petHistory = PaginationUtils.getPage(allPetHistory, historyPage, HISTORY_PAGE_SIZE);
+        List<MedicalRecord> petHistory = PaginationUtils.getPage(allPetHistory, historyPage, historyPageSize);
 
         List<LabTest> labTests = labDao.listByRecordForVet(recordId, account.getUserId());
         Map<Integer, String> labResultImageMap = new HashMap<>();
@@ -151,6 +152,7 @@ public class MedicalRecordDetailController extends HttpServlet {
         request.setAttribute("petHistory", petHistory);
         request.setAttribute("historyCurrentPage", historyPage);
         request.setAttribute("historyTotalPages", historyTotalPages);
+        request.setAttribute("historyPageSize", historyPageSize);
         request.setAttribute("labTestTypes", labTestTypes);
         request.setAttribute("labTests", labTests);
         request.setAttribute("labResultImageMap", labResultImageMap);

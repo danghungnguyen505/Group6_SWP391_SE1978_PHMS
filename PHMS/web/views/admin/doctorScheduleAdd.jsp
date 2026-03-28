@@ -1,4 +1,4 @@
-<%-- 
+﻿<%-- 
     Document   : doctorScheduleAdd
     Created on : Jan 22, 2026
     Author     : Auto
@@ -71,6 +71,24 @@
             align-items: center;
             gap: 20px;
             margin-bottom: 40px;
+        }
+        .header-right {
+            margin-left: auto;
+        }
+        .btn-signout {
+            padding: 9px 16px;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            border-radius: 10px;
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        .btn-signout:hover {
+            border-color: var(--primary-green);
+            color: #0f172a;
         }
 
         .btn-back {
@@ -363,6 +381,9 @@
                 <h1>Thêm Lịch Làm Việc</h1>
                 <p>Thêm lịch làm việc cho bác sĩ với tùy chọn lặp lại</p>
             </div>
+            <div class="header-right">
+                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
+            </div>
         </header>
 
         <c:if test="${not empty error}">
@@ -583,5 +604,10 @@
         }
     </script>
 
+<script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
