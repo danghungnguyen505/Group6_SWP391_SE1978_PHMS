@@ -509,6 +509,7 @@
 
                     <div class="totals-section">
                         <div class="total-row"><span>Subtotal</span><span class="amount"><fmt:formatNumber value="${subtotal != null ? subtotal : 0}" type="currency" currencySymbol="VND "/></span></div>
+                        <div class="total-row"><span>VAT (10%)</span><span class="amount"><fmt:formatNumber value="${tax != null ? tax : 0}" type="currency" currencySymbol="VND "/></span></div>
                         <div class="total-row grand-total"><span>Grand Total</span><span class="amount-green"><fmt:formatNumber value="${grandTotal != null ? grandTotal : 0}" type="currency" currencySymbol="VND "/></span></div>
                     </div>
                 </div>
@@ -684,5 +685,12 @@
                                 return true;
                             }
         </script>
-    </body>
+    <script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
+</body>
 </html>
+
+

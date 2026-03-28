@@ -109,6 +109,7 @@ public class ServiceListController extends HttpServlet {
         }
 
         int page = 1;
+        int pageSize = PaginationUtils.normalizePageSize(request.getParameter("size"), PAGE_SIZE);
         String pageStr = request.getParameter("page");
         if (pageStr != null && !pageStr.trim().isEmpty()) {
             try {
@@ -121,15 +122,15 @@ public class ServiceListController extends HttpServlet {
             }
         }
 
-        int totalPages = PaginationUtils.getTotalPages(filteredServices, PAGE_SIZE);
+        int totalPages = PaginationUtils.getTotalPages(filteredServices, pageSize);
         page = PaginationUtils.getValidPage(page, totalPages);
-        List<Service> services = PaginationUtils.getPage(filteredServices, page, PAGE_SIZE);
+        List<Service> services = PaginationUtils.getPage(filteredServices, page, pageSize);
         
         request.setAttribute("services", services);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("totalServices", filteredServices.size());
-        request.setAttribute("pageSize", PAGE_SIZE);
+        request.setAttribute("pageSize", pageSize);
         request.setAttribute("searchKeyword", search);
         request.setAttribute("statusFilter", statusFilter);
         request.setAttribute("typeFilter", typeFilter);

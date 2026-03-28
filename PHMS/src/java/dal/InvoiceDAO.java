@@ -18,6 +18,11 @@ import model.TriageRecord;
  * DAO for Invoice and InvoiceDetail.
  */
 public class InvoiceDAO extends DBContext {
+    private static final double VAT_RATE = 0.10d;
+
+    private double applyVat(double subtotal) {
+        return subtotal * (1.0d + VAT_RATE);
+    }
 
     /**
      * Create invoice and details for an appointment. All unit prices are loaded
@@ -171,7 +176,7 @@ public class InvoiceDAO extends DBContext {
 
             // 3. Update invoice total
             try (PreparedStatement up = connection.prepareStatement(updateTotalSql)) {
-                up.setDouble(1, total);
+                up.setDouble(1, applyVat(total));
                 up.setInt(2, invoiceId);
                 up.executeUpdate();
             }
@@ -522,7 +527,7 @@ public class InvoiceDAO extends DBContext {
             double total = mainService != null ? mainService.getBasePrice() : 0;
             String updateTotal = "UPDATE Invoice SET total_amount = ? WHERE invoice_id = ?";
             try (PreparedStatement st = connection.prepareStatement(updateTotal)) {
-                st.setDouble(1, total);
+                st.setDouble(1, applyVat(total));
                 st.setInt(2, invoiceId);
                 st.executeUpdate();
             }

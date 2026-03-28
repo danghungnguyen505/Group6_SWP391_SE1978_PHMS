@@ -1,4 +1,4 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
@@ -364,20 +364,38 @@
 
                     <!-- Pagination -->
                     <c:if test="${totalPages > 1}">
-                        <div class="pagination-bar">
-                            <a class="page-btn ${currentPage <= 1 ? 'disabled' : ''}" href="?page=${currentPage - 1}">
+                        <div class="pagination-bar" style="justify-content:space-between; flex-wrap:wrap; gap:10px;">
+                            <form method="get" action="${pageContext.request.contextPath}/veterinarian/emr/queue" style="display:flex; align-items:center; gap:8px;">
+                                <span style="font-size:12px; color:#64748b; font-weight:700;">Hiển thị</span>
+                                <select name="size" onchange="this.form.submit()" style="padding:6px 10px; border:1px solid #d1d5db; border-radius:8px; font-size:12px;">
+                                    <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
+                                    <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
+                                    <option value="20" ${pageSize == 20 ? 'selected' : ''}>20</option>
+                                    <option value="50" ${pageSize == 50 ? 'selected' : ''}>50</option>
+                                    <option value="100" ${pageSize == 100 ? 'selected' : ''}>100</option>
+                                </select>
+                            </form>
+                            <div style="display:flex; gap:6px; align-items:center;">
+                            <a class="page-btn ${currentPage <= 1 ? 'disabled' : ''}" href="?page=${currentPage - 1}&size=${pageSize}">
                                 <i class="fa-solid fa-chevron-left"></i>
                             </a>
                             <c:forEach begin="1" end="${totalPages}" var="i">
-                                <a class="page-btn ${currentPage == i ? 'active' : ''}" href="?page=${i}">${i}</a>
+                                <a class="page-btn ${currentPage == i ? 'active' : ''}" href="?page=${i}&size=${pageSize}">${i}</a>
                             </c:forEach>
-                            <a class="page-btn ${currentPage >= totalPages ? 'disabled' : ''}" href="?page=${currentPage + 1}">
+                            <a class="page-btn ${currentPage >= totalPages ? 'disabled' : ''}" href="?page=${currentPage + 1}&size=${pageSize}">
                                 <i class="fa-solid fa-chevron-right"></i>
                             </a>
+                            </div>
                         </div>
                     </c:if>
                 </c:if>
             </div>
         </main>
-    </body>
+    <script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
+</body>
 </html>
+

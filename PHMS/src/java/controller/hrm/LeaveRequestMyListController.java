@@ -45,6 +45,7 @@ public class LeaveRequestMyListController extends HttpServlet {
         List<LeaveRequest> all = dao.listByEmployee(account.getUserId());
 
         int page = 1;
+        int pageSize = PaginationUtils.normalizePageSize(request.getParameter("size"), PAGE_SIZE);
         String pageStr = request.getParameter("page");
         if (pageStr != null && !pageStr.trim().isEmpty()) {
             try {
@@ -54,13 +55,14 @@ public class LeaveRequestMyListController extends HttpServlet {
             }
         }
 
-        int totalPages = PaginationUtils.getTotalPages(all, PAGE_SIZE);
+        int totalPages = PaginationUtils.getTotalPages(all, pageSize);
         page = PaginationUtils.getValidPage(page, totalPages);
-        List<LeaveRequest> list = PaginationUtils.getPage(all, page, PAGE_SIZE);
+        List<LeaveRequest> list = PaginationUtils.getPage(all, page, pageSize);
 
         request.setAttribute("requests", list);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
+        request.setAttribute("pageSize", pageSize);
         request.getRequestDispatcher("/views/hrm/leaveMyList.jsp").forward(request, response);
     }
 }

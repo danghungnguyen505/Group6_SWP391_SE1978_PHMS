@@ -290,18 +290,68 @@ public class ReportingDAO extends DBContext {
      * Get recent invoices for transaction history panel in admin report.
      */
     public List<Map<String, Object>> getRecentInvoices(int limit) {
+        return getPaidInvoices(limit);
+    }
+
+    /**
+     * Get all paid invoices for full transaction history page.
+     */
+    public List<Map<String, Object>> getAllPaidInvoices() {
+        return getPaidInvoices(0);
+    }
+
+    /**
+     * Get invoice rows for admin list with optional search/filter and paging.
+     * Ordered by newest first.
+     */
+    public List<Map<String, Object>> getInvoicesForAdmin(String keyword, String status,
+            String startDate, String endDate, int offset, int limit) {
         List<Map<String, Object>> list = new ArrayList<>();
-        String sql = "SELECT TOP (?) "
-                + "inv.invoice_id, inv.appt_id, inv.total_amount, inv.status, inv.created_at, "
-                + "p.name AS pet_name, u_owner.full_name AS owner_name "
-                + "FROM Invoice inv "
-                + "INNER JOIN Appointment a ON inv.appt_id = a.appt_id "
-                + "INNER JOIN Pet p ON a.pet_id = p.pet_id "
-                + "INNER JOIN Users u_owner ON p.owner_id = u_owner.user_id "
-                + "WHERE inv.status = 'Paid' "
-                + "ORDER BY inv.created_at DESC, inv.invoice_id DESC";
-        try (PreparedStatement st = connection.prepareStatement(sql)) {
-            st.setInt(1, limit);
+        List<Object> params = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT inv.invoice_id, inv.appt_id, inv.total_amount, inv.status, inv.created_at, ");
+        sql.append("p.name AS pet_name, u_owner.full_name AS owner_name ");
+        sql.append("FROM Invoice inv ");
+        sql.append("INNER JOIN Appointment a ON inv.appt_id = a.appt_id ");
+        sql.append("INNER JOIN Pet p ON a.pet_id = p.pet_id ");
+        sql.append("INNER JOIN Users u_owner ON p.owner_id = u_owner.user_id ");
+        sql.append("WHERE 1 = 1 ");
+
+        if (util.ValidationUtils.isNotEmpty(status)) {
+            sql.append("AND inv.status = ? ");
+            params.add(status.trim());
+        }
+        if (util.ValidationUtils.isNotEmpty(startDate)) {
+            sql.append("AND CAST(inv.created_at AS DATE) >= CAST(? AS DATE) ");
+            params.add(startDate.trim());
+        }
+        if (util.ValidationUtils.isNotEmpty(endDate)) {
+            sql.append("AND CAST(inv.created_at AS DATE) <= CAST(? AS DATE) ");
+            params.add(endDate.trim());
+        }
+        if (util.ValidationUtils.isNotEmpty(keyword)) {
+            sql.append("AND (");
+            sql.append("CAST(inv.invoice_id AS VARCHAR(20)) LIKE ? ");
+            sql.append("OR u_owner.full_name LIKE ? ");
+            sql.append("OR p.name LIKE ? ");
+            sql.append(") ");
+            String like = "%" + keyword.trim() + "%";
+            params.add(like);
+            params.add(like);
+            params.add(like);
+        }
+
+        sql.append("ORDER BY inv.created_at DESC, inv.invoice_id DESC ");
+        sql.append("OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+        params.add(offset);
+        params.add(limit);
+
+        try (PreparedStatement st = connection.prepareStatement(sql.toString())) {
+            int i = 1;
+            for (Object p : params) {
+                st.setObject(i++, p);
+            }
             try (ResultSet rs = st.executeQuery()) {
                 while (rs.next()) {
                     Map<String, Object> item = new HashMap<>();
@@ -316,7 +366,100 @@ public class ReportingDAO extends DBContext {
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Error getRecentInvoices: " + e.getMessage());
+            System.out.println("Error getInvoicesForAdmin: " + e.getMessage());
+        }
+
+        return list;
+    }
+
+    /**
+     * Count invoices for admin list with optional search/filter.
+     */
+    public int countInvoicesForAdmin(String keyword, String status, String startDate, String endDate) {
+        int total = 0;
+        List<Object> params = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT COUNT(*) AS total ");
+        sql.append("FROM Invoice inv ");
+        sql.append("INNER JOIN Appointment a ON inv.appt_id = a.appt_id ");
+        sql.append("INNER JOIN Pet p ON a.pet_id = p.pet_id ");
+        sql.append("INNER JOIN Users u_owner ON p.owner_id = u_owner.user_id ");
+        sql.append("WHERE 1 = 1 ");
+
+        if (util.ValidationUtils.isNotEmpty(status)) {
+            sql.append("AND inv.status = ? ");
+            params.add(status.trim());
+        }
+        if (util.ValidationUtils.isNotEmpty(startDate)) {
+            sql.append("AND CAST(inv.created_at AS DATE) >= CAST(? AS DATE) ");
+            params.add(startDate.trim());
+        }
+        if (util.ValidationUtils.isNotEmpty(endDate)) {
+            sql.append("AND CAST(inv.created_at AS DATE) <= CAST(? AS DATE) ");
+            params.add(endDate.trim());
+        }
+        if (util.ValidationUtils.isNotEmpty(keyword)) {
+            sql.append("AND (");
+            sql.append("CAST(inv.invoice_id AS VARCHAR(20)) LIKE ? ");
+            sql.append("OR u_owner.full_name LIKE ? ");
+            sql.append("OR p.name LIKE ? ");
+            sql.append(") ");
+            String like = "%" + keyword.trim() + "%";
+            params.add(like);
+            params.add(like);
+            params.add(like);
+        }
+
+        try (PreparedStatement st = connection.prepareStatement(sql.toString())) {
+            int i = 1;
+            for (Object p : params) {
+                st.setObject(i++, p);
+            }
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    total = rs.getInt("total");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error countInvoicesForAdmin: " + e.getMessage());
+        }
+
+        return total;
+    }
+
+    private List<Map<String, Object>> getPaidInvoices(int limit) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        String columnPart = "inv.invoice_id, inv.appt_id, inv.total_amount, inv.status, inv.created_at, "
+                + "p.name AS pet_name, u_owner.full_name AS owner_name ";
+        String fromPart = "FROM Invoice inv "
+                + "INNER JOIN Appointment a ON inv.appt_id = a.appt_id "
+                + "INNER JOIN Pet p ON a.pet_id = p.pet_id "
+                + "INNER JOIN Users u_owner ON p.owner_id = u_owner.user_id "
+                + "WHERE inv.status = 'Paid' "
+                + "ORDER BY inv.created_at DESC, inv.invoice_id DESC";
+        String sql = limit > 0
+                ? "SELECT TOP (?) " + columnPart + fromPart
+                : "SELECT " + columnPart + fromPart;
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            if (limit > 0) {
+                st.setInt(1, limit);
+            }
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> item = new HashMap<>();
+                    item.put("invoiceId", rs.getInt("invoice_id"));
+                    item.put("appointmentId", rs.getInt("appt_id"));
+                    item.put("totalAmount", rs.getDouble("total_amount"));
+                    item.put("status", rs.getString("status"));
+                    item.put("createdAt", rs.getTimestamp("created_at"));
+                    item.put("petName", rs.getString("pet_name"));
+                    item.put("ownerName", rs.getString("owner_name"));
+                    list.add(item);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getPaidInvoices: " + e.getMessage());
         }
         return list;
     }

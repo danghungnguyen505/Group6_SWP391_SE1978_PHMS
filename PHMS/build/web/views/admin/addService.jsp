@@ -36,7 +36,7 @@
             min-height: 100vh;
         }
 
-        /* --- SIDEBAR (Giữ nguyên đồng bộ) --- */
+        /* --- SIDEBAR (Giá»¯ nguyÃªn Ä‘á»“ng bá»™) --- */
         .sidebar {
             width: var(--sidebar-width);
             background: #ffffff;
@@ -210,7 +210,7 @@
 <c:if test="${not empty error}">
     <div style="background-color: #fee2e2; color: #dc2626; padding: 15px; border-radius: 12px; border: 1px solid #fecaca; margin-bottom: 20px; font-size: 14px; line-height: 1.5;">
         <i class="fa-solid fa-triangle-exclamation" style="margin-right: 8px;"></i>
-        <strong>Lỗi:</strong> ${error}
+        <strong>Lá»—i:</strong> ${error}
     </div>
 </c:if>
         <div class="form-container">
@@ -223,8 +223,8 @@
                 <div class="form-group">
                     <label class="form-label">Service Type</label>
                     <select name="serviceType" class="form-input" required>
-                        <option value="Basic" ${serviceType == 'Basic' || empty serviceType ? 'selected' : ''}>Cơ bản</option>
-                        <option value="Emergency" ${serviceType == 'Emergency' ? 'selected' : ''}>Cấp cứu</option>
+                        <option value="Basic" ${serviceType == 'Basic' || empty serviceType ? 'selected' : ''}>CÆ¡ báº£n</option>
+                        <option value="Emergency" ${serviceType == 'Emergency' ? 'selected' : ''}>Cáº¥p cá»©u</option>
                         <option value="LabTest" ${serviceType == 'LabTest' ? 'selected' : ''}>Lab test</option>
                     </select>
                 </div>
@@ -241,7 +241,7 @@
 
                 <div class="form-group">
                     <label class="form-label">Current Status</label>
-                    <input type="text" class="form-input" value="Hoạt động" readonly style="font-weight: 700;">
+                    <input type="text" class="form-input" value="Hoáº¡t Ä‘á»™ng" readonly style="font-weight: 700;">
                 </div>
 
                 <div class="form-actions">
@@ -252,5 +252,14 @@
         </div>
     </main>
 
+<div class="phms-account-entry" style="position:fixed; top:16px; right:20px; z-index:1200;">
+    <a href="${pageContext.request.contextPath}/logout" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;color:#334155;text-decoration:none;font-size:13px;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.05);">Sign Out</a>
+</div>
+<script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+

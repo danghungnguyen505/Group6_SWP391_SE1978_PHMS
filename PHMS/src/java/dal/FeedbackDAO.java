@@ -191,7 +191,7 @@ public class FeedbackDAO extends DBContext {
      */
     public List<Feedback> getFeedbacksByOwner(int ownerId) {
         List<Feedback> list = new ArrayList<>();
-        String sql = "SELECT f.feedback_id, f.appt_id, f.rating, f.comment, " +
+        String sql = "SELECT f.feedback_id, f.appt_id, f.rating, f.comment, f.status, " +
                      "u.full_name AS customer_name, p.name AS pet_name, " +
                      "FORMAT(a.start_time, 'dd/MM/yyyy HH:mm') AS appt_date " +
                      "FROM Feedback f " +
@@ -226,7 +226,8 @@ public class FeedbackDAO extends DBContext {
                      "JOIN Pet p ON a.pet_id = p.pet_id " +
                      "JOIN Users u ON a.vet_id = u.user_id " +
                      "WHERE p.owner_id = ? AND a.status = 'Completed' " +
-                     "AND NOT EXISTS (SELECT 1 FROM Feedback f WHERE f.appt_id = a.appt_id) " +
+                     "AND (NOT EXISTS (SELECT 1 FROM Feedback f WHERE f.appt_id = a.appt_id) " +
+                     "OR EXISTS (SELECT 1 FROM Feedback f WHERE f.appt_id = a.appt_id AND f.status = 'New')) " +
                      "ORDER BY a.start_time DESC";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, ownerId);
@@ -245,6 +246,55 @@ public class FeedbackDAO extends DBContext {
             System.out.println("Error getAppointmentsForFeedback: " + e.getMessage());
         }
         return list;
+    }
+
+    /**
+     * Get existing feedback for a specific appointment of an owner.
+     */
+    public Feedback getFeedbackByAppointmentAndOwner(int apptId, int ownerId) {
+        String sql = "SELECT TOP 1 f.feedback_id, f.appt_id, f.rating, f.comment, f.status, " +
+                     "u.full_name AS customer_name, p.name AS pet_name, " +
+                     "FORMAT(a.start_time, 'dd/MM/yyyy HH:mm') AS appt_date " +
+                     "FROM Feedback f " +
+                     "JOIN Appointment a ON f.appt_id = a.appt_id " +
+                     "JOIN Pet p ON a.pet_id = p.pet_id " +
+                     "JOIN PetOwner po ON p.owner_id = po.user_id " +
+                     "JOIN Users u ON po.user_id = u.user_id " +
+                     "WHERE f.appt_id = ? AND p.owner_id = ?";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, apptId);
+            st.setInt(2, ownerId);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return mapFeedback(rs);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getFeedbackByAppointmentAndOwner: " + e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * Allow owner to overwrite feedback only when current status is New.
+     */
+    public boolean updateFeedbackIfNew(int apptId, int ownerId, int rating, String comment) {
+        String sql = "UPDATE f " +
+                     "SET f.rating = ?, f.comment = ? " +
+                     "FROM Feedback f " +
+                     "JOIN Appointment a ON f.appt_id = a.appt_id " +
+                     "JOIN Pet p ON a.pet_id = p.pet_id " +
+                     "WHERE f.appt_id = ? AND p.owner_id = ? AND f.status = 'New'";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, rating);
+            st.setString(2, comment);
+            st.setInt(3, apptId);
+            st.setInt(4, ownerId);
+            return st.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Error updateFeedbackIfNew: " + e.getMessage());
+            return false;
+        }
     }
     
     private Feedback mapFeedback(ResultSet rs) throws SQLException {

@@ -1,4 +1,4 @@
-<%--
+﻿<%--
     Document   : myAppointment
     Created on : Jan 31, 2026
     Author     : zoxy4
@@ -56,7 +56,7 @@
                 <table class="table-custom">
                     <thead>
                         <tr>
-                            <th>#ID</th>
+                            <th>STT</th>
                             <th>${t_date_time}</th>
                             <th>${t_pet}</th>
                             <th>${t_service}</th>
@@ -67,9 +67,12 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <c:forEach items="${upcomingList}" var="u">
+                        <c:forEach items="${upcomingList}" var="u" varStatus="st">
                             <tr>
-                                <td><b>#${u.apptId}</b></td>
+                                <td>
+                                    <b>${st.count}</b>
+                                    <input type="hidden" name="apptId" value="${u.apptId}">
+                                </td>
                                 <td>
                                     <i class="fa-regular fa-calendar"></i> <fmt:formatDate value="${u.startTime}" pattern="dd-MM-yyyy HH:mm"/>
                                 </td>
@@ -143,7 +146,7 @@
                 <table class="table-custom">
                     <thead>
                         <tr>
-                            <th>#ID</th>
+                            <th>STT</th>
                             <th>${t_date_time}</th>
                             <th>${t_pet}</th>
                             <th>${t_service}</th>
@@ -152,9 +155,12 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <c:forEach items="${historyList}" var="h">
+                        <c:forEach items="${historyList}" var="h" varStatus="st">
                             <tr>
-                                <td>#${h.apptId}</td>
+                                <td>
+                                    <c:out value="${(currentPage - 1) * pageSize + st.count}" />
+                                    <input type="hidden" name="apptId" value="${h.apptId}">
+                                </td>
                                 <td style="color: #666;">
                                     <fmt:formatDate value="${h.startTime}" pattern="dd-MM-yyyy HH:mm"/>
                                 </td>
@@ -168,9 +174,9 @@
                                     <c:if test="${h.status == 'Completed'}">
                                         <c:choose>
                                             <c:when test="${feedbackedApptIds.contains(h.apptId)}">
-                                                <span style="display:inline-flex; align-items:center; gap:4px; margin-top:5px; font-size:12px; color:#059669; background:#d1fae5; padding:3px 10px; border-radius:20px; font-weight:600;">
+                                                <a href="${pageContext.request.contextPath}/feedback/create?apptId=${h.apptId}" style="display:inline-flex; align-items:center; gap:4px; margin-top:5px; font-size:12px; color:#059669; background:#d1fae5; padding:3px 10px; border-radius:20px; font-weight:600; text-decoration:none;">
                                                     <i class="fa-solid fa-check-circle"></i> ${t_reviewed}
-                                                </span>
+                                                </a>
                                             </c:when>
                                             <c:otherwise>
                                                 <a href="${pageContext.request.contextPath}/feedback/create?apptId=${h.apptId}"
@@ -190,14 +196,24 @@
             <!--Paging của History-->           
             <c:if test="${totalPages > 1}">
                 <div class="pagination-container">
+                    <form method="get" action="${pageContext.request.contextPath}/myAppointment" style="display:flex; align-items:center; gap:8px; margin-right:auto;">
+                        <span style="font-size:12px; color:#64748b; font-weight:700;">Hiển thị</span>
+                        <select name="size" onchange="this.form.submit()" style="padding:6px 10px; border:1px solid #d1d5db; border-radius:8px; font-size:12px;">
+                            <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
+                            <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
+                            <option value="20" ${pageSize == 20 ? 'selected' : ''}>20</option>
+                            <option value="50" ${pageSize == 50 ? 'selected' : ''}>50</option>
+                            <option value="100" ${pageSize == 100 ? 'selected' : ''}>100</option>
+                        </select>
+                    </form>
                     <!-- Previous -->
                     <c:if test="${currentPage > 1}">
-                        <a href="?page=${currentPage - 1}" class="page-link">
+                        <a href="?page=${currentPage - 1}&size=${pageSize}" class="page-link">
                             <i class="fa-solid fa-chevron-left"></i>
                         </a>
                     </c:if>
                     <!-- Trang 1 -->
-                    <a href="?page=1" class="page-link ${currentPage == 1 ? 'active' : ''}">1</a>
+                    <a href="?page=1&size=${pageSize}" class="page-link ${currentPage == 1 ? 'active' : ''}">1</a>
                     <!-- Dấu ... bên trái -->
                     <c:if test="${currentPage > 4}">
                         <span class="page-dots">...</span>
@@ -205,7 +221,7 @@
                     <!-- Vòng lặp các trang ở giữa (Current - 2 đến Current + 2) -->
                     <c:forEach begin="2" end="${totalPages - 1}" var="i">
                         <c:if test="${i >= currentPage - 2 && i <= currentPage + 2}">
-                            <a href="?page=${i}" class="page-link ${currentPage == i ? 'active' : ''}">
+                            <a href="?page=${i}&size=${pageSize}" class="page-link ${currentPage == i ? 'active' : ''}">
                                 ${i}
                             </a>
                         </c:if>
@@ -216,13 +232,13 @@
                     </c:if>
                     <!-- Trang cuối (nếu tổng trang > 1) -->
                     <c:if test="${totalPages > 1}">
-                        <a href="?page=${totalPages}" class="page-link ${currentPage == totalPages ? 'active' : ''}">
+                        <a href="?page=${totalPages}&size=${pageSize}" class="page-link ${currentPage == totalPages ? 'active' : ''}">
                             ${totalPages}
                         </a>
                     </c:if>
                     <!-- Next -->
                     <c:if test="${currentPage < totalPages}">
-                        <a href="?page=${currentPage + 1}" class="page-link">
+                        <a href="?page=${currentPage + 1}&size=${pageSize}" class="page-link">
                             <i class="fa-solid fa-chevron-right"></i>
                         </a>
                     </c:if>   
@@ -240,5 +256,10 @@
                 </div>
         </main>
         <script src="${pageContext.request.contextPath}/assets/js/myAppointment.js"></script>
-    </body>
+    <script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
+</body>
 </html>

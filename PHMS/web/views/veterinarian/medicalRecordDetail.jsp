@@ -1,4 +1,4 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
@@ -821,10 +821,24 @@ Doctor Note: ${h.treatmentPlan}</textarea>
                                 </div>
 
                                 <c:if test="${historyTotalPages > 1}">
-                                    <div class="history-pagination">
+                                    <div class="history-pagination" style="justify-content:space-between; flex-wrap:wrap; gap:10px;">
+                                        <form method="get" action="${pageContext.request.contextPath}/veterinarian/emr/detail" style="display:flex; align-items:center; gap:8px;">
+                                            <input type="hidden" name="id" value="${record.recordId}" />
+                                            <input type="hidden" name="historyPage" value="1" />
+                                            <span style="font-size:12px; color:#64748b; font-weight:700;">Hiển thị</span>
+                                            <select name="historySize" onchange="this.form.submit()" style="padding:6px 10px; border:1px solid #d1d5db; border-radius:8px; font-size:12px;">
+                                                <option value="5" ${historyPageSize == 5 ? 'selected' : ''}>5</option>
+                                                <option value="10" ${historyPageSize == 10 ? 'selected' : ''}>10</option>
+                                                <option value="20" ${historyPageSize == 20 ? 'selected' : ''}>20</option>
+                                                <option value="50" ${historyPageSize == 50 ? 'selected' : ''}>50</option>
+                                                <option value="100" ${historyPageSize == 100 ? 'selected' : ''}>100</option>
+                                            </select>
+                                        </form>
+                                        <div style="display:flex; gap:6px; align-items:center;">
                                         <c:url var="historyPrevUrl" value="/veterinarian/emr/detail">
                                             <c:param name="id" value="${record.recordId}" />
                                             <c:param name="historyPage" value="${historyCurrentPage - 1}" />
+                                            <c:param name="historySize" value="${historyPageSize}" />
                                         </c:url>
                                         <a class="history-page-btn ${historyCurrentPage <= 1 ? 'disabled' : ''}" href="${historyPrevUrl}">
                                             <i class="fa-solid fa-chevron-left"></i>
@@ -834,6 +848,7 @@ Doctor Note: ${h.treatmentPlan}</textarea>
                                             <c:url var="historyPageUrl" value="/veterinarian/emr/detail">
                                                 <c:param name="id" value="${record.recordId}" />
                                                 <c:param name="historyPage" value="${i}" />
+                                                <c:param name="historySize" value="${historyPageSize}" />
                                             </c:url>
                                             <a class="history-page-btn ${historyCurrentPage == i ? 'active' : ''}" href="${historyPageUrl}">${i}</a>
                                         </c:forEach>
@@ -841,10 +856,12 @@ Doctor Note: ${h.treatmentPlan}</textarea>
                                         <c:url var="historyNextUrl" value="/veterinarian/emr/detail">
                                             <c:param name="id" value="${record.recordId}" />
                                             <c:param name="historyPage" value="${historyCurrentPage + 1}" />
+                                            <c:param name="historySize" value="${historyPageSize}" />
                                         </c:url>
                                         <a class="history-page-btn ${historyCurrentPage >= historyTotalPages ? 'disabled' : ''}" href="${historyNextUrl}">
                                             <i class="fa-solid fa-chevron-right"></i>
                                         </a>
+                                        </div>
                                     </div>
                                 </c:if>
                             </div>
@@ -1225,6 +1242,12 @@ Doctor Note: ${h.treatmentPlan}</textarea>
                 }
             };
         </script>
-    </body>
+    <script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
+</body>
 </html>
+
 

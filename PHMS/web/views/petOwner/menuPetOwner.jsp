@@ -65,7 +65,7 @@
                             </c:if>
                             <c:forEach items="${services}" var="s">
                                 <option value="${s.name}" ${param.serviceType == s.name ? 'selected' : ''}>
-                                    ${s.name} - <fmt:formatNumber value="${s.basePrice}" pattern="#,###"/>₫
+                                    ${s.name} - <fmt:formatNumber value="${s.basePrice}" pattern="#,###"/>&#8363;
                                 </option>
                             </c:forEach>
                         </select>
@@ -145,5 +145,11 @@
                 </div>
             </form>
         </main>
-    </body>
+    <script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
+</body>
 </html>
+

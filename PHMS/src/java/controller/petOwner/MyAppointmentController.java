@@ -63,7 +63,7 @@ public class MyAppointmentController extends HttpServlet {
 
         // Pagination for history
         int page = 1;
-        int pageSize = 5;
+        int pageSize = PaginationUtils.normalizePageSize(request.getParameter("size"), 5);
         if (request.getParameter("page") != null) {
             try {
                 page = Integer.parseInt(request.getParameter("page"));
@@ -79,6 +79,7 @@ public class MyAppointmentController extends HttpServlet {
         request.setAttribute("historyList", paginatedHistory);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("currentPage", page);
+        request.setAttribute("pageSize", pageSize);
         request.getRequestDispatcher("/views/petOwner/myAppointment.jsp").forward(request, response);
     }
 

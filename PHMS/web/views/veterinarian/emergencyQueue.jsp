@@ -22,52 +22,42 @@
                             <h1 class="mgmt-title">My emergency queue</h1>
                             <p class="mgmt-subtitle">Emergency cases have been triaged and assigned to you.</p>
                         </div>
+                        <a href="${pageContext.request.contextPath}/logout"
+                           class="btn"
+                           style="padding:8px 14px; border:1px solid #d1d5db; border-radius:8px; text-decoration:none; color:#334155; background:#fff; font-size:13px; font-weight:600;">
+                            <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+                        </a>
                     </header>
 
                     <!-- Search -->
                     <form method="get" action="${pageContext.request.contextPath}/veterinarian/emergency/queue" style="display:flex; gap:8px; margin-bottom:16px;">
                         <input type="text" name="search" placeholder="Search by pet, owner..."
                                value="${search}" style="flex:1; padding:8px 12px; border:1px solid #d1d5db; border-radius:6px;">
-                        <input type="hidden" name="filter" value="${filter}">
+                        <input type="hidden" name="size" value="${pageSize}">
+                        <select name="filter" onchange="this.form.submit()" style="padding:8px 12px; border:1px solid #d1d5db; border-radius:6px; min-width:140px;">
+                            <option value="all" ${filter == 'all' ? 'selected' : ''}>All status</option>
+                            <option value="Pending" ${filter == 'Pending' ? 'selected' : ''}>Pending</option>
+                            <option value="Confirmed" ${filter == 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+                            <option value="In-Progress" ${filter == 'In-Progress' ? 'selected' : ''}>In Progress</option>
+                            <option value="Completed" ${filter == 'Completed' ? 'selected' : ''}>Completed</option>
+                        </select>
+                        <select name="level" onchange="this.form.submit()" style="padding:8px 12px; border:1px solid #d1d5db; border-radius:6px; min-width:140px;">
+                            <option value="all" ${level == 'all' ? 'selected' : ''}>All levels</option>
+                            <option value="Critical" ${level == 'Critical' ? 'selected' : ''}>Critical</option>
+                            <option value="High" ${level == 'High' ? 'selected' : ''}>High</option>
+                            <option value="Medium" ${level == 'Medium' ? 'selected' : ''}>Medium</option>
+                            <option value="Low" ${level == 'Low' ? 'selected' : ''}>Low</option>
+                        </select>
                         <button type="submit" class="btn btn-approve">
                             <i class="fa-solid fa-search"></i> Search
                         </button>
                         <c:if test="${not empty search}">
                             <a class="btn btn-reject" style="text-decoration:none; background:#e5e7eb;color:#111827;"
-                               href="${pageContext.request.contextPath}/veterinarian/emergency/queue?filter=${filter}">
+                               href="${pageContext.request.contextPath}/veterinarian/emergency/queue?filter=${filter}&level=${level}&size=${pageSize}">
                                 <i class="fa-solid fa-times"></i> Clear
                             </a>
                         </c:if>
                     </form>
-
-                    <!-- Filter Tabs -->
-                    <div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
-                        <a style="padding:8px 16px; border-radius:20px; font-weight:500; text-decoration:none; font-size:13px;
-                           ${filter == 'all' ? 'background:#16a34a;color:#fff;' : 'background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;'}"
-                           href="${pageContext.request.contextPath}/veterinarian/emergency/queue?filter=all">
-                            All
-                        </a>
-                        <a style="padding:8px 16px; border-radius:20px; font-weight:500; text-decoration:none; font-size:13px;
-                           ${filter == 'Pending' ? 'background:#16a34a;color:#fff;' : 'background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;'}"
-                           href="${pageContext.request.contextPath}/veterinarian/emergency/queue?filter=Pending">
-                            Pending
-                        </a>
-                        <a style="padding:8px 16px; border-radius:20px; font-weight:500; text-decoration:none; font-size:13px;
-                           ${filter == 'Confirmed' ? 'background:#16a34a;color:#fff;' : 'background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;'}"
-                           href="${pageContext.request.contextPath}/veterinarian/emergency/queue?filter=Confirmed">
-                            Confirmed
-                        </a>
-                        <a style="padding:8px 16px; border-radius:20px; font-weight:500; text-decoration:none; font-size:13px;
-                           ${filter == 'In-Progress' ? 'background:#16a34a;color:#fff;' : 'background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;'}"
-                           href="${pageContext.request.contextPath}/veterinarian/emergency/queue?filter=In-Progress">
-                            In Progress
-                        </a>
-                        <a style="padding:8px 16px; border-radius:20px; font-weight:500; text-decoration:none; font-size:13px;
-                           ${filter == 'Completed' ? 'background:#16a34a;color:#fff;' : 'background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;'}"
-                           href="${pageContext.request.contextPath}/veterinarian/emergency/queue?filter=Completed">
-                            Completed
-                        </a>
-                    </div>
 
                     <c:if test="${empty appointments}">
                         <p>There are currently no emergency cases in the waiting list.</p>
@@ -93,7 +83,7 @@
                                         <c:set var="triage" value="${triageMap[a.apptId]}" />
                                         <tr>
                                             <td style="display:none;">${a.apptId}</td>
-                                            <td>${(currentPage - 1) * 10 + loop.index + 1}</td>
+                                            <td>${(currentPage - 1) * pageSize + loop.index + 1}</td>
                                             <td>${a.petName}</td>
                                             <td>${a.ownerName}</td>
                                             <td>${a.startTime}</td>
@@ -135,11 +125,29 @@
                                             <td style="text-align:center;">
                                                 <c:choose>
                                                     <c:when test="${a.status eq 'In-Progress'}">
-                                                        <a href="${pageContext.request.contextPath}/veterinarian/emergency/complete?apptId=${a.apptId}"
-                                                           class="btn"
-                                                           style="padding:6px 12px; font-size:12px; background:#2563eb; color:#fff; border:none; border-radius:6px; text-decoration:none;">
-                                                            Complete
-                                                        </a>
+                                                        <div style="display:flex; gap:6px; justify-content:center; flex-wrap:wrap;">
+                                                            <c:choose>
+                                                                <c:when test="${not empty recordIdMap[a.apptId]}">
+                                                                    <a href="${pageContext.request.contextPath}/veterinarian/emr/detail?id=${recordIdMap[a.apptId]}"
+                                                                       class="btn"
+                                                                       style="padding:6px 12px; font-size:12px; background:#10b981; color:#fff; border:none; border-radius:6px; text-decoration:none;">
+                                                                        Open EMR
+                                                                    </a>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <a href="${pageContext.request.contextPath}/veterinarian/emr/submit?apptId=${a.apptId}"
+                                                                       class="btn"
+                                                                       style="padding:6px 12px; font-size:12px; background:#10b981; color:#fff; border:none; border-radius:6px; text-decoration:none;">
+                                                                        Create EMR
+                                                                    </a>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                            <a href="${pageContext.request.contextPath}/veterinarian/emergency/complete?apptId=${a.apptId}"
+                                                               class="btn"
+                                                               style="padding:6px 12px; font-size:12px; background:#2563eb; color:#fff; border:none; border-radius:6px; text-decoration:none;">
+                                                                Complete
+                                                            </a>
+                                                        </div>
                                                     </c:when>
                                                     <c:when test="${a.status eq 'Completed'}">
                                                         <span style="color:#94a3b8;font-size:12px;">-</span>
@@ -166,28 +174,50 @@
 
                     <c:if test="${totalPages > 1}">
                         <c:set var="filterParam" value="&filter=${filter}" />
+                        <c:set var="levelParam" value="&level=${level}" />
+                        <c:set var="sizeParam" value="&size=${pageSize}" />
                         <c:set var="searchParam" value="${not empty search ? '&search='.concat(search) : ''}" />
-                        <div style="display:flex; gap:6px; justify-content:flex-end; margin-top:12px;">
+                        <div style="display:flex; gap:6px; justify-content:space-between; margin-top:12px; align-items:center; flex-wrap:wrap;">
+                            <form method="get" action="${pageContext.request.contextPath}/veterinarian/emergency/queue" style="display:flex; align-items:center; gap:8px;">
+                                <input type="hidden" name="filter" value="${filter}">
+                                <input type="hidden" name="level" value="${level}">
+                                <input type="hidden" name="search" value="${search}">
+                                <span style="font-size:12px; color:#64748b; font-weight:700;">Hiển thị</span>
+                                <select name="size" onchange="this.form.submit()" style="padding:6px 10px; border:1px solid #d1d5db; border-radius:8px; font-size:12px;">
+                                    <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
+                                    <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
+                                    <option value="20" ${pageSize == 20 ? 'selected' : ''}>20</option>
+                                    <option value="50" ${pageSize == 50 ? 'selected' : ''}>50</option>
+                                    <option value="100" ${pageSize == 100 ? 'selected' : ''}>100</option>
+                                </select>
+                            </form>
+                            <div style="display:flex; gap:6px; justify-content:flex-end;">
                             <c:if test="${currentPage > 1}">
-                                <a class="btn btn-approve" style="text-decoration:none;" href="?page=${currentPage - 1}${filterParam}${searchParam}">
+                                <a class="btn btn-approve" style="text-decoration:none;" href="?page=${currentPage - 1}${sizeParam}${filterParam}${levelParam}${searchParam}">
                                     <i class="fa-solid fa-chevron-left"></i>
                                 </a>
                             </c:if>
                             <c:forEach begin="1" end="${totalPages}" var="i">
                                 <a class="btn ${currentPage == i ? 'btn-approve' : 'btn-secondary'}"
                                    style="text-decoration:none;"
-                                   href="?page=${i}${filterParam}${searchParam}">${i}</a>
+                                   href="?page=${i}${sizeParam}${filterParam}${levelParam}${searchParam}">${i}</a>
                             </c:forEach>
                             <c:if test="${currentPage < totalPages}">
-                                <a class="btn btn-approve" style="text-decoration:none;" href="?page=${currentPage + 1}${filterParam}${searchParam}">
+                                <a class="btn btn-approve" style="text-decoration:none;" href="?page=${currentPage + 1}${sizeParam}${filterParam}${levelParam}${searchParam}">
                                     <i class="fa-solid fa-chevron-right"></i>
                                 </a>
                             </c:if>
+                            </div>
                         </div>
                     </c:if>
                 </div>
             </div>
         </main>
+        <script>
+            window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+            window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+        </script>
+        <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
     </body>
 </html>
 

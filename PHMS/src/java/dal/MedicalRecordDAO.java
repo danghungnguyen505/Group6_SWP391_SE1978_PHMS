@@ -81,6 +81,95 @@ public class MedicalRecordDAO extends DBContext {
     }
 
     /**
+     * Ensure medical record exists for an appointment owned by vet.
+     * Rules:
+     * - If record already exists: return it.
+     * - If appointment is Checked-in: create record and move appointment to In-Progress.
+     * - If appointment is In-Progress: create record and keep status.
+     * Returns record_id, or -1 when appointment is invalid/not owned/not eligible.
+     */
+    public int createOrGetForVetByAppointment(int apptId, int vetId, String diagnosis, String treatmentPlan) throws SQLException {
+        String existingSql = "SELECT TOP 1 mr.record_id "
+                + "FROM MedicalRecord mr "
+                + "JOIN Appointment a ON mr.appt_id = a.appt_id "
+                + "WHERE mr.appt_id = ? AND a.vet_id = ? "
+                + "ORDER BY mr.record_id DESC";
+        String checkApptSql = "SELECT status FROM Appointment WHERE appt_id = ? AND vet_id = ? AND status IN ('Checked-in','In-Progress')";
+        String insertSql = "INSERT INTO MedicalRecord (appt_id, diagnosis, treatment_plan) VALUES (?, ?, ?)";
+        String updateToInProgressSql = "UPDATE Appointment SET status = 'In-Progress' WHERE appt_id = ? AND vet_id = ? AND status = 'Checked-in'";
+
+        boolean oldAutoCommit = connection.getAutoCommit();
+        try {
+            connection.setAutoCommit(false);
+
+            try (PreparedStatement ex = connection.prepareStatement(existingSql)) {
+                ex.setInt(1, apptId);
+                ex.setInt(2, vetId);
+                try (ResultSet rs = ex.executeQuery()) {
+                    if (rs.next()) {
+                        connection.commit();
+                        return rs.getInt("record_id");
+                    }
+                }
+            }
+
+            String status = null;
+            try (PreparedStatement chk = connection.prepareStatement(checkApptSql)) {
+                chk.setInt(1, apptId);
+                chk.setInt(2, vetId);
+                try (ResultSet rs = chk.executeQuery()) {
+                    if (rs.next()) {
+                        status = rs.getString("status");
+                    } else {
+                        connection.rollback();
+                        return -1;
+                    }
+                }
+            }
+
+            int recordId = -1;
+            try (PreparedStatement ins = connection.prepareStatement(insertSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                ins.setInt(1, apptId);
+                ins.setString(2, diagnosis);
+                ins.setString(3, treatmentPlan);
+                if (ins.executeUpdate() <= 0) {
+                    connection.rollback();
+                    return -1;
+                }
+                try (ResultSet rs = ins.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        recordId = rs.getInt(1);
+                    }
+                }
+            }
+
+            if (recordId <= 0) {
+                connection.rollback();
+                return -1;
+            }
+
+            if ("Checked-in".equalsIgnoreCase(status)) {
+                try (PreparedStatement up = connection.prepareStatement(updateToInProgressSql)) {
+                    up.setInt(1, apptId);
+                    up.setInt(2, vetId);
+                    if (up.executeUpdate() <= 0) {
+                        connection.rollback();
+                        return -1;
+                    }
+                }
+            }
+
+            connection.commit();
+            return recordId;
+        } catch (SQLException e) {
+            connection.rollback();
+            throw e;
+        } finally {
+            connection.setAutoCommit(oldAutoCommit);
+        }
+    }
+
+    /**
      * Get medical record detail for vet (must own appointment).
      */
     public MedicalRecord getByIdForVet(int recordId, int vetId) {

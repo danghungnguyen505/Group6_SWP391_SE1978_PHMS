@@ -38,7 +38,7 @@ public class UserDAO extends DBContext {
     public User checkLogin(String username, String password) {
         String sql = "SELECT u.*, p.address, p.email FROM Users u " +
                      "LEFT JOIN PetOwner p ON u.user_id = p.user_id " +
-                     "WHERE u.username = ?";
+                     "WHERE u.username = ? AND ISNULL(u.is_active, 1) = 1";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, username);
@@ -73,6 +73,24 @@ public class UserDAO extends DBContext {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * Check whether a username exists but is inactive/locked.
+     */
+    public boolean isLockedUser(String username) {
+        String sql = "SELECT TOP 1 ISNULL(is_active, 1) AS is_active FROM Users WHERE username = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("is_active") == 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error isLockedUser: " + e.getMessage());
+        }
+        return false;
     }
 
     public boolean checkUsernameExists(String username) {

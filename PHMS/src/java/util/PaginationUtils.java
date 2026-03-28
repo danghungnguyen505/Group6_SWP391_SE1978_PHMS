@@ -11,6 +11,20 @@ import java.util.List;
  * @author zoxy4
  */
 public class PaginationUtils {
+    public static int normalizePageSize(String raw, int defaultSize) {
+        if (raw == null || raw.trim().isEmpty()) {
+            return defaultSize;
+        }
+        try {
+            int parsed = Integer.parseInt(raw.trim());
+            if (parsed == 5 || parsed == 10 || parsed == 20 || parsed == 50 || parsed == 100) {
+                return parsed;
+            }
+        } catch (NumberFormatException ignored) {
+        }
+        return defaultSize;
+    }
+
     public static <T> List<T> getPage(List<T> list, int page, int pageSize) {
         if (list == null || list.isEmpty()) {
             return Collections.emptyList();

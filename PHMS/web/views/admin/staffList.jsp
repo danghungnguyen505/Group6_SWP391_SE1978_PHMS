@@ -1,4 +1,4 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -139,6 +139,17 @@
                 text-transform: uppercase;
                 box-shadow: 0 4px 15px rgba(80, 180, 152, 0.2);
                 transition: 0.2s;
+            }
+            .btn-signout {
+                padding: 10px 20px;
+                border: 1px solid #e2e8f0;
+                background: white;
+                border-radius: 10px;
+                color: var(--text-main);
+                font-weight: 700;
+                font-size: 12px;
+                text-decoration: none;
+                text-transform: uppercase;
             }
 
             /* --- TABLE CARD --- */
@@ -322,6 +333,7 @@
                 </div>
                 <div style="display:flex; gap:15px; align-items:center;">
                     <form action="${pageContext.request.contextPath}/admin/staff/list" method="get" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                        <input type="hidden" name="size" value="${pageSize}">
                         <input type="text" name="search" placeholder="Search name/username/phone/code..." 
                                value="${searchKeyword}" 
                                style="padding:8px 10px; border-radius:8px; border:1px solid #e2e8f0; font-size:13px; min-width:200px;">
@@ -350,6 +362,7 @@
                         </c:if>
                     </form>
                     <a href="${pageContext.request.contextPath}/admin/staff/create" class="btn-create">Create New</a>
+                    <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
                 </div>
             </div>
 
@@ -378,7 +391,7 @@
                             <tbody>
                                 <c:forEach var="staff" items="${staffAccounts}" varStatus="st">
                                     <tr>
-                                        <td class="col-id">${st.index + 1}</td>
+                                        <td class="col-id">${(currentPage - 1) * pageSize + st.index + 1}</td>
                                         <td class="col-username">${staff.username}</td>
                                         <td class="col-fullname">${staff.fullName}</td>
                                         <td>
@@ -490,8 +503,23 @@
                             <c:set var="searchParam" value="${not empty searchKeyword ? '&search='.concat(searchKeyword) : ''}" />
                             <c:set var="roleParam" value="${not empty roleFilter ? '&role='.concat(roleFilter) : ''}" />
                             <c:set var="statusParam" value="${not empty statusFilter ? '&status='.concat(statusFilter) : ''}" />
-                            <c:set var="queryParams" value="${searchParam.concat(roleParam).concat(statusParam)}" />
-                            <div class="pagination">
+                            <c:set var="sizeParam" value="${'&size='.concat(pageSize)}" />
+                            <c:set var="queryParams" value="${searchParam.concat(roleParam).concat(statusParam).concat(sizeParam)}" />
+                            <div class="pagination" style="justify-content:space-between; width:100%;">
+                                <form method="get" action="${pageContext.request.contextPath}/admin/staff/list" style="display:flex; align-items:center; gap:8px;">
+                                    <input type="hidden" name="search" value="${searchKeyword}">
+                                    <input type="hidden" name="role" value="${roleFilter}">
+                                    <input type="hidden" name="status" value="${statusFilter}">
+                                    <label class="page-info">Hiển thị</label>
+                                    <select name="size" style="padding:8px 10px; border-radius:8px; border:1px solid #e2e8f0; font-size:12px;" onchange="this.form.submit()">
+                                        <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
+                                        <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
+                                        <option value="20" ${pageSize == 20 ? 'selected' : ''}>20</option>
+                                        <option value="50" ${pageSize == 50 ? 'selected' : ''}>50</option>
+                                        <option value="100" ${pageSize == 100 ? 'selected' : ''}>100</option>
+                                    </select>
+                                </form>
+                                <div style="display:flex; gap:15px; align-items:center;">
                                 <c:if test="${currentPage > 1}">
                                     <a href="?page=${currentPage - 1}${queryParams}" class="btn-page">Previous</a>
                                 </c:if>
@@ -501,11 +529,17 @@
                                 <c:if test="${currentPage < totalPages}">
                                     <a href="?page=${currentPage + 1}${queryParams}" class="btn-page">Next</a>
                                 </c:if>
+                                </div>
                             </div>
                         </c:if>
                     </c:otherwise>
                 </c:choose>
             </div>
         </main>
-    </body>
+    <script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
+</body>
 </html>

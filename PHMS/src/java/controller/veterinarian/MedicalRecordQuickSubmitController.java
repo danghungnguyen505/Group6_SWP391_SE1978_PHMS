@@ -42,19 +42,17 @@ public class MedicalRecordQuickSubmitController extends HttpServlet {
 
         try {
             MedicalRecordDAO dao = new MedicalRecordDAO();
-            Integer existingRecordId = dao.getRecordIdByApptForVet(apptId, account.getUserId());
-            if (existingRecordId != null) {
-                session.setAttribute("toastMessage", "success|Opened existing medical record.");
-                response.sendRedirect(request.getContextPath() + "/veterinarian/emr/detail?id=" + existingRecordId);
-                return;
-            }
-
-            int recordId = dao.createForVetReturnId(apptId, account.getUserId(), DEFAULT_DIAGNOSIS, DEFAULT_TREATMENT_PLAN);
+            int recordId = dao.createOrGetForVetByAppointment(
+                    apptId,
+                    account.getUserId(),
+                    DEFAULT_DIAGNOSIS,
+                    DEFAULT_TREATMENT_PLAN
+            );
             if (recordId > 0) {
-                session.setAttribute("toastMessage", "success|Medical record created. Appointment moved to In-Progress.");
+                session.setAttribute("toastMessage", "success|Medical record is ready.");
                 response.sendRedirect(request.getContextPath() + "/veterinarian/emr/detail?id=" + recordId);
             } else {
-                session.setAttribute("toastMessage", "error|Cannot create medical record. Appointment may not be Checked-in or not assigned to you.");
+                session.setAttribute("toastMessage", "error|Cannot open/create medical record. Appointment may not be eligible or not assigned to you.");
                 response.sendRedirect(request.getContextPath() + "/veterinarian/emr/queue");
             }
         } catch (Exception e) {

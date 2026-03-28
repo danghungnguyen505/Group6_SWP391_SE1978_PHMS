@@ -55,7 +55,7 @@ public class ReceptionistRequestAppointmentController extends HttpServlet {
         
         // Pagination
         int page = 1;
-        int pageSize = 10;
+        int pageSize = util.PaginationUtils.normalizePageSize(request.getParameter("size"), 10);
         String pageStr = request.getParameter("page");
         if (pageStr != null && !pageStr.trim().isEmpty()) {
             try {
@@ -73,6 +73,7 @@ public class ReceptionistRequestAppointmentController extends HttpServlet {
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("totalItems", allAppointments.size());
+        request.setAttribute("pageSize", pageSize);
         request.setAttribute("filterDate", filterDate);
         request.setAttribute("filterStatus", filterStatus);
         request.setAttribute("filterVetId", filterVetIdStr);

@@ -56,7 +56,7 @@
                 <div class="alert-locked">
                     <i class="fa-solid fa-lock fa-2x mb-3"></i>
                     <h5>Action Locked</h5>
-                    <p class="mb-3">Hành động bị khóa! Bạn chỉ có thể hủy/đổi lịch khi còn <strong>ít nhất 5 tiếng</strong> trước giờ hẹn.</p>
+                    <p class="mb-3">HÃƒÂ nh Ã„â€˜Ã¡Â»â„¢ng bÃ¡Â»â€¹ khÃƒÂ³a! BÃ¡ÂºÂ¡n chÃ¡Â»â€° cÃƒÂ³ thÃ¡Â»Æ’ hÃ¡Â»Â§y/Ã„â€˜Ã¡Â»â€¢i lÃ¡Â»â€¹ch khi cÃƒÂ²n <strong>ÃƒÂ­t nhÃ¡ÂºÂ¥t 5 tiÃ¡ÂºÂ¿ng</strong> trÃ†Â°Ã¡Â»â€ºc giÃ¡Â»Â hÃ¡ÂºÂ¹n.</p>
                     <a href="${pageContext.request.contextPath}/myAppointment" class="btn btn-outline-danger">
                         <i class="fa-solid fa-arrow-left"></i> Go Back
                     </a>
@@ -91,5 +91,13 @@
         </div>
     </div>
 
+<div class="phms-account-entry" style="position:fixed; top:16px; right:20px; z-index:1200;">
+    <a href="${pageContext.request.contextPath}/logout" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;color:#334155;text-decoration:none;font-size:13px;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.05);">Sign Out</a>
+</div>
+<script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>

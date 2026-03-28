@@ -1,4 +1,4 @@
-<%-- 
+﻿<%-- 
     Document   : doctorScheduleList
     Created on : Jan 22, 2026
     Author     : Auto
@@ -162,6 +162,17 @@
 
         .btn-primary:hover {
             opacity: 0.9;
+        }
+        .btn-signout {
+            padding: 10px 20px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 10px;
+            color: var(--text-main);
+            font-weight: 700;
+            font-size: 12px;
+            text-decoration: none;
+            text-transform: uppercase;
         }
 
         /* --- CONTROLS BAR --- */
@@ -502,6 +513,7 @@
                 <a href="${pageContext.request.contextPath}/admin/doctor/schedule/add" class="btn-primary">
                     <i class="fa-solid fa-plus"></i> Thêm Lịch
                 </a>
+                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
             </div>
         </div>
 
@@ -637,5 +649,10 @@
         });
     </script>
 
+<script>
+window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
