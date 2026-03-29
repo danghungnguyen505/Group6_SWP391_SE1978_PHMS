@@ -320,25 +320,6 @@
                             </div>
 
                             <div class="form-group">
-                                <label>Breed *</label>
-                                <input type="text" name="breedNew" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Giới tính *</label>
-                                <select name="genderNew" required>
-                                    <option value="">-- Chọn --</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Ngày sinh *</label>
-                                <input type="date" name="birthDateNew" required>
-                            </div>
-
-                            <div class="form-group">
                                 <label>Cân nặng (kg) *</label>
                                 <input type="number" name="weightNew" step="0.1" min="0.1" required>
                             </div>
@@ -497,6 +478,7 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+
 
 
 

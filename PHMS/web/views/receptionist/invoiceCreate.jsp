@@ -584,7 +584,7 @@
                                 <img src="https://img.vietqr.io/image/techcombank-1999992707-compact.png?amount=${grandTotal}&addInfo=DH${param.apptId}&accountName=PHAM CONG HUY"
                                      alt="QR">
                             </div>
-                            <div class="qr-note">Qu?t m? QR d? thanh to?n</div>
+                            <div class="qr-note">Quét mã QR để thanh toán</div>
                         </div>
 
                         <!-- RIGHT INFO -->

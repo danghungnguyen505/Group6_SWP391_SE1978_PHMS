@@ -228,7 +228,7 @@
 
                     <select name="type" style="padding:8px 10px; border-radius:8px; border:1px solid #e2e8f0; font-size:13px;">
                         <option value="">${L == 'en' ? 'All types' : 'Tất cả loại'}</option>
-                        <option value="Basic" ${typeFilter == 'Basic' ? 'selected' : ''}>CÆ¡ báº£n</option>
+                        <option value="Basic" ${typeFilter == 'Basic' ? 'selected' : ''}>Cơ bản</option>
                         <option value="Emergency" ${typeFilter == 'Emergency' ? 'selected' : ''}>Cấp cứu</option>
                         <option value="LabTest" ${typeFilter == 'LabTest' ? 'selected' : ''}>${L == 'en' ? 'Lab test' : 'Xét nghiệm'}</option>
                     </select>

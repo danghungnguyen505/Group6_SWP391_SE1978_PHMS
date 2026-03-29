@@ -7,6 +7,8 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
+<jsp:useBean id="today" class="java.util.Date" scope="page" />
+<fmt:formatDate value="${today}" pattern="yyyy-MM-dd" var="todayYmd" />
 <!DOCTYPE html>
 <html lang="${L}">
     <head>
@@ -72,9 +74,8 @@
                     </div>
                     <div class="form-group">
                         <label>${t_select_date}</label>
-                        <input type="date" name="selectedDate" class="form-control"
-                               value="${selectedDateStr}"
-                               onchange="this.form.submit()">
+                        <input type="date" id="selectedDate" name="selectedDate" class="form-control"
+                               value="${selectedDateStr}" min="${todayYmd}">
                     </div>
                     <div class="form-group">
                         <label>${t_pref_vet}</label>
@@ -146,10 +147,40 @@
             </form>
         </main>
     <script>
-window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
-window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
-</script>
-<script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
+        (function () {
+            const dateInput = document.getElementById("selectedDate");
+            const bookingForm = document.getElementById("bookingForm");
+            const todayYmd = "${todayYmd}";
+            const dateErrorMsg = "${L == 'en' ? 'Please select today or a future date.' : 'Vui lòng chọn ngày từ hôm nay trở đi.'}";
+
+            if (!dateInput || !bookingForm) {
+                return;
+            }
+
+            dateInput.min = todayYmd;
+
+            dateInput.addEventListener("change", function () {
+                if (this.value && this.value < todayYmd) {
+                    alert(dateErrorMsg);
+                    this.value = todayYmd;
+                    return;
+                }
+                this.form.submit();
+            });
+
+            bookingForm.addEventListener("submit", function (e) {
+                if (dateInput.value && dateInput.value < todayYmd) {
+                    e.preventDefault();
+                    alert(dateErrorMsg);
+                    dateInput.focus();
+                }
+            });
+        })();
+
+        window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
+        window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
+    </script>
+    <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
 

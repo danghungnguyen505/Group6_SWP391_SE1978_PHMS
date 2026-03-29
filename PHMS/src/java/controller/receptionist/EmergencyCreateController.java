@@ -274,9 +274,6 @@ public class EmergencyCreateController extends HttpServlet {
         // New-pet info (when owner doesn't exist)
         String petNameNew = util.ValidationUtils.sanitize(request.getParameter("petNameNew"));
         String speciesNew = util.ValidationUtils.sanitize(request.getParameter("speciesNew"));
-        String breedNew = util.ValidationUtils.sanitize(request.getParameter("breedNew"));
-        String genderNew = util.ValidationUtils.sanitize(request.getParameter("genderNew"));
-        String birthDateNewStr = util.ValidationUtils.sanitize(request.getParameter("birthDateNew"));
         String weightNewStr = util.ValidationUtils.sanitize(request.getParameter("weightNew"));
         String historyNew = util.ValidationUtils.sanitize(request.getParameter("historyNew"));
         
@@ -319,29 +316,9 @@ public class EmergencyCreateController extends HttpServlet {
                 doGet(request, response);
                 return;
             }
-            if (!util.ValidationUtils.isNotEmpty(breedNew) || !util.ValidationUtils.isLengthValid(breedNew, 1, 100)) {
-                request.setAttribute("error", "Vui lòng nhập breed (1-100 ký tự).");
-                doGet(request, response);
-                return;
-            }
-            if (!("Male".equalsIgnoreCase(genderNew) || "Female".equalsIgnoreCase(genderNew))) {
-                request.setAttribute("error", "Vui lòng chọn giới tính (Male/Female).");
-                doGet(request, response);
-                return;
-            }
-            if (!util.ValidationUtils.isNotEmpty(birthDateNewStr)) {
-                request.setAttribute("error", "Vui lòng chọn ngày sinh.");
-                doGet(request, response);
-                return;
-            }
-            Date birthDateNew;
-            try {
-                birthDateNew = Date.valueOf(birthDateNewStr);
-            } catch (IllegalArgumentException ex) {
-                request.setAttribute("error", "Ngày sinh không hợp lệ.");
-                doGet(request, response);
-                return;
-            }
+            Date birthDateNew = Date.valueOf(LocalDate.now());
+            String breedNew = "Unknown";
+            String genderNew = "Unknown";
             if (!util.ValidationUtils.isPositiveNumber(weightNewStr)) {
                 request.setAttribute("error", "Vui lòng nhập cân nặng hợp lệ (>0).");
                 doGet(request, response);
@@ -487,3 +464,4 @@ public class EmergencyCreateController extends HttpServlet {
         }
     }
 }
+
