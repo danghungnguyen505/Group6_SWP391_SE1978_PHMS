@@ -3,7 +3,7 @@
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
-<html>
+<html lang="${L}">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>VetCare Pro - Lab Requests</title>
@@ -21,7 +21,7 @@
                     <h2>Lab Requests</h2>
                     <p>Track requested tests and results.</p>
                 </div>
-                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
+                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
             </div>
 
             <div class="card">
@@ -156,7 +156,7 @@
                         <form method="get" action="${pageContext.request.contextPath}/veterinarian/lab/requests" style="display:flex; align-items:center; gap:8px;">
                             <input type="hidden" name="filter" value="${filter}">
                             <input type="hidden" name="search" value="${search}">
-                            <span style="font-size:12px; color:#64748b; font-weight:700;">Hiển thị</span>
+                            <span style="font-size:12px; color:#64748b; font-weight:700;">${L == 'en' ? 'Showing' : 'Hiển thị'}</span>
                             <select name="size" onchange="this.form.submit()" style="padding:6px 10px; border:1px solid #d1d5db; border-radius:8px; font-size:12px;">
                                 <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
                                 <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
@@ -261,5 +261,6 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+
 
 

@@ -1,9 +1,10 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page pageEncoding="UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="${L}">
     <head>
         <meta charset="UTF-8">
         <title>VetCare Pro - PHÊ DUYỆT NGHỈ PHÉP</title>
@@ -301,20 +302,20 @@
         <main class="main-content">
             <header class="page-header">
                 <div>
-                    <h1>Leave Management</h1>
-                    <p>Review and manage staff absence requests.</p>
+                    <h1>${L == 'en' ? 'Leave Management' : 'Quản lý nghỉ phép'}</h1>
+                    <p>${L == 'en' ? 'Review and manage staff absence requests.' : 'Xem và xử lý đơn nghỉ phép của nhân viên.'}</p>
                 </div>
-                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
+                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
             </header>
 
             <!-- Filter & Search Bar (Single Row) -->
             <div class="filter-bar" style="margin-bottom: 25px;">
                 <!-- Filter Tabs -->
                 <div class="filter-tabs">
-                    <a href="${pageContext.request.contextPath}/leavePending?status=all&search=${search}&size=${pageSize}" class="filter-tab ${statusFilter == 'all' ? 'active' : ''}">All</a>
-                    <a href="${pageContext.request.contextPath}/leavePending?status=Pending&search=${search}&size=${pageSize}" class="filter-tab ${statusFilter == 'Pending' ? 'active' : ''}">Pending</a>
-                    <a href="${pageContext.request.contextPath}/leavePending?status=Approved&search=${search}&size=${pageSize}" class="filter-tab ${statusFilter == 'Approved' ? 'active' : ''}">Approved</a>
-                    <a href="${pageContext.request.contextPath}/leavePending?status=Rejected&search=${search}&size=${pageSize}" class="filter-tab ${statusFilter == 'Rejected' ? 'active' : ''}">Rejected</a>
+                    <a href="${pageContext.request.contextPath}/leavePending?status=all&search=${search}&size=${pageSize}" class="filter-tab ${statusFilter == 'all' ? 'active' : ''}">${L == 'en' ? 'All' : 'Tất cả'}</a>
+                    <a href="${pageContext.request.contextPath}/leavePending?status=Pending&search=${search}&size=${pageSize}" class="filter-tab ${statusFilter == 'Pending' ? 'active' : ''}">${L == 'en' ? 'Pending' : 'Đang chờ'}</a>
+                    <a href="${pageContext.request.contextPath}/leavePending?status=Approved&search=${search}&size=${pageSize}" class="filter-tab ${statusFilter == 'Approved' ? 'active' : ''}">${L == 'en' ? 'Approved' : 'Đã duyệt'}</a>
+                    <a href="${pageContext.request.contextPath}/leavePending?status=Rejected&search=${search}&size=${pageSize}" class="filter-tab ${statusFilter == 'Rejected' ? 'active' : ''}">${L == 'en' ? 'Rejected' : 'Từ chối'}</a>
                 </div>
 
                 <!-- Search -->
@@ -323,10 +324,10 @@
                     <input type="hidden" name="size" value="${pageSize}">
                     <div class="search-box" style="flex: 0 1 300px;">
                         <i class="fa-solid fa-search"></i>
-                        <input type="text" name="search" value="${search}" placeholder="Search by employee name...">
+                        <input type="text" name="search" value="${search}" placeholder="${L == 'en' ? 'Search by employee name...' : 'Tìm theo tên nhân viên...'}">
                     </div>
                     <button type="submit" class="btn-approve" style="padding: 12px 24px; font-size: 12px;">
-                        <i class="fa-solid fa-search"></i> Search
+                        <i class="fa-solid fa-search"></i> ${L == 'en' ? 'Search' : 'Tìm kiếm'}
                     </button>
                 </form>
             </div>
@@ -336,7 +337,7 @@
                     <c:when test="${empty requests}">
                         <div style="text-align:center; padding:60px; color:var(--text-muted);">
                             <i class="fa-solid fa-calendar-xmark" style="font-size: 48px; margin-bottom: 20px; opacity: 0.3;"></i>
-                            <p>No leave requests found.</p>
+                            <p>${L == 'en' ? 'No leave requests found.' : 'Không tìm thấy đơn nghỉ phép nào.'}</p>
                         </div>
                     </c:when>
                     <c:otherwise>
@@ -344,11 +345,11 @@
                             <thead>
                                 <tr>
                                     <th class="col-id">STT</th>
-                                    <th>Employee</th>
-                                    <th>Leave Date</th>
-                                    <th>Reason</th>
-                                    <th>Status</th>
-                                    <th style="text-align:right;">Action</th>
+                                    <th>${L == 'en' ? 'Employee' : 'Nhân viên'}</th>
+                                    <th>${L == 'en' ? 'Leave Date' : 'Ngày nghỉ'}</th>
+                                    <th>${L == 'en' ? 'Reason' : 'Lý do'}</th>
+                                    <th>${L == 'en' ? 'Status' : 'Trạng thái'}</th>
+                                    <th style="text-align:right;">${L == 'en' ? 'Action' : 'Thao tác'}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -362,9 +363,9 @@
                                         <td class="col-reason">${r.reason}</td>
                                         <td>
                                             <c:choose>
-                                                <c:when test="${r.status == 'Pending'}"><span class="badge bg-pending">Pending</span></c:when>
-                                                <c:when test="${r.status == 'Approved'}"><span class="badge bg-approved">Approved</span></c:when>
-                                                <c:when test="${r.status == 'Rejected'}"><span class="badge bg-rejected">Rejected</span></c:when>
+                                                <c:when test="${r.status == 'Pending'}"><span class="badge bg-pending">${L == 'en' ? 'Pending' : 'Đang chờ'}</span></c:when>
+                                                <c:when test="${r.status == 'Approved'}"><span class="badge bg-approved">${L == 'en' ? 'Approved' : 'Đã duyệt'}</span></c:when>
+                                                <c:when test="${r.status == 'Rejected'}"><span class="badge bg-rejected">${L == 'en' ? 'Rejected' : 'Từ chối'}</span></c:when>
                                                 <c:otherwise><span class="badge">${r.status}</span></c:otherwise>
                                             </c:choose>
                                         </td>
@@ -374,12 +375,12 @@
                                                     <form action="${pageContext.request.contextPath}/updateLeaveStatus" method="post">
                                                         <input type="hidden" name="id" value="${r.leaveId}">
                                                         <input type="hidden" name="action" value="approve">
-                                                        <button type="submit" class="btn-approve">Approve</button>
+                                                        <button type="submit" class="btn-approve">${L == 'en' ? 'Approve' : 'Duyệt'}</button>
                                                     </form>
                                                     <form action="${pageContext.request.contextPath}/updateLeaveStatus" method="post">
                                                         <input type="hidden" name="id" value="${r.leaveId}">
                                                         <input type="hidden" name="action" value="reject">
-                                                        <button type="submit" class="btn-reject">Reject</button>
+                                                        <button type="submit" class="btn-reject">${L == 'en' ? 'Reject' : 'Từ chối'}</button>
                                                     </form>
                                                 </div>
                                             </c:if>
@@ -395,7 +396,7 @@
                                 <form method="get" action="${pageContext.request.contextPath}/leavePending" style="display:flex; gap:8px; align-items:center;">
                                     <input type="hidden" name="status" value="${statusFilter}">
                                     <input type="hidden" name="search" value="${search}">
-                                    <label style="font-size:12px; color:#64748b; font-weight:700;">Hiển thị</label>
+                                    <label style="font-size:12px; color:#64748b; font-weight:700;">${L == 'en' ? 'Showing' : 'Hiển thị'}</label>
                                     <select name="size" class="filter-select" style="min-width:90px; padding:8px 10px;" onchange="this.form.submit()">
                                         <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
                                         <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
@@ -425,3 +426,4 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+

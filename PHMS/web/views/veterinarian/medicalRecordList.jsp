@@ -3,7 +3,7 @@
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
-<html>
+<html lang="${L}">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>VetCare Pro - Medical Records</title>
@@ -432,8 +432,7 @@
                         <i class="fa-solid fa-file-circle-plus"></i> Create EMR
                     </a>
                     <a href="${pageContext.request.contextPath}/logout" class="btn-header">
-                        <i class="fa-solid fa-right-from-bracket"></i> Sign Out
-                    </a>
+                        <i class="fa-solid fa-right-from-bracket"></i>${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
                 </div>
             </div>
 
@@ -568,7 +567,7 @@
                         <form method="get" action="${pageContext.request.contextPath}/veterinarian/emr/records" style="display:flex; align-items:center; gap:8px;">
                             <input type="hidden" name="keyword" value="${keyword}" />
                             <input type="hidden" name="status" value="${statusFilter}" />
-                            <span style="font-size:12px; color:#64748b; font-weight:700;">Hiển thị</span>
+                            <span style="font-size:12px; color:#64748b; font-weight:700;">${L == 'en' ? 'Showing' : 'Hiển thị'}</span>
                             <select name="size" onchange="this.form.submit()" style="padding:6px 10px; border:1px solid #d1d5db; border-radius:8px; font-size:12px;">
                                 <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
                                 <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
@@ -631,5 +630,6 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+
 
 

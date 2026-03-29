@@ -55,7 +55,7 @@ public class StaffAccountCreateController extends HttpServlet {
         String vetType = util.ValidationUtils.sanitize(request.getParameter("vetType"));
 
         if (!util.ValidationUtils.isNotEmpty(username) || !util.ValidationUtils.isValidUsername(username)) {
-            request.setAttribute("error", "Ten dang nhap khong hop le!");
+            request.setAttribute("error", "Tên đăng nhập không hợp lệ!");
             repopulateForm(request, username, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber, vetType);
             doGet(request, response);
             return;
@@ -63,49 +63,49 @@ public class StaffAccountCreateController extends HttpServlet {
 
         dal.UserDAO userDAO = new dal.UserDAO();
         if (userDAO.checkUsernameExists(username)) {
-            request.setAttribute("error", "Ten dang nhap da ton tai!");
+            request.setAttribute("error", "Tên đăng nhập đã tồn tại!");
             repopulateForm(request, username, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber, vetType);
             doGet(request, response);
             return;
         }
 
         if (!util.ValidationUtils.isNotEmpty(password) || !util.ValidationUtils.isValidPassword(password)) {
-            request.setAttribute("error", "Mat khau phai co it nhat 6 ky tu!");
+            request.setAttribute("error", "Mật khẩu phải có ít nhất 6 ký tự!");
             repopulateForm(request, username, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber, vetType);
             doGet(request, response);
             return;
         }
 
         if (!util.ValidationUtils.isNotEmpty(fullName) || !util.ValidationUtils.isLengthValid(fullName, 2, 100)) {
-            request.setAttribute("error", "Ho ten phai co tu 2 den 100 ky tu!");
+            request.setAttribute("error", "Họ tên phải có từ 2 đến 100 ký tự!");
             repopulateForm(request, username, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber, vetType);
             doGet(request, response);
             return;
         }
 
         if (!util.ValidationUtils.isNotEmpty(phone) || !util.ValidationUtils.isValidPhone(phone)) {
-            request.setAttribute("error", "So dien thoai khong hop le!");
+            request.setAttribute("error", "Số điện thoại không hợp lệ!");
             repopulateForm(request, username, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber, vetType);
             doGet(request, response);
             return;
         }
 
         if (userDAO.checkPhoneExists(phone)) {
-            request.setAttribute("error", "So dien thoai nay da duoc su dung!");
+            request.setAttribute("error", "Số điện thoại này đã được sử dụng!");
             repopulateForm(request, username, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber, vetType);
             doGet(request, response);
             return;
         }
 
         if (!isValidStaffRole(role)) {
-            request.setAttribute("error", "Vai tro khong hop le!");
+            request.setAttribute("error", "Vai trò không hợp lệ!");
             repopulateForm(request, username, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber, vetType);
             doGet(request, response);
             return;
         }
 
         if (!util.ValidationUtils.isNotEmpty(employeeCode) || !util.ValidationUtils.isLengthValid(employeeCode, 1, 20)) {
-            request.setAttribute("error", "Ma nhan vien phai co tu 1 den 20 ky tu!");
+            request.setAttribute("error", "Mã nhân viên phải có từ 1 đến 20 ký tự!");
             repopulateForm(request, username, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber, vetType);
             doGet(request, response);
             return;
@@ -113,7 +113,7 @@ public class StaffAccountCreateController extends HttpServlet {
 
         if ("Veterinarian".equalsIgnoreCase(role)) {
             if (!"Normal".equalsIgnoreCase(vetType) && !"Emergency".equalsIgnoreCase(vetType)) {
-                request.setAttribute("error", "Loai bac si khong hop le!");
+                request.setAttribute("error", "Loại bác sĩ không hợp lệ!");
                 repopulateForm(request, username, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber, vetType);
                 doGet(request, response);
                 return;
@@ -125,7 +125,7 @@ public class StaffAccountCreateController extends HttpServlet {
         Double salaryBase = null;
         if (util.ValidationUtils.isNotEmpty(salaryStr)) {
             if (!util.ValidationUtils.isPositiveNumber(salaryStr)) {
-                request.setAttribute("error", "Luong co ban phai la so duong!");
+                request.setAttribute("error", "Lương cơ bản phải là số dương!");
                 repopulateForm(request, username, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber, vetType);
                 doGet(request, response);
                 return;
@@ -138,16 +138,16 @@ public class StaffAccountCreateController extends HttpServlet {
             boolean ok = staffDAO.createStaffAccount(username, password, fullName, phone, role,
                     employeeCode, department, salaryBase, specialization, licenseNumber, vetType);
             if (ok) {
-                session.setAttribute("toastMessage", "success|Tao tai khoan nhan vien thanh cong!");
+                session.setAttribute("toastMessage", "success|Tạo tài khoản nhân viên thành công!");
                 response.sendRedirect(request.getContextPath() + "/admin/staff/list");
             } else {
-                request.setAttribute("error", "Khong the tao tai khoan. Vui long thu lai.");
+                request.setAttribute("error", "Không thể tạo tài khoản. Vui lòng thử lại.");
                 repopulateForm(request, username, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber, vetType);
                 doGet(request, response);
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            request.setAttribute("error", "Loi he thong: " + e.getMessage());
+            request.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
             repopulateForm(request, username, fullName, phone, role, employeeCode, department, salaryStr, specialization, licenseNumber, vetType);
             doGet(request, response);
         }

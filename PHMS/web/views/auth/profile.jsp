@@ -1,4 +1,5 @@
-﻿<%-- 
+<%@ page pageEncoding="UTF-8" %>
+<%-- 
     Document   : profile
     Created on : Jan 22, 2026, 5:39:23 AM
     Author     : Nguyen Dang Hung
@@ -8,7 +9,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="${L}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -163,4 +164,5 @@
 
 </body>
 </html>
+
 

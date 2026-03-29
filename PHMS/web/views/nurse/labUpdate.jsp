@@ -2,11 +2,12 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
 <!DOCTYPE html>
-<html>
+<html lang="${L}">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>VetCare Pro - Update Lab Result</title>
+        <title>${L == 'en' ? 'VetCare Pro - Update Lab Result' : 'VetCare Pro - Cập nhật kết quả xét nghiệm'}</title>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/pages/receptionistDashboard.css">
     </head>
@@ -17,24 +18,38 @@
             </div>
             <ul class="menu">
                 <li><a href="${pageContext.request.contextPath}/nurse/lab/queue" class="active">
-                        <i class="fa-solid fa-flask"></i> Lab Queue</a></li>
+                        <i class="fa-solid fa-flask"></i> ${L == 'en' ? 'Lab Queue' : 'Hàng đợi xét nghiệm'}</a></li>
             </ul>
+            <div style="padding: 12px; margin-top: auto;">
+                <div style="display:flex; background:#f1f5f9; border-radius:8px; padding:3px; gap:2px;">
+                    <a href="${pageContext.request.contextPath}/language?lang=vi"
+                       style="padding:5px 10px; border-radius:6px; font-size:11px; font-weight:700; text-decoration:none; flex:1; text-align:center;
+                              ${L == 'vi' ? 'background:#10b981; color:#fff;' : 'color:#64748b;'}">VI</a>
+                    <a href="${pageContext.request.contextPath}/language?lang=en"
+                       style="padding:5px 10px; border-radius:6px; font-size:11px; font-weight:700; text-decoration:none; flex:1; text-align:center;
+                              ${L == 'en' ? 'background:#10b981; color:#fff;' : 'color:#64748b;'}">EN</a>
+                </div>
+            </div>
             <div class="help-box">
-                <div class="help-text">Need help?</div>
-                <a href="#" class="btn-contact">Contact Support</a>
+                <div class="help-text">${L == 'en' ? 'Need help?' : 'Cần hỗ trợ?'}</div>
+                <a href="#" class="btn-contact">${L == 'en' ? 'Contact Support' : 'Liên hệ hỗ trợ'}</a>
             </div>
         </nav>
 
         <main class="main-content">
             <div class="top-bar">
                 <div class="page-header">
-                    <h2><c:choose><c:when test="${canUpdate == false}">View Lab Result</c:when><c:otherwise>Update Lab Result</c:otherwise></c:choose></h2>
-                    <p>Test #${test.testId}</p>
+                    <h2>
+                        <c:choose>
+                            <c:when test="${canUpdate == false}">${L == 'en' ? 'View Lab Result' : 'Xem kết quả xét nghiệm'}</c:when>
+                            <c:otherwise>${L == 'en' ? 'Update Lab Result' : 'Cập nhật kết quả xét nghiệm'}</c:otherwise>
+                        </c:choose>
+                    </h2>
+                    <p>${L == 'en' ? 'Test' : 'Phiếu'} #${test.testId}</p>
                 </div>
-                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
+                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
             </div>
 
-            <!-- Toast Message -->
             <c:if test="${not empty sessionScope.toastMessage}">
                 <c:set var="toast" value="${sessionScope.toastMessage}" />
                 <c:choose>
@@ -59,44 +74,43 @@
                     <div class="alert alert-danger">${error}</div>
                 </c:if>
 
-                <!-- Readonly banner for completed/cancelled tests -->
                 <c:if test="${canUpdate == false}">
                     <div style="background:#fee2e2; border:1px solid #fecaca; border-radius:8px; padding:12px; margin-bottom:16px; color:#991b1b;">
                         <i class="fa-solid fa-info-circle"></i>
-                        <strong>This lab test is ${test.status}.</strong> You can view the details below but cannot make changes.
+                        <strong>${L == 'en' ? 'This lab test is' : 'Phiếu xét nghiệm này ở trạng thái'} ${test.status}.</strong>
+                        ${L == 'en' ? 'You can view details below but cannot make changes.' : 'Bạn chỉ có thể xem chi tiết, không thể chỉnh sửa.'}
                     </div>
                 </c:if>
 
                 <c:if test="${not empty test}">
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                        <div><b>Type:</b> ${test.testType}</div>
-                        <div><b>Status:</b>
+                        <div><b>${L == 'en' ? 'Type' : 'Loại'}:</b> ${test.testType}</div>
+                        <div><b>${L == 'en' ? 'Status' : 'Trạng thái'}:</b>
                             <c:choose>
                                 <c:when test="${test.status == 'Completed'}">
-                                    <span style="color:#10b981; font-weight:600;">Completed</span>
+                                    <span style="color:#10b981; font-weight:600;">${L == 'en' ? 'Completed' : 'Hoàn thành'}</span>
                                 </c:when>
                                 <c:when test="${test.status == 'Cancelled'}">
-                                    <span style="color:#94a3b8; font-weight:600;">Cancelled</span>
+                                    <span style="color:#94a3b8; font-weight:600;">${L == 'en' ? 'Cancelled' : 'Đã hủy'}</span>
                                 </c:when>
                                 <c:when test="${test.status == 'In Progress'}">
-                                    <span style="color:#3b82f6; font-weight:600;">In Progress</span>
+                                    <span style="color:#3b82f6; font-weight:600;">${L == 'en' ? 'In Progress' : 'Đang xử lý'}</span>
                                 </c:when>
                                 <c:otherwise>${test.status}</c:otherwise>
                             </c:choose>
                         </div>
-                        <div><b>Pet:</b> ${test.petName}</div>
-                        <div><b>Owner:</b> ${test.ownerName}</div>
-                        <div><b>Vet:</b> ${test.vetName}</div>
-                        <div><b>Request Notes:</b> ${test.requestNotes}</div>
+                        <div><b>${L == 'en' ? 'Pet' : 'Thú cưng'}:</b> ${test.petName}</div>
+                        <div><b>${L == 'en' ? 'Owner' : 'Chủ nuôi'}:</b> ${test.ownerName}</div>
+                        <div><b>${L == 'en' ? 'Vet' : 'Bác sĩ'}:</b> ${test.vetName}</div>
+                        <div><b>${L == 'en' ? 'Request Notes' : 'Ghi chú yêu cầu'}:</b> ${test.requestNotes}</div>
                     </div>
 
-                    <!-- Show result data if exists -->
                     <c:if test="${not empty test.resultData}">
                         <div style="margin-top:16px; padding:12px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px;">
-                            <b><i class="fa-solid fa-file-medical"></i> Result:</b>
+                            <b><i class="fa-solid fa-file-medical"></i> ${L == 'en' ? 'Result' : 'Kết quả'}:</b>
                             <c:if test="${not empty existingFilePath}">
                                 <a href="${pageContext.request.contextPath}${existingFilePath}" target="_blank" class="btn btn-approve" style="text-decoration:none; margin-left:8px;">
-                                    <i class="fa-regular fa-image"></i> View Image
+                                    <i class="fa-regular fa-image"></i> ${L == 'en' ? 'View Image' : 'Xem ảnh'}
                                 </a>
                                 <c:if test="${fn:endsWith(fn:toLowerCase(existingFilePath), '.jpg') || fn:endsWith(fn:toLowerCase(existingFilePath), '.jpeg') || fn:endsWith(fn:toLowerCase(existingFilePath), '.png')}">
                                     <div style="margin-top:10px;">
@@ -116,26 +130,26 @@
                     <input type="hidden" name="testId" value="${test.testId}">
 
                     <div style="margin-top: 10px;">
-                        <label><b>Status</b></label>
+                        <label><b>${L == 'en' ? 'Status' : 'Trạng thái'}</b></label>
                         <select name="status" style="width:100%;" ${canUpdate == false ? 'disabled' : ''}>
-                            <option value="Requested" ${test.status == 'Requested' ? 'selected' : ''}>Requested</option>
-                            <option value="In Progress" ${test.status == 'In Progress' ? 'selected' : ''}>In Progress</option>
-                            <option value="Completed" ${test.status == 'Completed' ? 'selected' : ''}>Completed</option>
+                            <option value="Requested" ${test.status == 'Requested' ? 'selected' : ''}>${L == 'en' ? 'Requested' : 'Đã yêu cầu'}</option>
+                            <option value="In Progress" ${test.status == 'In Progress' ? 'selected' : ''}>${L == 'en' ? 'In Progress' : 'Đang xử lý'}</option>
+                            <option value="Completed" ${test.status == 'Completed' ? 'selected' : ''}>${L == 'en' ? 'Completed' : 'Hoàn thành'}</option>
                         </select>
                     </div>
 
                     <div style="margin-top: 10px;">
-                        <label><b>Result Text</b> (optional)</label>
+                        <label><b>${L == 'en' ? 'Result Text' : 'Nội dung kết quả'}</b> (${L == 'en' ? 'optional' : 'không bắt buộc'})</label>
                         <textarea name="resultText" rows="4" style="width:100%;" maxlength="4000"
-                                  placeholder="Enter result text..." ${canUpdate == false ? 'readonly' : ''}>${existingResultText}</textarea>
+                                  placeholder="${L == 'en' ? 'Enter result text...' : 'Nhập nội dung kết quả...'}" ${canUpdate == false ? 'readonly' : ''}>${existingResultText}</textarea>
                     </div>
 
                     <div style="margin-top: 10px;">
-                        <label><b>Upload Result Image</b> (optional)</label>
+                        <label><b>${L == 'en' ? 'Upload Result Image' : 'Tải ảnh kết quả'}</b> (${L == 'en' ? 'optional' : 'không bắt buộc'})</label>
                         <input id="resultFileInput" type="file" name="resultFile" accept=".jpg,.jpeg,.png,image/*" style="width:100%;" ${canUpdate == false ? 'disabled' : ''}>
-                        <small style="color:#64748b;">Allowed: JPG, JPEG, PNG. Max size: 10MB.</small>
+                        <small style="color:#64748b;">${L == 'en' ? 'Allowed: JPG, JPEG, PNG. Max size: 10MB.' : 'Cho phép: JPG, JPEG, PNG. Dung lượng tối đa: 10MB.'}</small>
                         <div id="selectedImagePreviewWrap" style="display:none; margin-top:10px;">
-                            <div style="font-weight:600; margin-bottom:6px; color:#334155;">Preview before save:</div>
+                            <div style="font-weight:600; margin-bottom:6px; color:#334155;">${L == 'en' ? 'Preview before save:' : 'Xem trước trước khi lưu:'}</div>
                             <img id="selectedImagePreview" alt="Selected image preview"
                                  style="max-width:320px; width:100%; border:1px solid #d1d5db; border-radius:10px;">
                         </div>
@@ -143,10 +157,10 @@
 
                     <div style="display:flex; gap:10px; margin-top: 12px;">
                         <a class="btn btn-reject" style="text-decoration:none; background:#e5e7eb;color:#111827;"
-                           href="${pageContext.request.contextPath}/nurse/lab/queue">Back</a>
+                           href="${pageContext.request.contextPath}/nurse/lab/queue">${L == 'en' ? 'Back' : 'Quay lại'}</a>
                         <c:if test="${canUpdate != false}">
                             <button class="btn btn-approve" type="submit">
-                                <i class="fa-solid fa-save"></i> Save
+                                <i class="fa-solid fa-save"></i> ${L == 'en' ? 'Save' : 'Lưu'}
                             </button>
                         </c:if>
                     </div>
@@ -190,5 +204,3 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
-
-

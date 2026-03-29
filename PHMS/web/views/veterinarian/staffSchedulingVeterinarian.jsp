@@ -1,4 +1,4 @@
-<%-- 
+﻿<%-- 
     Document   : staffSchedulingVeterinarian
     Created on : Feb 1, 2026, 11:47:01 PM
     Author     : zoxy4
@@ -8,7 +8,7 @@
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
-<html>
+<html lang="${L}">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>VetCare Pro - My Schedule</title>
@@ -27,7 +27,7 @@
                     <p>Manage your personal work shifts.</p>
                 </div>
                 <div class="header-actions">
-                    <a href="${pageContext.request.contextPath}/logout" class="btn-signout" style="margin-left: 15px;">Sign Out</a>
+                    <a href="${pageContext.request.contextPath}/logout" class="btn-signout" style="margin-left: 15px;">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
                 </div>
             </div>
 
@@ -160,3 +160,4 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+

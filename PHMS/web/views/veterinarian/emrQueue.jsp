@@ -2,7 +2,7 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
-<html>
+<html lang="${L}">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>VetCare Pro - EMR Queue</title>
@@ -261,8 +261,7 @@
                     <p>Checked-in patients for <fmt:formatDate value="${today}" pattern="EEEE, dd MMMM yyyy"/></p>
                 </div>
                 <a href="${pageContext.request.contextPath}/logout" class="btn-signout">
-                    <i class="fa-solid fa-right-from-bracket"></i> Sign Out
-                </a>
+                    <i class="fa-solid fa-right-from-bracket"></i>${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
             </div>
 
             <!-- Stats Row -->
@@ -366,7 +365,7 @@
                     <c:if test="${totalPages > 1}">
                         <div class="pagination-bar" style="justify-content:space-between; flex-wrap:wrap; gap:10px;">
                             <form method="get" action="${pageContext.request.contextPath}/veterinarian/emr/queue" style="display:flex; align-items:center; gap:8px;">
-                                <span style="font-size:12px; color:#64748b; font-weight:700;">Hiển thị</span>
+                                <span style="font-size:12px; color:#64748b; font-weight:700;">${L == 'en' ? 'Showing' : 'Hiển thị'}</span>
                                 <select name="size" onchange="this.form.submit()" style="padding:6px 10px; border:1px solid #d1d5db; border-radius:8px; font-size:12px;">
                                     <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
                                     <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
@@ -398,4 +397,5 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+
 

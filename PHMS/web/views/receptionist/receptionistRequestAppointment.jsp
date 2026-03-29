@@ -9,7 +9,7 @@
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
 <!DOCTYPE html>
-<html>
+<html lang="${L}">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>VetCare Pro - Receptionist Dashboard</title>
@@ -73,10 +73,10 @@
             <!-- Top Bar -->
             <div class="top-bar">
                 <div class="page-header">
-                    <h2>Booking Management</h2>
-                    <p>Review and manage pending appointment requests.</p>
+                    <h2>${L == 'en' ? 'Booking Management' : 'Quản lý lịch hẹn'}</h2>
+                    <p>${L == 'en' ? 'Review and manage pending appointment requests.' : 'Xem và xử lý các yêu cầu đặt lịch đang chờ.'}</p>
                 </div>
-                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
+                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
             </div>
 
             <!-- Notification -->
@@ -98,12 +98,12 @@
                         <label style="font-size:12px; color:#64748b; display:block; margin-bottom:4px;">${L == 'en' ? 'Status' : 'Trạng thái'}</label>
                         <select name="filterStatus" style="width:100%; padding:8px 12px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px;">
                             <option value="">${L == 'en' ? 'All' : 'Tất cả'}</option>
-                            <option value="Pending" ${filterStatus == 'Pending' ? 'selected' : ''}>Pending</option>
-                            <option value="Confirmed" ${filterStatus == 'Confirmed' ? 'selected' : ''}>Confirmed</option>
-                            <option value="Checked-in" ${filterStatus == 'Checked-in' ? 'selected' : ''}>Checked-in</option>
-                            <option value="In-Progress" ${filterStatus == 'In-Progress' ? 'selected' : ''}>In-Progress</option>
-                            <option value="Completed" ${filterStatus == 'Completed' ? 'selected' : ''}>Completed</option>
-                            <option value="Cancelled" ${filterStatus == 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                            <option value="Pending" ${filterStatus == 'Pending' ? 'selected' : ''}>${L == 'en' ? 'Pending' : 'Đang chờ'}</option>
+                            <option value="Confirmed" ${filterStatus == 'Confirmed' ? 'selected' : ''}>${L == 'en' ? 'Confirmed' : 'Đã xác nhận'}</option>
+                            <option value="Checked-in" ${filterStatus == 'Checked-in' ? 'selected' : ''}>${L == 'en' ? 'Checked-in' : 'Đã check-in'}</option>
+                            <option value="In-Progress" ${filterStatus == 'In-Progress' ? 'selected' : ''}>${L == 'en' ? 'In-Progress' : 'Đang khám'}</option>
+                            <option value="Completed" ${filterStatus == 'Completed' ? 'selected' : ''}>${L == 'en' ? 'Completed' : 'Hoàn thành'}</option>
+                            <option value="Cancelled" ${filterStatus == 'Cancelled' ? 'selected' : ''}>${L == 'en' ? 'Cancelled' : 'Đã hủy'}</option>
                         </select>
                     </div>
                     <div>
@@ -131,7 +131,7 @@
             <!-- Main Card: Appointments List -->
             <div class="card">
                 <div class="section-title">
-                    <span>Appointments List</span>
+                    <span>${L == 'en' ? 'Appointments List' : 'Danh sách lịch hẹn'}</span>
                     <span style="float:right; font-size:14px; color:#6b7280;">Total: ${totalItems}</span>
                 </div>
 
@@ -139,7 +139,7 @@
                 <c:if test="${empty appointments}">
                     <div class="empty-state">
                         <i class="fa-regular fa-calendar-times" style="font-size: 30px; margin-bottom: 10px;"></i>
-                        <p>No appointments found.</p>
+                        <p>${L == 'en' ? 'No appointments found.' : 'Không tìm thấy lịch hẹn nào.'}</p>
                     </div>
                 </c:if>
                 <!-- Data Table -->
@@ -148,14 +148,14 @@
                         <thead>
                             <tr>
                                 <th>${L == 'en' ? 'No.' : 'STT'}</th>
-                                <th>Owner Name</th>
-                                <th>Pet Name</th>
-                                <th>Service</th>
-                                <th>Veterinarian</th>
-                                <th>Date & Time</th>
-                                <th>Status</th>
-                                <th>Notes</th>
-                                                            </tr>
+                                <th>${L == 'en' ? 'Owner Name' : 'Tên chủ nuôi'}</th>
+                                <th>${L == 'en' ? 'Pet Name' : 'Tên thú cưng'}</th>
+                                <th>${L == 'en' ? 'Service' : 'Dịch vụ'}</th>
+                                <th>${L == 'en' ? 'Veterinarian' : 'Bác sĩ thú y'}</th>
+                                <th>${L == 'en' ? 'Date & Time' : 'Ngày & giờ'}</th>
+                                <th>${L == 'en' ? 'Status' : 'Trạng thái'}</th>
+                                <th>${L == 'en' ? 'Notes' : 'Ghi chú'}</th>
+                            </tr>
                         </thead>
                         
                         <tbody>
@@ -170,33 +170,33 @@
                                     <td>
                                         <c:choose>
                                             <c:when test="${a.status == 'Pending'}">
-                                                <span style="background:#fef3c7; color:#92400e; padding:4px 8px; border-radius:4px; font-size:12px;">Pending</span>
+                                                <span style="background:#fef3c7; color:#92400e; padding:4px 8px; border-radius:4px; font-size:12px;">${L == 'en' ? 'Pending' : 'Đang chờ'}</span>
                                             </c:when>
                                             <c:when test="${a.status == 'Confirmed'}">
-                                                <span style="background:#d1fae5; color:#065f46; padding:4px 8px; border-radius:4px; font-size:12px;">Confirmed</span>
+                                                <span style="background:#d1fae5; color:#065f46; padding:4px 8px; border-radius:4px; font-size:12px;">${L == 'en' ? 'Confirmed' : 'Đã xác nhận'}</span>
                                             </c:when>
                                             <c:when test="${a.status == 'Checked-in'}">
-                                                <span style="background:#dbeafe; color:#1e40af; padding:4px 8px; border-radius:4px; font-size:12px;">Checked-in</span>
+                                                <span style="background:#dbeafe; color:#1e40af; padding:4px 8px; border-radius:4px; font-size:12px;">${L == 'en' ? 'Checked-in' : 'Đã check-in'}</span>
                                             </c:when>
                                                 <c:when test="${a.status == 'In-Progress'}">
-                                                <span style="background:#dbeafe; color:#1e40af; padding:4px 8px; border-radius:4px; font-size:12px;">In-Progress</span>
+                                                <span style="background:#dbeafe; color:#1e40af; padding:4px 8px; border-radius:4px; font-size:12px;">${L == 'en' ? 'In-Progress' : 'Đang khám'}</span>
                                             </c:when>
                                             <c:when test="${a.status == 'Completed'}">
-                                                <span style="background:#dcfce7; color:#166534; padding:4px 8px; border-radius:4px; font-size:12px;">Completed</span>
+                                                <span style="background:#dcfce7; color:#166534; padding:4px 8px; border-radius:4px; font-size:12px;">${L == 'en' ? 'Completed' : 'Hoàn thành'}</span>
                                             </c:when>
                                             <c:when test="${a.status == 'Cancelled'}">
-                                                <span style="background:#fee2e2; color:#991b1b; padding:4px 8px; border-radius:4px; font-size:12px;">Cancelled</span>
+                                                <span style="background:#fee2e2; color:#991b1b; padding:4px 8px; border-radius:4px; font-size:12px;">${L == 'en' ? 'Cancelled' : 'Đã hủy'}</span>
                                             </c:when>
                                         </c:choose>
                                     </td>
                                     <td>
                                         <c:if test="${not empty a.notes}">
                                             <button type="button" class="btn-view-note" data-note="${a.notes}" onclick="openModal(this)">
-                                                <i class="fa-regular fa-eye"></i> View
+                                                <i class="fa-regular fa-eye"></i> ${L == 'en' ? 'View' : 'Xem'}
                                             </button>
                                         </c:if>
                                         <c:if test="${empty a.notes}">
-                                            <span style="color: #999; font-style: italic;">No note</span>
+                                            <span style="color: #999; font-style: italic;">${L == 'en' ? 'No note' : 'Không có ghi chú'}</span>
                                         </c:if>
                                     </td>
                                 </tr>
@@ -211,7 +211,7 @@
                                 <input type="hidden" name="filterDate" value="${filterDate}">
                                 <input type="hidden" name="filterStatus" value="${filterStatus}">
                                 <input type="hidden" name="filterVetId" value="${filterVetId}">
-                                <span style="font-size:12px; color:#64748b; font-weight:700;">Hiển thị</span>
+                                <span style="font-size:12px; color:#64748b; font-weight:700;">${L == 'en' ? 'Showing' : 'Hiển thị'}</span>
                                 <select name="size" onchange="this.form.submit()" style="padding:6px 10px; border:1px solid #d1d5db; border-radius:8px; font-size:12px;">
                                     <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
                                     <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>

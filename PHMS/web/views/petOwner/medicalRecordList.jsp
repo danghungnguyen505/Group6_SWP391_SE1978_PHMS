@@ -113,7 +113,7 @@
                     <div class="pagination-container">
                         <form method="get" action="${pageContext.request.contextPath}/my-medical-records" style="display:flex; align-items:center; gap:8px; margin-right:auto;">
                             <input type="hidden" name="petId" value="${selectedPetId}">
-                            <span style="font-size:12px; color:#64748b; font-weight:700;">Hiển thị</span>
+                            <span style="font-size:12px; color:#64748b; font-weight:700;">${L == 'en' ? 'Showing' : 'Hiển thị'}</span>
                             <select name="size" onchange="this.form.submit()" style="padding:6px 10px; border:1px solid #d1d5db; border-radius:8px; font-size:12px;">
                                 <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
                                 <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>

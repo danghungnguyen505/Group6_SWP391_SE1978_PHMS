@@ -1,10 +1,11 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page pageEncoding="UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
 
 <!DOCTYPE html>
 
-<html lang="vi">
+<html lang="${L}">
     <head>
         <meta charset="UTF-8">
 
@@ -174,7 +175,7 @@
 
                 <a href="${pageContext.request.contextPath}/logout"
                    class="btn-signout">
-                    Sign Out </a>
+                    ${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
 
             </div>
 
@@ -350,7 +351,7 @@
 
                     <div class="form-group">
 
-                        <label>Chọn bác sĩ cấp cứu *</label>
+                        <label>Chọn bác sĩ *</label>
 
                         <select name="vetId" required>
 
@@ -496,5 +497,6 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+
 
 

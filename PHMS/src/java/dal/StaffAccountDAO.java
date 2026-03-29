@@ -48,7 +48,7 @@ public class StaffAccountDAO extends DBContext {
         boolean hasRole = roleFilter != null && !roleFilter.trim().isEmpty() && !"ALL".equalsIgnoreCase(roleFilter);
         boolean hasStatus = statusFilter != null && !statusFilter.trim().isEmpty();
 
-        String baseSql = "SELECT u.user_id, u.username, u.full_name, u.role, u.phone, u.is_active, "
+        String baseSql = "SELECT u.user_id, u.username, u.full_name, u.role, u.phone, ISNULL(u.is_active, 1) AS is_active, "
                 + "e.employee_code, e.department, e.salary_base "
                 + "FROM Users u "
                 + "LEFT JOIN Employee e ON u.user_id = e.user_id "
@@ -60,9 +60,9 @@ public class StaffAccountDAO extends DBContext {
         }
         if (hasStatus) {
             if ("active".equalsIgnoreCase(statusFilter)) {
-                filterSql.append("AND u.is_active = 1 ");
+                filterSql.append("AND ISNULL(u.is_active, 1) = 1 ");
             } else if ("inactive".equalsIgnoreCase(statusFilter)) {
-                filterSql.append("AND u.is_active = 0 ");
+                filterSql.append("AND ISNULL(u.is_active, 1) = 0 ");
             }
         }
         if (hasKeyword) {
@@ -100,6 +100,7 @@ public class StaffAccountDAO extends DBContext {
                     String dept = rs.getString("department") != null ? rs.getString("department") : "N/A";
                     double salary = rs.getDouble("salary_base");
                     int active = rs.getInt("is_active");
+                    user.setActive(active == 1);
 
                     user.setAddress(code + "|" + dept + "|" + salary + "|" + active);
 
@@ -132,9 +133,9 @@ public class StaffAccountDAO extends DBContext {
         }
         if (hasStatus) {
             if ("active".equalsIgnoreCase(statusFilter)) {
-                filterSql.append("AND u.is_active = 1 ");
+                filterSql.append("AND ISNULL(u.is_active, 1) = 1 ");
             } else if ("inactive".equalsIgnoreCase(statusFilter)) {
-                filterSql.append("AND u.is_active = 0 ");
+                filterSql.append("AND ISNULL(u.is_active, 1) = 0 ");
             }
         }
         if (hasKeyword) {
@@ -219,7 +220,7 @@ public class StaffAccountDAO extends DBContext {
             return false;
         }
 
-        String sqlUser = "INSERT INTO Users (username, password, full_name, phone, role) VALUES (?, ?, ?, ?, ?)";
+        String sqlUser = "INSERT INTO Users (username, password, full_name, phone, role, is_active) VALUES (?, ?, ?, ?, ?, 1)";
         String sqlEmployee = "INSERT INTO Employee (user_id, employee_code, department, salary_base) VALUES (?, ?, ?, ?)";
         String sqlRoleSpecific = getRoleSpecificInsertSQL(role);
 
@@ -272,12 +273,14 @@ public class StaffAccountDAO extends DBContext {
                             ps.setString(4, vetType != null ? vetType : "Normal");
                         }
                     }
+                    // Nurse and Receptionist only need emp_id (already set above)
                     if (ps.executeUpdate() <= 0) {
                         connection.rollback();
                         return false;
                     }
                 }
             }
+            // ClinicManager and Admin: no role-specific table to insert
 
             connection.commit();
             return true;
@@ -380,7 +383,7 @@ public class StaffAccountDAO extends DBContext {
 
     public boolean toggleStaffStatus(int userId) {
         // 1. Lấy trạng thái hiện tại để biết là đang muốn KHÓA hay MỞ KHÓA
-        String statusSql = "SELECT is_active FROM Users WHERE user_id = ?";
+        String statusSql = "SELECT ISNULL(is_active, 1) AS is_active FROM Users WHERE user_id = ?";
         int currentStatus = -1;
 
         try (PreparedStatement ps = connection.prepareStatement(statusSql)) {
@@ -412,7 +415,7 @@ public class StaffAccountDAO extends DBContext {
         }
 
         // 3. Thực hiện đảo ngược trạng thái: 1 -> 0, 0 -> 1
-        String updateSql = "UPDATE Users SET is_active = 1 - is_active WHERE user_id = ?";
+        String updateSql = "UPDATE Users SET is_active = CASE WHEN ISNULL(is_active, 1) = 1 THEN 0 ELSE 1 END WHERE user_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(updateSql)) {
             ps.setInt(1, userId);
             return ps.executeUpdate() > 0;
@@ -515,7 +518,12 @@ public class StaffAccountDAO extends DBContext {
             }
             return "INSERT INTO Veterinarian (emp_id, license_number, specialization) VALUES (?, ?, ?)";
         }
-        // Other roles don't need additional inserts based on schema
+        if ("Nurse".equalsIgnoreCase(role)) {
+            return "INSERT INTO Nurse (emp_id) VALUES (?)";
+        }
+        if ("Receptionist".equalsIgnoreCase(role)) {
+            return "INSERT INTO Receptionist (emp_id) VALUES (?)";
+        }
         return null;
     }
 

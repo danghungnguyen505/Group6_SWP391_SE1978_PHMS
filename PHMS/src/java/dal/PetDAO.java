@@ -177,6 +177,22 @@ public class PetDAO extends DBContext {
     }
 
     // 6. Tìm kiếm thú cưng (Tìm theo Tên, Loài hoặc Giống)
+    public boolean hasMedicalRecords(int petId) {
+        String sql = "SELECT TOP 1 1 "
+                + "FROM MedicalRecord mr "
+                + "JOIN Appointment a ON a.appt_id = mr.appt_id "
+                + "WHERE a.pet_id = ?";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, petId);
+            ResultSet rs = st.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            System.out.println("Error hasMedicalRecords: " + e);
+        }
+        return false;
+    }
+
     public List<Pet> searchPets(int ownerId, String keyword) {
         List<Pet> list = new ArrayList<>();
         String sql = "SELECT * FROM Pet WHERE owner_id = ? AND (name LIKE ? OR species LIKE ? OR breed LIKE ?)";

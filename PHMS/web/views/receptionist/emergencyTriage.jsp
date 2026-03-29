@@ -1,8 +1,9 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page pageEncoding="UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="${L}">
 <head>
     <meta charset="UTF-8">
     <title>Triage cấp cứu - Lễ tân</title>
@@ -65,10 +66,10 @@
     <main class="main-content">
         <div class="top-bar">
             <div class="page-header">
-                <h2>Triage ca cấp cứu #${appt.apptId}</h2>
-                <p>Thú cưng: ${appt.petName} | Chủ: ${appt.ownerName} | Bác sĩ: ${appt.vetName}</p>
+                <h2>${L == 'en' ? 'Emergency Triage' : 'Phân loại cấp cứu'} #${appt.apptId}</h2>
+                <p>${L == 'en' ? 'Pet' : 'Thú cưng'}: ${appt.petName} | ${L == 'en' ? 'Owner' : 'Chủ'}: ${appt.ownerName} | ${L == 'en' ? 'Doctor' : 'Bác sĩ'}: ${appt.vetName}</p>
             </div>
-            <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
+            <a href="${pageContext.request.contextPath}/logout" class="btn-signout">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
         </div>
 
         <div class="card">
@@ -113,5 +114,6 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+
 
 

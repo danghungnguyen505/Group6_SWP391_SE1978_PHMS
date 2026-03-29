@@ -1,4 +1,5 @@
-﻿<%-- 
+<%@ page pageEncoding="UTF-8" %>
+<%-- 
     Document   : serviceManagement
     Created on : Jan 22, 2026, 2:43:16 AM
     Author     : Nguyen Dang Hung
@@ -8,7 +9,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="${L}">
 <head>
     <meta charset="UTF-8">
     <title>VetCare Pro - SERVICE CATALOG</title>
@@ -132,7 +133,7 @@
 
         .col-id { color: #cbd5e0; font-weight: 600; width: 60px; }
         .col-name { font-weight: 800; color: var(--text-main); font-size: 15px; width: 180px; }
-        .col-desc { color: var(--text-muted); font-style: italic; font-size: 13px; max-width: 320px; line-height: 1.5; }
+        .col-desc { color: var(--text-muted); font-style: normal; font-size: 13px; max-width: 320px; line-height: 1.5; }
         
         /* Chỉnh sửa căn lề trái cho 3 cột cuối */
         .col-price { font-weight: 800; font-size: 16px; color: var(--text-main); width: 160px; }
@@ -209,27 +210,27 @@
     <main class="main-content">
         <header class="page-header">
             <div class="title-area">
-                <h1>Service Catalog</h1>
-                <p>Configure examination types and basic price list. Total: ${totalServices} services</p>
+                <h1>${L == 'en' ? 'Service Catalog' : 'Danh mục dịch vụ'}</h1>
+                <p>${L == 'en' ? 'Configure examination types and basic price list. Total:' : 'Cấu hình loại khám và bảng giá cơ bản. Tổng:'} ${totalServices} ${L == 'en' ? 'services' : 'dịch vụ'}</p>
             </div>
             <div style="display:flex; gap:15px; align-items:center;">
                 <form action="services" method="get" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
                     <input type="hidden" name="size" value="${pageSize}">
-                    <input type="text" name="search" placeholder="Search name/description..." 
+                    <input type="text" name="search" placeholder="${L == 'en' ? 'Search name/description...' : 'Tìm theo tên/mô tả...'}" 
                            value="${searchKeyword}" 
                            style="padding:8px 10px; border-radius:8px; border:1px solid #e2e8f0; font-size:13px; min-width:200px;">
 
                     <select name="status" style="padding:8px 10px; border-radius:8px; border:1px solid #e2e8f0; font-size:13px;">
-                        <option value="">All statuses</option>
-                        <option value="active" ${statusFilter == 'active' ? 'selected' : ''}>Active</option>
-                        <option value="inactive" ${statusFilter == 'inactive' ? 'selected' : ''}>Inactive</option>
+                        <option value="">${L == 'en' ? 'All statuses' : 'Tất cả trạng thái'}</option>
+                        <option value="active" ${statusFilter == 'active' ? 'selected' : ''}>${L == 'en' ? 'Active' : 'Hoạt động'}</option>
+                        <option value="inactive" ${statusFilter == 'inactive' ? 'selected' : ''}>${L == 'en' ? 'Inactive' : 'Tạm dừng'}</option>
                     </select>
 
                     <select name="type" style="padding:8px 10px; border-radius:8px; border:1px solid #e2e8f0; font-size:13px;">
-                        <option value="">All types</option>
-                        <option value="Basic" ${typeFilter == 'Basic' ? 'selected' : ''}>Cơ bản</option>
+                        <option value="">${L == 'en' ? 'All types' : 'Tất cả loại'}</option>
+                        <option value="Basic" ${typeFilter == 'Basic' ? 'selected' : ''}>CÆ¡ báº£n</option>
                         <option value="Emergency" ${typeFilter == 'Emergency' ? 'selected' : ''}>Cấp cứu</option>
-                        <option value="LabTest" ${typeFilter == 'LabTest' ? 'selected' : ''}>Lab test</option>
+                        <option value="LabTest" ${typeFilter == 'LabTest' ? 'selected' : ''}>${L == 'en' ? 'Lab test' : 'Xét nghiệm'}</option>
                     </select>
 
                     <button type="submit" class="btn-create" style="padding:8px 14px; text-transform:none;">
@@ -237,11 +238,11 @@
                     </button>
                     <c:if test="${not empty searchKeyword || not empty statusFilter || not empty typeFilter}">
                         <a href="services" 
-                           style="font-size:12px; color:#a0aec0; text-decoration:none;">Clear</a>
+                           style="font-size:12px; color:#a0aec0; text-decoration:none;">${L == 'en' ? 'Clear' : 'Xóa lọc'}</a>
                     </c:if>
                 </form>
-                <a href="add-service" class="btn-create">Create New</a>
-                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
+                <a href="add-service" class="btn-create">${L == 'en' ? 'Create New' : 'Tạo mới'}</a>
+                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
             </div>
         </header>
 
@@ -250,12 +251,12 @@
                 <thead>
                     <tr>
                         <th class="col-id">STT</th>
-                        <th class="col-name">Service Name</th>
-                        <th class="col-status">Type</th>
-                        <th class="col-desc">Description</th>
+                        <th class="col-name">${L == 'en' ? 'Service Name' : 'Tên dịch vụ'}</th>
+                        <th class="col-status">${L == 'en' ? 'Type' : 'Loại'}</th>
+                        <th class="col-desc">${L == 'en' ? 'Description' : 'Mô tả'}</th>
                         <th class="col-price">Base Price (VND)</th>
-                        <th class="col-status">Status</th>
-                        <th class="col-action">Action</th>
+                        <th class="col-status">${L == 'en' ? 'Status' : 'Trạng thái'}</th>
+                        <th class="col-action">${L == 'en' ? 'Action' : 'Thao tác'}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -267,12 +268,12 @@
                                 <span class="badge ${service.type == 'Emergency' ? 'badge-emergency' : (service.type == 'LabTest' ? 'badge-lab' : 'badge-basic')}">
                                     <c:choose>
                                         <c:when test="${service.type == 'Emergency'}">Cấp cứu</c:when>
-                                        <c:when test="${service.type == 'LabTest'}">Lab test</c:when>
-                                        <c:otherwise>Cơ bản</c:otherwise>
+                                        <c:when test="${service.type == 'LabTest'}">${L == 'en' ? 'Lab test' : 'Xét nghiệm'}</c:when>
+                                        <c:otherwise>CÆ¡ báº£n</c:otherwise>
                                     </c:choose>
                                 </span>
                             </td>
-                            <td class="col-desc">"${service.description}"</td>
+                            <td class="col-desc">${service.description}</td>
                             <td class="col-price">
                                 <fmt:formatNumber value="${service.basePrice}" pattern="#,###"/>đ
                             </td>
@@ -282,7 +283,7 @@
                                 </span>
                             </td>
                             <td class="col-action">
-                                <a href="edit-service?id=${service.serviceId}" class="btn-action btn-edit" title="Edit">
+                                <a href="edit-service?id=${service.serviceId}" class="btn-action btn-edit" title="${L == 'en' ? 'Edit' : 'Sửa'}">
                                     <i class="fa-solid fa-pen-to-square"></i>
                                 </a>
                                 <form action="services" method="post" style="display:inline;">
@@ -319,7 +320,7 @@
                         <input type="hidden" name="search" value="${searchKeyword}">
                         <input type="hidden" name="status" value="${statusFilter}">
                         <input type="hidden" name="type" value="${typeFilter}">
-                        <label class="page-info">Hiển thị</label>
+                        <label class="page-info">${L == 'en' ? 'Showing' : 'Hiển thị'}</label>
                         <select name="size" style="padding:8px 10px; border-radius:8px; border:1px solid #e2e8f0; font-size:12px;" onchange="this.form.submit()">
                             <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
                             <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
@@ -330,13 +331,13 @@
                     </form>
                     <div style="display:flex; gap:15px; align-items:center;">
                     <c:if test="${currentPage > 1}">
-                        <a href="services?page=${currentPage - 1}${queryParams}" class="btn-page">Previous</a>
+                        <a href="services?page=${currentPage - 1}${queryParams}" class="btn-page">${L == 'en' ? 'Previous' : 'Trước'}</a>
                     </c:if>
 
-                    <span class="page-info">Page ${currentPage} of ${totalPages}</span>
+                                <span class="page-info">${L == 'en' ? 'Page' : 'Trang'} ${currentPage} ${L == 'en' ? 'of' : 'trên'} ${totalPages}</span>
 
                     <c:if test="${currentPage < totalPages}">
-                        <a href="services?page=${currentPage + 1}${queryParams}" class="btn-page">Next</a>
+                        <a href="services?page=${currentPage + 1}${queryParams}" class="btn-page">${L == 'en' ? 'Next' : 'Tiếp'}</a>
                     </c:if>
                     </div>
                 </div>
@@ -350,4 +351,5 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+
 

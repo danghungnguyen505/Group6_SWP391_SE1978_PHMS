@@ -1,10 +1,11 @@
+<%@ page pageEncoding="UTF-8" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="${L}">
     <head>
         <meta charset="UTF-8">
         <title>Chi tiết hóa đơn - PHMS</title>
@@ -388,17 +389,17 @@
         <main class="main-content">
             <!-- Top Header -->
             <header class="top-bar">
-                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
+                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
             </header>
 
             <!-- Page Title Section -->
             <div class="page-header">
                 <div class="header-text">
-                    <h1>Invoice Details</h1>
-                    <p>Viewing records for Invoice #${invoice.invoiceId}</p>
+                    <h1>${L == 'en' ? 'Invoice Details' : 'Chi tiết hóa đơn'}</h1>
+                    <p>${L == 'en' ? 'Viewing records for Invoice' : 'Đang xem thông tin hóa đơn'} #${invoice.invoiceId}</p>
                 </div>
                 <button class="btn-print" onclick="window.print()">
-                    <i class="fa-solid fa-print"></i> Print Invoice
+                    <i class="fa-solid fa-print"></i> ${L == 'en' ? 'Print Invoice' : 'In hóa đơn'}
                 </button>
             </div>
 
@@ -417,7 +418,7 @@
 
                     <div class="invoice-top">
                         <div>
-                            <span class="invoice-label">INVOICE STATUS</span>
+                            <span class="invoice-label">${L == 'en' ? 'INVOICE STATUS' : 'TRẠNG THÁI HÓA ĐƠN'}</span>
                             <h2 class="invoice-number">#${invoice.invoiceId}</h2>
                             <div class="invoice-date print-only">Appointment ID: #${invoice.apptId}</div>
                             <div class="invoice-date print-only">
@@ -429,10 +430,10 @@
                         <div>
                             <c:choose>
                                 <c:when test="${invoice.status eq 'Paid'}">
-                                    <span class="status-badge" style="background: #d1fae5; color: #065f46;">PAID</span>
+                                    <span class="status-badge" style="background: #d1fae5; color: #065f46;">${L == 'en' ? 'PAID' : 'ĐÃ THANH TOÁN'}</span>
                                 </c:when>
                                 <c:otherwise>
-                                    <span class="status-badge unpaid">UNPAID</span>
+                                    <span class="status-badge unpaid">${L == 'en' ? 'UNPAID' : 'CHƯA THANH TOÁN'}</span>
                                 </c:otherwise>
                             </c:choose>
                         </div>
@@ -441,25 +442,25 @@
                     <!-- Thông tin bổ sung (nếu có trong object invoice) -->
                     <div class="customer-info-row">
                         <div class="info-group">
-                            <label>OWNER NAME</label>
+                            <label>${L == 'en' ? 'OWNER NAME' : 'CHỦ NUÔI'}</label>
                             <div class="info-value"><c:out value="${appt.ownerName}" default="-"/></div>
                         </div>
                         <div class="info-group">
-                            <label>PET NAME</label>
+                            <label>${L == 'en' ? 'PET NAME' : 'THÚ CƯNG'}</label>
                             <div class="info-value"><c:out value="${appt.petName}" default="-"/></div>
                         </div>
                     </div>
                     <div class="customer-info-row" style="margin-top:10px;">
                         <div class="info-group">
-                            <label>VETERINARIAN</label>
+                            <label>${L == 'en' ? 'VETERINARIAN' : 'BÁC SĨ THÚ Y'}</label>
                             <div class="info-value"><c:out value="${appt.vetName}" default="-"/></div>
                         </div>
                         <div class="info-group">
-                            <label>TYPE</label>
+                            <label>${L == 'en' ? 'TYPE' : 'LOẠI'}</label>
                             <div class="info-value">
                                 <c:choose>
                                     <c:when test="${appt.type == 'Urgent'}">
-                                        <span style="color:#dc2626; font-weight:600;">Emergency</span>
+                                        <span style="color:#dc2626; font-weight:600;">${L == 'en' ? 'Emergency' : 'Cấp cứu'}</span>
                                     </c:when>
                                     <c:otherwise>
                                         <c:out value="${appt.type}" default="-"/>
@@ -470,26 +471,26 @@
                     </div>
                     <div class="customer-info-row" style="margin-top:10px;">
                         <div class="info-group">
-                            <label>PAYMENT STATUS</label>
+                            <label>${L == 'en' ? 'PAYMENT STATUS' : 'TRẠNG THÁI THANH TOÁN'}</label>
                             <div class="info-value">${invoice.status}</div>
                         </div>
                         <div class="info-group">
-                            <label>TOTAL AMOUNT</label>
+                            <label>${L == 'en' ? 'TOTAL AMOUNT' : 'TỔNG TIỀN'}</label>
                             <div class="info-value">
                                 <fmt:formatNumber value="${invoice.totalAmount}" type="currency" currencySymbol="VND "/>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Table Chi tiết -->
+                    <!-- Table Chi tiáº¿t -->
                     <table class="invoice-table">
                         <thead>
                             <tr>
-                                <th>TYPE</th>
-                                <th>ITEM NAME</th>
-                                <th style="text-align: right;">QTY</th>
-                                <th style="text-align: right;">UNIT PRICE</th>
-                                <th style="text-align: right;">SUBTOTAL</th>
+                                <th>${L == 'en' ? 'TYPE' : 'LOẠI'}</th>
+                                <th>${L == 'en' ? 'ITEM NAME' : 'TÊN HẠNG MỤC'}</th>
+                                <th style="text-align: right;">${L == 'en' ? 'QTY' : 'SL'}</th>
+                                <th style="text-align: right;">${L == 'en' ? 'UNIT PRICE' : 'ĐƠN GIÁ'}</th>
+                                <th style="text-align: right;">${L == 'en' ? 'SUBTOTAL' : 'THÀNH TIỀN'}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -580,7 +581,7 @@
                                 </div>
                                 <h3>Payment Completed</h3>
                                 <p class="text-muted">This invoice has been fully settled.<br>No further actions are required.</p>
-                                <a href="${pageContext.request.contextPath}/receptionist/dashboard" class="btn btn-secondary w-100">Back to Dashboard</a>
+                                <a href="${pageContext.request.contextPath}/receptionist/dashboard" class="btn btn-secondary w-100">${L == 'en' ? 'Back to Dashboard' : 'Về bảng điều khiển'}</a>
                             </div>
                         </c:otherwise>
                     </c:choose>
@@ -721,5 +722,6 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+
 
 

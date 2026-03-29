@@ -1,4 +1,4 @@
-<%-- 
+﻿<%-- 
     Document   : dashboardPetOwner
     Created on : Feb 2, 2026, 11:08:10 PM
     Author     : zoxy4
@@ -6,7 +6,7 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html>
+<html lang="${L}">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>DashBoard</title>
@@ -31,7 +31,7 @@
                         <i class="fa-regular fa-bell"></i>
                         <span class="badge-dot"></span>
                     </div>
-                    <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
+                    <a href="${pageContext.request.contextPath}/logout" class="btn-signout">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
                 </div>
             </header>
             <!-- Stats Row (Overview) -->
@@ -65,7 +65,7 @@
                     <!-- Next Appointment Card (Highlight) -->
                     <div class="section-card highlight-card">
                         <div class="card-header">
-                            <h3><i class="fa-solid fa-clock"></i> Next Appointment</h3>
+                            <h3><i class="fa-solid fa-clock"></i> ${L == 'en' ? 'Next Appointment' : 'Lịch hẹn tiếp theo'}</h3>
                             <a href="${pageContext.request.contextPath}/myAppointment" class="view-all">View All</a>
                         </div>
                         <div class="appointment-details">
@@ -161,4 +161,5 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+
 

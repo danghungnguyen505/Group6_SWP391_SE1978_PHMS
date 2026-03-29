@@ -1,7 +1,7 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="${L}">
 <head>
     <meta charset="UTF-8">
     <title>VetCare Pro - CATALOG NEW MEDICINE</title>
@@ -196,8 +196,8 @@
                 <i class="fa-solid fa-chevron-left"></i>
             </a>
             <div class="title-area">
-                <h1>Catalog New Medicine</h1>
-                <p>Enter the details of the pharmaceutical product below.</p>
+                <h1>${L == 'en' ? 'Catalog New Medicine' : 'Thêm thuốc mới'}</h1>
+                <p>${L == 'en' ? 'Enter the details of the pharmaceutical product below.' : 'Nhập thông tin sản phẩm dược bên dưới.'}</p>
             </div>
         </header>
 
@@ -208,44 +208,44 @@
 
             <form method="post" action="${pageContext.request.contextPath}/admin/medicine/add">
                 <div class="form-group">
-                    <label class="form-label">Medicine Name *</label>
+                    <label class="form-label">${L == 'en' ? 'Medicine Name *' : 'Tên thuốc *'}</label>
                     <input type="text" name="name" value="${name}" required maxlength="100" 
-                           class="form-input" placeholder="e.g. Amoxicillin 250mg">
+                           class="form-input" placeholder="${L == 'en' ? 'e.g. Amoxicillin 250mg' : 'Ví dụ: Amoxicillin 250mg'}">
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Unit *</label>
+                        <label class="form-label">${L == 'en' ? 'Unit *' : 'Đơn vị *'}</label>
                         <input type="text" name="unit" value="${unit}" required maxlength="20" 
-                               class="form-input" placeholder="e.g. tablet, ml, bottle">
+                               class="form-input" placeholder="${L == 'en' ? 'e.g. tablet, ml, bottle' : 'Ví dụ: viên, ml, chai'}">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Price (VND) *</label>
+                        <label class="form-label">${L == 'en' ? 'Price (VND) *' : 'Giá (VND) *'}</label>
                         <input type="number" name="price" value="${price}" step="0.01" min="0" required 
-                               class="form-input" placeholder="e.g. 150000">
+                               class="form-input" placeholder="${L == 'en' ? 'e.g. 150000' : 'Ví dụ: 150000'}">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Stock Quantity *</label>
+                    <label class="form-label">${L == 'en' ? 'Stock Quantity *' : 'Số lượng tồn *'}</label>
                     <input type="number" name="stockQuantity" value="${stockQuantity}" min="0" required 
-                           class="form-input" placeholder="e.g. 100">
+                           class="form-input" placeholder="${L == 'en' ? 'e.g. 100' : 'Ví dụ: 100'}">
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Inventory Status</label>
-                    <input type="text" class="form-input" value="Hoáº¡t Ä‘á»™ng" readonly style="font-weight: 700;">
+                    <label class="form-label">${L == 'en' ? 'Inventory Status' : 'Trạng thái kho'}</label>
+                    <input type="text" class="form-input" value="${L == 'en' ? 'Active' : 'Hoạt động'}" readonly style="font-weight: 700;">
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="btn-submit">Add to Inventory</button>
-                    <a href="${pageContext.request.contextPath}/admin/medicine/list" class="btn-cancel">Cancel</a>
+                    <button type="submit" class="btn-submit">${L == 'en' ? 'Add to Inventory' : 'Thêm vào kho'}</button>
+                    <a href="${pageContext.request.contextPath}/admin/medicine/list" class="btn-cancel">${L == 'en' ? 'Cancel' : 'Hủy'}</a>
                 </div>
             </form>
         </div>
     </main>
 <div class="phms-account-entry" style="position:fixed; top:16px; right:20px; z-index:1200;">
-    <a href="${pageContext.request.contextPath}/logout" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;color:#334155;text-decoration:none;font-size:13px;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.05);">Sign Out</a>
+    <a href="${pageContext.request.contextPath}/logout" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;color:#334155;text-decoration:none;font-size:13px;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.05);">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
 </div>
 <script>
 window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
@@ -254,3 +254,4 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+

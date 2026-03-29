@@ -9,7 +9,7 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
 <!DOCTYPE html>
-<html>
+<html lang="${L}">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>VetCare Pro - Staff Scheduling</title>
@@ -77,7 +77,7 @@
                 <div class="header-actions">
                     <button class="btn btn-outline"><i class="fa-solid fa-plus"></i> Add Shift</button>
                     <button class="btn btn-primary">Publish Schedule</button>
-                    <a href="${pageContext.request.contextPath}/logout" class="btn-signout" style="margin-left: 15px;">Sign Out</a>
+                    <a href="${pageContext.request.contextPath}/logout" class="btn-signout" style="margin-left: 15px;">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
                 </div>
             </div>
 

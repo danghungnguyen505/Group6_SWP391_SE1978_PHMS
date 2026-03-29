@@ -30,6 +30,7 @@ import model.Appointment;
 import model.TimeSlot;
 import model.User;
 import java.sql.Timestamp;
+import java.util.Locale;
 
 /**
  *
@@ -37,6 +38,14 @@ import java.sql.Timestamp;
  */
 @WebServlet(name = "BookingController", urlPatterns = {"/booking"})
 public class BookingController extends HttpServlet {
+
+    private boolean shouldBlockByLeaveStatus(String leaveStatus) {
+        if (leaveStatus == null) {
+            return false;
+        }
+        String s = leaveStatus.trim().toUpperCase(Locale.ENGLISH);
+        return "PENDING".equals(s) || "APPROVED".equals(s);
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -75,8 +84,8 @@ public class BookingController extends HttpServlet {
             Map<Integer, Schedule> uniqueMap = new LinkedHashMap<>();
             for (Schedule s : rawList) {
                 String leaveStatus = scheduleDAO.getLeaveStatusByEmpAndDate(s.getEmpId(), date);
-                if (leaveStatus != null) {
-                    // Vet has a leave request on this date -> do not show for booking
+                if (shouldBlockByLeaveStatus(leaveStatus)) {
+                    // Block only when leave is Pending/Approved.
                     continue;
                 }
                 if (uniqueMap.containsKey(s.getEmpId())) {

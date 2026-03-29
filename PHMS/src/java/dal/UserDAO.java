@@ -4,6 +4,7 @@
  */
 package dal;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -40,7 +41,12 @@ public class UserDAO extends DBContext {
                      "LEFT JOIN PetOwner p ON u.user_id = p.user_id " +
                      "WHERE u.username = ? AND ISNULL(u.is_active, 1) = 1";
         try {
-            PreparedStatement ps = connection.prepareStatement(sql);
+            Connection conn = getConnection();
+            if (conn == null) {
+                System.out.println("Error checkLogin: database connection is not available");
+                return null;
+            }
+            PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -80,12 +86,19 @@ public class UserDAO extends DBContext {
      */
     public boolean isLockedUser(String username) {
         String sql = "SELECT TOP 1 ISNULL(is_active, 1) AS is_active FROM Users WHERE username = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try {
+            Connection conn = getConnection();
+            if (conn == null) {
+                System.out.println("Error isLockedUser: database connection is not available");
+                return false;
+            }
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, username);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt("is_active") == 0;
                 }
+            }
             }
         } catch (SQLException e) {
             System.out.println("Error isLockedUser: " + e.getMessage());
@@ -379,7 +392,7 @@ public class UserDAO extends DBContext {
         }
         return null;
     }
-    //List Veterinarians Ä‘á»ƒ hiá»‡n danh sÃ¡ch lÃ m viá»‡c
+    // List veterinarians for work schedule display
     public List<User> getAllVeterinarians() {
         List<User> list = new ArrayList<>();
         boolean withType = hasVeterinarianTypeColumn();

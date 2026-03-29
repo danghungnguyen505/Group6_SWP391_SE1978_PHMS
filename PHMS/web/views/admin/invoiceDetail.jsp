@@ -1,12 +1,12 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="${L}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VetCare Pro - Chi ti&#7871;t h&#243;a &#273;&#417;n</title>
+    <title>VetCare Pro - ${L == 'en' ? 'Invoice Details' : 'Chi tiết hóa đơn'}</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -156,13 +156,13 @@
     <main class="main-content">
         <header class="top-header">
             <div class="title">
-                <h1>Chi ti&#7871;t h&#243;a &#273;&#417;n #${invoice.invoiceId}</h1>
+                <h1>${L == 'en' ? 'Invoice Details' : 'Chi tiết hóa đơn'} #${invoice.invoiceId}</h1>
                 <div class="back-box">
-                    <a class="btn-back" href="${pageContext.request.contextPath}/admin/reports">Quay l&#7841;i b&#225;o c&#225;o</a>
+                    <a class="btn-back" href="${pageContext.request.contextPath}/admin/reports">${L == 'en' ? 'Back to report' : 'Quay lại báo cáo'}</a>
                 </div>
             </div>
             <div class="top-actions">
-                <a class="btn-logout" href="${pageContext.request.contextPath}/logout">&#272;&#259;ng xu&#7845;t</a>
+                <a class="btn-logout" href="${pageContext.request.contextPath}/logout">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
             </div>
         </header>
 
@@ -170,25 +170,25 @@
             <section class="card">
                 <div class="info-row">
                     <div>
-                        <div class="label">Owner</div>
+                        <div class="label">${L == 'en' ? 'Owner' : 'Chủ nuôi'}</div>
                         <div class="val"><c:out value="${appt.ownerName}" default="-" /></div>
                     </div>
                     <div>
-                        <div class="label">Pet</div>
+                        <div class="label">${L == 'en' ? 'Pet' : 'Thú cưng'}</div>
                         <div class="val"><c:out value="${appt.petName}" default="-" /></div>
                     </div>
                 </div>
                 <div class="info-row">
                     <div>
-                        <div class="label">Veterinarian</div>
+                        <div class="label">${L == 'en' ? 'Veterinarian' : 'Bác sĩ thú y'}</div>
                         <div class="val"><c:out value="${appt.vetName}" default="-" /></div>
                     </div>
                     <div>
-                        <div class="label">Status</div>
+                        <div class="label">${L == 'en' ? 'Status' : 'Trạng thái'}</div>
                         <div class="val">
                             <c:choose>
-                                <c:when test="${invoice.status eq 'Paid'}"><span class="status paid">Paid</span></c:when>
-                                <c:when test="${invoice.status eq 'Unpaid'}"><span class="status unpaid">Unpaid</span></c:when>
+                                <c:when test="${invoice.status eq 'Paid'}"><span class="status paid">${L == 'en' ? 'Paid' : 'Đã thanh toán'}</span></c:when>
+                                <c:when test="${invoice.status eq 'Unpaid'}"><span class="status unpaid">${L == 'en' ? 'Unpaid' : 'Chưa thanh toán'}</span></c:when>
                                 <c:otherwise><span class="status other">${invoice.status}</span></c:otherwise>
                             </c:choose>
                         </div>
@@ -198,11 +198,11 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Type</th>
-                            <th>Item</th>
-                            <th class="right">Qty</th>
-                            <th class="right">Unit Price</th>
-                            <th class="right">Subtotal</th>
+                            <th>${L == 'en' ? 'Type' : 'Loại'}</th>
+                            <th>${L == 'en' ? 'Item' : 'Mục'}</th>
+                            <th class="right">${L == 'en' ? 'Qty' : 'SL'}</th>
+                            <th class="right">${L == 'en' ? 'Unit Price' : 'Đơn giá'}</th>
+                            <th class="right">${L == 'en' ? 'Subtotal' : 'Thành tiền'}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -226,7 +226,7 @@
 
                 <div class="summary">
                     <div class="sum-row">
-                        <span>T&#7893;ng ti&#7873;n h&#243;a &#273;&#417;n</span>
+                        <span>${L == 'en' ? 'Invoice Subtotal' : 'Tổng tiền hóa đơn'}</span>
                         <span><fmt:formatNumber value="${invoiceSubtotal}" pattern="#,###"/>&#8363;</span>
                     </div>
                     <div class="sum-row">
@@ -234,22 +234,22 @@
                         <span><fmt:formatNumber value="${invoiceVat}" pattern="#,###"/>&#8363;</span>
                     </div>
                     <div class="sum-row">
-                        <span>T&#7893;ng sau thu&#7871;</span>
+                        <span>${L == 'en' ? 'Total after tax' : 'Tổng sau thuế'}</span>
                         <span><fmt:formatNumber value="${invoice.totalAmount}" pattern="#,###"/>&#8363;</span>
                     </div>
                     <div class="sum-row total">
-                        <span>T&#7893;ng thanh to&#225;n</span>
+                        <span>${L == 'en' ? 'Total payment' : 'Tổng thanh toán'}</span>
                         <span><fmt:formatNumber value="${invoice.totalAmount}" pattern="#,###"/>&#8363;</span>
                     </div>
                     <div class="sum-row paid">
-                        <span>&#272;&#227; thanh to&#225;n</span>
+                        <span>${L == 'en' ? 'Paid amount' : 'Đã thanh toán'}</span>
                         <span><fmt:formatNumber value="${paymentTotal}" pattern="#,###"/>&#8363;</span>
                     </div>
                 </div>
             </section>
 
             <aside class="card">
-                <div style="font-size:13px; font-weight:800; text-transform:uppercase; margin-bottom:14px;">L&#7883;ch s&#7917; thanh to&#225;n</div>
+                <div style="font-size:13px; font-weight:800; text-transform:uppercase; margin-bottom:14px;">${L == 'en' ? 'Payment History' : 'Lịch sử thanh toán'}</div>
                 <c:choose>
                     <c:when test="${not empty payments}">
                         <c:forEach var="p" items="${payments}">
@@ -260,13 +260,19 @@
                                 </div>
                                 <div class="payment-right">
                                     <div><fmt:formatNumber value="${p.amount}" pattern="#,###"/>&#8363;</div>
-                                    <div class="small">${p.status}</div>
+                                    <div class="small">
+                                        <c:choose>
+                                            <c:when test="${p.status eq 'Paid'}">${L == 'en' ? 'Paid' : 'Đã thanh toán'}</c:when>
+                                            <c:when test="${p.status eq 'Unpaid'}">${L == 'en' ? 'Unpaid' : 'Chưa thanh toán'}</c:when>
+                                            <c:otherwise>${p.status}</c:otherwise>
+                                        </c:choose>
+                                    </div>
                                 </div>
                             </div>
                         </c:forEach>
                     </c:when>
                     <c:otherwise>
-                        <div class="empty">Ch&#432;a c&#243; giao d&#7883;ch thanh to&#225;n.</div>
+                        <div class="empty">${L == 'en' ? 'No payment transactions yet.' : 'Chưa có giao dịch thanh toán.'}</div>
                     </c:otherwise>
                 </c:choose>
             </aside>
@@ -279,4 +285,5 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+
 

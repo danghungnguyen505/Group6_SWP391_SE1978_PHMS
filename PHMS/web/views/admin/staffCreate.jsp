@@ -1,7 +1,7 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="${L}">
 <head>
     <meta charset="UTF-8">
     <title>VetCare Pro - REGISTER NEW STAFF</title>
@@ -97,8 +97,8 @@
         <header class="page-header">
             <a href="${pageContext.request.contextPath}/admin/staff/list" class="btn-back"><i class="fa-solid fa-chevron-left"></i></a>
             <div class="title-area">
-                <h1>Register New Staff</h1>
-                <p>Complete the form below to onboard a new team member.</p>
+                <h1>${L == 'en' ? 'Register New Staff' : 'Thêm nhân viên mới'}</h1>
+                <p>${L == 'en' ? 'Complete the form below to onboard a new team member.' : 'Hoàn tất biểu mẫu bên dưới để thêm nhân viên mới.'}</p>
             </div>
         </header>
 
@@ -109,80 +109,80 @@
 
             <form method="post" action="${pageContext.request.contextPath}/admin/staff/create" id="staffForm">
                 
-                <div class="section-divider"><span>Account Credentials</span></div>
+                <div class="section-divider"><span>${L == 'en' ? 'Account Credentials' : 'Thông tin tài khoản'}</span></div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Username *</label>
-                        <input type="text" name="username" value="${username}" required class="form-input" placeholder="e.g. sarah_wilson">
+                        <label class="form-label">${L == 'en' ? 'Username *' : 'Tên đăng nhập *'}</label>
+                        <input type="text" name="username" value="${username}" required class="form-input" placeholder="${L == 'en' ? 'e.g. sarah_wilson' : 'Ví dụ: sarah_wilson'}">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Password *</label>
+                        <label class="form-label">${L == 'en' ? 'Password *' : 'Mật khẩu *'}</label>
                         <input type="password" name="password" required class="form-input" placeholder="********">
                     </div>
                 </div>
 
-                <div class="section-divider"><span>Personal Information</span></div>
+                <div class="section-divider"><span>${L == 'en' ? 'Personal Information' : 'Thông tin cá nhân'}</span></div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Full Name *</label>
-                        <input type="text" name="fullName" value="${fullName}" required class="form-input" placeholder="e.g. Dr. Sarah Wilson">
+                        <label class="form-label">${L == 'en' ? 'Full Name *' : 'Họ tên *'}</label>
+                        <input type="text" name="fullName" value="${fullName}" required class="form-input" placeholder="${L == 'en' ? 'e.g. Dr. Sarah Wilson' : 'Ví dụ: BS. Nguyễn Văn A'}">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Employee Code *</label>
-                        <input type="text" name="employeeCode" value="${employeeCode}" required class="form-input" placeholder="e.g. EMP001">
+                        <label class="form-label">${L == 'en' ? 'Employee Code *' : 'Mã nhân viên *'}</label>
+                        <input type="text" name="employeeCode" value="${employeeCode}" required class="form-input" placeholder="${L == 'en' ? 'e.g. EMP001' : 'Ví dụ: EMP001'}">
                     </div>
                 </div>
 
-                <div class="section-divider"><span>Role & Salary</span></div>
+                <div class="section-divider"><span>${L == 'en' ? 'Role & Salary' : 'Vai trò & Lương'}</span></div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Job Role *</label>
+                        <label class="form-label">${L == 'en' ? 'Job Role *' : 'Vai trò công việc *'}</label>
                         <select name="role" id="roleSelect" required class="form-input" onchange="toggleVetFields()">
-                            <option value="">-- Select Role --</option>
-                            <option value="Veterinarian" ${role == 'Veterinarian' ? 'selected' : ''}>Veterinarian</option>
-                            <option value="Nurse" ${role == 'Nurse' ? 'selected' : ''}>Nurse</option>
-                            <option value="Receptionist" ${role == 'Receptionist' ? 'selected' : ''}>Receptionist</option>
-                            <option value="ClinicManager" ${role == 'ClinicManager' ? 'selected' : ''}>Clinic Manager</option>
+                            <option value="">${L == 'en' ? '-- Select Role --' : '-- Chọn vai trò --'}</option>
+                            <option value="Veterinarian" ${role == 'Veterinarian' ? 'selected' : ''}>${L == 'en' ? 'Veterinarian' : 'Bác sĩ thú y'}</option>
+                            <option value="Nurse" ${role == 'Nurse' ? 'selected' : ''}>${L == 'en' ? 'Nurse' : 'Y tá'}</option>
+                            <option value="Receptionist" ${role == 'Receptionist' ? 'selected' : ''}>${L == 'en' ? 'Receptionist' : 'Lễ tân'}</option>
+                            <option value="ClinicManager" ${role == 'ClinicManager' ? 'selected' : ''}>${L == 'en' ? 'Clinic Manager' : 'Quản lý phòng khám'}</option>
                             <option value="Admin" ${role == 'Admin' ? 'selected' : ''}>Admin</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Base Salary (VND)</label>
-                        <input type="number" name="salaryBase" value="${salaryBase}" class="form-input" placeholder="e.g. 15000000">
+                        <label class="form-label">${L == 'en' ? 'Base Salary (VND)' : 'Lương cơ bản (VND)'}</label>
+                        <input type="number" name="salaryBase" value="${salaryBase}" class="form-input" placeholder="${L == 'en' ? 'e.g. 15000000' : 'Ví dụ: 15000000'}">
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Phone Number *</label>
+                        <label class="form-label">${L == 'en' ? 'Phone Number *' : 'Số điện thoại *'}</label>
                         <input type="text" name="phone" value="${phone}" required class="form-input" placeholder="09xxxxxxxx">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Work Status</label>
-                        <input type="text" class="form-input" value="Äang lÃ m viá»‡c (Active)" readonly style="font-weight: 700;">
+                        <label class="form-label">${L == 'en' ? 'Work Status' : 'Trạng thái làm việc'}</label>
+                        <input type="text" class="form-input" value="${L == 'en' ? 'Active' : 'Đang làm việc'}" readonly style="font-weight: 700;">
                     </div>
                 </div>
 
                 <!-- Special Fields for Veterinarian -->
                 <div id="specializationGroup" class="form-group" style="margin-top: 15px;">
-                    <label class="form-label">Specialization (Veterinarian only)</label>
-                    <input type="text" name="specialization" value="${specialization}" class="form-input" placeholder="e.g. Surgery, Internal Medicine">
+                    <label class="form-label">${L == 'en' ? 'Specialization (Veterinarian only)' : 'Chuyên môn (chỉ bác sĩ thú y)'}</label>
+                    <input type="text" name="specialization" value="${specialization}" class="form-input" placeholder="${L == 'en' ? 'e.g. Surgery, Internal Medicine' : 'Ví dụ: Phẫu thuật, Nội khoa'}">
                 </div>
                 <div id="licenseGroup" class="form-group" style="margin-top: 20px;">
-                    <label class="form-label">License Number (Veterinarian only)</label>
-                    <input type="text" name="licenseNumber" value="${licenseNumber}" class="form-input" placeholder="LIC-XXXXX">
+                    <label class="form-label">${L == 'en' ? 'License Number (Veterinarian only)' : 'Số chứng chỉ hành nghề (chỉ bác sĩ thú y)'}</label>
+                    <input type="text" name="licenseNumber" value="${licenseNumber}" class="form-input" placeholder="${L == 'en' ? 'LIC-XXXXX' : 'LIC-XXXXX'}">
                 </div>
                 <div id="vetTypeGroup" class="form-group" style="margin-top: 20px;">
-                    <label class="form-label">Veterinarian Type</label>
+                    <label class="form-label">${L == 'en' ? 'Veterinarian Type' : 'Loại bác sĩ thú y'}</label>
                     <select name="vetType" class="form-input">
-                        <option value="Normal" ${vetType == 'Normal' || empty vetType ? 'selected' : ''}>Normal</option>
-                        <option value="Emergency" ${vetType == 'Emergency' ? 'selected' : ''}>Emergency</option>
+                        <option value="Normal" ${vetType == 'Normal' || empty vetType ? 'selected' : ''}>${L == 'en' ? 'Normal' : 'Thường'}</option>
+                        <option value="Emergency" ${vetType == 'Emergency' ? 'selected' : ''}>${L == 'en' ? 'Emergency' : 'Cấp cứu'}</option>
                     </select>
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="btn-submit">Confirm & Register</button>
-                    <a href="${pageContext.request.contextPath}/admin/staff/list" class="btn-cancel">Cancel</a>
+                    <button type="submit" class="btn-submit">${L == 'en' ? 'Confirm & Register' : 'Xác nhận & Đăng ký'}</button>
+                    <a href="${pageContext.request.contextPath}/admin/staff/list" class="btn-cancel">${L == 'en' ? 'Cancel' : 'Hủy'}</a>
                 </div>
             </form>
         </div>
@@ -208,7 +208,7 @@
         toggleVetFields();
     </script>
 <div class="phms-account-entry" style="position:fixed; top:16px; right:20px; z-index:1200;">
-    <a href="${pageContext.request.contextPath}/logout" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;color:#334155;text-decoration:none;font-size:13px;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.05);">Sign Out</a>
+    <a href="${pageContext.request.contextPath}/logout" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;color:#334155;text-decoration:none;font-size:13px;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.05);">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
 </div>
 <script>
 window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
@@ -217,4 +217,5 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+
 

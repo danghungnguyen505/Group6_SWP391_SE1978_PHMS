@@ -136,7 +136,17 @@ public class MyPetController extends HttpServlet {
             // Dùng Toast message nếu có (từ AddPetController chuyển sang)
             String toastMessage = (String) session.getAttribute("toastMessage");
             if (toastMessage != null) {
-                request.setAttribute("toastMessage", toastMessage);
+                String toastType = "success";
+                String toastText = toastMessage;
+                if (toastMessage.contains("|")) {
+                    String[] parts = toastMessage.split("\\|", 2);
+                    if (parts.length == 2) {
+                        toastType = parts[0];
+                        toastText = parts[1];
+                    }
+                }
+                request.setAttribute("toastType", toastType);
+                request.setAttribute("toastMessage", toastText);
                 session.removeAttribute("toastMessage");
             }
 

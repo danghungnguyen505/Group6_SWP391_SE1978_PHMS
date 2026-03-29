@@ -109,7 +109,7 @@ public class MedicalRecordUpdateController extends HttpServlet {
 
         MedicalRecordDAO dao = new MedicalRecordDAO();
         MedicalRecord existing = dao.getByIdForVet(recordId, account.getUserId());
-        //Khong cho sua neu da o trang thai Completed
+        //Không cho sửa nếu đã ở trạng thái Completed
         if (existing != null && "Completed".equalsIgnoreCase(existing.getApptStatus())) {
             session.setAttribute("toastMessage", "error|Appointment already completed. You cannot edit this record.");
             response.sendRedirect(request.getContextPath() + "/veterinarian/emr/detail?id=" + recordId);

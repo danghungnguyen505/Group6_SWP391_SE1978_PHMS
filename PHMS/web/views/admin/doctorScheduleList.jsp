@@ -1,4 +1,5 @@
-﻿<%-- 
+<%@ page pageEncoding="UTF-8" %>
+<%-- 
     Document   : doctorScheduleList
     Created on : Jan 22, 2026
     Author     : Auto
@@ -9,10 +10,10 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="${L}">
 <head>
     <meta charset="UTF-8">
-    <title>VetCare Pro - LỊCH LÀM VIỆC BÁC SĨ</title>
+    <title>VetCare Pro - ${L == 'en' ? 'Doctor Work Schedule' : 'LỊCH LÀM VIỆC BÁC SĨ'}</title>
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -479,6 +480,7 @@
     </style>
 </head>
 <body>
+    <fmt:setLocale value="${L == 'en' ? 'en_US' : 'vi_VN'}" />
 
     <jsp:include page="common/navbar.jsp">
         <jsp:param name="activePage" value="scheduling" />
@@ -506,14 +508,14 @@
 
         <div class="header-section">
             <div class="header-text">
-                <h2>LỊCH LÀM VIỆC BÁC SĨ</h2>
-                <p>Xem và quản lý lịch làm việc của các bác sĩ</p>
+                <h2>${L == 'en' ? 'DOCTOR WORK SCHEDULE' : 'LỊCH LÀM VIỆC BÁC SĨ'}</h2>
+                <p>${L == 'en' ? 'View and manage doctor work schedules' : 'Xem và quản lý lịch làm việc của các bác sĩ'}</p>
             </div>
             <div class="header-actions">
                 <a href="${pageContext.request.contextPath}/admin/doctor/schedule/add" class="btn-primary">
-                    <i class="fa-solid fa-plus"></i> Thêm Lịch
+                    <i class="fa-solid fa-plus"></i> ${L == 'en' ? 'Add Schedule' : 'Thêm Lịch'}
                 </a>
-                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
+                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
             </div>
         </div>
 
@@ -534,13 +536,13 @@
             </div>
 
             <div class="doctor-filter">
-                <span>Đang xem:</span>
-                <strong>${selectedDoctorName}</strong>
+                <span>${L == 'en' ? 'Viewing:' : 'Đang xem:'}</span>
+                <strong>${empty selectedDoctorId ? (L == 'en' ? 'All Doctors' : 'Tất cả bác sĩ') : selectedDoctorName}</strong>
                 <form method="get" action="${pageContext.request.contextPath}/admin/doctor/schedule/list" style="display: inline;">
                     <input type="hidden" name="date" value="${startOfWeek}">
                     <input type="hidden" name="shift" value="${selectedShift}">
                     <select name="doctorId" onchange="this.form.submit()" style="margin-left: 8px;">
-                        <option value="">Tất cả bác sĩ</option>
+                        <option value="">${L == 'en' ? 'All Doctors' : 'Tất cả bác sĩ'}</option>
                         <c:forEach var="vet" items="${veterinarians}">
                             <c:set var="vetIdStr" value="${vet.userId}" />
                             <option value="${vet.userId}" ${selectedDoctorId != null && selectedDoctorId == vetIdStr ? 'selected' : ''}>
@@ -555,9 +557,9 @@
                         <input type="hidden" name="doctorId" value="${selectedDoctorId}">
                     </c:if>
                     <select name="shift" onchange="this.form.submit()" style="margin-left: 8px;">
-                        <option value="">Tất cả ca</option>
-                        <option value="morning" ${selectedShift == 'morning' ? 'selected' : ''}>Ca Sáng</option>
-                        <option value="afternoon" ${selectedShift == 'afternoon' ? 'selected' : ''}>Ca Chiều</option>
+                        <option value="">${L == 'en' ? 'All Shifts' : 'Tất cả ca'}</option>
+                        <option value="morning" ${selectedShift == 'morning' ? 'selected' : ''}>${L == 'en' ? 'Morning Shift' : 'Ca Sáng'}</option>
+                        <option value="afternoon" ${selectedShift == 'afternoon' ? 'selected' : ''}>${L == 'en' ? 'Afternoon Shift' : 'Ca Chiều'}</option>
                     </select>
                 </form>
             </div>
@@ -593,24 +595,32 @@
                             </div>
                             <div class="shift-info">
                                 <h4>${schedule.vetName}</h4>
-                                <span class="role-badge vet">VETERINARIAN</span>
+                                <span class="role-badge vet">${L == 'en' ? 'VETERINARIAN' : 'BÁC SĨ THÚ Y'}</span>
                                 <c:if test="${not empty leaveStatus}">
                                     <div style="font-size: 11px; font-weight: bold; margin-top: 5px;
                                          color:
                                          ${leaveStatus == 'Pending' ? '#d97706' :
                                            leaveStatus == 'Approved' ? '#dc2626' : '#6b7280'};">
-                                        [Leave: ${leaveStatus}]
+                                        [${L == 'en' ? 'Leave' : 'Nghỉ phép'}: ${leaveStatus}]
                                     </div>
                                 </c:if>
                                 <div class="time">
                                     <i class="fa-regular fa-clock"></i>
-                                    <span>${schedule.shiftTime}</span>
+                                    <span>
+                                        <c:choose>
+                                            <c:when test="${schedule.shiftTime == 'Buổi Sáng (09:00 - 12:00)'}">${L == 'en' ? 'Morning (09:00 - 12:00)' : 'Buổi Sáng (09:00 - 12:00)'}</c:when>
+                                            <c:when test="${schedule.shiftTime == 'Buổi Chiều (14:00 - 17:00)'}">${L == 'en' ? 'Afternoon (14:00 - 17:00)' : 'Buổi Chiều (14:00 - 17:00)'}</c:when>
+                                            <c:when test="${schedule.shiftTime == 'Ca Sáng'}">${L == 'en' ? 'Morning Shift' : 'Ca Sáng'}</c:when>
+                                            <c:when test="${schedule.shiftTime == 'Ca Chiều'}">${L == 'en' ? 'Afternoon Shift' : 'Ca Chiều'}</c:when>
+                                            <c:otherwise>${schedule.shiftTime}</c:otherwise>
+                                        </c:choose>
+                                    </span>
                                 </div>
                             </div>
                         </div>
                     </c:forEach>
                     <button class="add-another-btn" onclick="window.location.href='${pageContext.request.contextPath}/admin/doctor/schedule/add?date=${entry.key}'">
-                        <i class="fa-solid fa-plus"></i> Add Another
+                        <i class="fa-solid fa-plus"></i> ${L == 'en' ? 'Add Another' : 'Thêm mục khác'}
                     </button>
                 </div>
             </c:forEach>
@@ -620,15 +630,15 @@
     <div class="footer-stats">
         <div class="stats-group">
             <div class="stat-item">
-                <span class="stat-label">Total Shifts</span>
+                <span class="stat-label">${L == 'en' ? 'Total Shifts' : 'Tổng ca làm việc'}</span>
                 <span class="stat-value">${totalShifts}</span>
             </div>
         </div>
         <div class="warning-box" style="display: none;">
             <i class="fa-solid fa-triangle-exclamation" style="color: #fbbf24;"></i>
             <div class="warning-text">
-                <strong>Staff Warning</strong>
-                <span>No warnings at this time.</span>
+                <strong>${L == 'en' ? 'Staff Warning' : 'Cảnh báo nhân sự'}</strong>
+                <span>${L == 'en' ? 'No warnings at this time.' : 'Hiện không có cảnh báo.'}</span>
             </div>
         </div>
     </div>
@@ -641,7 +651,7 @@
                 var form = this.previousElementSibling;
                 if (!form || form.tagName !== 'FORM') return;
 
-                var ok = confirm('Bạn có chắc muốn xoá ca làm việc này không?');
+                var ok = confirm("${L == 'en' ? 'Are you sure you want to delete this shift?' : 'Bạn có chắc muốn xoá ca làm việc này không?'}");
                 if (!ok) return;
 
                 form.submit();
@@ -656,3 +666,4 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+

@@ -7,7 +7,7 @@
 <%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
 
 <!DOCTYPE html>
-<html>
+<html lang="${L}">
     <head>
         <meta charset="UTF-8">
         <title>VNPay Result - VetCare Pro</title>
@@ -91,10 +91,10 @@
 
             <div class="top-bar">
                 <div class="page-header">
-                    <h2>Billing & Checkout</h2>
-                    <p>VNPay Payment Result</p>
+                    <h2>${L == 'en' ? 'Billing & Checkout' : 'Thanh toán hóa đơn'}</h2>
+                    <p>${L == 'en' ? 'VNPay Payment Result' : 'Kết quả thanh toán VNPay'}</p>
                 </div>
-                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
+                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
             </div>
 
             <div class="card" style="max-width: 700px; margin: 0 auto;">
@@ -144,13 +144,13 @@
 
                 <div style="margin-top: 20px; display:flex; gap:12px;">
                     <a href="${pageContext.request.contextPath}/receptionist/dashboard" class="btn btn-approve">
-                        ← Back to Dashboard
+                        ${L == 'en' ? 'Back to Dashboard' : 'Về bảng điều khiển'}
                     </a>
 
                     <c:if test="${not empty param.invoiceId}">
                         <a href="${pageContext.request.contextPath}/receptionist/invoice/detail?invoiceId=${param.invoiceId}"
                            class="btn btn-approve">
-                            View Invoice
+                            ${L == 'en' ? 'View Invoice' : 'Xem hóa đơn'}
                         </a>
                     </c:if>
                 </div>
@@ -164,5 +164,6 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+
 
 

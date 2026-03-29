@@ -10,7 +10,7 @@
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
 <!DOCTYPE html>
-<html>
+<html lang="${L}">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>VetCare Pro - Receptionist Dashboard</title>
@@ -134,10 +134,10 @@
             <!-- Top Bar -->
             <div class="top-bar">
                 <div class="page-header">
-                    <h2>Booking Management</h2>
-                    <p>Review and manage pending appointment requests.</p>
+                    <h2>${L == 'en' ? 'Booking Management' : 'Quản lý lịch hẹn'}</h2>
+                    <p>${L == 'en' ? 'Review and manage pending appointment requests.' : 'Xem và xử lý các yêu cầu đặt lịch đang chờ.'}</p>
                 </div>
-                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
+                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
             </div>
 
             <!-- Notification -->
@@ -150,14 +150,14 @@
             <!-- Main Card: Pending Requests -->
             <div class="card">
                 <div class="section-title">
-                    <span>Pending Requests</span>
-                    <span style="font-size:13px; color:#94a3b8; font-weight:400;">${fn:length(pendingList)} request(s)</span>
+                    <span>${L == 'en' ? 'Pending Requests' : 'Yêu cầu đang chờ'}</span>
+                    <span style="font-size:13px; color:#94a3b8; font-weight:400;">${fn:length(pendingList)} ${L == 'en' ? 'request(s)' : 'yêu cầu'}</span>
                 </div>
 
                 <c:if test="${empty pendingList}">
                     <div class="empty-state">
                         <i class="fa-regular fa-calendar-times" style="font-size: 30px; margin-bottom: 10px;"></i>
-                        <p>No pending appointment requests found.</p>
+                        <p>${L == 'en' ? 'No pending appointment requests found.' : 'Không có yêu cầu lịch hẹn nào đang chờ.'}</p>
                     </div>
                 </c:if>
 
@@ -166,13 +166,13 @@
                         <thead>
                             <tr>
                                 <th>${L == 'en' ? 'No.' : 'STT'}</th>
-                                <th>Owner Name</th>
-                                <th>Pet Name</th>
-                                <th>Service</th>
-                                <th>Veterinarian</th>
-                                <th>Date & Time</th>
-                                <th>Notes</th>
-                                <th style="text-align: center;">Actions</th>
+                                <th>${L == 'en' ? 'Owner Name' : 'Tên chủ nuôi'}</th>
+                                <th>${L == 'en' ? 'Pet Name' : 'Tên thú cưng'}</th>
+                                <th>${L == 'en' ? 'Service' : 'Dịch vụ'}</th>
+                                <th>${L == 'en' ? 'Veterinarian' : 'Bác sĩ thú y'}</th>
+                                <th>${L == 'en' ? 'Date & Time' : 'Ngày & giờ'}</th>
+                                <th>${L == 'en' ? 'Notes' : 'Ghi chú'}</th>
+                                <th style="text-align: center;">${L == 'en' ? 'Actions' : 'Thao tác'}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -190,23 +190,23 @@
                                                     class="btn-view-note"
                                                     data-note="${a.notes}"
                                                     onclick="openModal(this)">
-                                                <i class="fa-regular fa-eye"></i> View
+                                                <i class="fa-regular fa-eye"></i> ${L == 'en' ? 'View' : 'Xem'}
                                             </button>
                                         </c:if>
                                         <c:if test="${empty a.notes}">
-                                            <span style="color: #999; font-style: italic;">No note</span>
+                                            <span style="color: #999; font-style: italic;">${L == 'en' ? 'No note' : 'Không có ghi chú'}</span>
                                         </c:if>
                                     </td>
                                     <td>
                                         <div class="action-group">
                                             <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${a.apptId}&status=Confirmed"
                                                class="btn btn-approve">
-                                                <i class="fa-solid fa-check"></i> Approve
+                                                <i class="fa-solid fa-check"></i> ${L == 'en' ? 'Approve' : 'Duyệt'}
                                             </a>
                                             <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${a.apptId}&status=Cancelled"
                                                class="btn btn-reject"
-                                               onclick="return confirm('Are you sure you want to reject this appointment?');">
-                                                <i class="fa-solid fa-xmark"></i> Reject
+                                               onclick="return confirm('${L == 'en' ? 'Are you sure you want to reject this appointment?' : 'Bạn có chắc muốn từ chối lịch hẹn này không?'}');">
+                                                <i class="fa-solid fa-xmark"></i> ${L == 'en' ? 'Reject' : 'Từ chối'}
                                             </a>
                                         </div>
                                     </td>
@@ -221,13 +221,13 @@
             <div class="card" style="margin-top: 24px;">
                 <div class="section-title">
                     <jsp:useBean id="today" class="java.util.Date" />
-                    <span>Today's Appointments &mdash; <fmt:formatDate value="${today}" pattern="dd/MM/yyyy"/></span>
-                    <span style="font-size:13px; color:#94a3b8; font-weight:400;">${totalTodayItems} appointment(s)</span>
+                    <span>${L == 'en' ? 'Today Appointments' : 'Lịch hẹn hôm nay'} &mdash; <fmt:formatDate value="${today}" pattern="dd/MM/yyyy"/></span>
+                    <span style="font-size:13px; color:#94a3b8; font-weight:400;">${totalTodayItems} ${L == 'en' ? 'appointment(s)' : 'lịch hẹn'}</span>
                 </div>
 
                 <c:if test="${empty pagedTodayList}">
                     <div class="empty-state">
-                        <p>No appointments scheduled for today.</p>
+                        <p>${L == 'en' ? 'No appointments scheduled for today.' : 'Hôm nay chưa có lịch hẹn nào.'}</p>
                     </div>
                 </c:if>
 
@@ -236,13 +236,13 @@
                         <thead>
                             <tr>
                                 <th>${L == 'en' ? 'No.' : 'STT'}</th>
-                                <th>Time</th>
-                                <th>Owner &amp; Pet</th>
-                                <th>Service</th>
-                                <th>Doctor</th>
-                                <th>Status</th>
-                                <th>Notes</th>
-                                <th style="text-align: center;">Actions</th>
+                                <th>${L == 'en' ? 'Time' : 'Thời gian'}</th>
+                                <th>${L == 'en' ? 'Owner &amp; Pet' : 'Chủ nuôi &amp; thú cưng'}</th>
+                                <th>${L == 'en' ? 'Service' : 'Dịch vụ'}</th>
+                                <th>${L == 'en' ? 'Doctor' : 'Bác sĩ'}</th>
+                                <th>${L == 'en' ? 'Status' : 'Trạng thái'}</th>
+                                <th>${L == 'en' ? 'Notes' : 'Ghi chú'}</th>
+                                <th style="text-align: center;">${L == 'en' ? 'Actions' : 'Thao tác'}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -254,26 +254,26 @@
                                     </td>
                                     <td>
                                         <div style="font-weight:600;">${t.ownerName}</div>
-                                        <small style="color: #666;">Pet: ${t.petName}</small>
+                                        <small style="color: #666;">${L == 'en' ? 'Pet' : 'Thú cưng'}: ${t.petName}</small>
                                     </td>
                                     <td class="col-service">${t.type}</td>
                                     <td>${t.vetName}</td>
                                     <td>
                                         <c:choose>
                                             <c:when test="${t.status == 'Confirmed'}">
-                                                <span class="status-badge badge-confirmed">Confirmed</span>
+                                                <span class="status-badge badge-confirmed">${L == 'en' ? 'Confirmed' : 'Đã xác nhận'}</span>
                                             </c:when>
                                             <c:when test="${t.status == 'Checked-in'}">
-                                                <span class="status-badge badge-checked-in">Checked-in</span>
+                                                <span class="status-badge badge-checked-in">${L == 'en' ? 'Checked-in' : 'Đã check-in'}</span>
                                             </c:when>
                                             <c:when test="${t.status == 'In-Progress'}">
-                                                <span class="status-badge badge-in-progress">In-Progress</span>
+                                                <span class="status-badge badge-in-progress">${L == 'en' ? 'In-Progress' : 'Đang khám'}</span>
                                             </c:when>
                                             <c:when test="${t.status == 'Completed'}">
-                                                <span class="status-badge badge-completed">Completed</span>
+                                                <span class="status-badge badge-completed">${L == 'en' ? 'Completed' : 'Hoàn thành'}</span>
                                             </c:when>
                                             <c:when test="${t.status == 'No-show'}">
-                                                <span class="status-badge badge-no-show">No-show</span>
+                                                <span class="status-badge badge-no-show">${L == 'en' ? 'No-show' : 'Không đến'}</span>
                                             </c:when>
                                             <c:otherwise>
                                                 <span class="status-badge badge-pending">${t.status}</span>
@@ -283,11 +283,11 @@
                                     <td>
                                         <c:if test="${not empty t.notes}">
                                             <button type="button" class="btn-view-note" data-note="${t.notes}" onclick="openModal(this)">
-                                                <i class="fa-regular fa-eye"></i> View
+                                                <i class="fa-regular fa-eye"></i> ${L == 'en' ? 'View' : 'Xem'}
                                             </button>
                                         </c:if>
                                         <c:if test="${empty t.notes}">
-                                            <span style="color:#999; font-style:italic;">No note</span>
+                                            <span style="color:#999; font-style:italic;">${L == 'en' ? 'No note' : 'Không có ghi chú'}</span>
                                         </c:if>
                                     </td>
                                     <td>
@@ -295,12 +295,12 @@
                                             <c:if test="${t.status == 'Confirmed'}">
                                                 <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${t.apptId}&status=Checked-in"
                                                    class="btn btn-approve" style="font-size:12px;">
-                                                    <i class="fa-solid fa-clipboard-check"></i> Check-in
+                                                    <i class="fa-solid fa-clipboard-check"></i> ${L == 'en' ? 'Check-in' : 'Check-in'}
                                                 </a>
                                                 <a href="${pageContext.request.contextPath}/receptionist/appointment-action?id=${t.apptId}&status=No-show"
                                                    class="btn btn-reject" style="font-size:12px;"
-                                                   onclick="return confirm('Mark as No-show?');">
-                                                    <i class="fa-solid fa-user-slash"></i> No-show
+                                                   onclick="return confirm('${L == 'en' ? 'Mark as No-show?' : 'Đánh dấu không đến?'}');">
+                                                    <i class="fa-solid fa-user-slash"></i> ${L == 'en' ? 'No-show' : 'Không đến'}
                                                 </a>
                                             </c:if>
                                             <c:if test="${t.status == 'Completed'}">
@@ -308,19 +308,19 @@
                                                     <c:when test="${invoiceMap[t.apptId] != null && invoiceMap[t.apptId].status == 'Paid'}">
                                                         <a href="${pageContext.request.contextPath}/receptionist/invoice/detail?invoiceId=${invoiceMap[t.apptId].invoiceId}"
                                                            class="btn btn-approve" style="font-size:12px;">
-                                                            <i class="fa-solid fa-eye"></i> View Invoice
+                                                            <i class="fa-solid fa-eye"></i> ${L == 'en' ? 'View Invoice' : 'Xem hóa đơn'}
                                                         </a>
                                                     </c:when>
                                                     <c:when test="${invoiceMap[t.apptId] != null && invoiceMap[t.apptId].status == 'Unpaid'}">
                                                         <a href="${pageContext.request.contextPath}/receptionist/invoice/detail?invoiceId=${invoiceMap[t.apptId].invoiceId}"
                                                            class="btn btn-approve" style="font-size:12px; background:#f59e0b; border-color:#f59e0b;">
-                                                            <i class="fa-solid fa-credit-card"></i> Pay Invoice
+                                                            <i class="fa-solid fa-credit-card"></i> ${L == 'en' ? 'Pay Invoice' : 'Thanh toán'}
                                                         </a>
                                                     </c:when>
                                                     <c:otherwise>
                                                         <a href="${pageContext.request.contextPath}/receptionist/invoice/create?apptId=${t.apptId}"
                                                            class="btn btn-approve" style="font-size:12px;">
-                                                            <i class="fa-solid fa-file-invoice-dollar"></i> Create Invoice
+                                                            <i class="fa-solid fa-file-invoice-dollar"></i> ${L == 'en' ? 'Create Invoice' : 'Tạo hóa đơn'}
                                                         </a>
                                                     </c:otherwise>
                                                 </c:choose>
@@ -355,7 +355,7 @@
             <div class="modal-content" style="background:#fff; margin:10% auto; padding:30px; border-radius:12px; width:50%; max-width:600px; position:relative;">
                 <span class="close-btn" onclick="closeModal()" style="position:absolute; top:15px; right:20px; font-size:24px; cursor:pointer; color:#94a3b8;">&times;</span>
                 <h2 class="modal-title" style="font-size:16px; font-weight:700; margin-bottom:15px; color:#1e293b;">
-                    <i class="fa-solid fa-clipboard-list"></i> Appointment Notes
+                    <i class="fa-solid fa-clipboard-list"></i> ${L == 'en' ? 'Appointment Notes' : 'Ghi chú lịch hẹn'}
                 </h2>
                 <div id="modalNoteContent" class="modal-body" style="font-size:14px; color:#475569; line-height:1.7;"></div>
             </div>
@@ -381,5 +381,7 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+
+
 
 

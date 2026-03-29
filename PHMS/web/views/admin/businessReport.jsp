@@ -1,9 +1,9 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="${L}">
 <head>
     <meta charset="UTF-8">
     <title>VetCare Pro - PHÂN TÍCH HIỆU SUẤT</title>
@@ -242,16 +242,16 @@
     <main class="main-content">
         <header class="top-header">
             <div class="title-area">
-                <h1>Phân tích hiệu suất</h1>
-                <p>Tăng trưởng doanh thu hàng tháng và chỉ số hài lòng khách hàng</p>
+                <h1>${L == 'en' ? 'Performance Analytics' : 'Phân tích hiệu suất'}</h1>
+                <p>${L == 'en' ? 'Monthly revenue growth and customer satisfaction indicators' : 'Tăng trưởng doanh thu hàng tháng và chỉ số hài lòng khách hàng'}</p>
             </div>
-            <a href="${pageContext.request.contextPath}/logout" class="btn-logout">Đăng xuất</a>
+            <a href="${pageContext.request.contextPath}/logout" class="btn-logout">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
         </header>
 
         <div class="dashboard-grid">
             <!-- Left Panel: Revenue Trends -->
             <section class="card-panel">
-                <h2 class="panel-title">Xu hướng doanh thu (6 tháng qua)</h2>
+                <h2 class="panel-title">${L == 'en' ? 'Revenue Trend (Last 6 Months)' : 'Xu hướng doanh thu (6 tháng qua)'}</h2>
                 
                 <div class="chart-placeholder">
                     <c:choose>
@@ -264,19 +264,19 @@
                                 <div class="month-col">
                                     <span class="month-value" style="font-size:11px; font-weight:700; color:#0f172a;"><fmt:formatNumber value="${month.revenue}" pattern="#,###"/>₫</span>
                                     <div style="width:30px; background:linear-gradient(to top, #10b981, #34d399); border-radius:4px 4px 0 0; height: ${month.revenue > 0 ? (month.revenue / maxRev) * 120 : 4}px;"></div>
-                                    <span class="month-label">Tháng ${fn:substring(month.month, 5, 7)}</span>
+                                    <span class="month-label">${L == 'en' ? 'Month' : 'Tháng'} ${fn:substring(month.month, 5, 7)}</span>
                                 </div>
                             </c:forEach>
                         </c:when>
                         <c:otherwise>
-                            <div style="width:100%; text-align:center; color:#cbd5e0; font-size:12px; margin-bottom:20px;">Dữ liệu biểu đồ đang được cập nhật...</div>
+                            <div style="width:100%; text-align:center; color:#cbd5e0; font-size:12px; margin-bottom:20px;">${L == 'en' ? 'Chart data is being updated...' : 'Dữ liệu biểu đồ đang được cập nhật...'}</div>
                         </c:otherwise>
                     </c:choose>
                 </div>
 
                 <div class="revenue-footer">
                     <div>
-                        <p class="rev-total-label">Tổng kỳ hạn</p>
+                        <p class="rev-total-label">${L == 'en' ? 'Period Total' : 'Tổng kỳ hạn'}</p>
                         <div class="rev-total-val">
                             <c:choose>
                                 <c:when test="${not empty revenueReport}">
@@ -287,7 +287,7 @@
                         </div>
                     </div>
                     <div>
-                        <p class="rev-total-label" style="text-align: right;">Tăng trưởng</p>
+                        <p class="rev-total-label" style="text-align: right;">${L == 'en' ? 'Growth' : 'Tăng trưởng'}</p>
                         <div class="growth-badge">
                             <c:choose>
                                 <c:when test="${not empty revenueGrowth}">
@@ -307,8 +307,8 @@
             <!-- Right Panel: Transaction History -->
             <section class="card-panel">
                 <div class="panel-head">
-                    <h2 class="panel-title">Lịch sử giao dịch gần đây</h2>
-                    <a class="panel-head-link" href="${pageContext.request.contextPath}/admin/invoice/list">Xem tất cả</a>
+                    <h2 class="panel-title">${L == 'en' ? 'Recent Transactions' : 'Lịch sử giao dịch gần đây'}</h2>
+                    <a class="panel-head-link" href="${pageContext.request.contextPath}/admin/invoice/list">${L == 'en' ? 'View All' : 'Xem tất cả'}</a>
                 </div>
                 
                 <div class="txn-list">
@@ -317,9 +317,9 @@
                             <c:forEach var="inv" items="${recentInvoices}">
                                 <div class="txn-item">
                                     <div class="txn-main">
-                                        <div class="txn-title">Hóa đơn #${inv.invoiceId}</div>
+                                        <div class="txn-title">${L == 'en' ? 'Invoice' : 'Hóa đơn'} #${inv.invoiceId}</div>
                                         <div class="txn-meta">
-                                            ${inv.ownerName} - Thú cưng: ${inv.petName}
+                                            ${inv.ownerName} - ${L == 'en' ? 'Pet' : 'Thú cưng'}: ${inv.petName}
                                             <span style="margin:0 4px;">|</span>
                                             <fmt:formatDate value="${inv.createdAt}" pattern="dd/MM/yyyy HH:mm" />
                                         </div>
@@ -329,23 +329,23 @@
                                         <div class="txn-actions">
                                             <c:choose>
                                                 <c:when test="${inv.status eq 'Paid'}">
-                                                    <span class="txn-status paid">Paid</span>
+                                                    <span class="txn-status paid">${L == 'en' ? 'Paid' : 'Đã thanh toán'}</span>
                                                 </c:when>
                                                 <c:when test="${inv.status eq 'Unpaid'}">
-                                                    <span class="txn-status unpaid">Unpaid</span>
+                                                    <span class="txn-status unpaid">${L == 'en' ? 'Unpaid' : 'Chưa thanh toán'}</span>
                                                 </c:when>
                                                 <c:otherwise>
                                                     <span class="txn-status other">${inv.status}</span>
                                                 </c:otherwise>
                                             </c:choose>
-                                            <a class="txn-link" href="${pageContext.request.contextPath}/admin/invoice/detail?invoiceId=${inv.invoiceId}">Xem</a>
+                                            <a class="txn-link" href="${pageContext.request.contextPath}/admin/invoice/detail?invoiceId=${inv.invoiceId}">${L == 'en' ? 'View' : 'Xem'}</a>
                                         </div>
                                     </div>
                                 </div>
                             </c:forEach>
                         </c:when>
                         <c:otherwise>
-                            <p style="text-align:center; color:#cbd5e0; font-size:13px; padding-top:20px;">Chưa có hóa đơn nào để hiển thị.</p>
+                            <p style="text-align:center; color:#cbd5e0; font-size:13px; padding-top:20px;">${L == 'en' ? 'No invoices to display.' : 'Chưa có hóa đơn nào để hiển thị.'}</p>
                         </c:otherwise>
                     </c:choose>
                 </div>
@@ -360,3 +360,4 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+

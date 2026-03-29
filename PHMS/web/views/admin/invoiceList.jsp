@@ -1,8 +1,8 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="${L}">
 <head>
     <meta charset="UTF-8">
     <title>VetCare Pro - T&#7845;t c&#7843; giao d&#7883;ch</title>
@@ -310,7 +310,7 @@
                 </a>
             </div>
             <div class="actions">
-                <a class="btn" href="${pageContext.request.contextPath}/logout">&#272;&#259;ng xu&#7845;t</a>
+                <a class="btn" href="${pageContext.request.contextPath}/logout">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
             </div>
         </div>
 
@@ -425,3 +425,4 @@
     <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+
