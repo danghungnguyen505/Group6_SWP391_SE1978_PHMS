@@ -25,7 +25,7 @@
         </li>
         <li class="nav-item">
             <a href="${pageContext.request.contextPath}/myPetOwner"
-               class="nav-link ${pageContext.request.requestURI.contains('/myPetOwner') ? 'active' : ''}">
+               class="nav-link ${pageContext.request.requestURI.contains('/myPetOwner') || pageContext.request.requestURI.contains('/pet/add') || pageContext.request.requestURI.contains('/pet/update') ? 'active' : ''}">
                 <i class="fa-solid fa-paw"></i> ${L == 'en' ? 'My Pets' : 'Thú cưng của tôi'}
             </a>
         </li>

@@ -79,8 +79,8 @@ public class LoginController extends HttpServlet {
         String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
         VerifyRecaptcha vr = new VerifyRecaptcha();
         boolean isCaptchaValid = vr.verify(gRecaptchaResponse);
-        if (isCaptchaValid) {
-            request.setAttribute("error", "Vui lÃƒÂ²ng xÃƒÂ¡c thÃ¡Â»Â±c bÃ¡ÂºÂ¡n khÃƒÂ´ng phÃ¡ÂºÂ£i lÃƒÂ  ngÃ†Â°Ã¡Â»Âi mÃƒÂ¡y!");
+        if (!isCaptchaValid) {
+            request.setAttribute("error", "Vui lòng xác thực bạn không phải là người máy!");
             request.setAttribute("username", request.getParameter("username"));
             request.getRequestDispatcher("views/auth/login.jsp").forward(request, response);
             return;
@@ -91,7 +91,7 @@ public class LoginController extends HttpServlet {
         String p = request.getParameter("password");
 
         if (u == null || u.trim().isEmpty() || p == null || p.trim().isEmpty()) {
-            request.setAttribute("error", "Vui lÃƒÂ²ng nhÃ¡ÂºÂ­p Ã„â€˜Ã¡ÂºÂ§y Ã„â€˜Ã¡Â»Â§ tÃƒÂªn Ã„â€˜Ã„Æ’ng nhÃ¡ÂºÂ­p vÃƒÂ  mÃ¡ÂºÂ­t khÃ¡ÂºÂ©u!");
+            request.setAttribute("error", "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!");
             request.setAttribute("username", u != null ? u : "");
             request.getRequestDispatcher("views/auth/login.jsp").forward(request, response);
             return;
@@ -112,7 +112,7 @@ public class LoginController extends HttpServlet {
             HttpSession session = request.getSession();
             session.setAttribute("account", account);
 
-            String role = account.getRole(); // LÃ¡ÂºÂ¥y tÃ¡Â»Â« DB: Admin, Veterinarian, PetOwner...
+            String role = account.getRole(); // Lấy từ DB: Admin, Veterinarian, PetOwner...
             if ("ClinicManager".equalsIgnoreCase(role) || "Admin".equalsIgnoreCase(role)) {
                 response.sendRedirect("admin/dashboard");
             } else if ("Veterinarian".equalsIgnoreCase(role)) {

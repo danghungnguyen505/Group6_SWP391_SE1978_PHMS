@@ -7,13 +7,15 @@ package controller.receptionist;
 
 import dal.AppointmentDAO;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.sql.Timestamp;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.time.LocalDateTime;
+import model.Appointment;
 import model.User;
 
 /**
@@ -22,6 +24,14 @@ import model.User;
  */
 @WebServlet(name="ReceptionistActionController", urlPatterns={"/receptionist/appointment-action"})
 public class ReceptionistActionController extends HttpServlet {
+    private boolean isWithinCheckInWindow(Timestamp startTime) {
+        if (startTime == null) {
+            return false;
+        }
+        LocalDateTime earliestCheckIn = startTime.toLocalDateTime().minusMinutes(5);
+        return !LocalDateTime.now().isBefore(earliestCheckIn);
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
@@ -57,7 +67,22 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
                 } 
                 // TRƯỜNG HỢP 2: CHECK-IN / NO-SHOW (Confirmed -> Checked-in/No-show)
                 else if (status.equals("Checked-in") || status.equals("No-show")) {
-                    // Gọi hàm changeAppointmentStatusByReceptionist để lưu receptionist_id
+                    // TEMP DEMO: bypass check-in time window (kept code in comments)
+//                    if ("Checked-in".equals(status)) {
+//                        Appointment appt = dao.getAppointmentById(apptId);
+//                        if (appt == null) {
+//                            session.setAttribute("actionMessage", "Lỗi: Không tìm thấy cuộc hẹn.");
+//                            response.sendRedirect(request.getContextPath() + "/receptionist/dashboard");
+//                            return;
+//                        }
+//                        if (!isWithinCheckInWindow(appt.getStartTime())) {
+//                            session.setAttribute("actionMessage", "Chỉ được check-in trong vòng 5 phút trước giờ hẹn.");
+//                            response.sendRedirect(request.getContextPath() + "/receptionist/dashboard");
+//                            return;
+//                        }
+//                    }
+                    // TEMP DEMO //
+                    
                     isUpdated = dao.changeAppointmentStatusByReceptionist(apptId, status, account.getUserId());
                     
                     if (isUpdated) {
@@ -85,3 +110,4 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
     }
 
 }
+

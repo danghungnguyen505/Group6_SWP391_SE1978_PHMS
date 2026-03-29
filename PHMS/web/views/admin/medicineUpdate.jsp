@@ -2,7 +2,7 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="${L}">
 <head>
     <meta charset="UTF-8">
     <title>VetCare Pro - UPDATE MEDICINE</title>
@@ -110,11 +110,11 @@
             <div class="header-left">
                 <a href="${pageContext.request.contextPath}/admin/medicine/list" class="btn-back"><i class="fa-solid fa-chevron-left"></i></a>
                 <div class="title-area">
-                    <h1>Update Medicine Details</h1>
-                    <p>Edit pharmaceutical information and manage current stock levels.</p>
+                    <h1>${L == 'en' ? 'Update Medicine Details' : 'Cập nhật thông tin thuốc'}</h1>
+                    <p>${L == 'en' ? 'Edit pharmaceutical information and manage current stock levels.' : 'Chỉnh sửa thông tin dược phẩm và tồn kho hiện tại.'}</p>
                 </div>
             </div>
-            <a class="btn-logout" href="${pageContext.request.contextPath}/logout">&#272;&#259;ng xu&#7845;t</a>
+            <a class="btn-logout" href="${pageContext.request.contextPath}/logout">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
         </header>
 
         <div class="form-container">
@@ -124,42 +124,42 @@
 
             <c:if test="${not empty medicine}">
                 <!-- Medicine ID Badge -->
-                <div class="medicine-id-badge">Medicine ID: #${medicine.medicineId}</div>
+                <div class="medicine-id-badge">${L == 'en' ? 'Medicine ID' : 'Mã thuốc'}: #${medicine.medicineId}</div>
 
                 <form method="post" action="${pageContext.request.contextPath}/admin/medicine/update">
-                    <!-- Hidden field Ä‘á»ƒ gá»­i ID thuá»‘c -->
+                    <!-- Hidden field để gửi ID thuốc -->
                     <input type="hidden" name="medicineId" value="${medicine.medicineId}">
 
                     <div class="form-group">
-                        <label class="form-label">Medicine Name *</label>
+                        <label class="form-label">${L == 'en' ? 'Medicine Name *' : 'Tên thuốc *'}</label>
                         <input type="text" name="name" value="${medicine.name}" required maxlength="100" class="form-input">
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Unit *</label>
+                            <label class="form-label">${L == 'en' ? 'Unit *' : 'Đơn vị *'}</label>
                             <input type="text" name="unit" value="${medicine.unit}" required maxlength="20" class="form-input">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Price (VND) *</label>
+                            <label class="form-label">${L == 'en' ? 'Price (VND) *' : 'Giá (VND) *'}</label>
                             <input type="number" name="price" value="${medicine.price}" step="0.01" min="0" required class="form-input">
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Stock Quantity *</label>
+                        <label class="form-label">${L == 'en' ? 'Stock Quantity *' : 'Số lượng tồn *'}</label>
                         <input type="number" name="stockQuantity" value="${medicine.stockQuantity}" min="0" required class="form-input">
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Inventory Status</label>
-                        <input type="text" class="form-input" value="${medicine.stockQuantity > 0 ? 'Hoáº¡t Ä‘á»™ng' : 'Háº¿t hÃ ng'}" readonly 
+                        <label class="form-label">${L == 'en' ? 'Inventory Status' : 'Trạng thái kho'}</label>
+                        <input type="text" class="form-input" value="${medicine.stockQuantity > 0 ? (L == 'en' ? 'Active' : 'Hoạt động') : (L == 'en' ? 'Out of stock' : 'Hết hàng')}" readonly 
                                style="font-weight: 700; color: ${medicine.stockQuantity > 0 ? '#15803d' : '#b91c1c'}">
                     </div>
 
                     <div class="form-actions">
-                        <button type="submit" class="btn-submit">Update Changes</button>
-                        <a href="${pageContext.request.contextPath}/admin/medicine/list" class="btn-cancel">Cancel</a>
+                        <button type="submit" class="btn-submit">${L == 'en' ? 'Update Changes' : 'Cập nhật thay đổi'}</button>
+                        <a href="${pageContext.request.contextPath}/admin/medicine/list" class="btn-cancel">${L == 'en' ? 'Cancel' : 'Hủy'}</a>
                     </div>
                 </form>
             </c:if>
@@ -173,3 +173,4 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+

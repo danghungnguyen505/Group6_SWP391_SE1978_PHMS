@@ -2,7 +2,7 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="${L}">
 <head>
     <meta charset="UTF-8">
     <title>VetCare Pro - CUSTOMER FEEDBACK</title>
@@ -144,32 +144,32 @@
     <main class="main-content">
         <div class="top-bar">
             <div class="page-header">
-                <h2>Customer Feedback</h2>
-                <p>Monitoring client satisfaction and service quality</p>
+                <h2>${L == 'en' ? 'Customer Feedback' : 'Phản hồi khách hàng'}</h2>
+                <p>${L == 'en' ? 'Monitoring client satisfaction and service quality' : 'Theo dõi mức độ hài lòng và chất lượng dịch vụ'}</p>
             </div>
             <div style="display:flex; align-items:center; gap:20px;">
                 <form id="filterForm" method="get" style="display:flex; align-items:center; gap:10px;">
                     <input type="hidden" name="size" value="${pageSize}">
                     <div class="filter-area">
-                        Rating:
+                        ${L == 'en' ? 'Rating:' : 'Mức sao:'}
                         <select class="filter-select" name="ratingFilter" onchange="document.getElementById('filterForm').submit()">
-                            <option value="all" ${empty ratingFilter || ratingFilter == 'all' ? 'selected' : ''}>All Ratings</option>
-                            <option value="5" ${ratingFilter == '5' ? 'selected' : ''}>5 Stars</option>
-                            <option value="4" ${ratingFilter == '4' ? 'selected' : ''}>4 Stars</option>
-                            <option value="below3" ${ratingFilter == 'below3' ? 'selected' : ''}>Below 3 Stars</option>
+                            <option value="all" ${empty ratingFilter || ratingFilter == 'all' ? 'selected' : ''}>${L == 'en' ? 'All Ratings' : 'Tất cả mức sao'}</option>
+                            <option value="5" ${ratingFilter == '5' ? 'selected' : ''}>${L == 'en' ? '5 Stars' : '5 sao'}</option>
+                            <option value="4" ${ratingFilter == '4' ? 'selected' : ''}>${L == 'en' ? '4 Stars' : '4 sao'}</option>
+                            <option value="below3" ${ratingFilter == 'below3' ? 'selected' : ''}>${L == 'en' ? 'Below 3 Stars' : 'Dưới 3 sao'}</option>
                         </select>
                     </div>
                     <div class="filter-area">
-                        Status:
+                        ${L == 'en' ? 'Status:' : 'Trạng thái:'}
                         <select class="filter-select" name="statusFilter" onchange="document.getElementById('filterForm').submit()">
-                            <option value="all" ${empty statusFilter || statusFilter == 'all' ? 'selected' : ''}>All Status</option>
-                            <option value="New" ${statusFilter == 'New' ? 'selected' : ''}>New</option>
-                            <option value="Read" ${statusFilter == 'Read' ? 'selected' : ''}>Read</option>
-                            <option value="Flagged" ${statusFilter == 'Flagged' ? 'selected' : ''}>Flagged</option>
+                            <option value="all" ${empty statusFilter || statusFilter == 'all' ? 'selected' : ''}>${L == 'en' ? 'All Status' : 'Tất cả trạng thái'}</option>
+                            <option value="New" ${statusFilter == 'New' ? 'selected' : ''}>${L == 'en' ? 'New' : 'Mới'}</option>
+                            <option value="Read" ${statusFilter == 'Read' ? 'selected' : ''}>${L == 'en' ? 'Read' : 'Đã đọc'}</option>
+                            <option value="Flagged" ${statusFilter == 'Flagged' ? 'selected' : ''}>${L == 'en' ? 'Flagged' : 'Cần chú ý'}</option>
                         </select>
                     </div>
                 </form>
-                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
+                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
             </div>
         </div>
 
@@ -178,7 +178,7 @@
                 <c:when test="${empty feedbacks}">
                     <div style="text-align:center; padding:60px; color:var(--text-muted);">
                         <i class="fa-solid fa-comments-slash" style="font-size:48px; margin-bottom:20px; opacity:0.3;"></i>
-                        <p>No client feedbacks found at this time.</p>
+                        <p>${L == 'en' ? 'No client feedbacks found at this time.' : 'Hiện chưa có phản hồi khách hàng.'}</p>
                     </div>
                 </c:when>
                 <c:otherwise>
@@ -186,12 +186,12 @@
                         <thead>
                             <tr>
                                 <th>STT</th>
-                                <th>Client / Pet</th>
-                                <th>Rating</th>
-                                <th>Comment</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                                <th style="text-align:right;">Action</th>
+                                <th>${L == 'en' ? 'Client / Pet' : 'Khách hàng / Thú cưng'}</th>
+                                <th>${L == 'en' ? 'Rating' : 'Số sao'}</th>
+                                <th>${L == 'en' ? 'Comment' : 'Nhận xét'}</th>
+                                <th>${L == 'en' ? 'Date' : 'Ngày'}</th>
+                                <th>${L == 'en' ? 'Status' : 'Trạng thái'}</th>
+                                <th style="text-align:right;">${L == 'en' ? 'Action' : 'Thao tác'}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -212,9 +212,9 @@
                                     <td class="col-date">${fb.apptDate}</td>
                                     <td>
                                         <c:choose>
-                                            <c:when test="${fb.status == 'Flagged'}"><span class="status-badge status-flagged">Flagged</span></c:when>
-                                            <c:when test="${fb.status == 'Read'}"><span class="status-badge status-read">Read</span></c:when>
-                                            <c:otherwise><span class="status-badge status-new">New</span></c:otherwise>
+                                            <c:when test="${fb.status == 'Flagged'}"><span class="status-badge status-flagged">${L == 'en' ? 'Flagged' : 'Cần chú ý'}</span></c:when>
+                                            <c:when test="${fb.status == 'Read'}"><span class="status-badge status-read">${L == 'en' ? 'Read' : 'Đã đọc'}</span></c:when>
+                                            <c:otherwise><span class="status-badge status-new">${L == 'en' ? 'New' : 'Mới'}</span></c:otherwise>
                                         </c:choose>
                                     </td>
                                     <td style="text-align:right;">
@@ -222,14 +222,14 @@
                                             <form action="${pageContext.request.contextPath}/admin/feedback/list" method="post" style="display:inline;">
                                                 <input type="hidden" name="feedbackId" value="${fb.feedbackId}">
                                                 <input type="hidden" name="action" value="markRead">
-                                                <button type="submit" class="btn-action" title="Mark as read"><i class="fa-solid fa-check"></i></button>
+                                                <button type="submit" class="btn-action" title="${L == 'en' ? 'Mark as read' : 'Đánh dấu đã đọc'}"><i class="fa-solid fa-check"></i></button>
                                             </form>
                                         </c:if>
                                         <c:if test="${fb.status != 'Flagged'}">
                                             <form action="${pageContext.request.contextPath}/admin/feedback/list" method="post" style="display:inline;">
                                                 <input type="hidden" name="feedbackId" value="${fb.feedbackId}">
                                                 <input type="hidden" name="action" value="flag">
-                                                <button type="submit" class="btn-action" title="Flag review"><i class="fa-solid fa-flag"></i></button>
+                                                <button type="submit" class="btn-action" title="${L == 'en' ? 'Flag review' : 'Đánh dấu cần chú ý'}"><i class="fa-solid fa-flag"></i></button>
                                             </form>
                                         </c:if>
                                     </td>
@@ -244,7 +244,7 @@
                             <form method="get" style="display:flex; align-items:center; gap:8px;">
                                 <input type="hidden" name="ratingFilter" value="${ratingFilter}">
                                 <input type="hidden" name="statusFilter" value="${statusFilter}">
-                                <label style="font-size:12px; font-weight:700; color:var(--text-muted);">Hiển thị</label>
+                                <label style="font-size:12px; font-weight:700; color:var(--text-muted);">${L == 'en' ? 'Showing' : 'Hiển thị'}</label>
                                 <select name="size" class="filter-select" style="padding:6px 10px;" onchange="this.form.submit()">
                                     <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
                                     <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
@@ -254,11 +254,11 @@
                                 </select>
                             </form>
                             <c:if test="${currentPage > 1}">
-                                <a href="?page=${currentPage - 1}&size=${pageSize}<c:if test='${not empty ratingFilter}'>&ratingFilter=${ratingFilter}</c:if><c:if test='${not empty statusFilter}'>&statusFilter=${statusFilter}</c:if>" class="page-link">Previous</a>
+                                <a href="?page=${currentPage - 1}&size=${pageSize}<c:if test='${not empty ratingFilter}'>&ratingFilter=${ratingFilter}</c:if><c:if test='${not empty statusFilter}'>&statusFilter=${statusFilter}</c:if>" class="page-link">${L == 'en' ? 'Previous' : 'Trước'}</a>
                             </c:if>
-                            <span style="font-size:12px; font-weight:700; color:var(--text-muted);">Page ${currentPage} of ${totalPages}</span>
+                            <span style="font-size:12px; font-weight:700; color:var(--text-muted);">${L == 'en' ? 'Page' : 'Trang'} ${currentPage} ${L == 'en' ? 'of' : 'trên'} ${totalPages}</span>
                             <c:if test="${currentPage < totalPages}">
-                                <a href="?page=${currentPage + 1}&size=${pageSize}<c:if test='${not empty ratingFilter}'>&ratingFilter=${ratingFilter}</c:if><c:if test='${not empty statusFilter}'>&statusFilter=${statusFilter}</c:if>" class="page-link">Next</a>
+                                <a href="?page=${currentPage + 1}&size=${pageSize}<c:if test='${not empty ratingFilter}'>&ratingFilter=${ratingFilter}</c:if><c:if test='${not empty statusFilter}'>&statusFilter=${statusFilter}</c:if>" class="page-link">${L == 'en' ? 'Next' : 'Tiếp'}</a>
                             </c:if>
                         </div>
                     </c:if>
@@ -273,3 +273,4 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+

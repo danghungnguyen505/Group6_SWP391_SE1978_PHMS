@@ -2,7 +2,7 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
-<html>
+<html lang="${L}">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>VetCare Pro - Veterinarian Dashboard</title>
@@ -111,8 +111,7 @@
                     <p>Welcome back, ${sessionScope.account.fullName} &mdash; <fmt:formatDate value="${today}" pattern="EEEE, dd MMMM yyyy"/></p>
                 </div>
                 <a href="${pageContext.request.contextPath}/logout" class="btn-signout">
-                    <i class="fa-solid fa-right-from-bracket"></i> Sign Out
-                </a>
+                    <i class="fa-solid fa-right-from-bracket"></i>${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
             </div>
 
             <!-- Stats Row -->
@@ -349,4 +348,5 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+
 

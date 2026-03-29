@@ -37,7 +37,7 @@ public class StaffAccountUpdateController extends HttpServlet {
         }
 
         if (!util.ValidationUtils.isIntegerInRange(idStr, 1, Integer.MAX_VALUE)) {
-            session.setAttribute("toastMessage", "error|Staff ID khong hop le.");
+            session.setAttribute("toastMessage", "error|Staff ID không hợp lệ.");
             response.sendRedirect(request.getContextPath() + "/admin/staff/list");
             return;
         }
@@ -47,7 +47,7 @@ public class StaffAccountUpdateController extends HttpServlet {
         User staff = staffDAO.getStaffAccountById(id);
 
         if (staff == null) {
-            session.setAttribute("toastMessage", "error|Khong tim thay tai khoan nhan vien.");
+            session.setAttribute("toastMessage", "error|Không tìm thấy tài khoản nhân viên.");
             response.sendRedirect(request.getContextPath() + "/admin/staff/list");
             return;
         }
@@ -91,7 +91,7 @@ public class StaffAccountUpdateController extends HttpServlet {
         String vetType = util.ValidationUtils.sanitize(request.getParameter("vetType"));
 
         if (!util.ValidationUtils.isIntegerInRange(idStr, 1, Integer.MAX_VALUE)) {
-            session.setAttribute("toastMessage", "error|Staff ID khong hop le.");
+            session.setAttribute("toastMessage", "error|Staff ID không hợp lệ.");
             response.sendRedirect(request.getContextPath() + "/admin/staff/list");
             return;
         }
@@ -106,7 +106,7 @@ public class StaffAccountUpdateController extends HttpServlet {
         }
 
         if (!util.ValidationUtils.isNotEmpty(phone) || !util.ValidationUtils.isValidPhone(phone)) {
-            request.setAttribute("error", "So dien thoai khong hop le!");
+            request.setAttribute("error", "Số điện thoại không hợp lệ!");
             request.setAttribute("userId", idStr);
             doGet(request, response);
             return;
@@ -114,14 +114,14 @@ public class StaffAccountUpdateController extends HttpServlet {
 
         dal.UserDAO userDAO = new dal.UserDAO();
         if (userDAO.checkPhoneExistsForOther(userId, phone)) {
-            request.setAttribute("error", "So dien thoai nay da duoc su dung!");
+            request.setAttribute("error", "Số điện thoại này đã được sử dụng!");
             request.setAttribute("userId", idStr);
             doGet(request, response);
             return;
         }
 
         if (!isValidStaffRole(role)) {
-            request.setAttribute("error", "Vai tro khong hop le!");
+            request.setAttribute("error", "Vai trò không hợp lệ!");
             request.setAttribute("userId", idStr);
             doGet(request, response);
             return;
@@ -129,7 +129,7 @@ public class StaffAccountUpdateController extends HttpServlet {
 
         if ("Veterinarian".equalsIgnoreCase(role)) {
             if (!"Normal".equalsIgnoreCase(vetType) && !"Emergency".equalsIgnoreCase(vetType)) {
-                request.setAttribute("error", "Loai bac si khong hop le!");
+                request.setAttribute("error", "Loại bác sĩ không hợp lệ!");
                 request.setAttribute("userId", idStr);
                 doGet(request, response);
                 return;
@@ -162,16 +162,16 @@ public class StaffAccountUpdateController extends HttpServlet {
             boolean ok = staffDAO.updateStaffAccount(userId, fullName, phone, role,
                     employeeCode, department, salaryBase, specialization, licenseNumber, vetType);
             if (ok) {
-                session.setAttribute("toastMessage", "success|Cap nhat tai khoan nhan vien thanh cong!");
+                session.setAttribute("toastMessage", "success|Cập nhật tài khoản nhân viên thành công!");
                 response.sendRedirect(request.getContextPath() + "/admin/staff/list");
             } else {
-                request.setAttribute("error", "Khong the cap nhat tai khoan. Vui long thu lai.");
+                request.setAttribute("error", "Không thể cập nhật tài khoản. Vui lòng thử lại.");
                 request.setAttribute("userId", idStr);
                 doGet(request, response);
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            request.setAttribute("error", "Loi he thong: " + e.getMessage());
+            request.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
             request.setAttribute("userId", idStr);
             doGet(request, response);
         }

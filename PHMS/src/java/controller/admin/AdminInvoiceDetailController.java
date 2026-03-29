@@ -48,7 +48,7 @@ public class AdminInvoiceDetailController extends HttpServlet {
 
         Invoice inv = invoiceDAO.getInvoiceById(invoiceId);
         if (inv == null) {
-            session.setAttribute("toastMessage", "error|Khong tim thay hoa don.");
+            session.setAttribute("toastMessage", "Không tìm thấy hoá đơn.");
             response.sendRedirect(request.getContextPath() + "/admin/reports");
             return;
         }

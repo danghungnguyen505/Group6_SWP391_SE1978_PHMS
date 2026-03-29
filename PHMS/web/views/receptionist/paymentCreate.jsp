@@ -1,3 +1,4 @@
+<%@ page pageEncoding="UTF-8" %>
 <%-- 
     Document   : paymentCreate
     Created on : Feb 3, 2026, 7:49:48 PM
@@ -9,10 +10,10 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="${L}">
 <head>
     <meta charset="UTF-8">
-    <title>Thanh toÃ¡n hÃ³a Ä‘Æ¡n - PHMS</title>
+    <title>Thanh toán hóa đơn - PHMS</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/components.css">
@@ -30,22 +31,22 @@
         <ul class="menu">
             <li>
                 <a href="${pageContext.request.contextPath}/receptionist/dashboard">
-                    <i class="fa-solid fa-table-columns"></i> ${L == 'en' ? 'Dashboard' : 'Báº£ng Ä‘iá»u khiá»ƒn'}
+                    <i class="fa-solid fa-table-columns"></i> ${L == 'en' ? 'Dashboard' : 'Bảng điều khiển'}
                 </a>
             </li>
             <li>
                 <a href="${pageContext.request.contextPath}/receptionist/emergency/queue" class="text-danger">
-                    <i class="fa-solid fa-truck-medical"></i> ${L == 'en' ? 'Emergency Triage' : 'Cáº¥p cá»©u'}
+                    <i class="fa-solid fa-truck-medical"></i> ${L == 'en' ? 'Emergency Triage' : 'Cấp cứu'}
                 </a>
             </li>
             <li>
                 <a href="${pageContext.request.contextPath}/receptionist/appointment">
-                    <i class="fa-regular fa-calendar-check"></i> ${L == 'en' ? 'Appointments' : 'Cuá»™c háº¹n'}
+                    <i class="fa-regular fa-calendar-check"></i> ${L == 'en' ? 'Appointments' : 'Cuộc hẹn'}
                 </a>
             </li>
             <li>
                 <a href="${pageContext.request.contextPath}/receptionist/invoice/create" class="active">
-                    <i class="fa-regular fa-credit-card"></i> ${L == 'en' ? 'Billing' : 'Thanh toÃ¡n'}
+                    <i class="fa-regular fa-credit-card"></i> ${L == 'en' ? 'Billing' : 'Thanh toán'}
                 </a>
             </li>
         </ul>
@@ -63,15 +64,15 @@
         </div>
 
         <div class="help-box">
-            <div class="help-text">${L == 'en' ? 'Need help?' : 'Cáº§n há»— trá»£?'}</div>
-            <a href="#" class="btn-contact">${L == 'en' ? 'Contact Support' : 'LiÃªn há»‡ há»— trá»£'}</a>
+            <div class="help-text">${L == 'en' ? 'Need help?' : 'Cần hỗ trợ?'}</div>
+            <a href="#" class="btn-contact">${L == 'en' ? 'Contact Support' : 'Liên hệ hỗ trợ'}</a>
         </div>
     </nav>
 
     <main class="main-content">
         <div class="page-header">
             <div class="header-text">
-                <h1>Payment Gateway</h1>
+                <h1>${L == 'en' ? 'Payment Gateway' : 'Cổng thanh toán'}</h1>
                 <p>Select a payment method for Invoice #${invoice.invoiceId}</p>
             </div>
         </div>
@@ -81,18 +82,18 @@
                 
                 <div class="alert alert-info">
                     <div class="d-flex justify-content-between">
-                        <strong>Invoice ID:</strong>
+                        <strong>${L == 'en' ? 'Invoice ID' : 'Mã hóa đơn'}:</strong>
                         <span>#${invoice.invoiceId}</span>
                     </div>
                     <div class="d-flex justify-content-between mt-2">
-                        <strong>Total Amount:</strong>
+                        <strong>${L == 'en' ? 'Total Amount' : 'Tổng tiền'}:</strong>
                         <span class="fs-4 fw-bold text-primary">
                             <fmt:formatNumber value="${invoice.totalAmount}" type="currency" currencySymbol="VND "/>
                         </span>
                     </div>
                 </div>
 
-                <h3>Select Payment Method</h3>
+                <h3>${L == 'en' ? 'Select Payment Method' : 'Chọn phương thức thanh toán'}</h3>
                 
                 <form action="${pageContext.request.contextPath}/receptionist/payment/create" method="POST">
                     <input type="hidden" name="invoiceId" value="${invoice.invoiceId}"/>
@@ -105,8 +106,8 @@
                                     <i class="fa-solid fa-wallet"></i>
                                 </div>
                                 <div class="text-box">
-                                    <span class="method-name">Cash / POS</span>
-                                    <span class="method-desc">Pay directly at the counter</span>
+                                    <span class="method-name">${L == 'en' ? 'Cash / POS' : 'Tiền mặt / POS'}</span>
+                                    <span class="method-desc">${L == 'en' ? 'Pay directly at the counter' : 'Thanh toán trực tiếp tại quầy'}</span>
                                 </div>
                             </div>
                         </label>
@@ -118,8 +119,8 @@
                                     <i class="fa-solid fa-qrcode"></i>
                                 </div>
                                 <div class="text-box">
-                                    <span class="method-name">VNPay / Banking</span>
-                                    <span class="method-desc">Scan QR Code instantly</span>
+                                    <span class="method-name">${L == 'en' ? 'VNPay / Banking' : 'VNPay / Chuyển khoản'}</span>
+                                    <span class="method-desc">${L == 'en' ? 'Scan QR Code instantly' : 'Quét QR để thanh toán nhanh'}</span>
                                 </div>
                             </div>
                         </label>
@@ -133,7 +134,7 @@
         </div>
     </main>
 <div class="phms-account-entry" style="position:fixed; top:16px; right:20px; z-index:1200;">
-    <a href="${pageContext.request.contextPath}/logout" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;color:#334155;text-decoration:none;font-size:13px;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.05);">Sign Out</a>
+    <a href="${pageContext.request.contextPath}/logout" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;color:#334155;text-decoration:none;font-size:13px;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.05);">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
 </div>
 <script>
 window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
@@ -142,3 +143,4 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+

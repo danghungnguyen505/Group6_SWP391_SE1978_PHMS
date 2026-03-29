@@ -1,7 +1,8 @@
+<%@ page pageEncoding="UTF-8" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="${L}">
     <head>
         <meta charset="UTF-8">
         <title>Hàng đợi cấp cứu - Bác sĩ</title>
@@ -25,8 +26,7 @@
                         <a href="${pageContext.request.contextPath}/logout"
                            class="btn"
                            style="padding:8px 14px; border:1px solid #d1d5db; border-radius:8px; text-decoration:none; color:#334155; background:#fff; font-size:13px; font-weight:600;">
-                            <i class="fa-solid fa-right-from-bracket"></i> Sign Out
-                        </a>
+                            <i class="fa-solid fa-right-from-bracket"></i>${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
                     </header>
 
                     <!-- Search -->
@@ -182,7 +182,7 @@
                                 <input type="hidden" name="filter" value="${filter}">
                                 <input type="hidden" name="level" value="${level}">
                                 <input type="hidden" name="search" value="${search}">
-                                <span style="font-size:12px; color:#64748b; font-weight:700;">Hiển thị</span>
+                                <span style="font-size:12px; color:#64748b; font-weight:700;">${L == 'en' ? 'Showing' : 'Hiển thị'}</span>
                                 <select name="size" onchange="this.form.submit()" style="padding:6px 10px; border:1px solid #d1d5db; border-radius:8px; font-size:12px;">
                                     <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
                                     <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
@@ -220,4 +220,5 @@
         <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
     </body>
 </html>
+
 

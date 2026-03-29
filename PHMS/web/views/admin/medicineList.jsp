@@ -1,9 +1,9 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="${L}">
     <head>
         <meta charset="UTF-8">
         <title>VetCare Pro - MEDICINE INVENTORY</title>
@@ -335,20 +335,20 @@
         <main class="main-content">
             <div class="top-bar">
                 <div class="page-header">
-                    <h2>Medicine Inventory</h2>
-                    <p>Total: ${totalMedicines} medicines in stock</p>
+                    <h2>${L == 'en' ? 'Medicine Inventory' : 'Kho thuốc'}</h2>
+                    <p>${L == 'en' ? 'Total:' : 'Tổng:'} ${totalMedicines} ${L == 'en' ? 'medicines in stock' : 'thuốc trong kho'}</p>
                 </div>
                 <div style="display:flex; gap:15px; align-items:center;">
                     <form action="${pageContext.request.contextPath}/admin/medicine/list" method="get" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
                         <input type="hidden" name="size" value="${pageSize}">
-                        <input type="text" name="search" placeholder="Search name/unit..." 
+                        <input type="text" name="search" placeholder="${L == 'en' ? 'Search name/unit...' : 'Tìm theo tên/đơn vị...'}" 
                                value="${searchKeyword}" 
                                style="padding:8px 10px; border-radius:8px; border:1px solid #e2e8f0; font-size:13px; min-width:200px;">
 
                         <select name="status" style="padding:8px 10px; border-radius:8px; border:1px solid #e2e8f0; font-size:13px;">
-                            <option value="">All statuses</option>
-                            <option value="active" ${statusFilter == 'active' ? 'selected' : ''}>In stock</option>
-                            <option value="inactive" ${statusFilter == 'inactive' ? 'selected' : ''}>Out of stock</option>
+                            <option value="">${L == 'en' ? 'All statuses' : 'Tất cả trạng thái'}</option>
+                            <option value="active" ${statusFilter == 'active' ? 'selected' : ''}>${L == 'en' ? 'In stock' : 'Còn hàng'}</option>
+                            <option value="inactive" ${statusFilter == 'inactive' ? 'selected' : ''}>${L == 'en' ? 'Out of stock' : 'Hết hàng'}</option>
                         </select>
 
                         <button type="submit" class="btn-create" style="padding:8px 14px; text-transform:none;">
@@ -356,13 +356,13 @@
                         </button>
                         <c:if test="${not empty searchKeyword || not empty statusFilter}">
                             <a href="${pageContext.request.contextPath}/admin/medicine/list" 
-                               style="font-size:12px; color:#a0aec0; text-decoration:none;">Clear</a>
+                               style="font-size:12px; color:#a0aec0; text-decoration:none;">${L == 'en' ? 'Clear' : 'Xóa lọc'}</a>
                         </c:if>
                     </form>
                     <a href="${pageContext.request.contextPath}/admin/medicine/add" class="btn-create">
-                        <i class="fa-solid fa-plus"></i> Create New
+                        <i class="fa-solid fa-plus"></i> ${L == 'en' ? 'Create New' : 'Tạo mới'}
                     </a>
-                    <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
+                    <a href="${pageContext.request.contextPath}/logout" class="btn-signout">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
                 </div>
             </div>
 
@@ -390,8 +390,8 @@
                     <c:when test="${empty medicines || medicines.size() == 0}">
                         <div style="text-align:center; padding:60px; color: #a0aec0;">
                             <i class="fa-solid fa-box-open" style="font-size: 48px; margin-bottom: 20px;"></i>
-                            <p>No medicines found in the inventory.</p>
-                            <a href="${pageContext.request.contextPath}/admin/medicine/add" class="btn-create" style="display:inline-block; margin-top:20px;">Add First Medicine</a>
+                            <p>${L == 'en' ? 'No medicines found in the inventory.' : 'Không tìm thấy thuốc nào trong kho.'}</p>
+                            <a href="${pageContext.request.contextPath}/admin/medicine/add" class="btn-create" style="display:inline-block; margin-top:20px;">${L == 'en' ? 'Add First Medicine' : 'Thêm thuốc đầu tiên'}</a>
                         </div>
                     </c:when>
                     <c:otherwise>
@@ -399,11 +399,11 @@
                             <thead>
                                 <tr>
                                     <th class="col-id">STT</th>
-                                    <th style="width: 25%;">Medicine Name</th>
-                                    <th style="width: 20%;">Unit</th>
-                                    <th style="width: 15%;">Price</th>
-                                    <th style="width: 15%;">Stock</th>
-                                    <th style="width: 15%;">Actions</th>
+                                    <th style="width: 25%;">${L == 'en' ? 'Medicine Name' : 'Tên thuốc'}</th>
+                                    <th style="width: 20%;">${L == 'en' ? 'Unit' : 'Đơn vị'}</th>
+                                    <th style="width: 15%;">${L == 'en' ? 'Price' : 'Giá'}</th>
+                                    <th style="width: 15%;">${L == 'en' ? 'Stock' : 'Tồn kho'}</th>
+                                    <th style="width: 15%;">${L == 'en' ? 'Actions' : 'Thao tác'}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -422,14 +422,14 @@
                                         </td>
                                         <td>
                                             <a href="${pageContext.request.contextPath}/admin/medicine/update?id=${med.medicineId}" 
-                                               class="btn-action btn-edit" title="Edit">
+                                               class="btn-action btn-edit" title="${L == 'en' ? 'Edit' : 'Sửa'}">
                                                 <i class="fa-solid fa-pen-to-square"></i>
                                             </a>
                                             <form method="post" action="${pageContext.request.contextPath}/admin/medicine/delete" 
                                                   style="display:inline;" 
                                                   onsubmit="return confirm('Bạn có chắc muốn xóa thuốc này?');">
                                                 <input type="hidden" name="id" value="${med.medicineId}">
-                                                <button type="submit" class="btn-action btn-reject" title="Delete">
+                                                <button type="submit" class="btn-action btn-reject" title="${L == 'en' ? 'Delete' : 'Xóa'}">
                                                     <i class="fa-solid fa-trash-can"></i>
                                                 </button>
                                             </form>
@@ -449,7 +449,7 @@
                                 <form method="get" action="${pageContext.request.contextPath}/admin/medicine/list" style="display:flex; gap:8px; align-items:center;">
                                     <input type="hidden" name="search" value="${searchKeyword}">
                                     <input type="hidden" name="status" value="${statusFilter}">
-                                    <label class="page-info">Hiển thị</label>
+                                    <label class="page-info">${L == 'en' ? 'Showing' : 'Hiển thị'}</label>
                                     <select name="size" style="padding:8px 10px; border-radius:8px; border:1px solid #e2e8f0; font-size:12px;" onchange="this.form.submit()">
                                         <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
                                         <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
@@ -460,13 +460,13 @@
                                 </form>
                                 <div style="display:flex; gap:15px; align-items:center;">
                                 <c:if test="${currentPage > 1}">
-                                    <a href="${pageContext.request.contextPath}/admin/medicine/list?page=${currentPage - 1}${queryParams}" class="btn-page">Previous</a>
+                                    <a href="${pageContext.request.contextPath}/admin/medicine/list?page=${currentPage - 1}${queryParams}" class="btn-page">${L == 'en' ? 'Previous' : 'Trước'}</a>
                                 </c:if>
 
-                                <span class="page-info">Page ${currentPage} of ${totalPages}</span>
+                                <span class="page-info">${L == 'en' ? 'Page' : 'Trang'} ${currentPage} ${L == 'en' ? 'of' : 'trên'} ${totalPages}</span>
 
                                 <c:if test="${currentPage < totalPages}">
-                                    <a href="${pageContext.request.contextPath}/admin/medicine/list?page=${currentPage + 1}${queryParams}" class="btn-page">Next</a>
+                                    <a href="${pageContext.request.contextPath}/admin/medicine/list?page=${currentPage + 1}${queryParams}" class="btn-page">${L == 'en' ? 'Next' : 'Tiếp'}</a>
                                 </c:if>
                                 </div>
                             </div>
@@ -482,3 +482,5 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+
+

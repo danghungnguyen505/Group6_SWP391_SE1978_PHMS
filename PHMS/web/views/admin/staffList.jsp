@@ -1,9 +1,9 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="${L}">
     <head>
         <meta charset="UTF-8">
         <title>VetCare Pro - STAFF MANAGEMENT</title>
@@ -328,29 +328,29 @@
         <main class="main-content">
             <div class="top-bar">
                 <div class="page-header">
-                    <h2>Staff Management</h2>
-                    <p>Manage employee accounts, credentials and working status</p>
+                    <h2>${L == 'en' ? 'Staff Management' : 'Quản lý nhân sự'}</h2>
+                    <p>${L == 'en' ? 'Manage employee accounts, credentials and working status' : 'Quản lý tài khoản, thông tin và trạng thái làm việc của nhân viên'}</p>
                 </div>
                 <div style="display:flex; gap:15px; align-items:center;">
                     <form action="${pageContext.request.contextPath}/admin/staff/list" method="get" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
                         <input type="hidden" name="size" value="${pageSize}">
-                        <input type="text" name="search" placeholder="Search name/username/phone/code..." 
+                        <input type="text" name="search" placeholder="${L == 'en' ? 'Search name/username/phone/code...' : 'Tìm theo tên/tài khoản/sđt/mã...'}" 
                                value="${searchKeyword}" 
                                style="padding:8px 10px; border-radius:8px; border:1px solid #e2e8f0; font-size:13px; min-width:200px;">
 
                         <select name="role" style="padding:8px 10px; border-radius:8px; border:1px solid #e2e8f0; font-size:13px;">
-                            <option value="">All roles</option>
+                            <option value="">${L == 'en' ? 'All roles' : 'Tất cả vai trò'}</option>
                             <option value="Veterinarian" ${roleFilter == 'Veterinarian' ? 'selected' : ''}>Veterinarian</option>
                             <option value="Nurse" ${roleFilter == 'Nurse' ? 'selected' : ''}>Nurse</option>
                             <option value="Receptionist" ${roleFilter == 'Receptionist' ? 'selected' : ''}>Receptionist</option>
-                            <option value="ClinicManager" ${roleFilter == 'ClinicManager' ? 'selected' : ''}>Clinic Manager</option>
+                            <option value="ClinicManager" ${roleFilter == 'ClinicManager' ? 'selected' : ''}>${L == 'en' ? 'Clinic Manager' : 'Quản lý phòng khám'}</option>
                             <option value="Admin" ${roleFilter == 'Admin' ? 'selected' : ''}>Admin</option>
                         </select>
 
                         <select name="status" style="padding:8px 10px; border-radius:8px; border:1px solid #e2e8f0; font-size:13px;">
-                            <option value="">All statuses</option>
-                            <option value="active" ${statusFilter == 'active' ? 'selected' : ''}>Active</option>
-                            <option value="inactive" ${statusFilter == 'inactive' ? 'selected' : ''}>Locked</option>
+                            <option value="">${L == 'en' ? 'All statuses' : 'Tất cả trạng thái'}</option>
+                            <option value="active" ${statusFilter == 'active' ? 'selected' : ''}>${L == 'en' ? 'Active' : 'Đang làm việc'}</option>
+                            <option value="inactive" ${statusFilter == 'inactive' ? 'selected' : ''}>${L == 'en' ? 'Locked' : 'Đã khóa'}</option>
                         </select>
 
                         <button type="submit" class="btn-create" style="padding:8px 14px; text-transform:none;">
@@ -358,11 +358,11 @@
                         </button>
                         <c:if test="${not empty searchKeyword || not empty roleFilter || not empty statusFilter}">
                             <a href="${pageContext.request.contextPath}/admin/staff/list" 
-                               style="font-size:12px; color:#a0aec0; text-decoration:none;">Clear</a>
+                               style="font-size:12px; color:#a0aec0; text-decoration:none;">${L == 'en' ? 'Clear' : 'Xóa lọc'}</a>
                         </c:if>
                     </form>
-                    <a href="${pageContext.request.contextPath}/admin/staff/create" class="btn-create">Create New</a>
-                    <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
+                    <a href="${pageContext.request.contextPath}/admin/staff/create" class="btn-create">${L == 'en' ? 'Create New' : 'Tạo mới'}</a>
+                    <a href="${pageContext.request.contextPath}/logout" class="btn-signout">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
                 </div>
             </div>
 
@@ -371,7 +371,7 @@
                     <c:when test="${empty staffAccounts}">
                         <div style="text-align:center; padding:60px; color:#cbd5e0;">
                             <i class="fa-solid fa-users-slash" style="font-size:48px; margin-bottom:20px;"></i>
-                            <p>No staff accounts found.</p>
+                            <p>${L == 'en' ? 'No staff accounts found.' : 'Không tìm thấy tài khoản nhân viên.'}</p>
                         </div>
                     </c:when>
                     <c:otherwise>
@@ -379,13 +379,13 @@
                             <thead>
                                 <tr>
                                     <th class="col-id">STT</th>
-                                    <th>Username</th>
-                                    <th>Full Name</th>
-                                    <th>Role</th>
-                                    <th>Phone</th>
-                                    <th>Employee Code</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
+                                    <th>${L == 'en' ? 'Username' : 'Tên đăng nhập'}</th>
+                                    <th>${L == 'en' ? 'Full Name' : 'Họ tên'}</th>
+                                    <th>${L == 'en' ? 'Role' : 'Vai trò'}</th>
+                                    <th>${L == 'en' ? 'Phone' : 'Số điện thoại'}</th>
+                                    <th>${L == 'en' ? 'Employee Code' : 'Mã nhân viên'}</th>
+                                    <th>${L == 'en' ? 'Status' : 'Trạng thái'}</th>
+                                    <th>${L == 'en' ? 'Action' : 'Thao tác'}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -411,7 +411,7 @@
                                         <c:set var="parts" value="${fn:split(staff.address, '|')}" />
 
                                         <td>
-    <%-- parts[0]: Code, parts[1]: Dept, parts[2]: Salary, parts[3]: Active --%>
+    <%-- parts[0]: Code, parts[1]: Dept, parts[2]: Salary, active --%>
     <c:choose>
         <%-- TRƯỜNG HỢP 1: Nếu là Admin thì luôn hiển thị Đang làm việc --%>
         <c:when test="${staff.role == 'Admin'}">
@@ -419,7 +419,7 @@
         </c:when>
 
         <%-- TRƯỜNG HỢP 2: Nếu không phải Admin thì mới kiểm tra giá trị parts[3] --%>
-        <c:when test="${parts[3] == '1'}">
+        <c:when test="${staff.active}">
             <span class="status-badge status-active">Đang làm việc</span>
         </c:when>
 
@@ -431,13 +431,13 @@
 </td>
 
                                         <td>
-                                            <a href="${pageContext.request.contextPath}/admin/staff/update?id=${staff.userId}" class="btn-action" title="Edit">
+                                            <a href="${pageContext.request.contextPath}/admin/staff/update?id=${staff.userId}" class="btn-action" title="${L == 'en' ? 'Edit' : 'Sửa'}">
                                                 <i class="fa-solid fa-pen-to-square"></i>
                                             </a>
 
-                                            <form method="post" action="${pageContext.request.contextPath}/admin/staff/lock" style="display:inline;" 
-                                                  onsubmit="return confirm('Bạn có chắc chắn muốn thay đổi trạng thái tài khoản này?');">
-                                                <input type="hidden" name="id" value="${staff.userId}">
+                                            <div style="display:inline;">
+
+
 
                                                 <c:choose>
                                                     <%-- TRƯỜNG HỢP LÀ ADMIN: Không cho phép khóa --%>
@@ -460,7 +460,7 @@
 
                                                             <c:choose>
                                                                 <%-- Nếu parts[3] là '1' (đang hoạt động) -> Hiện nút Khóa --%>
-                                                                <c:when test="${parts[3] == '1'}">
+                                                                <c:when test="${staff.active}">
                                                                     <button type="submit" class="btn-action btn-lock" title="Khóa tài khoản">
                                                                         <i class="fa-solid fa-lock"></i>
                                                                     </button>
@@ -475,7 +475,7 @@
                                                         </form>
                                                     </c:otherwise>
                                                 </c:choose>
-                                            </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 </c:forEach>
@@ -510,7 +510,7 @@
                                     <input type="hidden" name="search" value="${searchKeyword}">
                                     <input type="hidden" name="role" value="${roleFilter}">
                                     <input type="hidden" name="status" value="${statusFilter}">
-                                    <label class="page-info">Hiển thị</label>
+                                    <label class="page-info">${L == 'en' ? 'Showing' : 'Hiển thị'}</label>
                                     <select name="size" style="padding:8px 10px; border-radius:8px; border:1px solid #e2e8f0; font-size:12px;" onchange="this.form.submit()">
                                         <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
                                         <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
@@ -521,13 +521,13 @@
                                 </form>
                                 <div style="display:flex; gap:15px; align-items:center;">
                                 <c:if test="${currentPage > 1}">
-                                    <a href="?page=${currentPage - 1}${queryParams}" class="btn-page">Previous</a>
+                                    <a href="?page=${currentPage - 1}${queryParams}" class="btn-page">${L == 'en' ? 'Previous' : 'Trước'}</a>
                                 </c:if>
 
-                                <span class="page-info">Page ${currentPage} of ${totalPages}</span>
+                                <span class="page-info">${L == 'en' ? 'Page' : 'Trang'} ${currentPage} ${L == 'en' ? 'of' : 'trên'} ${totalPages}</span>
 
                                 <c:if test="${currentPage < totalPages}">
-                                    <a href="?page=${currentPage + 1}${queryParams}" class="btn-page">Next</a>
+                                    <a href="?page=${currentPage + 1}${queryParams}" class="btn-page">${L == 'en' ? 'Next' : 'Tiếp'}</a>
                                 </c:if>
                                 </div>
                             </div>
@@ -543,3 +543,6 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+
+
+

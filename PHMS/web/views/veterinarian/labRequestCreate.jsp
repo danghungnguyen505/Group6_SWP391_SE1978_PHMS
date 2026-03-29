@@ -1,8 +1,8 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
-<html>
+<html lang="${L}">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>VetCare Pro - Lab Request</title>
@@ -28,7 +28,7 @@
                     <h2>Create Lab Request</h2>
                     <p>Order lab test for nursing team.</p>
                 </div>
-                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
+                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
             </div>
 
             <div class="card">
@@ -73,7 +73,7 @@
 
                     <div style="display:flex; gap:10px; margin-top: 12px;">
                         <a class="btn btn-reject" style="text-decoration:none; background:#e5e7eb;color:#111827;"
-                           href="${pageContext.request.contextPath}/veterinarian/emr/records">Back</a>
+                           href="${pageContext.request.contextPath}/veterinarian/emr/records">${L == 'en' ? 'Back' : 'Quay lại'}</a>
                         <button class="btn btn-approve" type="submit">
                             <i class="fa-solid fa-paper-plane"></i> Submit Request
                         </button>
@@ -88,5 +88,7 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+
+
 
 

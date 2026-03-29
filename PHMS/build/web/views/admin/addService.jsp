@@ -1,3 +1,4 @@
+<%@ page pageEncoding="UTF-8" %>
 <%-- 
     Document   : addService
     Created on : Jan 22, 2026, 11:13:10 AM
@@ -7,10 +8,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="${L}">
 <head>
     <meta charset="UTF-8">
-    <title>VetCare Pro - ADD NEW SERVICE</title>
+    <title>${L == 'en' ? 'VetCare Pro - Add New Service' : 'VetCare Pro - Thêm dịch vụ mới'}</title>
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -36,7 +37,7 @@
             min-height: 100vh;
         }
 
-        /* --- SIDEBAR (Giá»¯ nguyÃªn Ä‘á»“ng bá»™) --- */
+        /* --- SIDEBAR (Giữ nguyên đồng bộ) --- */
         .sidebar {
             width: var(--sidebar-width);
             background: #ffffff;
@@ -203,57 +204,57 @@
                 <i class="fa-solid fa-chevron-left"></i>
             </a>
             <div class="title-area">
-                <h1>Add New Service</h1>
-                <p>Update your hospital's service catalog and base pricing.</p>
+                <h1>${L == 'en' ? 'Add New Service' : 'Thêm dịch vụ mới'}</h1>
+                <p>${L == 'en' ? 'Update hospital service catalog and base pricing.' : 'Cập nhật danh mục dịch vụ và giá cơ bản của phòng khám.'}</p>
             </div>
         </header>
 <c:if test="${not empty error}">
     <div style="background-color: #fee2e2; color: #dc2626; padding: 15px; border-radius: 12px; border: 1px solid #fecaca; margin-bottom: 20px; font-size: 14px; line-height: 1.5;">
         <i class="fa-solid fa-triangle-exclamation" style="margin-right: 8px;"></i>
-        <strong>Lá»—i:</strong> ${error}
+        <strong>Lỗi:</strong> ${error}
     </div>
 </c:if>
         <div class="form-container">
             <form action="add-service" method="post">
                 <div class="form-group">
-                    <label class="form-label">Service Name</label>
-                    <input type="text" name="name" class="form-input" required placeholder="e.g. General Check-up" value="${name}">
+                    <label class="form-label">${L == 'en' ? 'Service Name' : 'Tên dịch vụ'}</label>
+                    <input type="text" name="name" class="form-input" required placeholder="${L == 'en' ? 'e.g. General Check-up' : 'Ví dụ: Khám tổng quát'}" value="${name}">
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Service Type</label>
+                    <label class="form-label">${L == 'en' ? 'Service Type' : 'Loại dịch vụ'}</label>
                     <select name="serviceType" class="form-input" required>
-                        <option value="Basic" ${serviceType == 'Basic' || empty serviceType ? 'selected' : ''}>CÆ¡ báº£n</option>
-                        <option value="Emergency" ${serviceType == 'Emergency' ? 'selected' : ''}>Cáº¥p cá»©u</option>
-                        <option value="LabTest" ${serviceType == 'LabTest' ? 'selected' : ''}>Lab test</option>
+                        <option value="Basic" ${serviceType == 'Basic' || empty serviceType ? 'selected' : ''}>${L == 'en' ? 'Basic' : 'Cơ bản'}</option>
+                        <option value="Emergency" ${serviceType == 'Emergency' ? 'selected' : ''}>${L == 'en' ? 'Emergency' : 'Cấp cứu'}</option>
+                        <option value="LabTest" ${serviceType == 'LabTest' ? 'selected' : ''}>${L == 'en' ? 'Lab test' : 'Xét nghiệm'}</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Base Price (VND)</label>
-                    <input type="number" name="price" class="form-input" required placeholder="e.g. 500000" value="${price}">
+                    <label class="form-label">${L == 'en' ? 'Base Price (VND)' : 'Giá cơ bản (VND)'}</label>
+                    <input type="number" name="price" class="form-input" required placeholder="${L == 'en' ? 'e.g. 500000' : 'Ví dụ: 500000'}" value="${price}">
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Detailed Description</label>
-                    <textarea name="description" class="form-input" placeholder="Describe what the service includes...">${description}</textarea>
+                    <label class="form-label">${L == 'en' ? 'Detailed Description' : 'Mô tả chi tiết'}</label>
+                    <textarea name="description" class="form-input" placeholder="${L == 'en' ? 'Describe what the service includes...' : 'Mô tả dịch vụ bao gồm những gì...'}">${description}</textarea>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Current Status</label>
-                    <input type="text" class="form-input" value="Hoáº¡t Ä‘á»™ng" readonly style="font-weight: 700;">
+                    <label class="form-label">${L == 'en' ? 'Current Status' : 'Trạng thái hiện tại'}</label>
+                    <input type="text" class="form-input" value="${L == 'en' ? 'Active' : 'Hoạt động'}" readonly style="font-weight: 700;">
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="btn-submit">Confirm & Save</button>
-                    <a href="services" class="btn-cancel">Cancel</a>
+                    <button type="submit" class="btn-submit">${L == 'en' ? 'Confirm & Save' : 'Xác nhận & Lưu'}</button>
+                    <a href="services" class="btn-cancel">${L == 'en' ? 'Cancel' : 'Hủy'}</a>
                 </div>
             </form>
         </div>
     </main>
 
 <div class="phms-account-entry" style="position:fixed; top:16px; right:20px; z-index:1200;">
-    <a href="${pageContext.request.contextPath}/logout" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;color:#334155;text-decoration:none;font-size:13px;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.05);">Sign Out</a>
+    <a href="${pageContext.request.contextPath}/logout" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;color:#334155;text-decoration:none;font-size:13px;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.05);">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
 </div>
 <script>
 window.__PHMS_ACCOUNT = window.__PHMS_ACCOUNT || {};
@@ -262,4 +263,5 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+
 

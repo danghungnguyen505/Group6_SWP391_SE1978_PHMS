@@ -1,4 +1,4 @@
-<%@page import="java.net.URLEncoder"%>
+﻿<%@page import="java.net.URLEncoder"%>
 <%@page import="java.nio.charset.StandardCharsets"%>
 <%@page import="com.vnpay.common.Config"%>
 
@@ -13,7 +13,7 @@
 <%@page import="java.util.HashMap"%>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="${L}">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -110,3 +110,4 @@
         </div>  
     </body>
 </html>
+

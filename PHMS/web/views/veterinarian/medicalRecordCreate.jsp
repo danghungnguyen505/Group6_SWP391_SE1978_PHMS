@@ -1,8 +1,8 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
-<html>
+<html lang="${L}">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>VetCare Pro - Create Medical Record</title>
@@ -32,7 +32,7 @@
                     <h2>Create Medical Record</h2>
                     <p>Record diagnosis and treatment plan.</p>
                 </div>
-                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
+                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
             </div>
 
             <div class="card">
@@ -69,7 +69,7 @@
 
                     <div style="display:flex; gap:10px; margin-top: 12px;">
                         <a class="btn btn-reject" style="text-decoration:none; background:#e5e7eb;color:#111827;"
-                           href="${pageContext.request.contextPath}/veterinarian/emr/queue">Back</a>
+                           href="${pageContext.request.contextPath}/veterinarian/emr/queue">${L == 'en' ? 'Back' : 'Quay lại'}</a>
                         <button type="submit" class="btn btn-approve">
                             <i class="fa-solid fa-save"></i> Save & Complete
                         </button>
@@ -84,5 +84,7 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+
+
 
 

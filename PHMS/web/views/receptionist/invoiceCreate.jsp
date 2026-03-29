@@ -1,9 +1,10 @@
+<%@ page pageEncoding="UTF-8" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="${L}">
     <head>
         <meta charset="UTF-8">
         <title>Tạo hóa đơn - PHMS</title>
@@ -395,16 +396,16 @@
         <!-- MAIN CONTENT -->
         <main class="main-content">
             <header class="top-bar">
-                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
+                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
             </header>
 
             <div class="page-header">
                 <div class="header-text">
-                    <h1>Billing & Checkout</h1>
-                    <p>Review details and complete payment for your recent visit.</p>
+                    <h1>${L == 'en' ? 'Billing & Checkout' : 'Thanh toán hóa đơn'}</h1>
+                    <p>${L == 'en' ? 'Review details and complete payment for your recent visit.' : 'Xem chi tiết và hoàn tất thanh toán cho lần khám gần nhất.'}</p>
                 </div>
                 <button class="btn-print" onclick="window.print()">
-                    <i class="fa-solid fa-print"></i> Print Invoice
+                    <i class="fa-solid fa-print"></i> ${L == 'en' ? 'Print Invoice' : 'In hóa đơn'}
                 </button>
             </div>
 
@@ -423,7 +424,7 @@
 
                     <div class="invoice-top">
                         <div>
-                            <span class="invoice-label">INVOICE DETAILS</span>
+                            <span class="invoice-label">${L == 'en' ? 'INVOICE DETAILS' : 'CHI TIẾT HÓA ĐƠN'}</span>
                             <!-- Invoice number, Date, Staff, Time - chỉ hiện khi in -->
                             <div class="invoice-date print-only">
                                 <h2 class="invoice-number">
@@ -438,30 +439,30 @@
                                 ${L == 'en' ? 'Time' : 'Giờ'}: <c:out value="${invoiceTime != null ? invoiceTime : ''}"/>
                             </div>
                         </div>
-                        <div><span class="status-badge unpaid">UNPAID</span></div>
+                        <div><span class="status-badge unpaid">${L == 'en' ? 'UNPAID' : 'CHƯA THANH TOÁN'}</span></div>
                     </div>
 
                     <div class="customer-info-row">
                         <div class="info-group">
-                            <label>OWNER NAME</label>
+                            <label>${L == 'en' ? 'OWNER NAME' : 'CHỦ NUÔI'}</label>
                             <div class="info-value"><c:out value="${appt.ownerName}"/></div>
                         </div>
                         <div class="info-group">
-                            <label>PET NAME</label>
+                            <label>${L == 'en' ? 'PET NAME' : 'THÚ CƯNG'}</label>
                             <div class="info-value"><c:out value="${appt.petName}"/></div>
                         </div>
                     </div>
                     <div class="customer-info-row" style="margin-top:10px;">
                         <div class="info-group">
-                            <label>VETERINARIAN</label>
+                            <label>${L == 'en' ? 'VETERINARIAN' : 'BÁC SĨ THÚ Y'}</label>
                             <div class="info-value"><c:out value="${appt.vetName}"/></div>
                         </div>
                         <div class="info-group">
-                            <label>TYPE</label>
+                            <label>${L == 'en' ? 'TYPE' : 'LOẠI'}</label>
                             <div class="info-value">
                                 <c:choose>
                                     <c:when test="${appt.type == 'Urgent'}">
-                                        <span style="color:#dc2626; font-weight:600;">Emergency</span>
+                                        <span style="color:#dc2626; font-weight:600;">${L == 'en' ? 'Emergency' : 'Cấp cứu'}</span>
                                     </c:when>
                                     <c:otherwise>
                                         <c:out value="${appt.type}"/>
@@ -474,10 +475,10 @@
                     <table class="invoice-table">
                         <thead>
                             <tr>
-                                <th style="width: 50%;">SERVICE / ITEM</th>
-                                <th style="text-align: center;">QTY</th>
-                                <th style="text-align: right;">UNIT PRICE</th>
-                                <th style="text-align: right;">SUBTOTAL</th>
+                                <th style="width: 50%;">${L == 'en' ? 'SERVICE / ITEM' : 'DỊCH VỤ / HẠNG MỤC'}</th>
+                                <th style="text-align: center;">${L == 'en' ? 'QTY' : 'SL'}</th>
+                                <th style="text-align: right;">${L == 'en' ? 'UNIT PRICE' : 'ĐƠN GIÁ'}</th>
+                                <th style="text-align: right;">${L == 'en' ? 'SUBTOTAL' : 'THÀNH TIỀN'}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -583,7 +584,7 @@
                                 <img src="https://img.vietqr.io/image/techcombank-1999992707-compact.png?amount=${grandTotal}&addInfo=DH${param.apptId}&accountName=PHAM CONG HUY"
                                      alt="QR">
                             </div>
-                            <div class="qr-note">Quét mã QR để thanh toán</div>
+                            <div class="qr-note">Qu?t m? QR d? thanh to?n</div>
                         </div>
 
                         <!-- RIGHT INFO -->
@@ -692,5 +693,6 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+
 
 

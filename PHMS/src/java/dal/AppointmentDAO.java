@@ -83,7 +83,7 @@ public class AppointmentDAO extends DBContext {
         return list;
     }
 
-    //Hàm insert cuoc hen
+    //Hàm insert cuộc hẹn
     public boolean insertAppointment(model.Appointment appt) {
         String sql = "INSERT INTO Appointment (pet_id, vet_id, start_time, status, type, notes) VALUES (?, ?, ?, ?, ?, ?)";
         try {
@@ -693,7 +693,7 @@ public class AppointmentDAO extends DBContext {
                 + "JOIN Users u_owner ON p.owner_id = u_owner.user_id "
                 + "WHERE a.type = 'Urgent' "
                 + "AND a.status IN ('Pending','Confirmed','Checked-in','In-Progress','Completed') "
-                + "ORDER BY a.start_time ASC";
+                + "ORDER BY a.start_time DESC";
         try (PreparedStatement st = connection.prepareStatement(sql); ResultSet rs = st.executeQuery()) {
             while (rs.next()) {
                 model.Appointment a = new model.Appointment();
@@ -726,7 +726,7 @@ public class AppointmentDAO extends DBContext {
                 + "WHERE a.type = 'Urgent' "
                 + "AND a.vet_id = ? "
                 + "AND a.status IN ('Pending','Confirmed','Checked-in','In-Progress','Completed') "
-                + "ORDER BY a.start_time ASC";
+                + "ORDER BY a.start_time DESC";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, vetId);
             try (ResultSet rs = st.executeQuery()) {
@@ -763,7 +763,7 @@ public class AppointmentDAO extends DBContext {
                 + "AND a.vet_id = ? "
                 + "AND (p.name LIKE ? OR u_owner.full_name LIKE ?) "
                 + (status != null ? "AND a.status = ? " : "AND a.status IN ('Pending','Confirmed','Checked-in','In-Progress','Completed') ")
-                + "ORDER BY a.start_time ASC";
+                + "ORDER BY a.start_time DESC";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             String like = "%" + keyword + "%";
             st.setInt(1, vetId);
@@ -803,7 +803,7 @@ public class AppointmentDAO extends DBContext {
                 + "WHERE a.type = 'Urgent' "
                 + "AND a.vet_id = ? "
                 + "AND a.status = ? "
-                + "ORDER BY a.start_time ASC";
+                + "ORDER BY a.start_time DESC";
         try (PreparedStatement st = connection.prepareStatement(sql)) {
             st.setInt(1, vetId);
             st.setString(2, status);

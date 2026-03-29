@@ -10,7 +10,7 @@
 <%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="${L}">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -197,7 +197,7 @@
             <c:if test="${totalPages > 1}">
                 <div class="pagination-container">
                     <form method="get" action="${pageContext.request.contextPath}/myAppointment" style="display:flex; align-items:center; gap:8px; margin-right:auto;">
-                        <span style="font-size:12px; color:#64748b; font-weight:700;">Hiển thị</span>
+                        <span style="font-size:12px; color:#64748b; font-weight:700;">${L == 'en' ? 'Showing' : 'Hiển thị'}</span>
                         <select name="size" onchange="this.form.submit()" style="padding:6px 10px; border:1px solid #d1d5db; border-radius:8px; font-size:12px;">
                             <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
                             <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
@@ -263,3 +263,4 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+

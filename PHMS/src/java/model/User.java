@@ -17,6 +17,7 @@ public class User {
     private String phone;
     private String email;
     private String address; 
+    private boolean active;
     private String vetType;
     private String specialization;
     private String licenseNumber;
@@ -97,6 +98,14 @@ public class User {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     public String getVetType() {

@@ -180,3 +180,125 @@
 <c:set var="t_no_account"     value="${L == 'en' ? 'Do not have an account?'                    : 'Bạn chưa có tài khoản?'}" />
 <c:set var="t_register_now"   value="${L == 'en' ? 'Register Now'                               : 'Đăng ký ngay'}" />
 <c:set var="t_enter_username" value="${L == 'en' ? 'Enter your username'                        : 'Nhập tên đăng nhập của bạn'}" />
+
+<%-- Auto-added dictionary entries from inline page labels --%>
+<c:set var="t_action" value="${L == 'en' ? 'Action' : 'Thao tác'}" />
+<c:set var="t_action_2" value="${L == 'en' ? 'Action' : 'Hành động'}" />
+<c:set var="t_add_a_pet_or_clear_search" value="${L == 'en' ? 'Add a pet or clear search' : 'Thêm thú cưng hoặc xóa tìm kiếm'}" />
+<c:set var="t_address" value="${L == 'en' ? 'Address' : 'Địa chỉ'}" />
+<c:set var="t_admin_menu" value="${L == 'en' ? 'Admin Menu' : 'Menu Quản trị'}" />
+<c:set var="t_ai_health_guide" value="${L == 'en' ? 'AI Health Guide' : 'Hướng dẫn sức khỏe AI'}" />
+<c:set var="t_all_levels" value="${L == 'en' ? 'All Levels' : 'Tất cả mức độ'}" />
+<c:set var="t_all_status" value="${L == 'en' ? 'All Status' : 'Tất cả trạng thái'}" />
+<c:set var="t_already_have_an_account" value="${L == 'en' ? 'Already have an account?' : 'Đã có tài khoản?'}" />
+<c:set var="t_amount" value="${L == 'en' ? 'Amount' : 'Số tiền'}" />
+<c:set var="t_appointment_id" value="${L == 'en' ? 'Appointment ID' : 'Mã lịch hẹn'}" />
+<c:set var="t_appointment_information" value="${L == 'en' ? 'Appointment Information' : 'Thông tin lịch hẹn'}" />
+<c:set var="t_appointment_time" value="${L == 'en' ? 'Appointment Time' : 'Thời gian khám'}" />
+<c:set var="t_appointments_2" value="${L == 'en' ? 'Appointments' : 'Đặt lịch'}" />
+<c:set var="t_appointments_3" value="${L == 'en' ? 'Appointments' : 'Cuộc hẹn'}" />
+<c:set var="t_are_you_sure_you_want_to_delete" value="${L == 'en' ? 'Are you sure you want to delete' : 'Bạn chắc chắn muốn xóa hồ sơ thú cưng'}" />
+<c:set var="t_back_to_appointments" value="${L == 'en' ? 'Back to Appointments' : 'Quay lại lịch hẹn'}" />
+<c:set var="t_back_to_medical_records" value="${L == 'en' ? 'Back to Medical Records' : 'Quay lại hồ sơ bệnh án'}" />
+<c:set var="t_billing" value="${L == 'en' ? 'Billing' : 'Thanh toán'}" />
+<c:set var="t_billing_2" value="${L == 'en' ? 'Billing' : 'Thanh toán'}" />
+<c:set var="t_briefly_describe_the_pet_symptoms" value="${L == 'en' ? 'Briefly describe the pet symptoms...' : 'Ghi nhận ngắn gọn các triệu chứng của thú cưng...'}" />
+<c:set var="t_cancelled" value="${L == 'en' ? 'Cancelled' : 'Đã hủy'}" />
+<c:set var="t_comment" value="${L == 'en' ? 'Comment' : 'Nhận xét'}" />
+<c:set var="t_confirm_password" value="${L == 'en' ? 'Confirm Password' : 'Nhập lại mật khẩu'}" />
+<c:set var="t_contact_support" value="${L == 'en' ? 'Contact Support' : 'Liên hệ hỗ trợ'}" />
+<c:set var="t_contact_support_2" value="${L == 'en' ? 'Contact Support' : 'Liên hệ hỗ trợ'}" />
+<c:set var="t_create_account" value="${L == 'en' ? 'Create Account' : 'Đăng ký Tài khoản'}" />
+<c:set var="t_create_emergency" value="${L == 'en' ? 'Create Emergency' : 'Tạo cấp cứu'}" />
+<c:set var="t_create_invoice" value="${L == 'en' ? 'Create Invoice' : 'Tạo hóa đơn'}" />
+<c:set var="t_create_new_account" value="${L == 'en' ? 'Create New Account' : 'Tạo tài khoản mới'}" />
+<c:set var="t_critical_critical_condition" value="${L == 'en' ? 'Critical - Critical condition' : 'Critical - Nguy kịch'}" />
+<c:set var="t_dashboard" value="${L == 'en' ? 'Dashboard' : 'Bảng điều khiển'}" />
+<c:set var="t_dashboard_2" value="${L == 'en' ? 'Dashboard' : 'Bảng điều khiển'}" />
+<c:set var="t_date_time_2" value="${L == 'en' ? 'Date & Time' : 'Ngày giờ'}" />
+<c:set var="t_diagnosis" value="${L == 'en' ? 'Diagnosis' : 'Chẩn đoán'}" />
+<c:set var="t_elevating_pet_healthcare_standards_with_technology_and_dedication" value="${L == 'en' ? 'Elevating pet healthcare standards with technology and dedication.' : 'Nâng tầm tiêu chuẩn chăm sóc sức khỏe thú cưng tại Việt Nam bằng công nghệ và sự tận tâm.'}" />
+<c:set var="t_emergency_queue" value="${L == 'en' ? 'Emergency Queue' : 'Hàng đợi cấp cứu'}" />
+<c:set var="t_emergency_queue_2" value="${L == 'en' ? 'Emergency Queue' : 'Khẩn cấp'}" />
+<c:set var="t_emergency_triage" value="${L == 'en' ? 'Emergency Triage' : 'Cấp cứu'}" />
+<c:set var="t_emergency_triage_2" value="${L == 'en' ? 'Emergency Triage' : 'Cấp cứu'}" />
+<c:set var="t_emr_queue" value="${L == 'en' ? 'EMR Queue' : 'Hàng đợi EMR'}" />
+<c:set var="t_female" value="${L == 'en' ? 'Female' : 'Cái'}" />
+<c:set var="t_full_name" value="${L == 'en' ? 'Full Name' : 'Họ và tên'}" />
+<c:set var="t_high_urgent" value="${L == 'en' ? 'High - Urgent' : 'High - Khẩn'}" />
+<c:set var="t_house_number_street_district" value="${L == 'en' ? 'House number, Street, District...' : 'Số nhà, Đường, Quận/Huyện...'}" />
+<c:set var="t_in_progress" value="${L == 'en' ? 'In Progress' : 'Đang xử lý'}" />
+<c:set var="t_initial_symptoms" value="${L == 'en' ? 'Initial Symptoms' : 'Triệu chứng ban đầu'}" />
+<c:set var="t_invoice" value="${L == 'en' ? 'INVOICE' : 'HÓA ĐƠN'}" />
+<c:set var="t_invoice_detail" value="${L == 'en' ? 'Invoice Detail' : 'Chi tiết hóa đơn'}" />
+<c:set var="t_invoice_id" value="${L == 'en' ? 'Invoice ID' : 'Mã hóa đơn'}" />
+<c:set var="t_invoice_items" value="${L == 'en' ? 'Invoice Items' : 'Chi tiết hạng mục'}" />
+<c:set var="t_invoice_not_available_yet" value="${L == 'en' ? 'Invoice not available yet' : 'Chưa có hóa đơn'}" />
+<c:set var="t_item" value="${L == 'en' ? 'Item' : 'Hạng mục'}" />
+<c:set var="t_join_the_vetcare_pro_pet_care_community" value="${L == 'en' ? 'Join the VetCare Pro pet care community' : 'Tham gia cộng đồng chăm sóc thú cưng VetCare Pro'}" />
+<c:set var="t_lab_requests" value="${L == 'en' ? 'Lab Requests' : 'Xét nghiệm'}" />
+<c:set var="t_leave_requests_2" value="${L == 'en' ? 'Leave Requests' : 'Xin nghỉ'}" />
+<c:set var="t_level" value="${L == 'en' ? 'Level' : 'Mức độ'}" />
+<c:set var="t_list_of_emergency_cases_awaiting_examination" value="${L == 'en' ? 'List of emergency cases awaiting examination.' : 'Danh sách các ca cấp cứu đang chờ khám.'}" />
+<c:set var="t_low_stable" value="${L == 'en' ? 'Low - Stable' : 'Low - ổn định'}" />
+<c:set var="t_main_menu" value="${L == 'en' ? 'MAIN MENU' : 'MENU CHÍNH'}" />
+<c:set var="t_male" value="${L == 'en' ? 'Male' : 'Đực'}" />
+<c:set var="t_medium_moderate" value="${L == 'en' ? 'Medium - Moderate' : 'Medium - Trung bình'}" />
+<c:set var="t_method" value="${L == 'en' ? 'Method' : 'Phương thức'}" />
+<c:set var="t_minimum_5_characters_maximum_1000_characters" value="${L == 'en' ? 'Minimum 5 characters, maximum 1000 characters.' : 'Tối thiểu 5 ký tự, tối đa 1000 ký tự.'}" />
+<c:set var="t_name" value="${L == 'en' ? 'Name' : 'Tên'}" />
+<c:set var="t_need_help" value="${L == 'en' ? 'Need help?' : 'Cần hỗ trợ?'}" />
+<c:set var="t_need_help_2" value="${L == 'en' ? 'Need help?' : 'Cần hỗ trợ?'}" />
+<c:set var="t_no" value="${L == 'en' ? 'No.' : 'STT'}" />
+<c:set var="t_no_completed_appointments_available_for_feedback" value="${L == 'en' ? 'No completed appointments available for feedback.' : 'Hiện chưa có lịch hẹn hoàn thành để gửi phản hồi.'}" />
+<c:set var="t_no_invoice_available_for_this_visit_yet" value="${L == 'en' ? 'No invoice available for this visit yet.' : 'Lần khám này chưa có hóa đơn.'}" />
+<c:set var="t_no_invoice_items_found" value="${L == 'en' ? 'No invoice items found.' : 'Không có chi tiết hóa đơn.'}" />
+<c:set var="t_no_medical_records_found" value="${L == 'en' ? 'No medical records found.' : 'Chưa có lịch sử khám nào.'}" />
+<c:set var="t_not_triaged" value="${L == 'en' ? 'Not triaged' : 'Chưa phân loại'}" />
+<c:set var="t_overview" value="${L == 'en' ? 'Overview' : 'Tổng quan'}" />
+<c:set var="t_pay_invoice" value="${L == 'en' ? 'Pay Invoice' : 'Thanh toán'}" />
+<c:set var="t_payment_history" value="${L == 'en' ? 'Payment History' : 'Lịch sử thanh toán'}" />
+<c:set var="t_pet_owner" value="${L == 'en' ? 'Pet Owner' : 'Chủ thú cưng'}" />
+<c:set var="t_pet_street_hanoi" value="${L == 'en' ? 'Pet Street, Hanoi' : 'Đường Thú Cưng, TP. Hà Nội'}" />
+<c:set var="t_pets" value="${L == 'en' ? 'Pets' : 'Thú cưng'}" />
+<c:set var="t_pharmacy_2" value="${L == 'en' ? 'Pharmacy' : 'Nhà thuốc'}" />
+<c:set var="t_phone_number" value="${L == 'en' ? 'Phone Number' : 'Số điện thoại'}" />
+<c:set var="t_please_share_your_experience" value="${L == 'en' ? 'Please share your experience...' : 'Hãy chia sẻ trải nghiệm của bạn...'}" />
+<c:set var="t_prescription" value="${L == 'en' ? 'Prescription' : 'Đơn thuốc'}" />
+<c:set var="t_prescriptions" value="${L == 'en' ? 'Prescriptions' : 'Đơn thuốc'}" />
+<c:set var="t_priority_level" value="${L == 'en' ? 'Priority Level' : 'Mức độ ưu tiên'}" />
+<c:set var="t_professional_pet_care" value="${L == 'en' ? 'Professional Pet Care' : 'Chăm sóc Thú cưng Chuyên nghiệp'}" />
+<c:set var="t_qty" value="${L == 'en' ? 'Qty' : 'SL'}" />
+<c:set var="t_rating" value="${L == 'en' ? 'Rating' : 'Số sao'}" />
+<c:set var="t_receptionist" value="${L == 'en' ? 'Receptionist' : 'Lễ tân'}" />
+<c:set var="t_reset" value="${L == 'en' ? 'Reset' : 'Đặt lại'}" />
+<c:set var="t_result_s" value="${L == 'en' ? 'result(s)' : 'kết quả'}" />
+<c:set var="t_revenue" value="${L == 'en' ? 'Revenue' : 'Doanh thu'}" />
+<c:set var="t_review" value="${L == 'en' ? 'Review' : 'Đánh giá'}" />
+<c:set var="t_review_charges_for_this_medical_record_visit" value="${L == 'en' ? 'Review charges for this medical record visit.' : 'Xem chi phí tương ứng với lần khám trong hồ sơ bệnh án.'}" />
+<c:set var="t_scheduling" value="${L == 'en' ? 'Scheduling' : 'Lịch làm việc'}" />
+<c:set var="t_search_by_pet_name_owner" value="${L == 'en' ? 'Search by pet name, owner...' : 'Tìm theo tên pet, chủ...'}" />
+<c:set var="t_select_a_completed_appointment_to_review" value="${L == 'en' ? 'Select a completed appointment to review.' : 'Chọn lịch hẹn đã hoàn thành để gửi đánh giá.'}" />
+<c:set var="t_select_level" value="${L == 'en' ? '-- Select level --' : '-- Chọn mức độ --'}" />
+<c:set var="t_share_your_experience_after_this_appointment" value="${L == 'en' ? 'Share your experience after this appointment.' : 'Chia sẻ trải nghiệm của bạn sau lịch hẹn này.'}" />
+<c:set var="t_showing" value="${L == 'en' ? 'Showing' : 'Hiển thị'}" />
+<c:set var="t_sign_out" value="${L == 'en' ? 'Sign Out' : 'Đăng xuất'}" />
+<c:set var="t_staff" value="${L == 'en' ? 'Staff' : 'Nhân viên'}" />
+<c:set var="t_staff_management" value="${L == 'en' ? 'Staff Management' : 'Quản lý nhân viên'}" />
+<c:set var="t_staff_scheduling" value="${L == 'en' ? 'Staff Scheduling' : 'Lịch làm việc'}" />
+<c:set var="t_submit_feedback" value="${L == 'en' ? 'Submit Feedback' : 'Gửi phản hồi'}" />
+<c:set var="t_subtotal" value="${L == 'en' ? 'Subtotal' : 'Thành tiền'}" />
+<c:set var="t_there_are_currently_no_emergency_cases" value="${L == 'en' ? 'There are currently no emergency cases.' : 'Hiện không có ca cấp cứu nào.'}" />
+<c:set var="t_time" value="${L == 'en' ? 'Time' : 'Thời gian'}" />
+<c:set var="t_time_2" value="${L == 'en' ? 'Time' : 'Giờ'}" />
+<c:set var="t_total_amount" value="${L == 'en' ? 'Total Amount' : 'Tổng tiền'}" />
+<c:set var="t_treatment_plan" value="${L == 'en' ? 'Treatment Plan' : 'Hướng điều trị'}" />
+<c:set var="t_unit_price" value="${L == 'en' ? 'Unit Price' : 'Đơn giá'}" />
+<c:set var="t_veterinarian" value="${L == 'en' ? 'Veterinarian' : 'Bác sĩ'}" />
+<c:set var="t_view" value="${L == 'en' ? 'View' : 'Xem'}" />
+<c:set var="t_view_details_prescription" value="${L == 'en' ? 'View Details & Prescription' : 'Xem chi tiết / Đơn thuốc'}" />
+<c:set var="t_view_invoice" value="${L == 'en' ? 'View invoice' : 'Xem hóa đơn'}" />
+<c:set var="t_view_medical_record" value="${L == 'en' ? 'View medical record' : 'Xem hồ sơ bệnh án'}" />
+<c:set var="t_you_can_cancel_reschedule_at_least_5_hours_before_remaining" value="${L == 'en' ? 'You can cancel/reschedule at least 5 hours before. Remaining:' : 'Bạn có thể hủy/đổi lịch trước giờ hẹn ít nhất 5 tiếng. Còn khoảng:'}" />
+<c:set var="t_you_do_not_have_permission_to_view_this_invoice" value="${L == 'en' ? 'You do not have permission to view this invoice.' : 'Bạn không có quyền xem hóa đơn này.'}" />
+<c:set var="t_your_review" value="${L == 'en' ? 'Your Review' : 'Đánh giá của bạn'}" />

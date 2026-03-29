@@ -1,4 +1,4 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8" %>
+<%@page contentType="text/html" pageEncoding="UTF-8" %>
     <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
         <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
             <%@include file="/WEB-INF/jsp/globals/i18n.jsp" %>
@@ -53,8 +53,8 @@
 
                         <!-- Toast Notification -->
                         <c:if test="${not empty toastMessage}">
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                <i class="fa-solid fa-check-circle me-2"></i> ${toastMessage}
+                            <div class="alert ${toastType == 'error' ? 'alert-danger' : 'alert-success'} alert-dismissible fade show" role="alert">
+                                <i class="fa-solid ${toastType == 'error' ? 'fa-circle-exclamation' : 'fa-check-circle'} me-2"></i> ${toastMessage}
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"
                                     aria-label="Close"></button>
                             </div>
@@ -302,6 +302,15 @@
                                                                     title="Edit Info">
                                                                     <i class="fa-solid fa-pen"></i>
                                                                 </a>
+                                                                <form action="${pageContext.request.contextPath}/pet/delete"
+                                                                      method="post"
+                                                                      style="display:inline;"
+                                                                      onsubmit="return confirm('${L == 'en' ? 'Are you sure you want to delete' : 'Bạn chắc chắn muốn xóa hồ sơ thú cưng'} ${p.name}?');">
+                                                                    <input type="hidden" name="id" value="${p.id}">
+                                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="${L == 'en' ? 'Delete' : 'Xóa'}">
+                                                                        <i class="fa-solid fa-trash-can"></i>
+                                                                    </button>
+                                                                </form>
                                                             </td>
                                                         </tr>
                                                     </c:forEach>
@@ -315,7 +324,7 @@
                                                 <form method="get" action="${pageContext.request.contextPath}/myPetOwner" style="display:flex; align-items:center; gap:8px;">
                                                     <input type="hidden" name="search" value="${search}">
                                                     <input type="hidden" name="selectedPetId" value="${selectedPet.id}">
-                                                    <span style="font-size:12px; color:#64748b; font-weight:700;">Hiển thị</span>
+                                                    <span style="font-size:12px; color:#64748b; font-weight:700;">${L == 'en' ? 'Showing' : 'Hiển thị'}</span>
                                                     <select name="size" onchange="this.form.submit()" style="padding:6px 10px; border:1px solid #d1d5db; border-radius:8px; font-size:12px;">
                                                         <option value="5" ${pageSize == 5 ? 'selected' : ''}>5</option>
                                                         <option value="10" ${pageSize == 10 ? 'selected' : ''}>10</option>
@@ -351,7 +360,7 @@
                                                         <c:if test="${currentPage < totalPages}">
                                                             <li class="page-item">
                                                                 <a class="page-link"
-                                                                    href="?page=${currentPage + 1}${searchParam}${selectedParam}${sizeParam}">Next</a>
+                                                                    href="?page=${currentPage + 1}${searchParam}${selectedParam}${sizeParam}">${L == 'en' ? 'Next' : 'Tiếp'}</a>
                                                             </li>
                                                         </c:if>
                                                     </ul>

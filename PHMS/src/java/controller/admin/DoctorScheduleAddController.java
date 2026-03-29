@@ -81,19 +81,19 @@ public class DoctorScheduleAddController extends HttpServlet {
         String repeatEndDateStr = request.getParameter("repeatEndDate");
 
         if (doctorIdStr == null || doctorIdStr.trim().isEmpty()) {
-            request.setAttribute("error", "Vui long chon bac si!");
+            request.setAttribute("error", "Vui lòng chọn bác sĩ!");
             doGet(request, response);
             return;
         }
 
         if (startDateStr == null || startDateStr.trim().isEmpty()) {
-            request.setAttribute("error", "Vui long chon ngay bat dau!");
+            request.setAttribute("error", "Vui lòng chọn ngày bắt đầu!");
             doGet(request, response);
             return;
         }
 
         if (selectedSlots == null || selectedSlots.length == 0) {
-            request.setAttribute("error", "Vui long chon it nhat 1 slot lam viec (09:00 - 17:30, moi 30 phut)!");
+            request.setAttribute("error", "Vui lòng chọn ít nhất 1 slot làm việc (09:00 - 17:30, mỗi 30 phút)!");
             doGet(request, response);
             return;
         }
@@ -104,7 +104,7 @@ public class DoctorScheduleAddController extends HttpServlet {
             LocalDate today = LocalDate.now();
 
             if (startDate.isBefore(today)) {
-                request.setAttribute("error", "Khong the them lich lam viec trong qua khu!");
+                request.setAttribute("error", "Không thể thêm lịch làm việc trong quá khứ!");
                 doGet(request, response);
                 return;
             }
@@ -120,7 +120,7 @@ public class DoctorScheduleAddController extends HttpServlet {
                 }
             }
             if (validSlots.isEmpty()) {
-                request.setAttribute("error", "Slot khong hop le. Vui long chon lai!");
+                request.setAttribute("error", "Slot không hợp lệ, Vui lòng chọn lại!");
                 doGet(request, response);
                 return;
             }
@@ -134,12 +134,12 @@ public class DoctorScheduleAddController extends HttpServlet {
                 if (endDateStr != null && !endDateStr.trim().isEmpty()) {
                     LocalDate endDate = LocalDate.parse(endDateStr);
                     if (endDate.isBefore(startDate)) {
-                        request.setAttribute("error", "Ngay ket thuc phai sau ngay bat dau!");
+                        request.setAttribute("error", "Ngày kết thúc phải sau ngày bắt đầu!");
                         doGet(request, response);
                         return;
                     }
                     if (endDate.isBefore(today)) {
-                        request.setAttribute("error", "Khong the them lich lam viec trong qua khu!");
+                        request.setAttribute("error", "Không thể thêm lịch làm việc trong quá khứ!");
                         doGet(request, response);
                         return;
                     }
@@ -177,12 +177,12 @@ public class DoctorScheduleAddController extends HttpServlet {
                 }
 
                 if (repeatEndDate.isBefore(startDate)) {
-                    request.setAttribute("error", "Ngay ket thuc lap lai phai sau ngay bat dau!");
+                    request.setAttribute("error", "Ngày kết thúc lặp lại phải sau ngày bắt đầu!");
                     doGet(request, response);
                     return;
                 }
                 if (repeatEndDate.isBefore(today)) {
-                    request.setAttribute("error", "Khong the them lich lam viec trong qua khu!");
+                    request.setAttribute("error", "Không thể thêm lịch làm việc trong quá khứ!");
                     doGet(request, response);
                     return;
                 }
@@ -218,25 +218,25 @@ public class DoctorScheduleAddController extends HttpServlet {
 
             if (successCount > 0) {
                 String msg = skippedPastTimeSlots
-                        ? "Da them " + successCount + " lich. Mot so slot hom nay da qua gio nen bi bo qua."
-                        : "Da them " + successCount + " lich lam viec thanh cong!";
+                        ? "Đã thêm " + successCount + " lịch. Một số slot hôm nay đã qua giờ nên bị bỏ qua."
+                        : "Đã thêm " + successCount + " lịch làm việc thành công!";
                 session.setAttribute("toastMessage", "success|" + msg);
                 response.sendRedirect(request.getContextPath() + "/admin/doctor/schedule/add");
             } else {
                 if (skippedPastTimeSlots) {
                     request.setAttribute("error", "Không thể thêm slot đã qua giờ ở ngày hôm nay!");
                 } else {
-                    request.setAttribute("error", "Khong the them lich lam viec. Co the lich da ton tai!");
+                    request.setAttribute("error", "Không thể thêm lịch làm việc. Có thể lịch đã tồn tại!");
                 }
                 doGet(request, response);
             }
 
         } catch (NumberFormatException e) {
-            request.setAttribute("error", "Du lieu khong hop le!");
+            request.setAttribute("error", "Dữ liệu không hợp lệ!");
             doGet(request, response);
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Loi he thong: " + e.getMessage());
+            request.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
             doGet(request, response);
         }
     }

@@ -40,7 +40,7 @@ public class vnpayRefund extends HttpServlet {
         String vnp_TxnRef = req.getParameter("order_id");
         long amount = Integer.parseInt(req.getParameter("amount"))*100;
         String vnp_Amount = String.valueOf(amount);
-        String vnp_OrderInfo = "Hoan tien GD OrderId:" + vnp_TxnRef;
+        String vnp_OrderInfo = "Hoàn tiền GD OrderId:" + vnp_TxnRef;
         String vnp_TransactionNo = ""; //Assuming value of the parameter "vnp_TransactionNo" does not exist on your system.
         String vnp_TransactionDate = req.getParameter("trans_date");
         String vnp_CreateBy = req.getParameter("user");

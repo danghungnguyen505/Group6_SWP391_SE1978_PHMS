@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import model.Appointment;
 import model.Pet;
 import model.StaffScheduleVeterinarian;
@@ -37,11 +39,17 @@ import model.User;
 @WebServlet(name = "EmergencyCreateController", urlPatterns = {"/receptionist/emergency/create"})
 public class EmergencyCreateController extends HttpServlet {
 
+    private static final Pattern SHIFT_RANGE_PATTERN = Pattern.compile(
+            "(\\d{1,2}:\\d{2}(?::\\d{2})?\\s*(?:AM|PM)?)\\s*[-]\\s*(\\d{1,2}:\\d{2}(?::\\d{2})?\\s*(?:AM|PM)?)",
+            Pattern.CASE_INSENSITIVE);
+
     private static LocalTime parseToLocalTime(String raw) {
         if (raw == null) {
             return null;
         }
         String t = raw.trim().toUpperCase(Locale.ENGLISH);
+        t = t.replaceAll("\\s+", " ");
+        t = t.replaceAll("(?<=\\d)(AM|PM)$", " $1");
         if (t.isEmpty()) {
             return null;
         }
@@ -72,22 +80,65 @@ public class EmergencyCreateController extends HttpServlet {
         if (shiftTime == null) {
             return null;
         }
+
         String s = shiftTime.trim();
-        if (s.isEmpty() || !s.contains("-")) {
+        if (s.isEmpty()) {
             return null;
         }
-        String[] parts = s.split("\\s*-\\s*");
-        if (parts.length != 2) {
-            return null;
+
+        // Normalize common unicode dash variants.
+        s = s.replace('\u2013', '-').replace('\u2014', '-').replace('\u2212', '-');
+
+        // Support historical shift labels.
+        String sLower = s.toLowerCase(Locale.ENGLISH);
+        if ("morning".equals(sLower) || "buoi sang".equals(sLower)) {
+            return new Time[]{Time.valueOf(LocalTime.of(9, 0)), Time.valueOf(LocalTime.of(12, 0))};
         }
-        LocalTime start = parseToLocalTime(parts[0].trim());
-        LocalTime end = parseToLocalTime(parts[1].trim());
+        if ("afternoon".equals(sLower) || "buoi chieu".equals(sLower)) {
+            return new Time[]{Time.valueOf(LocalTime.of(14, 0)), Time.valueOf(LocalTime.of(17, 0))};
+        }
+
+        Matcher m = SHIFT_RANGE_PATTERN.matcher(s);
+        LocalTime start;
+        LocalTime end;
+        if (m.find()) {
+            start = parseToLocalTime(m.group(1));
+            end = parseToLocalTime(m.group(2));
+        } else {
+            if (!s.contains("-")) {
+                return null;
+            }
+            String[] parts = s.split("\\s*-\\s*");
+            if (parts.length != 2) {
+                return null;
+            }
+            start = parseToLocalTime(parts[0].trim());
+            end = parseToLocalTime(parts[1].trim());
+        }
+
         if (start == null || end == null) {
             return null;
         }
         return new Time[]{Time.valueOf(start), Time.valueOf(end)};
     }
-    
+
+    private static LocalTime getCurrentSlotStart(LocalTime now) {
+        int minute = now.getMinute();
+        int slotMinute = (minute < 30) ? 0 : 30;
+        return now.withMinute(slotMinute).withSecond(0).withNano(0);
+    }
+
+    private static LocalTime getCurrentSlotEnd(LocalTime now) {
+        return getCurrentSlotStart(now).plusMinutes(30);
+    }
+
+    private static boolean isInCurrent30MinSlot(LocalTime scheduleStart, LocalTime scheduleEnd, LocalTime now) {
+        LocalTime slotStart = getCurrentSlotStart(now);
+        LocalTime slotEnd = getCurrentSlotEnd(now);
+        return scheduleStart.isBefore(slotEnd) && scheduleEnd.isAfter(slotStart);
+    }
+
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -99,9 +150,9 @@ public class EmergencyCreateController extends HttpServlet {
         }
         
         UserDAO userDAO = new UserDAO();
-        List<User> vetsAll = userDAO.getEmergencyVeterinarians();
+        List<User> vetsAll = userDAO.getAllVeterinarians();
 
-        // Determine which vets are currently in-shift and busy/available
+        // Determine which vets are in current 30-minute slot and currently free
         Map<Integer, String> vetStatusMap = new HashMap<>();
         Map<Integer, String> vetShiftMap = new HashMap<>();
         Map<Integer, Integer> vetPriorityMap = new HashMap<>(); // 0 available, 1 busy, 2 off-shift
@@ -120,50 +171,42 @@ public class EmergencyCreateController extends HttpServlet {
         }
 
         List<User> vetsSorted = new ArrayList<>();
+        int inShiftCount = 0;
         for (User v : vetsAll) {
-            boolean inShiftNow = false;
-            String shiftLabel = "Đang làm việc";
+            String shiftLabel = "Ca hôm nay";
             List<StaffScheduleVeterinarian> ss = schedulesByVet.get(v.getUserId());
             if (ss == null || ss.isEmpty()) {
-                // Only allow vets who actually have schedule today.
                 continue;
             }
-            if (ss != null && !ss.isEmpty()) {
-                for (StaffScheduleVeterinarian sch : ss) {
-                    Time[] times = parseShiftTimeToSqlTimes(sch.getShiftTime());
-                    if (times != null) {
-                        LocalTime start = times[0].toLocalTime();
-                        LocalTime end = times[1].toLocalTime();
-                        // assume shift does not cross midnight
-                        boolean within = !now.isBefore(start) && now.isBefore(end);
-                        if (within) {
-                            inShiftNow = true;
-                            shiftLabel = start.toString().substring(0, 5) + "-" + end.toString().substring(0, 5);
-                            break;
-                        }
-                        // Keep first shift label for display when not within
-                        if ("Đang làm việc".equals(shiftLabel)) {
-                            shiftLabel = start.toString().substring(0, 5) + "-" + end.toString().substring(0, 5);
-                        }
-                    } else if (sch.getShiftTime() != null) {
-                        shiftLabel = sch.getShiftTime();
+
+            boolean inShiftNow = false;
+            for (StaffScheduleVeterinarian sch : ss) {
+                Time[] times = parseShiftTimeToSqlTimes(sch.getShiftTime());
+                if (times != null) {
+                    LocalTime start = times[0].toLocalTime();
+                    LocalTime end = times[1].toLocalTime();
+                    shiftLabel = start.toString().substring(0, 5) + "-" + end.toString().substring(0, 5);
+                    if (isInCurrent30MinSlot(start, end, now)) {
+                        inShiftNow = true;
+                        break;
                     }
+                } else if (sch.getShiftTime() != null) {
+                    shiftLabel = sch.getShiftTime();
                 }
             }
 
-            String statusLabel;
-            int priority;
             if (!inShiftNow) {
-                // Emergency selection only shows doctors in current shift.
                 continue;
             }
+
+            inShiftCount++;
             boolean busy = apptDAO.isVetBusyNow(v.getUserId());
             if (busy) {
-                // Only show currently free doctors.
                 continue;
             }
-            statusLabel = "Trong ca hien tai";
-            priority = 0;
+
+            String statusLabel = "Trong ca hiện tại";
+            int priority = 0;
             vetStatusMap.put(v.getUserId(), statusLabel);
             vetShiftMap.put(v.getUserId(), shiftLabel);
             vetPriorityMap.put(v.getUserId(), priority);
@@ -178,7 +221,11 @@ public class EmergencyCreateController extends HttpServlet {
         request.setAttribute("vetStatusMap", vetStatusMap);
         request.setAttribute("vetShiftMap", vetShiftMap);
         if (vetsSorted.isEmpty()) {
-            request.setAttribute("error", "Khong co bac si nao dang trong ca hien tai.");
+            if (inShiftCount > 0) {
+                request.setAttribute("error", "Tất cả bác sĩ trong ca hiện tại đang bận.");
+            } else {
+                request.setAttribute("error", "Không có bác sĩ nào trong ca hiện tại.");
+            }
         }
 
         // Lookup pet owner by email (if provided)
@@ -340,7 +387,7 @@ public class EmergencyCreateController extends HttpServlet {
         }
         
         if (!util.ValidationUtils.isNotEmpty(vetIdStr) || !util.ValidationUtils.isIntegerInRange(vetIdStr, 1, Integer.MAX_VALUE)) {
-            request.setAttribute("error", "Vui lòng chọn bác sĩ cấp cứu.");
+            request.setAttribute("error", "Vui lòng chọn bác sĩ.");
             doGet(request, response);
             return;
         }
@@ -364,7 +411,7 @@ public class EmergencyCreateController extends HttpServlet {
         
         int vetId = Integer.parseInt(vetIdStr);
 
-                // Safety check: selected vet must be in current shift and currently free.
+        // Safety check: selected vet must be in current 30-minute slot and currently free.
         StaffScheduleVeterinarianDAO scheduleDAO2 = new StaffScheduleVeterinarianDAO();
         java.sql.Date today2 = java.sql.Date.valueOf(LocalDate.now());
         List<StaffScheduleVeterinarian> todaySchedules2 = scheduleDAO2.getSchedulesByDateRange(today2, today2);
@@ -381,21 +428,21 @@ public class EmergencyCreateController extends HttpServlet {
             }
             LocalTime start = times[0].toLocalTime();
             LocalTime end = times[1].toLocalTime();
-            if (!now2.isBefore(start) && now2.isBefore(end)) {
+            if (isInCurrent30MinSlot(start, end, now2)) {
                 inShiftNow2 = true;
                 break;
             }
         }
 
         if (!inShiftNow2) {
-            request.setAttribute("error", "Bac si duoc chon khong trong ca hien tai.");
+            request.setAttribute("error", "Bác sĩ được chọn không trong ca hiện tại.");
             doGet(request, response);
             return;
         }
 
         AppointmentDAO apptDAOForCheck = new AppointmentDAO();
         if (apptDAOForCheck.isVetBusyNow(vetId)) {
-            request.setAttribute("error", "Bac si duoc chon dang ban, vui long chon bac si khac.");
+            request.setAttribute("error", "Bác sĩ được chọn đang bận, vui lòng chọn bác sĩ khác.");
             doGet(request, response);
             return;
         }

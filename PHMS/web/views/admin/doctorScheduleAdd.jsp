@@ -1,4 +1,5 @@
-﻿<%-- 
+<%@ page pageEncoding="UTF-8" %>
+<%-- 
     Document   : doctorScheduleAdd
     Created on : Jan 22, 2026
     Author     : Auto
@@ -8,7 +9,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="${L}">
 <head>
     <meta charset="UTF-8">
     <title>VetCare Pro - THÊM LỊCH LÀM VIỆC BÁC SĨ</title>
@@ -378,18 +379,18 @@
                 <i class="fa-solid fa-chevron-left"></i>
             </a>
             <div class="title-area">
-                <h1>Thêm Lịch Làm Việc</h1>
-                <p>Thêm lịch làm việc cho bác sĩ với tùy chọn lặp lại</p>
+                <h1>${L == 'en' ? 'Add Work Schedule' : 'Thêm Lịch Làm Việc'}</h1>
+                <p>${L == 'en' ? 'Add doctor work schedules with repeat options' : 'Thêm lịch làm việc cho bác sĩ với tùy chọn lặp lại'}</p>
             </div>
             <div class="header-right">
-                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">Sign Out</a>
+                <a href="${pageContext.request.contextPath}/logout" class="btn-signout">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
             </div>
         </header>
 
         <c:if test="${not empty error}">
             <div class="alert-danger">
                 <i class="fa-solid fa-triangle-exclamation" style="margin-right: 8px;"></i>
-                <strong>Lỗi:</strong> ${error}
+                <strong>${L == 'en' ? 'Error:' : 'Lỗi:'}</strong> ${error}
             </div>
         </c:if>
 
@@ -409,9 +410,9 @@
         <div class="form-container">
             <form action="${pageContext.request.contextPath}/admin/doctor/schedule/add" method="post" id="scheduleForm">
                 <div class="form-group">
-                    <label class="form-label">Chọn Bác Sĩ *</label>
+                    <label class="form-label">${L == 'en' ? 'Select Doctor' : 'Chọn Bác Sĩ'} *</label>
                     <select name="doctorId" class="form-input" required>
-                        <option value="">-- Chọn bác sĩ --</option>
+                        <option value="">${L == 'en' ? '-- Select doctor --' : '-- Chọn bác sĩ --'}</option>
                         <c:forEach var="vet" items="${veterinarians}">
                             <option value="${vet.userId}">${vet.fullName}</option>
                         </c:forEach>
@@ -420,27 +421,27 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Ngày Bắt Đầu *</label>
+                        <label class="form-label">${L == 'en' ? 'Start Date' : 'Ngày Bắt Đầu'} *</label>
                         <input type="date" name="startDate" class="form-input" required value="${prefillDate}">
-                        <p class="info-text">Ngày bắt đầu làm việc</p>
+                        <p class="info-text">${L == 'en' ? 'Work start date' : 'Ngày bắt đầu làm việc'}</p>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Ngày Kết Thúc (Tùy chọn)</label>
+                        <label class="form-label">${L == 'en' ? 'End Date (Optional)' : 'Ngày Kết Thúc (Tùy chọn)'}</label>
                         <input type="date" name="endDate" class="form-input" id="endDate">
-                        <p class="info-text">Để trống nếu chỉ thêm 1 ngày</p>
+                        <p class="info-text">${L == 'en' ? 'Leave blank if adding only 1 day' : 'Để trống nếu chỉ thêm 1 ngày'}</p>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Chọn Slot Làm Việc *</label>
-                    <p class="info-text">Chọn buổi làm việc (Sáng: 09:00 - 12:00, Chiều: 14:00 - 17:00).</p>
+                    <label class="form-label">${L == 'en' ? 'Select Working Slots' : 'Chọn Slot Làm Việc'} *</label>
+                    <p class="info-text">${L == 'en' ? 'Choose work sessions (Morning: 09:00 - 12:00, Afternoon: 14:00 - 17:00).' : 'Chọn buổi làm việc (Sáng: 09:00 - 12:00, Chiều: 14:00 - 17:00).'}</p>
 
                     <div class="shift-selector" style="display: flex; gap: 20px; margin-top: 15px;">
                         <div class="shift-option" style="flex: 1;">
                             <input type="checkbox" id="shiftMorning" class="shift-checkbox" style="display:none;">
                             <label for="shiftMorning" class="shift-label" style="display:block; padding: 20px; border: 2px solid #edf2f7; border-radius: 12px; text-align: center; cursor: pointer; font-weight: 700; color: #64748b; transition: 0.2s;">
                                 <i class="fa-solid fa-sun" style="font-size: 24px; color: #fbbf24; margin-bottom: 10px; display: block;"></i>
-                                Buổi Sáng<br>
+                                ${L == 'en' ? 'Morning' : 'Buổi Sáng'}<br>
                                 <span style="font-size: 11px; font-weight: 500;">09:00 AM - 12:00 PM</span>
                             </label>
                         </div>
@@ -448,7 +449,7 @@
                             <input type="checkbox" id="shiftAfternoon" class="shift-checkbox" style="display:none;">
                             <label for="shiftAfternoon" class="shift-label" style="display:block; padding: 20px; border: 2px solid #edf2f7; border-radius: 12px; text-align: center; cursor: pointer; font-weight: 700; color: #64748b; transition: 0.2s;">
                                 <i class="fa-solid fa-cloud-moon" style="font-size: 24px; color: #818cf8; margin-bottom: 10px; display: block;"></i>
-                                Buổi Chiều<br>
+                                ${L == 'en' ? 'Afternoon' : 'Buổi Chiều'}<br>
                                 <span style="font-size: 11px; font-weight: 500;">02:00 PM - 05:00 PM</span>
                             </label>
                         </div>
@@ -463,10 +464,10 @@
 
                     <div class="slot-toolbar" style="display:none;">
                         <div class="slot-actions">
-                            <button type="button" class="btn-mini" id="btnSelectAll">Chọn tất cả</button>
-                            <button type="button" class="btn-mini" id="btnClearAll">Bỏ chọn</button>
+                            <button type="button" class="btn-mini" id="btnSelectAll">${L == 'en' ? 'Select all' : 'Chọn tất cả'}</button>
+                            <button type="button" class="btn-mini" id="btnClearAll">${L == 'en' ? 'Clear' : 'Bỏ chọn'}</button>
                         </div>
-                        <div class="info-text" id="slotCounter" style="margin-top:0;">Đã chọn: 0 slot</div>
+                        <div class="info-text" id="slotCounter" style="margin-top:0;">${L == 'en' ? 'Selected: 0 slots' : 'Đã chọn: 0 slot'}</div>
                     </div>
 
                     <div class="slot-grid" id="slotGrid" style="display:none;">
@@ -480,38 +481,38 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Lặp Lại</label>
+                    <label class="form-label">${L == 'en' ? 'Repeat' : 'Lặp Lại'}</label>
                     <div class="repeat-options">
                         <div class="repeat-option">
                             <input type="radio" name="repeatType" value="none" id="repeatNone" checked>
-                            <label for="repeatNone">Không lặp</label>
+                            <label for="repeatNone">${L == 'en' ? 'No repeat' : 'Không lặp'}</label>
                         </div>
                         <div class="repeat-option">
                             <input type="radio" name="repeatType" value="daily" id="repeatDaily">
-                            <label for="repeatDaily">Hàng Ngày</label>
+                            <label for="repeatDaily">${L == 'en' ? 'Daily' : 'Hàng Ngày'}</label>
                         </div>
                         <div class="repeat-option">
                             <input type="radio" name="repeatType" value="weekly" id="repeatWeekly">
-                            <label for="repeatWeekly">Hàng Tuần</label>
+                            <label for="repeatWeekly">${L == 'en' ? 'Weekly' : 'Hàng Tuần'}</label>
                         </div>
                         <div class="repeat-option">
                             <input type="radio" name="repeatType" value="monthly" id="repeatMonthly">
-                            <label for="repeatMonthly">Hàng Tháng</label>
+                            <label for="repeatMonthly">${L == 'en' ? 'Monthly' : 'Hàng Tháng'}</label>
                         </div>
                     </div>
                 </div>
 
                 <div class="repeat-end-date-group" id="repeatEndDateGroup">
                     <div class="form-group">
-                        <label class="form-label">Lặp Đến Ngày *</label>
+                        <label class="form-label">${L == 'en' ? 'Repeat Until' : 'Lặp Đến Ngày'} *</label>
                         <input type="date" name="repeatEndDate" class="form-input" id="repeatEndDate">
-                        <p class="info-text">Lịch sẽ được tạo tự động đến ngày này</p>
+                        <p class="info-text">${L == 'en' ? 'Schedules will be generated automatically until this date' : 'Lịch sẽ được tạo tự động đến ngày này'}</p>
                     </div>
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="btn-submit">Thêm Lịch Làm Việc</button>
-                    <a href="${pageContext.request.contextPath}/admin/dashboard" class="btn-cancel">Hủy</a>
+                    <button type="submit" class="btn-submit">${L == 'en' ? 'Add Work Schedule' : 'Thêm Lịch Làm Việc'}</button>
+                    <a href="${pageContext.request.contextPath}/admin/dashboard" class="btn-cancel">${L == 'en' ? 'Cancel' : 'Hủy'}</a>
                 </div>
             </form>
         </div>
@@ -598,7 +599,7 @@
                 const checked = document.querySelectorAll('input[name="slots"]:checked').length;
                 if (checked === 0) {
                     e.preventDefault();
-                    alert('Vui lòng chọn ít nhất 1 slot làm việc!');
+                    alert("${L == 'en' ? 'Please select at least 1 working slot!' : 'Vui lòng chọn ít nhất 1 slot làm việc!'}");
                 }
             });
         }
@@ -611,3 +612,4 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+

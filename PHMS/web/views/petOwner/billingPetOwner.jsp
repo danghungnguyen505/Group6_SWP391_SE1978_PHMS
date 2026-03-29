@@ -6,7 +6,7 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html>
+<html lang="${L}">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Billing</title>
@@ -22,9 +22,7 @@
         <main class="main-content">
             <!-- Top Header (Sign Out) -->
             <header class="top-bar">
-                <a href="${pageContext.request.contextPath}/logout" class="btn btn-dark" style="background-color: #ef4444; border-color: #ef4444;">
-                    Logout
-                </a>
+                <a href="${pageContext.request.contextPath}/logout" class="btn btn-dark" style="background-color: #ef4444; border-color: #ef4444;">${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
             </header>
             <!-- Page Title Section -->
             <div class="page-header">
@@ -169,4 +167,5 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+
 

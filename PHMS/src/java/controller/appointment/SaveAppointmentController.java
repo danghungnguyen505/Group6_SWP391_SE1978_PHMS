@@ -19,6 +19,7 @@ import model.Appointment;
 import model.User;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.util.Locale;
 
 /**
  *
@@ -26,6 +27,14 @@ import java.time.LocalDate;
  */
 @WebServlet(name = "SaveAppointmentController", urlPatterns = {"/save-appointment"})
 public class SaveAppointmentController extends HttpServlet {
+    
+    private boolean shouldBlockByLeaveStatus(String leaveStatus) {
+        if (leaveStatus == null) {
+            return false;
+        }
+        String s = leaveStatus.trim().toUpperCase(Locale.ENGLISH);
+        return "PENDING".equals(s) || "APPROVED".equals(s);
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -105,14 +114,14 @@ public class SaveAppointmentController extends HttpServlet {
             int vetId = Integer.parseInt(vetIdStr);
             UserDAO userDAOForBooking = new UserDAO();
             if (!userDAOForBooking.isBookableVeterinarianForOwner(vetId)) {
-                session.setAttribute("toastMessage", "error|Khong the dat lich voi bac si cap cuu. Vui long chon bac si khac.");
+                session.setAttribute("toastMessage", "error|Không thể đặt lịch với bác sĩ cấp cứu. Vui lòng chọn bác sĩ khác.");
                 response.sendRedirect(request.getContextPath() + "/booking?selectedDate=" + dateStr);
                 return;
             }
             java.sql.Date sqlDate = java.sql.Date.valueOf(dateStr);
             ScheduleVeterianrianDAO scheduleDao = new ScheduleVeterianrianDAO();
             String leaveStatus = scheduleDao.getLeaveStatusByEmpAndDate(vetId, sqlDate);
-            if (leaveStatus != null) {
+            if (shouldBlockByLeaveStatus(leaveStatus)) {
                 session.setAttribute("toastMessage", "error|Bác sĩ đã đăng ký nghỉ trong ngày này, vui lòng chọn ngày hoặc bác sĩ khác.");
                 response.sendRedirect(request.getContextPath() + "/booking?selectedDate=" + dateStr + "&vetId=" + vetIdStr);
                 return;

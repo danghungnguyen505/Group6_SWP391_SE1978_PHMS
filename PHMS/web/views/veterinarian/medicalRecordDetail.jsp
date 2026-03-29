@@ -2,7 +2,7 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
-<html>
+<html lang="${L}">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>VetCare Pro - Medical Record Detail</title>
@@ -588,8 +588,7 @@
                     <p>Medical record information</p>
                     </div>
                 <a href="${pageContext.request.contextPath}/logout" class="btn-signout">
-                    <i class="fa-solid fa-right-from-bracket"></i> Sign Out
-                </a>
+                    <i class="fa-solid fa-right-from-bracket"></i>${L == 'en' ? 'Logout' : 'Đăng xuất'}</a>
             </div>
 
             <c:if test="${empty record}">
@@ -825,7 +824,7 @@ Doctor Note: ${h.treatmentPlan}</textarea>
                                         <form method="get" action="${pageContext.request.contextPath}/veterinarian/emr/detail" style="display:flex; align-items:center; gap:8px;">
                                             <input type="hidden" name="id" value="${record.recordId}" />
                                             <input type="hidden" name="historyPage" value="1" />
-                                            <span style="font-size:12px; color:#64748b; font-weight:700;">Hiển thị</span>
+                                            <span style="font-size:12px; color:#64748b; font-weight:700;">${L == 'en' ? 'Showing' : 'Hiển thị'}</span>
                                             <select name="historySize" onchange="this.form.submit()" style="padding:6px 10px; border:1px solid #d1d5db; border-radius:8px; font-size:12px;">
                                                 <option value="5" ${historyPageSize == 5 ? 'selected' : ''}>5</option>
                                                 <option value="10" ${historyPageSize == 10 ? 'selected' : ''}>10</option>
@@ -1062,7 +1061,7 @@ Doctor Note: ${h.treatmentPlan}</textarea>
 
                                         <div class="btn-row">
                                             <button type="button" class="btn-action btn-add-medicine" onclick="addPrescriptionItem()">
-                                                <i class="fa-solid fa-plus"></i> Add Another Medicine
+                                                <i class="fa-solid fa-plus"></i> ${L == 'en' ? 'Add Another Medicine' : 'Thêm thuốc khác'}
                                             </button>
                                         </div>
 
@@ -1249,5 +1248,6 @@ window.__PHMS_ACCOUNT.fullName = "${sessionScope.account.fullName}";
 <script src="${pageContext.request.contextPath}/assets/js/account-menu.js"></script>
 </body>
 </html>
+
 
 
